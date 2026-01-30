@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Quick Login</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.75rem;
+        }
+        p {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        button {
+            background: #6c0b1a;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        button:hover {
+            background: #8b0d22;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 11, 26, 0.3);
+        }
+        .credentials {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+        .credentials p {
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+            color: #333;
+        }
+        .credentials strong {
+            color: #6c0b1a;
+        }
+        .success {
+            color: #10b981;
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Admin Dashboard Access</h1>
+        <p>Click the button below to automatically login as admin and access the dashboard.</p>
+        
+        <div class="credentials">
+            <p><strong>Email:</strong> admin@photographar.com</p>
+            <p><strong>Role:</strong> Super Admin</p>
+        </div>
+        
+        <button onclick="quickLogin()">Quick Login & Access Dashboard</button>
+        
+        <p class="success" id="success">✓ Logged in! Redirecting...</p>
+    </div>
+
+    <script>
+        function quickLogin() {
+            // Set auth token
+            localStorage.setItem('auth_token', '5|iSSMQmtqF2OoZiY7ircJEye6bji7fKKTYQ7uPvz44029aa29');
+            
+            // Set user data
+            localStorage.setItem('user', JSON.stringify({
+                id: 1,
+                name: 'Admin Rahman',
+                email: 'admin@photographar.com',
+                role: 'super_admin'
+            }));
+            
+            // Show success message
+            document.getElementById('success').style.display = 'block';
+            
+            // Redirect to admin dashboard after 1 second
+            setTimeout(() => {
+                window.location.href = '/admin/dashboard';
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

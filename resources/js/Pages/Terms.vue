@@ -1,0 +1,223 @@
+<template>
+  <div class="min-h-screen bg-gray-50 py-12">
+    <div class="container mx-auto px-4 max-w-4xl">
+      <h1 class="text-4xl font-bold mb-8">Terms of Service</h1>
+
+      <div class="bg-white rounded-lg shadow-lg p-8 space-y-6">
+        <div class="text-sm text-gray-600 mb-6">
+          <strong>Last Updated:</strong> January 2025
+        </div>
+
+        <!-- Introduction -->
+        <section>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">1. Acceptance of Terms</h2>
+          <p class="text-gray-700 mb-4">
+            Welcome to Photographer SB. By accessing or using our platform, you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use our services.
+          </p>
+          <p class="text-gray-700">
+            These Terms constitute a legally binding agreement between you and Photographer SB. We reserve the right to modify these Terms at any time, and your continued use constitutes acceptance of such modifications.
+          </p>
+        </section>
+
+        <!-- User Accounts -->
+        <section>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">2. User Accounts</h2>
+          
+          <h3 class="text-lg font-bold mb-2">Account Registration</h3>
+          <p class="text-gray-700 mb-3">To use certain features, you must create an account. You agree to:</p>
+          <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4 ml-4">
+            <li>Provide accurate, current, and complete information</li>
+            <li>Maintain and update your information to keep it accurate</li>
+            <li>Maintain the security of your password</li>
+            <li>Accept responsibility for all activities under your account</li>
+            <li>Notify us immediately of any unauthorized use</li>
+          </ul>
+
+          <h3 class="text-lg font-bold mb-2">Account Types</h3>
+          <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+            <li><strong>Client Account:</strong> For users seeking photography services</li>
+            <li><strong>Photographer Account:</strong> For professionals offering services (subject to verification)</li>
+          </ul>
+        </section>
+
+        <!-- Services -->
+        <section>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">3. Services Provided</h2>
+          <p class="text-gray-700 mb-3">
+            Photographer SB is a marketplace platform that connects photographers with clients. We provide:
+          </p>
+          <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+            <li>A platform for photographers to showcase their work and services</li>
+            <li>Tools for clients to search, compare, and contact photographers</li>
+            <li>Booking and payment processing services</li>
+            <li>Communication tools between clients and photographers</li>
+            <li>Rating and review systems</li>
+          </ul>
+          <p class="text-gray-700 mt-3">
+            <strong>Important:</strong> Photographer SB is not a party to the agreements between clients and photographers. We do not provide photography services directly.
+          </p>
+        </section>
+
+        <!-- Client Obligations -->
+        <section>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">4. Client Obligations</h2>
+          <p class="text-gray-700 mb-3">As a client, you agree to:</p>
+          <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+            <li>Provide accurate booking information (date, location, requirements)</li>
+            <li>Communicate clearly and professionally with photographers</li>
+            <li>Make payments as agreed for confirmed bookings</li>
+            <li>Honor cancellation policies set by photographers</li>
+            <li>Treat photographers with respect and professionalism</li>
+            <li>Provide honest and fair reviews based on actual experiences</li>
+          </ul>
+        </section>
+
+        <!-- Photographer Obligations -->
+        <section>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">5. Photographer Obligations</h2>
+          <p class="text-gray-700 mb-3">As a photographer, you agree to:</p>
+          <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+            <li>Maintain accurate profile information, portfolio, and pricing</li>
+            <li>Respond to inquiries in a timely and professional manner</li>
+            <li>Provide services as described and agreed upon</li>
+            <li>Deliver work within agreed timelines</li>
+            <li>Maintain necessary licenses, permits, and insurance</li>
+            <li>Honor your cancellation and refund policies</li>
+            <li>Communicate professionally with clients</li>
+            <li>Pay applicable platform fees and commissions</li>
+          </ul>
+        </section>
+
+        <!-- Payments -->
+        <section>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">6. Payments and Fees</h2>
+          
+          <h3 class="text-lg font-bold mb-2">Client Payments</h3>
+          <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4 ml-4">
+            <li>Payments must be made through our secure payment platform</li>
+            <li>You are responsible for applicable taxes and fees</li>
+            <li>Refunds are subject to photographer cancellation policies</li>
+          </ul>
+
+          <h3 class="text-lg font-bold mb-2">Photographer Commissions</h3>
+          <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+            <li>Photographers pay a 10-15% commission on completed bookings</li>
+            <li>Payments are transferred within 3-5 business days after project completion</li>
+            <li>Detailed transaction history available in your dashboard</li>
+          </ul>
+        </section>
+
+        <!-- Prohibited Conduct -->
+        <section>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">7. Prohibited Conduct</h2>
+          <p class="text-gray-700 mb-3">You may not:</p>
+          <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+            <li>Use the platform for any illegal purpose</li>
+            <li>Impersonate another person or entity</li>
+            <li>Post false, misleading, or fraudulent content</li>
+            <li>Harass, abuse, or harm other users</li>
+            <li>Attempt to circumvent platform fees</li>
+            <li>Scrape or harvest data from the platform</li>
+            <li>Interfere with platform security or functionality</li>
+            <li>Upload viruses or malicious code</li>
+            <li>Infringe on intellectual property rights</li>
+          </ul>
+        </section>
+
+        <!-- Content -->
+        <section>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">8. User Content and Intellectual Property</h2>
+          
+          <h3 class="text-lg font-bold mb-2">Your Content</h3>
+          <p class="text-gray-700 mb-3">
+            You retain ownership of content you post (photos, descriptions, reviews). By posting, you grant Photographar a non-exclusive license to use, display, and distribute your content on our platform.
+          </p>
+
+          <h3 class="text-lg font-bold mb-2">Platform Content</h3>
+          <p class="text-gray-700">
+            All platform design, logos, and functionality are owned by Photographar and protected by intellectual property laws. You may not copy or reproduce platform elements without permission.
+          </p>
+        </section>
+
+        <!-- Liability -->
+        <section>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">9. Disclaimer and Limitation of Liability</h2>
+          
+          <p class="text-gray-700 mb-3">
+            <strong>Disclaimer:</strong> Photographer SB is provided "as is" without warranties of any kind. We do not guarantee:
+          </p>
+          <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4 ml-4">
+            <li>Photographer quality, reliability, or performance</li>
+            <li>Uninterrupted or error-free service</li>
+            <li>Accuracy of user-provided information</li>
+          </ul>
+
+          <p class="text-gray-700 mb-3">
+            <strong>Limitation of Liability:</strong> To the maximum extent permitted by law, Photographer SB shall not be liable for:
+          </p>
+          <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+            <li>Indirect, incidental, or consequential damages</li>
+            <li>Loss of profits, data, or opportunities</li>
+            <li>Disputes between users and photographers</li>
+            <li>Third-party actions or content</li>
+          </ul>
+        </section>
+
+        <!-- Disputes -->
+        <section>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">10. Dispute Resolution</h2>
+          <p class="text-gray-700 mb-3">
+            In case of disputes:
+          </p>
+          <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+            <li>First, contact the other party directly to resolve</li>
+            <li>If unresolved, contact Photographer SB support for mediation</li>
+            <li>Legal disputes shall be governed by the laws of Bangladesh</li>
+            <li>Jurisdiction shall be in the courts of Dhaka, Bangladesh</li>
+          </ul>
+        </section>
+
+        <!-- Termination -->
+        <section>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">11. Termination</h2>
+          <p class="text-gray-700 mb-3">
+            We may suspend or terminate your account if you:
+          </p>
+          <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+            <li>Violate these Terms</li>
+            <li>Engage in fraudulent activity</li>
+            <li>Harm other users or the platform</li>
+          </ul>
+          <p class="text-gray-700 mt-3">
+            You may terminate your account at any time through your dashboard settings. Termination does not affect existing contractual obligations.
+          </p>
+        </section>
+
+        <!-- Changes -->
+        <section>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">12. Changes to Terms</h2>
+          <p class="text-gray-700">
+            We may modify these Terms at any time. Significant changes will be notified via email or platform notice. Your continued use after changes constitutes acceptance of the modified Terms.
+          </p>
+        </section>
+
+        <!-- Contact -->
+        <section class="border-t pt-6">
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">13. Contact Information</h2>
+          <p class="text-gray-700 mb-3">
+            Questions about these Terms? Contact us:
+          </p>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-gray-700"><strong>Email:</strong> <a href="mailto:legal@photographersb.com" class="text-burgundy hover:underline">legal@photographersb.com</a></p>
+            <p class="text-gray-700"><strong>Support:</strong> <a href="mailto:support@photographersb.com" class="text-burgundy hover:underline">support@photographersb.com</a></p>
+            <p class="text-gray-700"><strong>Address:</strong> Dhaka, Bangladesh</p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+// Terms of Service Page
+</script>

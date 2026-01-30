@@ -1,0 +1,15 @@
+{
+  "name": "Photographar - Photography Marketplace Bangladesh",
+  "short_name": "Photographar",
+  "description": "Bangladesh's premier photography marketplace connecting professional photographers with clients",
+  "icons": [],
+  "theme_color": "#8E0E3F",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "categories": ["photography", "marketplace", "business"],
+  "lang": "en",
+  "dir": "ltr"
+}

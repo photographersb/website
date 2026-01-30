@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard Links Checker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 3rem;
+        }
+        h1 {
+            color: #6c0b1a;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+        .section {
+            margin: 2rem 0;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #6c0b1a;
+        }
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .link-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: white;
+        }
+        .link-card:hover {
+            border-color: #6c0b1a;
+            background: #fef2f2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 11, 26, 0.1);
+        }
+        .link-icon {
+            width: 40px;
+            height: 40px;
+            background: #6c0b1a;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        .link-info {
+            flex: 1;
+        }
+        .link-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+        .link-path {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-family: 'Courier New', monospace;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status-placeholder {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .auth-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        .auth-info h3 {
+            color: #1e40af;
+            margin-bottom: 0.5rem;
+        }
+        .auth-info p {
+            color: #1e3a8a;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+        .test-all-btn {
+            background: #6c0b1a;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin: 2rem auto;
+        }
+        .test-all-btn:hover {
+            background: #4a070f;
+            transform: scale(1.05);
+        }
+        .legend {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Admin Dashboard Links Checker</h1>
+        <p class="subtitle">Comprehensive verification of all admin navigation routes</p>
+
+        <div class="auth-info">
+            <h3>🔒 Authentication Required</h3>
+            <p><strong>Token:</strong> Stored in localStorage as 'auth_token'</p>
+            <p><strong>Admin Access:</strong> All routes require super_admin role</p>
+            <p><strong>Quick Login:</strong> <a href="/admin-login.html" style="color: #6c0b1a; font-weight: 600;">Click here to authenticate</a></p>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">📊 Main Dashboard</h2>
+            <div class="links-grid">
+                <a href="/admin/dashboard" class="link-card">
+                    <div class="link-icon">📈</div>
+                    <div class="link-info">
+                        <div class="link-title">Admin Dashboard</div>
+                        <div class="link-path">/admin/dashboard</div>
+                    </div>
+                    <span class="status-badge status-active">Active</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">👥 User Management</h2>
+            <div class="links-grid">
+                <a href="/admin/users" class="link-card">
+                    <div class="link-icon">👤</div>
+                    <div class="link-info">
+                        <div class="link-title">Manage Users</div>
+                        <div class="link-path">/admin/users</div>
+                    </div>
+                    <span class="status-badge status-active">Active</span>
+                </a>
+                <a href="/admin/photographers" class="link-card">
+                    <div class="link-icon">📷</div>
+                    <div class="link-info">
+                        <div class="link-title">Photographers</div>
+                        <div class="link-path">/admin/photographers</div>
+                    </div>
+                    <span class="status-badge status-active">Active</span>
+                </a>
+                <a href="/admin/verifications" class="link-card">
+                    <div class="link-icon">✅</div>
+                    <div class="link-info">
+                        <div class="link-title">Verifications</div>
+                        <div class="link-path">/admin/verifications</div>
+                    </div>
+                    <span class="status-badge status-active">Active</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">📅 Bookings & Reviews</h2>
+            <div class="links-grid">
+                <a href="/admin/bookings" class="link-card">
+                    <div class="link-icon">📋</div>
+                    <div class="link-info">
+                        <div class="link-title">Bookings</div>
+                        <div class="link-path">/admin/bookings</div>
+                    </div>
+                    <span class="status-badge status-active">Active</span>
+                </a>
+                <a href="/admin/reviews" class="link-card">
+                    <div class="link-icon">⭐</div>
+                    <div class="link-info">
+                        <div class="link-title">Reviews</div>
+                        <div class="link-path">/admin/reviews</div>
+                    </div>
+                    <span class="status-badge status-active">Active</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">🎭 Events & Competitions</h2>
+            <div class="links-grid">
+                <a href="/admin/competitions" class="link-card">
+                    <div class="link-icon">🏆</div>
+                    <div class="link-info">
+                        <div class="link-title">Competitions</div>
+                        <div class="link-path">/admin/competitions</div>
+                    </div>
+                    <span class="status-badge status-active">Active</span>
+                </a>
+                <a href="/admin/events" class="link-card">
+                    <div class="link-icon">📅</div>
+                    <div class="link-info">
+                        <div class="link-title">Events</div>
+                        <div class="link-path">/admin/events</div>
+                    </div>
+                    <span class="status-badge status-active">Active</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">💰 Financial Management</h2>
+            <div class="links-grid">
+                <a href="/admin/transactions" class="link-card">
+                    <div class="link-icon">💳</div>
+                    <div class="link-info">
+                        <div class="link-title">Transactions</div>
+                        <div class="link-path">/admin/transactions</div>
+                    </div>
+                    <span class="status-badge status-active">Active</span>
+                </a>
+                <a href="/admin/payments" class="link-card">
+                    <div class="link-icon">💰</div>
+                    <div class="link-info">
+                        <div class="link-title">Payments</div>
+                        <div class="link-path">/admin/payments</div>
+                    </div>
+                    <span class="status-badge status-active">Active</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">⚙️ System Management</h2>
+            <div class="links-grid">
+                <a href="/admin/settings" class="link-card">
+                    <div class="link-icon">⚙️</div>
+                    <div class="link-info">
+                        <div class="link-title">Settings</div>
+                        <div class="link-path">/admin/settings</div>
+                    </div>
+                    <span class="status-badge status-active">Active</span>
+                </a>
+                <a href="/admin/audit-logs" class="link-card">
+                    <div class="link-icon">📝</div>
+                    <div class="link-info">
+                        <div class="link-title">Audit Logs</div>
+                        <div class="link-path">/admin/audit-logs</div>
+                    </div>
+                    <span class="status-badge status-active">Active</span>
+                </a>
+            </div>
+        </div>
+
+        <button class="test-all-btn" onclick="testAllLinks()">🚀 Test All Links (Opens in New Tabs)</button>
+
+        <div class="legend">
+            <div class="legend-item">
+                <span class="status-badge status-active">Active</span>
+                <span>All routes now have dedicated components!</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function testAllLinks() {
+            const links = [
+                '/admin/dashboard',
+                '/admin/users',
+                '/admin/photographers',
+                '/admin/verifications',
+                '/admin/bookings',
+                '/admin/reviews',
+                '/admin/competitions',
+                '/admin/events',
+                '/admin/transactions',
+                '/admin/payments',
+                '/admin/settings',
+                '/admin/audit-logs'
+            ];
+
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                alert('⚠️ No authentication token found!\n\nPlease login first at: /admin-login.html');
+                window.location.href = '/admin-login.html';
+                return;
+            }
+
+            let delay = 0;
+            links.forEach((link, index) => {
+                setTimeout(() => {
+                    window.open(link, `_blank_${index}`);
+                }, delay);
+                delay += 300; // Stagger opening by 300ms
+            });
+
+            alert(`✅ Opening ${links.length} links in new tabs!\n\nCheck each tab to verify the routes work correctly.`);
+        }
+
+        // Check authentication status on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('auth_token');
+            const authInfo = document.querySelector('.auth-info');
+            
+            if (token) {
+                authInfo.style.background = '#d1fae5';
+                authInfo.style.borderColor = '#6ee7b7';
+                authInfo.querySelector('h3').textContent = '✅ Authenticated';
+                authInfo.querySelector('h3').style.color = '#065f46';
+                authInfo.querySelector('p').innerHTML = '<strong>Status:</strong> Logged in as admin<br><strong>Token:</strong> ' + token.substring(0, 20) + '...';
+            }
+        });
+    </script>
+</body>
+</html>

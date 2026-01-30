@@ -1,0 +1,85 @@
+# Dependencies
+/node_modules
+/vendor
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.backup
+.env.*.php
+.env.php
+
+# Storage
+/storage/*.key
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+!/storage/framework/.gitignore
+!/storage/logs/.gitignore
+
+# Public storage
+/public/storage
+/public/hot
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+.phpunit.result.cache
+coverage/
+
+# Lock files (optional - remove if you want reproducible builds)
+# composer.lock
+# package-lock.json
+# yarn.lock
+
+# Deployment packages and backups
+*.zip
+*.tar.gz
+*.bak
+*.tmp
+deployment-package/
+deployment-package.zip
+PhotographerSB_COMPLETE.zip
+*_backup
+*_old
+
+# Database dumps
+*.sql
+database_export.sql
+
+# Build outputs (uncomment if building on server)
+# /public/build/*
+# !/public/build/.gitignore
+
+# Documentation (keep essential ones only)
+# Uncomment to exclude all markdown files except README
+# *.md
+# !README.md
+
+# Scripts
+*.bat
+FTP_Upload.*
+
+# Vite temp files
+vite.config.js.timestamp-*
+
+# Laravel specific
+.phpunit.result.cache
+.php-cs-fixer.cache

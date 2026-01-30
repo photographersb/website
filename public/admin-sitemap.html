@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Sitemap - Photographar SB</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #8E0E3F;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #8E0E3F 0%, #6F112D 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card h3 {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        .stat-card p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        .section {
+            background: #f9f9f9;
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+        }
+        .section h2 {
+            color: #8E0E3F;
+            margin-bottom: 15px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-icon {
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+        }
+        .links {
+            list-style: none;
+        }
+        .links li {
+            margin-bottom: 12px;
+        }
+        .links a {
+            color: #333;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.2s;
+        }
+        .links a:hover {
+            background: #8E0E3F;
+            color: white;
+            transform: translateX(5px);
+            border-color: #8E0E3F;
+        }
+        .links a::before {
+            content: '→';
+            font-weight: bold;
+            opacity: 0.6;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: auto;
+        }
+        .badge-primary {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        .badge-success {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+        .badge-warning {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        .badge-danger {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+        .public-section {
+            grid-column: 1 / -1;
+            background: #e8f5e9;
+            border-color: #4caf50;
+        }
+        .public-section h2 {
+            color: #2e7d32;
+        }
+        .test-all {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #8E0E3F;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(142, 14, 63, 0.3);
+            transition: all 0.3s;
+        }
+        .test-all:hover {
+            background: #6F112D;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(142, 14, 63, 0.4);
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗺️ Photographar Admin Sitemap</h1>
+        <p class="subtitle">Comprehensive testing map for all admin routes and features</p>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card">
+                <h3>6</h3>
+                <p>Active Competitions</p>
+            </div>
+            <div class="stat-card">
+                <h3>84</h3>
+                <p>Total Submissions</p>
+            </div>
+            <div class="stat-card">
+                <h3>19</h3>
+                <p>Pending Review</p>
+            </div>
+            <div class="stat-card">
+                <h3>65</h3>
+                <p>Approved Submissions</p>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Main Dashboard -->
+            <div class="section">
+                <h2>📊 Main Dashboard</h2>
+                <ul class="links">
+                    <li><a href="/admin/dashboard">Admin Dashboard <span class="badge badge-primary">Main</span></a></li>
+                    <li><a href="/dashboard">Photographer Dashboard <span class="badge badge-success">User</span></a></li>
+                    <li><a href="/notifications">Notifications Inbox <span class="badge badge-warning">Alerts</span></a></li>
+                    <li><a href="/transactions">Transaction History <span class="badge badge-primary">Finance</span></a></li>
+                </ul>
+            </div>
+
+            <!-- Competitions Management -->
+            <div class="section">
+                <h2>🏆 Competitions</h2>
+                <ul class="links">
+                    <li><a href="/admin/competitions">Competitions Index <span class="badge badge-primary">List</span></a></li>
+                    <li><a href="/admin/competitions/create">Create Competition <span class="badge badge-success">New</span></a></li>
+                    <li><a href="/admin/competitions/1/edit">Edit Competition #1 <span class="badge badge-warning">Edit</span></a></li>
+                    <li><a href="/admin/competitions/2/edit">Edit Competition #2 <span class="badge badge-warning">Edit</span></a></li>
+                    <li><a href="/admin/competitions/1/submissions">Competition #1 Submissions <span class="badge badge-primary">Review</span></a></li>
+                </ul>
+            </div>
+
+            <!-- Submissions Management -->
+            <div class="section">
+                <h2>📸 Submissions</h2>
+                <ul class="links">
+                    <li><a href="/admin/competitions/submissions">All Submissions <span class="badge badge-primary">19 Pending</span></a></li>
+                    <li><a href="/competitions/bangladesh-wildlife-photography-competition-2026/submissions/1">Submission Detail #1 <span class="badge badge-success">View</span></a></li>
+                    <li><a href="/competitions/best-wedding-photographer-bangladesh/gallery">Gallery View <span class="badge badge-primary">Public</span></a></li>
+                </ul>
+            </div>
+
+            <!-- Events Management -->
+            <div class="section">
+                <h2>📅 Events</h2>
+                <ul class="links">
+                    <li><a href="/admin/events">Events Index <span class="badge badge-primary">List</span></a></li>
+                    <li><a href="/admin/events/create">Create Event <span class="badge badge-success">New</span></a></li>
+                    <li><a href="/admin/events/edit/1">Edit Event #1 <span class="badge badge-warning">Edit</span></a></li>
+                </ul>
+            </div>
+
+            <!-- Users & Photographers -->
+            <div class="section">
+                <h2>👥 Users & Photographers</h2>
+                <ul class="links">
+                    <li><a href="/admin/users">All Users <span class="badge badge-primary">Manage</span></a></li>
+                    <li><a href="/admin/photographers">All Photographers <span class="badge badge-primary">List</span></a></li>
+                    <li><a href="/admin/verifications">Verifications <span class="badge badge-warning">Pending</span></a></li>
+                </ul>
+            </div>
+
+            <!-- Bookings & Reviews -->
+            <div class="section">
+                <h2>📋 Bookings & Reviews</h2>
+                <ul class="links">
+                    <li><a href="/admin/bookings">All Bookings (Admin) <span class="badge badge-primary">Manage</span></a></li>
+                    <li><a href="/admin/reviews">All Reviews (Admin) <span class="badge badge-primary">Moderate</span></a></li>
+                    <li><a href="/booking/1">Booking Form #1 <span class="badge badge-warning">Form</span></a></li>
+                    <li><a href="/review/1">Review Form #1 <span class="badge badge-warning">Form</span></a></li>
+                </ul>
+            </div>
+
+            <!-- Payments & Transactions -->
+            <div class="section">
+                <h2>💳 Payments</h2>
+                <ul class="links">
+                    <li><a href="/admin/payments">Payment Management <span class="badge badge-primary">List</span></a></li>
+                    <li><a href="/admin/transactions">All Transactions <span class="badge badge-primary">History</span></a></li>
+                    <li><a href="/payment/1">Payment Checkout <span class="badge badge-warning">Process</span></a></li>
+                    <li><a href="/payment/success">Payment Success <span class="badge badge-success">Result</span></a></li>
+                    <li><a href="/payment/failed">Payment Failed <span class="badge badge-danger">Error</span></a></li>
+                    <li><a href="/payment/cancelled">Payment Cancelled <span class="badge badge-warning">Cancel</span></a></li>
+                </ul>
+            </div>
+
+            <!-- System & Settings -->
+            <div class="section">
+                <h2>⚙️ System</h2>
+                <ul class="links">
+                    <li><a href="/admin/settings">System Settings <span class="badge badge-primary">Config</span></a></li>
+                    <li><a href="/admin/audit-logs">Audit Logs <span class="badge badge-primary">Security</span></a></li>
+                </ul>
+            </div>
+
+            <!-- Judge Portal -->
+            <div class="section">
+                <h2>⚖️ Judge Portal</h2>
+                <ul class="links">
+                    <li><a href="/competitions/bangladesh-wildlife-photography-competition-2026/judge">Judge Scoring <span class="badge badge-warning">Score</span></a></li>
+                    <li><a href="/competitions/best-wedding-photographer-bangladesh/winners">Winner Announcement <span class="badge badge-success">Results</span></a></li>
+                </ul>
+            </div>
+
+            <!-- Public Pages (Footer Links) -->
+            <div class="section public-section">
+                <h2>🌐 Public Pages (Footer Links)</h2>
+                <ul class="links">
+                    <li><a href="/">Homepage / Search <span class="badge badge-success">Public</span></a></li>
+                    <li><a href="/about">About Us <span class="badge badge-success">Info</span></a></li>
+                    <li><a href="/how-it-works">How It Works <span class="badge badge-success">Guide</span></a></li>
+                    <li><a href="/contact">Contact Us <span class="badge badge-success">Form</span></a></li>
+                    <li><a href="/help">Help Center <span class="badge badge-success">FAQ</span></a></li>
+                    <li><a href="/privacy">Privacy Policy <span class="badge badge-success">Legal</span></a></li>
+                    <li><a href="/terms">Terms of Service <span class="badge badge-success">Legal</span></a></li>
+                    <li><a href="/auth">Login / Register <span class="badge badge-primary">Auth</span></a></li>
+                </ul>
+            </div>
+
+            <!-- Competitions (Public) -->
+            <div class="section public-section">
+                <h2>🏅 Public Competitions</h2>
+                <ul class="links">
+                    <li><a href="/competitions">All Competitions <span class="badge badge-success">Public</span></a></li>
+                    <li><a href="/competitions/bangladesh-wildlife-photography-competition-2026">Competition #1 Detail <span class="badge badge-success">View</span></a></li>
+                    <li><a href="/competitions/best-wedding-photographer-bangladesh">Competition #2 Detail <span class="badge badge-success">View</span></a></li>
+                    <li><a href="/competitions/street-photography-contest-dhaka">Competition #3 Detail <span class="badge badge-success">View</span></a></li>
+                    <li><a href="/competitions/landscape-photography-of-bangladesh">Competition #4 Detail <span class="badge badge-success">View</span></a></li>
+                    <li><a href="/competitions/fashion-photography-awards">Competition #5 Detail <span class="badge badge-success">View</span></a></li>
+                    <li><a href="/competitions/bangladesh-nature-2026">Competition #6 Detail <span class="badge badge-success">View</span></a></li>
+                    <li><a href="/competitions/bangladesh-wildlife-photography-competition-2026/submit">Submit Entry <span class="badge badge-warning">Form</span></a></li>
+                    <li><a href="/competitions/best-wedding-photographer-bangladesh/gallery">Gallery View <span class="badge badge-success">Photos</span></a></li>
+                </ul>
+            </div>
+
+            <!-- Events (Public) -->
+            <div class="section public-section">
+                <h2>🎉 Public Events</h2>
+                <ul class="links">
+                    <li><a href="/events">All Events <span class="badge badge-success">Public</span></a></li>
+                    <li><a href="/events/dhaka-photography-meetup-2026">Event Detail (Sample) <span class="badge badge-success">View</span></a></li>
+                </ul>
+            </div>
+
+            <!-- Photographer Profiles -->
+            <div class="section public-section">
+                <h2>📷 Photographer Profiles</h2>
+                <ul class="links">
+                    <li><a href="/photographer/john-doe">Photographer Profile #1 <span class="badge badge-success">View</span></a></li>
+                    <li><a href="/photographer/jane-smith">Photographer Profile #2 <span class="badge badge-success">View</span></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <a href="/admin/dashboard" class="test-all">🚀 Start Testing</a>
+
+    <script>
+        // Add click counter
+        let clickCount = 0;
+        document.querySelectorAll('.links a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                clickCount++;
+                console.log(`Link clicked: ${this.href} (Total clicks: ${clickCount})`);
+            });
+        });
+
+        // Log all links on page load
+        console.log('=== ADMIN SITEMAP LOADED ===');
+        console.log(`Total Links: ${document.querySelectorAll('.links a').length}`);
+        console.log('=== ALL ROUTES ===');
+        document.querySelectorAll('.links a').forEach((link, index) => {
+            console.log(`${index + 1}. ${link.textContent.trim()} -> ${link.getAttribute('href')}`);
+        });
+    </script>
+</body>
+</html>
