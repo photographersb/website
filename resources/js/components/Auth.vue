@@ -221,6 +221,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '../api';
+import { notifySuccess, notifyWarning, notifyError } from '../utils/notifications';
 
 const router = useRouter();
 const isLogin = ref(true);
@@ -260,7 +261,7 @@ const login = async () => {
         // Redirect to email verification page
         localStorage.setItem('pending_email', data.data.user.email);
         localStorage.setItem('pending_user_id', data.data.user.id);
-        alert('Please verify your email before proceeding.');
+        notifyWarning('Please check your email and verify your account before logging in.', 'Email Verification Required');
         // In production, redirect to /verify-email
         // router.push('/verify-email');
         return;
@@ -300,7 +301,7 @@ const register = async () => {
       localStorage.setItem('pending_email', registerForm.value.email);
       localStorage.setItem('pending_user_id', data.data?.user_id);
       
-      alert('Registration successful! Please check your email for verification link.');
+      notifySuccess('Please check your email inbox for the verification link. Check spam folder if you don\'t see it.', 'Registration Successful! 🎉');
       // In production, redirect to /verify-email with token
       // router.push(`/verify-email?email=${registerForm.value.email}`);
       
