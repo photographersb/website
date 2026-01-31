@@ -16,7 +16,7 @@
             A Project by <a href="https://somogrobangladesh.com/" target="_blank" rel="noopener" class="underline hover:text-white/80 transition-colors">Somogro Bangladesh</a>
           </p>
         </div>
-        <h1 class="text-4xl md:text-6xl font-bold mb-4 tracking-tight">About Photographar</h1>
+        <h1 class="text-4xl md:text-6xl font-bold mb-4 tracking-tight">About Photographer SB</h1>
         <p class="text-lg md:text-xl text-gray-100 max-w-3xl mx-auto">Bangladesh's premier photography marketplace</p>
       </div>
     </section>
@@ -26,7 +26,7 @@
       <div class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-100">
         <h2 class="text-2xl font-bold mb-4 text-burgundy">Our Story</h2>
         <p class="text-gray-700 mb-4">
-          Photographar is Bangladesh's premier photography marketplace, connecting talented photographers with clients across the nation. Founded in 2025, we're committed to showcasing the incredible photography talent that Bangladesh has to offer.
+          Photographer SB is Bangladesh's premier photography marketplace, connecting talented photographers with clients across the nation. Founded in 2025, we're committed to showcasing the incredible photography talent that Bangladesh has to offer.
         </p>
         <p class="text-gray-700 mb-4">
           Our platform serves as a bridge between professional photographers and those seeking their services, making it easier than ever to find the perfect photographer for any occasion - from weddings and events to portraits and commercial shoots.
@@ -67,7 +67,7 @@
 
       <!-- Why Choose Us -->
       <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
-        <h2 class="text-2xl font-bold mb-6 text-burgundy">Why Choose Photographar?</h2>
+        <h2 class="text-2xl font-bold mb-6 text-burgundy">Why Choose Photographer SB?</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="flex gap-4">
             <div class="flex-shrink-0">

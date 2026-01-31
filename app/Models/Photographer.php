@@ -92,6 +92,11 @@ class Photographer extends Model
         return $this->hasMany(Booking::class);
     }
 
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class, 'user_id', 'user_id');
+    }
+
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);

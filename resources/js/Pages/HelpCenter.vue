@@ -123,9 +123,9 @@ const openFAQ = ref(null)
 
 const faqs = [
   // General
-  { category: 'general', question: 'What is Photographar?', answer: 'Photographar is Bangladesh\'s leading photography marketplace connecting professional photographers with clients across the country.' },
+  { category: 'general', question: 'What is Photographer SB?', answer: 'Photographer SB is Bangladesh\'s leading photography marketplace connecting professional photographers with clients across the country.' },
   { category: 'general', question: 'How do I find a photographer?', answer: 'Simply use our search feature on the homepage. Filter by location, specialty, budget, and style to find photographers that match your needs.' },
-  { category: 'general', question: 'Is Photographar free to use?', answer: 'Yes! Browsing photographers and sending inquiries is completely free for clients. Photographers pay a small commission only on completed bookings.' },
+  { category: 'general', question: 'Is Photographer SB free to use?', answer: 'Yes! Browsing photographers and sending inquiries is completely free for clients. Photographers pay a small commission only on completed bookings.' },
   
   // Booking
   { category: 'booking', question: 'How do I book a photographer?', answer: 'Browse photographers, select one you like, and click "Send Inquiry". Fill in your event details and budget. The photographer will respond with a quote. Once you agree, confirm the booking and make payment.' },

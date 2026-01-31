@@ -29,9 +29,7 @@
     25 => 'Laravel\\Sanctum\\SanctumServiceProvider',
     26 => 'Laravel\\Tinker\\TinkerServiceProvider',
     27 => 'Carbon\\Laravel\\ServiceProvider',
-    28 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
-    29 => 'Termwind\\Laravel\\TermwindServiceProvider',
-    30 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
+    28 => 'Termwind\\Laravel\\TermwindServiceProvider',
   ),
   'eager' => 
   array (
@@ -48,9 +46,7 @@
     10 => 'Barryvdh\\DomPDF\\ServiceProvider',
     11 => 'Laravel\\Sanctum\\SanctumServiceProvider',
     12 => 'Carbon\\Laravel\\ServiceProvider',
-    13 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
-    14 => 'Termwind\\Laravel\\TermwindServiceProvider',
-    15 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
+    13 => 'Termwind\\Laravel\\TermwindServiceProvider',
   ),
   'deferred' => 
   array (
