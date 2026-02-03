@@ -132,7 +132,7 @@
                 
                 <router-link 
                   v-if="submission.photographer?.photographer"
-                  :to="`/photographers/${submission.photographer.photographer.id}`"
+                  :to="`/photographers/${submission.photographer.photographer.slug}`"
                   class="block w-full text-center bg-gray-100 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors"
                 >
                   View Profile

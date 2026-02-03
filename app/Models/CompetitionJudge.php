@@ -11,16 +11,19 @@ class CompetitionJudge extends Model
     protected $fillable = [
         'competition_id',
         'judge_id',
+        'judge_profile_id',
         'role',
         'bio',
         'expertise',
         'is_active',
+        'sort_order',
         'assigned_at',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'assigned_at' => 'datetime',
+        'sort_order' => 'integer',
     ];
 
     public function competition(): BelongsTo
@@ -31,6 +34,11 @@ class CompetitionJudge extends Model
     public function judge(): BelongsTo
     {
         return $this->belongsTo(User::class, 'judge_id');
+    }
+
+    public function judgeProfile(): BelongsTo
+    {
+        return $this->belongsTo(Judge::class, 'judge_profile_id');
     }
 
     public function scores(): HasMany

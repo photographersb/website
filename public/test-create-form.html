@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competition Create - Full Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background: #f5f5f5; }
+        .navbar { background: linear-gradient(90deg, #8E0E3F 0%, #6B0A2F 100%); color: white; padding: 15px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .navbar h1 { font-size: 20px; }
+        .container { max-width: 1000px; margin: 20px auto; }
+        .alert { padding: 12px 16px; margin: 10px 0; border-radius: 4px; display: flex; align-items: center; gap: 10px; }
+        .alert-info { background: #e3f2fd; border-left: 4px solid #2196F3; color: #1565c0; }
+        .alert-success { background: #e8f5e9; border-left: 4px solid #4CAF50; color: #2e7d32; }
+        .alert-error { background: #ffebee; border-left: 4px solid #f44336; color: #c62828; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin: 15px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .form-group { margin: 15px 0; }
+        label { display: block; font-weight: 500; margin-bottom: 5px; color: #333; }
+        input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 14px; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #8E0E3F; box-shadow: 0 0 0 3px rgba(142, 14, 63, 0.1); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-row.full { grid-template-columns: 1fr; }
+        button { background: #8E0E3F; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 14px; transition: 0.2s; }
+        button:hover { background: #6B0A2F; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .loading { display: inline-block; width: 14px; height: 14px; border: 2px solid #f3f3f3; border-top: 2px solid #8E0E3F; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; vertical-align: middle; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .multi-select { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; max-height: 150px; overflow-y: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .multi-select label { display: flex; align-items: center; gap: 8px; margin: 0; width: auto; font-weight: normal; }
+        .multi-select input[type="checkbox"] { width: auto; }
+        .status { padding: 10px; background: #f0f0f0; border-radius: 4px; font-family: monospace; font-size: 12px; margin: 10px 0; }
+        h2 { color: #333; margin: 20px 0 10px 0; font-size: 18px; }
+        .submit-response { max-height: 200px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🏆 Create Competition - Direct Test</h1>
+    </div>
+
+    <div class="container">
+        <!-- Status Panel -->
+        <div class="card">
+            <h2>System Status</h2>
+            <div id="auth-status"></div>
+            <div id="api-status"></div>
+        </div>
+
+        <!-- Competition Form -->
+        <form class="card" id="competitionForm">
+            <h2>Competition Details</h2>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Competition Name *</label>
+                    <input type="text" id="name" placeholder="e.g., Spring Photography 2025" required>
+                </div>
+                <div class="form-group">
+                    <label>Category *</label>
+                    <select id="category_id" required>
+                        <option value="">-- Select Category --</option>
+                        <div id="categories-loading"><option disabled>Loading...</option></div>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="description" placeholder="Describe the competition..." rows="4"></textarea>
+            </div>
+
+            <h2>Important Dates</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Submission Deadline *</label>
+                    <input type="datetime-local" id="submission_deadline" required>
+                </div>
+                <div class="form-group">
+                    <label>Voting Start Date *</label>
+                    <input type="datetime-local" id="voting_start_at" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Voting End Date *</label>
+                    <input type="datetime-local" id="voting_end_at" required>
+                </div>
+                <div class="form-group">
+                    <label>Results Announcement *</label>
+                    <input type="datetime-local" id="results_announcement_date" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Number of Winners *</label>
+                <input type="number" id="number_of_winners" min="1" value="3" required>
+            </div>
+
+            <h2>Associated Sponsors</h2>
+            <div class="multi-select" id="sponsors-list">
+                <p style="color: #999; margin: 10px 0;">Loading sponsors...</p>
+            </div>
+
+            <h2>Associated Judges</h2>
+            <div class="multi-select" id="judges-list">
+                <p style="color: #999; margin: 10px 0;">Loading judges...</p>
+            </div>
+
+            <div class="form-group" style="margin-top: 30px;">
+                <button type="submit" id="submit-btn">Create Competition</button>
+                <span id="submit-status"></span>
+            </div>
+        </form>
+
+        <!-- Response -->
+        <div class="card" id="response-panel" style="display:none;">
+            <h2>Response</h2>
+            <div class="submit-response" id="response-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = '/api/v1';
+        let token = null;
+        let userData = null;
+
+        // Initialize
+        async function init() {
+            // Get auth from localStorage
+            token = localStorage.getItem('auth_token');
+            userData = JSON.parse(localStorage.getItem('user') || '{}');
+
+            updateAuthStatus();
+            
+            if (!token) {
+                showAlert('error', 'Not authenticated. Please set localStorage auth_token');
+                return;
+            }
+
+            await Promise.all([
+                loadCategories(),
+                loadSponsors(),
+                loadJudges()
+            ]);
+        }
+
+        function updateAuthStatus() {
+            const authStatus = document.getElementById('auth-status');
+            if (token && userData.email) {
+                authStatus.innerHTML = `
+                    <div class="alert alert-success">
+                        ✓ Authenticated as: <strong>${userData.name}</strong> (${userData.role})<br>
+                        Email: ${userData.email}
+                    </div>
+                `;
+            } else {
+                authStatus.innerHTML = `
+                    <div class="alert alert-error">
+                        ✗ Not authenticated. localStorage keys needed:
+                        <br>• auth_token
+                        <br>• user (JSON object with id, name, email, role)
+                        <br>• user_role
+                    </div>
+                `;
+            }
+        }
+
+        async function apiCall(endpoint, options = {}) {
+            const response = await fetch(`${BASE_URL}${endpoint}`, {
+                ...options,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }
+            });
+
+            if (response.status === 401) {
+                showAlert('error', 'Authentication failed. Token may be expired.');
+                return null;
+            }
+
+            return response.json();
+        }
+
+        async function loadCategories() {
+            const data = await apiCall('/categories');
+            const select = document.getElementById('category_id');
+            
+            if (data && data.data) {
+                select.innerHTML = '<option value="">-- Select Category --</option>';
+                data.data.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.id;
+                    option.textContent = cat.name;
+                    select.appendChild(option);
+                });
+                updateApiStatus('Categories', data.data.length + ' loaded');
+            }
+        }
+
+        async function loadSponsors() {
+            const data = await apiCall('/admin/platform-sponsors');
+            const container = document.getElementById('sponsors-list');
+            
+            if (data && data.data) {
+                container.innerHTML = '';
+                data.data.forEach(sponsor => {
+                    const label = document.createElement('label');
+                    label.innerHTML = `
+                        <input type="checkbox" name="sponsors" value="${sponsor.id}">
+                        ${sponsor.name}
+                    `;
+                    container.appendChild(label);
+                });
+                updateApiStatus('Sponsors', data.data.length + ' loaded');
+            }
+        }
+
+        async function loadJudges() {
+            const data = await apiCall('/judges');
+            const container = document.getElementById('judges-list');
+            
+            if (data && data.data) {
+                container.innerHTML = '';
+                data.data.forEach(judge => {
+                    const label = document.createElement('label');
+                    label.innerHTML = `
+                        <input type="checkbox" name="judges" value="${judge.id}">
+                        ${judge.name}
+                    `;
+                    container.appendChild(label);
+                });
+                updateApiStatus('Judges', data.data.length + ' loaded');
+            }
+        }
+
+        function updateApiStatus(name, status) {
+            const apiStatus = document.getElementById('api-status');
+            if (!apiStatus.innerHTML) apiStatus.innerHTML = '';
+            const exists = apiStatus.querySelector(`[data-api="${name}"]`);
+            const statusDiv = document.createElement('div');
+            statusDiv.setAttribute('data-api', name);
+            statusDiv.className = 'alert alert-success';
+            statusDiv.innerHTML = `✓ ${name}: ${status}`;
+            
+            if (exists) {
+                exists.replaceWith(statusDiv);
+            } else {
+                apiStatus.appendChild(statusDiv);
+            }
+        }
+
+        function showAlert(type, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = message;
+            document.querySelector('.card').appendChild(alertDiv);
+        }
+
+        // Form submission
+        document.getElementById('competitionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Creating...';
+
+            const sponsors = Array.from(document.querySelectorAll('input[name="sponsors"]:checked')).map(i => i.value);
+            const judges = Array.from(document.querySelectorAll('input[name="judges"]:checked')).map(i => i.value);
+
+            const payload = {
+                name: document.getElementById('name').value,
+                description: document.getElementById('description').value,
+                category_id: document.getElementById('category_id').value,
+                submission_deadline: document.getElementById('submission_deadline').value + ':00',
+                voting_start_at: document.getElementById('voting_start_at').value + ':00',
+                voting_end_at: document.getElementById('voting_end_at').value + ':00',
+                results_announcement_date: document.getElementById('results_announcement_date').value + ':00',
+                number_of_winners: document.getElementById('number_of_winners').value,
+                sponsors: sponsors,
+                judges: judges
+            };
+
+            const response = await apiCall('/admin/competitions', {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+
+            btn.disabled = false;
+            btn.innerHTML = 'Create Competition';
+
+            const responsePanel = document.getElementById('response-panel');
+            const responseContent = document.getElementById('response-content');
+            responsePanel.style.display = 'block';
+            
+            if (response && response.status === 'success') {
+                responseContent.innerHTML = `
+                    <div class="alert alert-success">✓ Competition created successfully!</div>
+                    <div class="status">${JSON.stringify(response.data, null, 2)}</div>
+                `;
+                document.getElementById('competitionForm').reset();
+            } else {
+                responseContent.innerHTML = `
+                    <div class="alert alert-error">✗ Error creating competition</div>
+                    <div class="status">${JSON.stringify(response, null, 2)}</div>
+                `;
+            }
+        });
+
+        // Start
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

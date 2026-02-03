@@ -1,21 +1,29 @@
 <template>
-  <div class="admin-competitions-dashboard">
-    <!-- Page Header -->
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">🏆 Competition Management Dashboard</h1>
-        <p class="page-subtitle">Comprehensive overview and management of photography competitions</p>
-      </div>
-      <router-link to="/admin/competitions/create" class="btn-primary">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        Create Competition
-      </router-link>
-    </div>
+  <div class="min-h-screen bg-gray-50">
+    <!-- Admin Header with Back Button & Notifications -->
+    <AdminHeader 
+      title="🏆 Competition Management Dashboard" 
+      subtitle="Comprehensive overview and management of photography competitions"
+    />
 
-    <!-- Primary Stats Grid -->
-    <div class="stats-grid">
+    <!-- Main Content -->
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      
+      <!-- Quick Navigation -->
+      <AdminQuickNav />
+
+      <!-- Create Competition Button -->
+      <div class="flex justify-end">
+        <router-link to="/admin/competitions/create" class="inline-flex items-center px-6 py-3 bg-burgundy text-white rounded-lg font-semibold hover:bg-burgundy-dark transition-all shadow-lg hover:shadow-xl">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          New Competition
+        </router-link>
+      </div>
+
+      <!-- Primary Stats Grid -->
+      <div class="stats-grid">
       <div class="stat-card stat-blue">
         <div class="stat-icon">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -189,6 +197,73 @@
         </div>
       </div>
 
+      <!-- Draft Competitions -->
+      <div class="dashboard-card full-width">
+        <div class="card-header">
+          <h2 class="card-title">📝 Draft Competitions</h2>
+          <router-link to="/admin/competitions/draft" class="card-link">View All →</router-link>
+        </div>
+        <div v-if="loading" class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading competitions...</p>
+        </div>
+        <div v-else-if="draftCompetitions.length > 0" class="competitions-grid">
+          <div v-for="comp in draftCompetitions" :key="comp.id" class="competition-card">
+            <div class="competition-header">
+              <div class="competition-title">
+                <h3>{{ comp.title }}</h3>
+                <span :class="['status-badge', statusClass(comp.status)]">{{ comp.status }}</span>
+              </div>
+              <div class="competition-actions">
+                <router-link :to="`/admin/competitions/${comp.id}`" class="btn-icon" title="View">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </router-link>
+                <router-link :to="`/admin/competitions/${comp.id}/edit`" class="btn-icon" title="Edit">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </router-link>
+              </div>
+            </div>
+            <div class="competition-body">
+              <div class="competition-meta">
+                <div class="meta-item">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span>{{ comp.submissions_count || 0 }} submissions</span>
+                </div>
+                <div class="meta-item">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>৳{{ formatNumber(comp.total_prize_pool || 0) }}</span>
+                </div>
+              </div>
+              <div class="competition-dates">
+                <div class="date-item">
+                  <span class="date-label">Deadline:</span>
+                  <span class="date-value">{{ formatDate(comp.submission_deadline) }}</span>
+                </div>
+                <div class="date-item">
+                  <span class="date-label">Voting Ends:</span>
+                  <span class="date-value">{{ formatDate(comp.voting_end) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else class="empty-state-small">
+          <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          <p>No draft competitions</p>
+        </div>
+      </div>
+
       <!-- Recent Submissions -->
       <div class="dashboard-card">
         <div class="card-header">
@@ -259,11 +334,24 @@
         <select v-model="form.status" @change="applyFilters" class="filter-select">
           <option value="">All Status</option>
           <option value="draft">Draft</option>
-          <option value="upcoming">Upcoming</option>
           <option value="active">Active</option>
           <option value="judging">Judging</option>
           <option value="completed">Completed</option>
           <option value="cancelled">Cancelled</option>
+          <option value="archived">Archived</option>
+        </select>
+
+        <select v-model="form.category_id" @change="applyFilters" class="filter-select">
+          <option value="">All Categories</option>
+          <option v-for="category in categories" :key="category.id" :value="category.id">
+            {{ category.name }}
+          </option>
+        </select>
+
+        <select v-model="form.featured" @change="applyFilters" class="filter-select">
+          <option value="">All Featured</option>
+          <option value="1">Featured</option>
+          <option value="0">Not Featured</option>
         </select>
 
         <button @click="clearFilters" class="btn-clear">Clear Filters</button>
@@ -341,6 +429,7 @@
 
     <!-- Toast -->
     <div v-if="showToast" class="toast">{{ toastMessage }}</div>
+    </div>
   </div>
 </template>
             <select
@@ -370,7 +459,7 @@
           <div class="flex items-end gap-2">
             <button
               type="submit"
-              class="flex-1 px-4 py-2 bg-burgundy-600 text-white rounded-lg font-medium hover:bg-burgundy-700 transition-all"
+              class="flex-1 px-4 py-2 bg-burgundy text-white rounded-lg font-medium hover:bg-burgundy-dark transition-all"
             >
               Apply Filters
             </button>
@@ -407,7 +496,7 @@
                   <div>
                     <div class="flex items-center gap-2">
                       <div class="text-sm font-medium text-gray-900">{{ competition.title }}</div>
-                      <span v-if="competition.is_featured" class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">
+                      <span v-if="competition.is_featured" class="badge badge-primary">
                         Featured
                       </span>
                     </div>
@@ -435,7 +524,7 @@
                 <div class="flex items-center justify-end gap-2">
                   <a
                     :href="`/admin/competitions/${competition.id}/submissions`"
-                    class="text-blue-600 hover:text-blue-900"
+                    class="text-burgundy hover:text-burgundy-dark"
                     title="View Submissions"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -444,7 +533,7 @@
                   </a>
                   <a
                     :href="`/admin/competitions/${competition.id}/submissions`"
-                    class="text-purple-600 hover:text-purple-900"
+                    class="text-burgundy hover:text-burgundy-dark"
                     title="Moderate Submissions"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -453,7 +542,7 @@
                   </a>
                   <a
                     :href="`/admin/competitions/${competition.id}/edit`"
-                    class="text-indigo-600 hover:text-indigo-900"
+                    class="text-burgundy hover:text-burgundy-dark"
                     title="Edit"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -491,7 +580,7 @@
                 :disabled="!link.url"
                 :class="[
                   'px-3 py-2 text-sm font-medium rounded-lg',
-                  link.active ? 'bg-burgundy-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50',
+                  link.active ? 'bg-burgundy text-white' : 'bg-white text-gray-700 hover:bg-gray-50',
                   !link.url ? 'opacity-50 cursor-not-allowed' : ''
                 ]"
               />
@@ -509,7 +598,7 @@
           <div class="mt-6">
             <a
               href="/admin/competitions/create"
-              class="inline-flex items-center px-4 py-2 bg-burgundy-600 text-white rounded-lg font-medium hover:bg-burgundy-700"
+              class="inline-flex items-center px-4 py-2 bg-burgundy text-white rounded-lg font-medium hover:bg-burgundy-dark"
             >
               Create Competition
             </a>
@@ -522,24 +611,39 @@
 
 <script>
 import axios from 'axios';
+import AdminHeader from '../../../components/AdminHeader.vue';
+import AdminQuickNav from '../../../components/AdminQuickNav.vue';
 
 export default {
+  components: {
+    AdminHeader,
+    AdminQuickNav
+  },
   data() {
     return {
       competitions: { data: [], links: [], from: 0, to: 0, total: 0 },
       stats: { total: 0, active: 0, upcoming: 0, completed: 0 },
+      categories: [],
       form: {
         search: '',
         status: '',
+        category_id: '',
+        featured: '',
         date_filter: '',
       },
       loading: true,
+      showToast: false,
+      toastMessage: '',
+      searchTimeout: null,
     };
   },
 
   computed: {
     activeCompetitions() {
       return (this.competitions.data || []).filter(c => c.status === 'active').slice(0, 3);
+    },
+    draftCompetitions() {
+      return (this.competitions.data || []).filter(c => c.status === 'draft').slice(0, 3);
     },
     upcomingDeadlines() {
       const now = new Date();
@@ -555,19 +659,39 @@ export default {
   },
 
   mounted() {
+    this.fetchCategories();
     this.fetchCompetitions();
   },
 
   methods: {
+    async fetchCategories() {
+      try {
+        const response = await axios.get('/api/v1/categories');
+        if (response.data.status === 'success') {
+          this.categories = response.data.data;
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    },
+
     async fetchCompetitions() {
       try {
         this.loading = true;
         const params = new URLSearchParams();
         if (this.form.search) params.append('search', this.form.search);
         if (this.form.status) params.append('status', this.form.status);
+        if (this.form.category_id) params.append('category_id', this.form.category_id);
+        if (this.form.featured !== '') params.append('featured', this.form.featured);
         if (this.form.date_filter) params.append('date_filter', this.form.date_filter);
 
-        const response = await axios.get(`/api/v1/admin/competitions?${params.toString()}`);
+        const token = localStorage.getItem('auth_token');
+        const response = await axios.get(`/api/v1/admin/competitions?${params.toString()}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
         
         // Extract competitions from response
         if (response.data.status === 'success') {
@@ -637,11 +761,22 @@ export default {
       this.fetchCompetitions();
     },
 
+    debounceSearch() {
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout);
+      }
+      this.searchTimeout = setTimeout(() => {
+        this.fetchCompetitions();
+      }, 300);
+    },
+
     clearFilters() {
       this.form = {
         search: '',
         status: '',
         date_filter: '',
+        category_id: '',
+        featured: '',
       };
       this.fetchCompetitions();
     },
@@ -656,20 +791,21 @@ export default {
     statusClass(status) {
       const classes = {
         draft: 'bg-gray-100 text-gray-800',
-        active: 'bg-green-100 text-green-800',
-        judging: 'bg-blue-100 text-blue-800',
-        completed: 'bg-purple-100 text-purple-800',
+        active: 'status-active',
+        judging: 'bg-info-100 text-info-800',
+        completed: 'bg-primary-100 text-primary-800',
         cancelled: 'bg-red-100 text-red-800',
       };
       return classes[status] || 'bg-gray-100 text-gray-800';
     },
 
     formatDate(date) {
-      return new Date(date).toLocaleDateString('en-BD', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
+      if (!date) return 'N/A'
+      const d = new Date(date)
+      const day = String(d.getDate()).padStart(2, '0')
+      const month = String(d.getMonth() + 1).padStart(2, '0')
+      const year = d.getFullYear()
+      return `${day}-${month}-${year}`
     },
 
     formatNumber(num) {

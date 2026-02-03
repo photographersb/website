@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
+    use ApiResponse;
     /**
      * Get user notifications
      */
@@ -17,14 +19,7 @@ class NotificationController extends Controller
             ->latest()
             ->paginate($request->get('per_page', 20));
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $notifications->items(),
-            'meta' => [
-                'total' => $notifications->total(),
-                'unread_count' => $request->user()->unreadNotifications->count(),
-            ],
-        ]);
+        return $this->paginated($notifications, 'Notifications retrieved successfully');
     }
 
     /**
@@ -34,12 +29,7 @@ class NotificationController extends Controller
     {
         $count = $request->user()->unreadNotifications->count();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'count' => $count,
-            ],
-        ]);
+        return $this->success(['count' => $count], 'Unread notification count retrieved successfully');
     }
 
     /**
@@ -54,10 +44,7 @@ class NotificationController extends Controller
 
         $notification->markAsRead();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Notification marked as read',
-        ]);
+        return $this->success([], 'Notification marked as read');
     }
 
     /**
@@ -67,10 +54,7 @@ class NotificationController extends Controller
     {
         $request->user()->unreadNotifications->markAsRead();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'All notifications marked as read',
-        ]);
+        return $this->success([], 'All notifications marked as read');
     }
 
     /**
@@ -85,9 +69,6 @@ class NotificationController extends Controller
 
         $notification->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Notification deleted',
-        ]);
+        return $this->success([], 'Notification deleted successfully');
     }
 }

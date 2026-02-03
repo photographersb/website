@@ -209,7 +209,7 @@ const toggleRsvp = async (event) => {
 
   try {
     const rsvpStatus = isRsvped(event) ? 'not_going' : 'going';
-    const { data } = await api.post(`/events/${event.id}/rsvp`, { rsvp_status: rsvpStatus });
+    const { data } = await api.post(`/events/${event.slug}/rsvp`);
 
     if (data.status === 'success') {
       if (rsvpStatus === 'going') {

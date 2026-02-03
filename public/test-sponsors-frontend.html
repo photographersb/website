@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sponsor API Test</title>
+</head>
+<body>
+    <h1>Testing Sponsor API</h1>
+    <div id="results"></div>
+    
+    <script>
+        const resultsDiv = document.getElementById('results');
+        
+        async function testAPI() {
+            try {
+                // Get token from localStorage (simulating logged-in admin)
+                const token = localStorage.getItem('auth_token');
+                
+                if (!token) {
+                    resultsDiv.innerHTML = '<p style="color: red;">❌ No auth token found in localStorage. Please log in to admin panel first.</p>';
+                    return;
+                }
+                
+                resultsDiv.innerHTML = '<p>🔄 Testing API endpoint...</p>';
+                
+                const response = await fetch('/api/v1/admin/platform-sponsors', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                let html = `<h2>API Response:</h2>`;
+                html += `<p><strong>Status:</strong> ${response.status} ${response.ok ? '✅' : '❌'}</p>`;
+                html += `<p><strong>Has 'data' key:</strong> ${data.data ? '✅ YES' : '❌ NO'}</p>`;
+                
+                if (data.data) {
+                    html += `<p><strong>Sponsor count:</strong> ${data.data.length}</p>`;
+                    html += `<h3>Sponsors:</h3><ul>`;
+                    data.data.forEach(sponsor => {
+                        html += `<li>
+                            <strong>${sponsor.name}</strong> - 
+                            Status: ${sponsor.status}, 
+                            Featured: ${sponsor.is_featured ? 'Yes' : 'No'}, 
+                            Logo: ${sponsor.logo ? 'Present' : 'Missing'}
+                        </li>`;
+                    });
+                    html += '</ul>';
+                }
+                
+                html += `<h3>Raw Response:</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                
+                resultsDiv.innerHTML = html;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+                console.error('Test error:', error);
+            }
+        }
+        
+        // Run test on load
+        testAPI();
+    </script>
+</body>
+</html>

@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\PhotoCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class PhotoCategoryController extends Controller
 {
+    use ApiResponse;
+
     public function index()
     {
         $categories = PhotoCategory::withCount('hashtags')

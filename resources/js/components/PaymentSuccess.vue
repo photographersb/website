@@ -156,7 +156,7 @@ const formatDate = (date) => {
 const downloadReceipt = () => {
   // Generate a simple receipt (in production, this should be a PDF from backend)
   const receiptData = `
-PHOTOGRAPHAR - PAYMENT RECEIPT
+PHOTOGRAPHER SB - PAYMENT RECEIPT
 =================================
 
 Transaction ID: ${transaction.value.reference_id}
@@ -170,7 +170,7 @@ Event Date: ${transaction.value.booking?.event_date ? formatDate(transaction.val
 Location: ${transaction.value.booking?.location || 'N/A'}
 
 =================================
-Thank you for choosing Photographar!
+Thank you for choosing Photographer SB!
 Across Somogro Bangladesh
   `.trim();
 

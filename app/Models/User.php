@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Notifications\VerifyEmailNotification;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -16,6 +17,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'uuid',
         'name',
+        'username',
         'email',
         'phone',
         'password',
@@ -31,6 +33,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_login_ip',
         'two_factor_enabled',
         'two_factor_secret',
+        'approval_status',
+        'rejection_reason',
+        'approved_at',
+        'approved_by_admin_id',
     ];
 
     protected $hidden = [
@@ -46,12 +52,38 @@ class User extends Authenticatable implements MustVerifyEmail
         'suspended_at' => 'datetime',
         'two_factor_enabled' => 'boolean',
         'password' => 'hashed',
+        'approval_status' => 'string',
+        'approved_at' => 'datetime',
     ];
+
+    /**
+     * Boot function to auto-generate UUID
+     */
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
+    }
 
     // Relationships
     public function photographer()
     {
         return $this->hasOne(Photographer::class);
+    }
+
+    public function mentor()
+    {
+        return $this->hasOne(\App\Models\Mentor::class);
+    }
+
+    public function judge()
+    {
+        return $this->hasOne(\App\Models\Judge::class);
     }
 
     public function bookings()
@@ -77,6 +109,41 @@ class User extends Authenticatable implements MustVerifyEmail
     public function judgeAssignments()
     {
         return $this->hasMany(CompetitionJudge::class, 'judge_id');
+    }
+
+    public function competitionScores()
+    {
+        return $this->hasMany(CompetitionScore::class, 'judge_id');
+    }
+
+    public function socialAccounts()
+    {
+        return $this->hasMany(SocialAccount::class);
+    }
+
+    public function usernameHistory()
+    {
+        return $this->hasMany(UsernameHistory::class);
+    }
+
+    public function seoMeta()
+    {
+        return $this->morphOne(SeoMeta::class, 'model');
+    }
+
+    public function bookingMessages()
+    {
+        return $this->hasMany(BookingMessage::class, 'sender_id');
+    }
+
+    public function verifications()
+    {
+        return $this->hasMany(UserVerification::class);
+    }
+
+    public function verificationRequests()
+    {
+        return $this->hasMany(VerificationRequest::class);
     }
 
     // Scopes
@@ -108,12 +175,69 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function isJudge()
     {
-        return $this->judgeAssignments()->where('is_active', true)->exists();
+        return $this->judge()->exists() || $this->judgeAssignments()->where('is_active', true)->exists();
+    }
+
+    public function isMentor()
+    {
+        return $this->mentor()->exists();
+    }
+
+    public function hasMultipleRoles()
+    {
+        $rolesCount = 0;
+        if ($this->photographer) $rolesCount++;
+        if ($this->mentor) $rolesCount++;
+        if ($this->judge) $rolesCount++;
+        return $rolesCount > 1;
+    }
+
+    public function getAvailableRoles()
+    {
+        $roles = ['base_role' => $this->role];
+        if ($this->photographer) $roles['photographer'] = true;
+        if ($this->mentor) $roles['mentor'] = true;
+        if ($this->judge) $roles['judge'] = true;
+        return $roles;
     }
 
     public function isSuspended()
     {
         return $this->is_suspended === true;
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->approval_status === 'approved';
+    }
+
+    public function isPendingApproval(): bool
+    {
+        return $this->approval_status === 'pending';
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->approval_status === 'rejected';
+    }
+
+    public function approveAsAdmin($adminId): void
+    {
+        $this->update([
+            'approval_status' => 'approved',
+            'approved_at' => now(),
+            'approved_by_admin_id' => $adminId,
+            'rejection_reason' => null,
+        ]);
+    }
+
+    public function rejectAsAdmin($adminId, string $reason): void
+    {
+        $this->update([
+            'approval_status' => 'rejected',
+            'rejection_reason' => $reason,
+            'approved_by_admin_id' => $adminId,
+        ]);
     }
 
     /**

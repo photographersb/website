@@ -143,6 +143,21 @@
           </label>
         </div>
 
+        <!-- Anonymous Review Option -->
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <label class="flex items-start gap-3">
+            <input
+              v-model="form.is_anonymous"
+              type="checkbox"
+              class="w-5 h-5 text-burgundy mt-1"
+            />
+            <div>
+              <span class="font-medium block">Post as Anonymous</span>
+              <span class="text-sm text-gray-600">Your name will be hidden from public view, but admin can see it for service improvement.</span>
+            </div>
+          </label>
+        </div>
+
         <!-- Submit -->
         <div class="flex gap-4">
           <button
@@ -195,6 +210,7 @@ const form = ref({
   communication_rating: 0,
   value_rating: 0,
   would_recommend: true,
+  is_anonymous: false,
 });
 
 const isFormValid = computed(() => {

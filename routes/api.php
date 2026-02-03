@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\NotificationPreferenceController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AlbumController;
 use App\Http\Controllers\Api\PackageController;
@@ -27,6 +28,30 @@ use App\Http\Controllers\Api\CompetitionCategoryController;
 use App\Http\Controllers\Api\CompetitionSponsorController;
 use App\Http\Controllers\Api\Admin\ActivityLogController;
 use App\Http\Controllers\Api\Admin\ExportController;
+use App\Http\Controllers\Api\Admin\ContactMessageController;
+use App\Http\Controllers\Api\Admin\EventCheckInController;
+use App\Http\Controllers\Api\Admin\AdminReviewController;
+use App\Http\Controllers\Api\Admin\AdminBookingController;
+use App\Http\Controllers\Api\Admin\AdminTransactionController;
+use App\Http\Controllers\Api\Admin\AdminSettingsController;
+use App\Http\Controllers\Api\Admin\CertificateTemplateController;
+use App\Http\Controllers\Api\Admin\ErrorCenterController;
+use App\Http\Controllers\Api\BookingMessageController;
+use App\Http\Controllers\Api\VerificationController;
+use App\Http\Controllers\Api\SitemapController;
+use App\Http\Controllers\Api\HealthController;
+use App\Models\Competition;
+use App\Models\Judge;
+use App\Models\Mentor;
+use App\Models\Event;
+use App\Models\Photographer;
+
+// Route Model Bindings
+Route::model('competition', Competition::class);
+Route::model('judge', Judge::class);
+Route::model('mentor', Mentor::class);
+Route::model('event', Event::class);
+Route::model('photographer', Photographer::class);
 
 Route::prefix('v1')->group(function () {
     // Public routes
@@ -36,15 +61,62 @@ Route::prefix('v1')->group(function () {
     Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:3,60');
     Route::post('/auth/verify-email', [AuthController::class, 'verifyEmail'])->middleware('throttle:10,60');
     Route::post('/auth/resend-verification', [AuthController::class, 'resendVerification'])->middleware('throttle:3,60');
+    Route::post('/auth/send-phone-otp', [AuthController::class, 'sendPhoneOtp'])->middleware('throttle:3,60');
+    Route::post('/auth/verify-phone-otp', [AuthController::class, 'verifyPhoneOtp'])->middleware('throttle:5,60');
+    Route::post('/auth/resend-phone-otp', [AuthController::class, 'resendPhoneOtp'])->middleware('throttle:2,60');
+    
+    // Social Authentication Routes
+    Route::get('/auth/{provider}/redirect', [\App\Http\Controllers\Api\SocialAuthController::class, 'redirectToProvider'])
+        ->where('provider', 'google|facebook|apple')
+        ->middleware('throttle:5,1');
+    Route::get('/auth/{provider}/callback', [\App\Http\Controllers\Api\SocialAuthController::class, 'handleProviderCallback'])
+        ->where('provider', 'google|facebook|apple')
+        ->middleware('throttle:10,1');
 
     // Public resources
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::get('/cities', [CityController::class, 'index']);
+    
+    // Public hashtags for dropdown
+    Route::get('/hashtags', [\App\Http\Controllers\Api\Admin\HashtagController::class, 'index']);
+    Route::get('/hashtags/featured', [\App\Http\Controllers\Api\Admin\HashtagController::class, 'featured']);
+    
+    // Public photo categories for dropdown
+    Route::get('/photo-categories', [\App\Http\Controllers\Api\Admin\PhotoCategoryController::class, 'index']);
+
+    // Public mentors
+    Route::get('/mentors', function () {
+        return response()->json([
+            'status' => 'success',
+            'data' => \App\Models\Mentor::active()->ordered()->get(),
+        ]);
+    });
+    Route::get('/mentors/{mentor}', function (\App\Models\Mentor $mentor) {
+        return response()->json([
+            'status' => 'success',
+            'data' => $mentor->load('competitions'),
+        ]);
+    });
+
+    // Public judges
+    Route::get('/judges', function () {
+        return response()->json([
+            'status' => 'success',
+            'data' => \App\Models\Judge::active()->ordered()->get(),
+        ]);
+    });
+    Route::get('/judges/{judge}', function (\App\Models\Judge $judge) {
+        return response()->json([
+            'status' => 'success',
+            'data' => $judge->load('competitions', 'scores'),
+        ]);
+    });
 
     // Public photographers
     Route::get('/photographers', [PhotographerController::class, 'index']);
-    Route::get('/photographers/{photographer}', [PhotographerController::class, 'show']);
     Route::get('/photographers/search', [PhotographerController::class, 'search']);
+    Route::get('/photographers/{photographerSlugOrId}', [PhotographerController::class, 'show']);
+    Route::get('/photographers/{photographerId}/awards', [\App\Http\Controllers\Api\PhotographerAwardController::class, 'index']);
 
     // Public events
     Route::get('/events/stats', [EventController::class, 'stats']);
@@ -75,16 +147,93 @@ Route::prefix('v1')->group(function () {
     // Public competition sponsors
     Route::get('/competitions/{competition}/sponsors', [CompetitionSponsorController::class, 'index']);
     Route::get('/sponsors/{sponsor}', [CompetitionSponsorController::class, 'show']);
+    
+    // Public platform sponsors
+    Route::get('/sponsors', function () {
+        return \App\Models\Sponsor::where('status', 'active')
+            ->orderBy('display_order')
+            ->get(['id', 'name', 'slug', 'logo', 'website', 'description']);
+    });
+    
+    // Sponsor inquiry
+    Route::post('/sponsor-inquiry', function (\Illuminate\Http\Request $request) {
+        $validated = $request->validate([
+            'company_name' => 'required|string|max:255',
+            'contact_person' => 'required|string|max:255',
+            'email' => 'required|email',
+            'phone' => 'nullable|string|max:20',
+            'message' => 'required|string'
+        ]);
+        
+        // Store as contact message
+        \Illuminate\Support\Facades\DB::table('contact_messages')->insert([
+            'type' => 'sponsorship',
+            'name' => $validated['contact_person'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
+            'subject' => 'Sponsorship Inquiry from ' . $validated['company_name'],
+            'message' => "Company: {$validated['company_name']}\n\n{$validated['message']}",
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+        
+        return response()->json(['message' => 'Inquiry submitted successfully']);
+    });
+    
+    // General contact form
+    Route::post('/contact', function (\Illuminate\Http\Request $request) {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'phone' => 'nullable|string|max:20',
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string'
+        ]);
+        
+        // Store as contact message
+        \Illuminate\Support\Facades\DB::table('contact_messages')->insert([
+            'type' => 'contact',
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
+            'subject' => $validated['subject'],
+            'message' => $validated['message'],
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+        
+        return response()->json(['message' => 'Message sent successfully']);
+    });
 
     // Certificate download (public access for certificate holders)
     Route::get('/certificates/{certificate_id}/download', [CompetitionController::class, 'downloadCertificate']);
     Route::get('/certificates/{certificate_id}', [CompetitionController::class, 'getCertificateDetails']);
+
+    // SEO Sitemaps (public)
+    Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
+    Route::get('/sitemap/photographers.xml', [SitemapController::class, 'photographers'])->name('api.sitemap.photographers');
+    Route::get('/sitemap/categories.xml', [SitemapController::class, 'categories'])->name('api.sitemap.categories');
+    Route::get('/sitemap/cities.xml', [SitemapController::class, 'cities'])->name('api.sitemap.cities');
+    Route::get('/sitemap/competitions.xml', [SitemapController::class, 'competitions'])->name('api.sitemap.competitions');
+    Route::get('/sitemap/static.xml', [SitemapController::class, 'static'])->name('api.sitemap.static');
+
+    // Health check (public)
+    Route::get('/health', [\App\Http\Controllers\Api\HealthController::class, 'check']);
 
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
         // Auth
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/auth/me', [AuthController::class, 'me']);
+        
+        // Social Authentication Protected Routes
+        Route::post('/auth/link-social-account', [\App\Http\Controllers\Api\SocialAuthController::class, 'linkAccount'])
+            ->middleware('throttle:5,60');
+        Route::post('/auth/unlink-social-account', [\App\Http\Controllers\Api\SocialAuthController::class, 'unlinkAccount'])
+            ->middleware('throttle:5,60');
+        Route::get('/auth/linked-accounts', [\App\Http\Controllers\Api\SocialAuthController::class, 'getLinkedAccounts']);
 
         // Bookings
         Route::post('/bookings/inquiry', [BookingController::class, 'createInquiry'])->middleware('throttle:10,1');
@@ -92,15 +241,47 @@ Route::prefix('v1')->group(function () {
         Route::get('/bookings/{booking}', [BookingController::class, 'getBooking']);
         Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus']);
         Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancelBooking']);
+        Route::post('/bookings/{booking}/invoice/generate', [BookingController::class, 'generateInvoice'])->middleware('throttle:5,60');
+        Route::get('/bookings/{booking}/invoice/download', [BookingController::class, 'downloadInvoice'])->name('bookings.invoice.download');
+        Route::post('/bookings/{booking}/invoice/email', [BookingController::class, 'emailInvoice'])->middleware('throttle:3,60');
 
         // Reviews
+
+                // P0: Booking Messages
+                Route::prefix('bookings/{booking}/messages')->group(function () {
+                    Route::get('/', [BookingMessageController::class, 'index'])->name('booking.messages.index');
+                    Route::post('/', [BookingMessageController::class, 'store'])->middleware('throttle:20,60')->name('booking.messages.store');
+                    Route::get('/{message}', [BookingMessageController::class, 'show'])->name('booking.messages.show');
+                    Route::post('/{message}/read', [BookingMessageController::class, 'markAsRead'])->name('booking.messages.read');
+                    Route::delete('/{message}', [BookingMessageController::class, 'destroy'])->name('booking.messages.destroy');
+                });
+        
+                // Mark all booking messages as read
+                Route::post('/bookings/{booking}/messages/mark-all-read', [BookingMessageController::class, 'markAllAsRead'])->middleware('throttle:10,60');
+
+                // P0: Photographer Verification
+                Route::prefix('verifications')->group(function () {
+                    // Photographer endpoints
+                    Route::get('/status/{photographer}', [VerificationController::class, 'getStatus'])->name('verifications.status');
+                    Route::post('/submit', [VerificationController::class, 'submitRequest'])->middleware('throttle:5,60')->name('verifications.submit');
+                    Route::post('/renew', [VerificationController::class, 'renewVerification'])->middleware('throttle:5,60')->name('verifications.renew');
+            
+                    // Admin endpoints
+                    Route::middleware('role:admin,super_admin')->group(function () {
+                        Route::get('/pending', [VerificationController::class, 'getPendingRequests'])->name('verifications.pending');
+                        Route::post('/{verificationRequest}/approve', [VerificationController::class, 'approveRequest'])->middleware('throttle:10,60')->name('verifications.approve');
+                        Route::post('/{verificationRequest}/reject', [VerificationController::class, 'rejectRequest'])->middleware('throttle:10,60')->name('verifications.reject');
+                        Route::post('/{photographer}/verifications/{verification}/revoke', [VerificationController::class, 'revokeVerification'])->middleware('throttle:10,60')->name('verifications.revoke');
+                        Route::get('/{photographer}/history', [VerificationController::class, 'getPhotographerHistory'])->name('verifications.history');
+                    });
+                });
+
         Route::get('/reviews', [ReviewController::class, 'index']);
         Route::post('/reviews', [ReviewController::class, 'store'])->middleware('throttle:5,60');
         Route::get('/photographers/{photographer_id}/reviews', [ReviewController::class, 'getPhotographerReviews']);
 
         // Events
-        Route::get('/events/{eventId}/rsvp-status', [EventController::class, 'rsvpStatus']);
-        Route::post('/events/{eventId}/rsvp', [EventController::class, 'rsvp'])->middleware('throttle:20,60');
+        Route::post('/events/{event}/rsvp', [EventController::class, 'rsvp'])->middleware('throttle:20,60');
 
         // Competitions
         Route::post('/competitions/{competition}/submit', [CompetitionController::class, 'submit']);
@@ -153,6 +334,33 @@ Route::prefix('v1')->group(function () {
             Route::put('/packages/{id}', [\App\Http\Controllers\Api\PackageController::class, 'update']);
             Route::delete('/packages/{id}', [\App\Http\Controllers\Api\PackageController::class, 'destroy']);
 
+            // Awards Management
+            Route::get('/awards', [PhotographerController::class, 'getAwards']);
+            Route::post('/awards', [PhotographerController::class, 'storeAward']);
+            Route::put('/awards/{id}', [PhotographerController::class, 'updateAward']);
+            Route::delete('/awards/{id}', [PhotographerController::class, 'deleteAward']);
+
+            // My Submissions (competition entries)
+            Route::get('/submissions', [PhotographerController::class, 'getMySubmissions']);
+            
+            // My Event RSVPs (registered events)
+            Route::get('/event-rsvps', [PhotographerController::class, 'getMyEventRsvps']);
+
+            // Notifications
+            Route::get('/notifications', [PhotographerController::class, 'getNotifications']);
+            Route::get('/notifications/unread-count', [PhotographerController::class, 'getUnreadNotificationCount']);
+            Route::post('/notifications/{id}/read', [PhotographerController::class, 'markNotificationAsRead']);
+            Route::post('/notifications/mark-all-read', [PhotographerController::class, 'markAllNotificationsAsRead']);
+            Route::delete('/notifications/{id}', [PhotographerController::class, 'deleteNotification']);
+
+            // Achievements & Gamification
+            Route::get('/achievements', [PhotographerController::class, 'getAchievements']);
+
+            // Onboarding Checklist
+            Route::get('/onboarding/checklist', [\App\Http\Controllers\Api\PhotographerOnboardingController::class, 'getChecklist']);
+            Route::put('/onboarding/checklist/update-step', [\App\Http\Controllers\Api\PhotographerOnboardingController::class, 'updateStep']);
+            Route::get('/onboarding/progress', [\App\Http\Controllers\Api\PhotographerOnboardingController::class, 'getProgress']);
+
             // Competition Management
             Route::get('/competitions', [PhotographerCompetitionController::class, 'index']);
             Route::post('/competitions', [PhotographerCompetitionController::class, 'store']);
@@ -167,12 +375,20 @@ Route::prefix('v1')->group(function () {
             Route::put('/events/{id}', [PhotographerEventController::class, 'update']);
             Route::delete('/events/{id}', [PhotographerEventController::class, 'destroy']);
             Route::post('/events/{id}/cancel', [PhotographerEventController::class, 'cancel']);
+            
+            // Awards & Achievements Management
+            Route::get('/awards', [\App\Http\Controllers\Api\PhotographerAwardController::class, 'index']);
+            Route::post('/awards', [\App\Http\Controllers\Api\PhotographerAwardController::class, 'store']);
+            Route::put('/awards/{id}', [\App\Http\Controllers\Api\PhotographerAwardController::class, 'update']);
+            Route::delete('/awards/{id}', [\App\Http\Controllers\Api\PhotographerAwardController::class, 'destroy']);
+            Route::post('/awards/reorder', [\App\Http\Controllers\Api\PhotographerAwardController::class, 'reorder']);
         });
 
         // Payments
         Route::post('/payments/initiate', [PaymentController::class, 'initiatePayment']);
         Route::get('/payments/transactions', [PaymentController::class, 'myTransactions']);
         Route::get('/payments/transactions/{transactionId}', [PaymentController::class, 'getTransaction']);
+        Route::post('/payments/{transactionId}/refund', [PaymentController::class, 'refund'])->middleware('throttle:3,60');
 
         // Notifications
         Route::get('/notifications', [NotificationController::class, 'index']);
@@ -180,11 +396,35 @@ Route::prefix('v1')->group(function () {
         Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
         Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
         Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+        
+        // Create Notifications (Testing/Admin)
+        Route::post('/notifications/create-test', [\App\Http\Controllers\Api\NotificationTestController::class, 'createTestNotification']);
+        Route::post('/notifications/create-admin', [\App\Http\Controllers\Api\NotificationTestController::class, 'createAdminNotification']);
+
+        // Activity Logs - User's own activity
+        Route::get('/my-activity', [ActivityLogController::class, 'myActivity']);
+
+        // Notification Preferences
+        Route::get('/notification-preferences', [NotificationPreferenceController::class, 'index']);
+        Route::put('/notification-preferences', [NotificationPreferenceController::class, 'update']);
+        Route::post('/notification-preferences/reset', [NotificationPreferenceController::class, 'reset']);
+        Route::get('/notification-channels', [NotificationPreferenceController::class, 'channels']);
+
+        // Judge Routes
+        Route::prefix('judge')->middleware('role:judge')->group(function () {
+            Route::get('/dashboard', [\App\Http\Controllers\Api\Judge\JudgeDashboardController::class, 'dashboard']);
+            Route::get('/competitions', [\App\Http\Controllers\Api\Judge\JudgeDashboardController::class, 'myCompetitions']);
+            Route::get('/competitions/{competition}/submissions', [\App\Http\Controllers\Api\Judge\JudgeDashboardController::class, 'competitionSubmissions']);
+            Route::get('/competitions/{competition}/submissions/{submission}', [\App\Http\Controllers\Api\Judge\JudgeDashboardController::class, 'getSubmission']);
+            Route::post('/competitions/{competition}/submissions/{submission}/score', [\App\Http\Controllers\Api\Judge\JudgeDashboardController::class, 'submitScore']);
+            Route::get('/scoring-history', [\App\Http\Controllers\Api\Judge\JudgeDashboardController::class, 'scoringHistory']);
+        });
 
         // Admin Routes
-        Route::prefix('admin')->group(function () {
+        Route::prefix('admin')->middleware('role:admin,super_admin,moderator')->group(function () {
             // Dashboard
             Route::get('/dashboard', [AdminController::class, 'dashboard']);
+            Route::get('/health', [\App\Http\Controllers\Api\HealthController::class, 'admin']);
             
             // User Management
             Route::get('/users', [AdminController::class, 'users']);
@@ -194,6 +434,8 @@ Route::prefix('v1')->group(function () {
             Route::delete('/users/{user}', [AdminController::class, 'deleteUser']);
             Route::post('/users/{user}/suspend', [AdminController::class, 'suspendUser']);
             Route::post('/users/{user}/unsuspend', [AdminController::class, 'unsuspendUser']);
+            Route::post('/users/{user}/promote-to-mentor', [AdminController::class, 'promoteToMentor']);
+            Route::post('/users/{user}/promote-to-judge', [AdminController::class, 'promoteToJudge']);
             
             // Verification Management
             Route::get('/verifications', [AdminController::class, 'getVerifications']);
@@ -203,12 +445,24 @@ Route::prefix('v1')->group(function () {
             // Audit Logs
             Route::get('/audit-logs', [AdminController::class, 'auditLogs']);
             
+            // Activity Logs
+            Route::get('/activity-logs', [ActivityLogController::class, 'index']);
+            Route::get('/activity-logs/statistics', [ActivityLogController::class, 'statistics']);
+            Route::get('/activity-logs/export', [ActivityLogController::class, 'export']);
+            Route::get('/activity-logs/model/{modelType}/{modelId}', [ActivityLogController::class, 'modelActivity']);
+            
             // Competition Management
             Route::get('/competitions', [AdminCompetitionApiController::class, 'index']);
             Route::post('/competitions', [AdminCompetitionApiController::class, 'store']);
             Route::get('/competitions/{id}', [AdminCompetitionApiController::class, 'show']);
             Route::put('/competitions/{id}', [AdminCompetitionApiController::class, 'update']);
             Route::delete('/competitions/{id}', [AdminCompetitionApiController::class, 'destroy']);
+            
+            // Winner calculation routes
+            Route::post('/competitions/{competition}/calculate-winners', [\App\Http\Controllers\Admin\CompetitionController::class, 'calculateWinners']);
+            Route::post('/competitions/{competition}/announce-winners', [\App\Http\Controllers\Admin\CompetitionController::class, 'announceWinners']);
+            Route::get('/competitions/{competition}/winners', [\App\Http\Controllers\Admin\CompetitionController::class, 'getWinners']);
+            Route::get('/competitions/{competition}/leaderboard', [\App\Http\Controllers\Admin\CompetitionController::class, 'getLeaderboard']);
 
             // Event Management
             Route::get('/events', [AdminEventApiController::class, 'index']);
@@ -218,6 +472,15 @@ Route::prefix('v1')->group(function () {
             Route::delete('/events/{id}', [AdminEventApiController::class, 'destroy']);
             Route::post('/events/bulk-update-status', [AdminEventApiController::class, 'bulkUpdateStatus']);
             Route::post('/events/{id}/toggle-featured', [AdminEventApiController::class, 'toggleFeatured']);
+            
+            // Event Check-in Management
+            Route::get('/events/{event}/check-in', [EventCheckInController::class, 'index']);
+            Route::post('/events/{event}/check-in/scan', [EventCheckInController::class, 'scan']);
+            Route::get('/events/{event}/check-in/registrations', [EventCheckInController::class, 'getRegistrations']);
+            Route::get('/events/{event}/check-in/qr/{qrToken}', [EventCheckInController::class, 'getByQrToken']);
+            Route::post('/events/{event}/check-in/manual', [EventCheckInController::class, 'manualCheckIn']);
+            Route::post('/registrations/{registration}/check-in/undo', [EventCheckInController::class, 'undoCheckIn']);
+            Route::get('/events/{event}/check-in/export', [EventCheckInController::class, 'exportCheckInReport']);
             
             // All Submissions (across all competitions)
             Route::get('/submissions', [CompetitionSubmissionController::class, 'allSubmissions']);
@@ -252,46 +515,52 @@ Route::prefix('v1')->group(function () {
             Route::get('/prizes/pending', [CompetitionController::class, 'getPendingPrizes']);
             Route::get('/prizes/statistics', [CompetitionController::class, 'getGlobalPrizeStats']);
             
-            // Category Management (Admin)
+            // Category Management (Admin) - COMPETITION CATEGORIES ONLY
             Route::post('/competitions/{competition}/categories', [CompetitionCategoryController::class, 'store']);
-            Route::put('/categories/{category}', [CompetitionCategoryController::class, 'update']);
-            Route::delete('/categories/{category}', [CompetitionCategoryController::class, 'destroy']);
+            Route::put('/competitions/{competition}/categories/{category}', [CompetitionCategoryController::class, 'update']);
+            Route::delete('/competitions/{competition}/categories/{category}', [CompetitionCategoryController::class, 'destroy']);
             Route::post('/competitions/{competition}/categories/bulk', [CompetitionCategoryController::class, 'bulkCreate']);
-            Route::post('/categories/{category}/toggle-active', [CompetitionCategoryController::class, 'toggleActive']);
+            Route::post('/competitions/{competition}/categories/{category}/toggle-active', [CompetitionCategoryController::class, 'toggleActive']);
             Route::get('/competitions/{competition}/categories/statistics', [CompetitionCategoryController::class, 'statistics']);
             
-            // Sponsorship Management (Admin)
+            // Platform Sponsor Management (must be before competition sponsors to avoid conflicts)
+            Route::get('/platform-sponsors', [\App\Http\Controllers\Api\Admin\SponsorController::class, 'index']);
+            Route::post('/platform-sponsors', [\App\Http\Controllers\Api\Admin\SponsorController::class, 'store']);
+            Route::get('/platform-sponsors/{id}', [\App\Http\Controllers\Api\Admin\SponsorController::class, 'show']);
+            Route::put('/platform-sponsors/{id}', [\App\Http\Controllers\Api\Admin\SponsorController::class, 'update']);
+            Route::delete('/platform-sponsors/{id}', [\App\Http\Controllers\Api\Admin\SponsorController::class, 'destroy']);
+            Route::post('/upload-logo', [\App\Http\Controllers\Api\Admin\SponsorController::class, 'uploadLogo']);
+            
+            // Contact Messages / Inquiries
+            Route::get('/contact-messages', [ContactMessageController::class, 'index']);
+            Route::post('/contact-messages', [ContactMessageController::class, 'store']);
+            Route::get('/contact-messages/stats', [ContactMessageController::class, 'stats']);
+            Route::get('/contact-messages/{id}', [ContactMessageController::class, 'show']);
+            Route::put('/contact-messages/{id}', [ContactMessageController::class, 'update']);
+            Route::put('/contact-messages/{id}/respond', [ContactMessageController::class, 'markAsResponded']);
+            Route::put('/contact-messages/{id}/archive', [ContactMessageController::class, 'archive']);
+            Route::patch('/contact-messages/{id}', [ContactMessageController::class, 'updateStatus']);
+            Route::delete('/contact-messages/{id}', [ContactMessageController::class, 'destroy']);
+            
+            // User Approval Management
+            Route::get('/pending-users', [\App\Http\Controllers\Api\Admin\UserApprovalController::class, 'index']);
+            Route::get('/approval-stats', [\App\Http\Controllers\Api\Admin\UserApprovalController::class, 'stats']);
+            Route::post('/users/{id}/approve', [\App\Http\Controllers\Api\Admin\UserApprovalController::class, 'approve']);
+            Route::post('/users/{id}/reject', [\App\Http\Controllers\Api\Admin\UserApprovalController::class, 'reject']);
+            Route::post('/users/bulk-approve', [\App\Http\Controllers\Api\Admin\UserApprovalController::class, 'bulkApprove']);
+            
+            // Sponsorship Management (Competition-specific)
             Route::post('/competitions/{competition}/sponsors', [CompetitionSponsorController::class, 'store']);
-            Route::put('/sponsors/{sponsor}', [CompetitionSponsorController::class, 'update']);
-            Route::delete('/sponsors/{sponsor}', [CompetitionSponsorController::class, 'destroy']);
+            Route::put('/competition-sponsors/{sponsor}', [CompetitionSponsorController::class, 'update']);
+            Route::delete('/competition-sponsors/{sponsor}', [CompetitionSponsorController::class, 'destroy']);
             Route::post('/competitions/{competition}/sponsors/bulk', [CompetitionSponsorController::class, 'bulkCreate']);
-            Route::post('/sponsors/{sponsor}/toggle-active', [CompetitionSponsorController::class, 'toggleActive']);
+            Route::post('/competition-sponsors/{sponsor}/toggle-active', [CompetitionSponsorController::class, 'toggleActive']);
             Route::post('/competitions/{competition}/sponsors/reorder', [CompetitionSponsorController::class, 'reorder']);
             Route::get('/competitions/{competition}/sponsors/statistics', [CompetitionSponsorController::class, 'statistics']);
-            Route::get('/sponsors/global-statistics', [CompetitionSponsorController::class, 'globalStatistics']);
+            Route::get('/competition-sponsors/global-statistics', [CompetitionSponsorController::class, 'globalStatistics']);
             
             // Activity Logs
             Route::get('/activity-logs', [ActivityLogController::class, 'index']);
-            Route::get('/activity-logs/stats', [ActivityLogController::class, 'stats']);
-            Route::get('/activity-logs/{id}', [ActivityLogController::class, 'show']);
-            Route::get('/activity-logs/user/{userId}', [ActivityLogController::class, 'userHistory']);
-            Route::get('/activity-logs/model/history', [ActivityLogController::class, 'modelHistory']);
-            
-            // Data Exports
-            Route::get('/export/users', [ExportController::class, 'exportUsers']);
-            Route::get('/export/photographers', [ExportController::class, 'exportPhotographers']);
-            Route::get('/export/bookings', [ExportController::class, 'exportBookings']);
-            Route::get('/export/activity-logs', [ExportController::class, 'exportActivityLogs']);
-            
-            // Sponsor Management
-            Route::get('/sponsors', [\App\Http\Controllers\Api\Admin\SponsorController::class, 'index']);
-            Route::post('/sponsors', [\App\Http\Controllers\Api\Admin\SponsorController::class, 'store']);
-            Route::get('/sponsors/{id}', [\App\Http\Controllers\Api\Admin\SponsorController::class, 'show']);
-            Route::put('/sponsors/{id}', [\App\Http\Controllers\Api\Admin\SponsorController::class, 'update']);
-            Route::delete('/sponsors/{id}', [\App\Http\Controllers\Api\Admin\SponsorController::class, 'destroy']);
-            
-            // Photo Category Management
-            Route::get('/photo-categories', [\App\Http\Controllers\Api\Admin\PhotoCategoryController::class, 'index']);
             Route::post('/photo-categories', [\App\Http\Controllers\Api\Admin\PhotoCategoryController::class, 'store']);
             Route::get('/photo-categories/{id}', [\App\Http\Controllers\Api\Admin\PhotoCategoryController::class, 'show']);
             Route::put('/photo-categories/{id}', [\App\Http\Controllers\Api\Admin\PhotoCategoryController::class, 'update']);
@@ -304,6 +573,120 @@ Route::prefix('v1')->group(function () {
             Route::get('/hashtags/{id}', [\App\Http\Controllers\Api\Admin\HashtagController::class, 'show']);
             Route::put('/hashtags/{id}', [\App\Http\Controllers\Api\Admin\HashtagController::class, 'update']);
             Route::delete('/hashtags/{id}', [\App\Http\Controllers\Api\Admin\HashtagController::class, 'destroy']);
+            
+            // Mentor Management
+            Route::get('/mentors', [\App\Http\Controllers\Api\Admin\MentorController::class, 'index']);
+            Route::post('/mentors', [\App\Http\Controllers\Api\Admin\MentorController::class, 'store']);
+            Route::get('/mentors/{mentor}', [\App\Http\Controllers\Api\Admin\MentorController::class, 'show'])->where('mentor', '[0-9]+');
+            Route::put('/mentors/{mentor}', [\App\Http\Controllers\Api\Admin\MentorController::class, 'update'])->where('mentor', '[0-9]+');
+            Route::delete('/mentors/{mentor}', [\App\Http\Controllers\Api\Admin\MentorController::class, 'destroy'])->where('mentor', '[0-9]+');
+            Route::post('/mentors/{mentor}/toggle-status', [\App\Http\Controllers\Api\Admin\MentorController::class, 'toggleStatus'])->where('mentor', '[0-9]+');
+            Route::post('/mentors/reorder', [\App\Http\Controllers\Api\Admin\MentorController::class, 'updateOrder']);
+            
+            // Judge Management
+            Route::get('/judges', [\App\Http\Controllers\Api\Admin\JudgeController::class, 'index']);
+            Route::post('/judges', [\App\Http\Controllers\Api\Admin\JudgeController::class, 'store']);
+            Route::get('/judges/{judge}', [\App\Http\Controllers\Api\Admin\JudgeController::class, 'show'])->where('judge', '[0-9]+');
+            Route::put('/judges/{judge}', [\App\Http\Controllers\Api\Admin\JudgeController::class, 'update'])->where('judge', '[0-9]+');
+            Route::delete('/judges/{judge}', [\App\Http\Controllers\Api\Admin\JudgeController::class, 'destroy'])->where('judge', '[0-9]+');
+            Route::post('/judges/{judge}/toggle-status', [\App\Http\Controllers\Api\Admin\JudgeController::class, 'toggleStatus'])->where('judge', '[0-9]+');
+            
+            // Certificate Templates (P0-007)
+            Route::get('/certificate-templates', [CertificateTemplateController::class, 'index']);
+            Route::post('/certificate-templates', [CertificateTemplateController::class, 'store']);
+            Route::get('/certificate-templates/{id}', [CertificateTemplateController::class, 'show']);
+            Route::put('/certificate-templates/{id}', [CertificateTemplateController::class, 'update']);
+            Route::delete('/certificate-templates/{id}', [CertificateTemplateController::class, 'destroy']);
+            Route::get('/certificate-templates/type/{type}/default', [CertificateTemplateController::class, 'getDefault']);
+            
+            // Notice Management
+            Route::get('/notices', [\App\Http\Controllers\Api\Admin\NoticeController::class, 'index']);
+            Route::post('/notices', [\App\Http\Controllers\Api\Admin\NoticeController::class, 'store']);
+            Route::get('/notices/{id}', [\App\Http\Controllers\Api\Admin\NoticeController::class, 'show']);
+            Route::put('/notices/{id}', [\App\Http\Controllers\Api\Admin\NoticeController::class, 'update']);
+            Route::delete('/notices/{id}', [\App\Http\Controllers\Api\Admin\NoticeController::class, 'destroy']);
+            Route::get('/notices/roles/available', [\App\Http\Controllers\Api\Admin\NoticeController::class, 'getRoles']);
+            
+            // SEO Meta Management
+            Route::get('/seo/all', [\App\Http\Controllers\Api\Admin\SeoMetaController::class, 'index']);
+            Route::get('/seo', [\App\Http\Controllers\Api\Admin\SeoMetaController::class, 'show']);
+            Route::post('/seo', [\App\Http\Controllers\Api\Admin\SeoMetaController::class, 'store']);
+            Route::post('/seo/generate', [\App\Http\Controllers\Api\Admin\SeoMetaController::class, 'generate']);
+            Route::post('/seo/preview', [\App\Http\Controllers\Api\Admin\SeoMetaController::class, 'preview']);
+            Route::delete('/seo', [\App\Http\Controllers\Api\Admin\SeoMetaController::class, 'destroy']);
+            
+            // City Management
+            Route::get('/cities', [CityController::class, 'adminIndex']);
+            Route::post('/cities', [CityController::class, 'store']);
+            Route::get('/cities/{id}', [CityController::class, 'show']);
+            Route::put('/cities/{id}', [CityController::class, 'update']);
+            Route::delete('/cities/{id}', [CityController::class, 'destroy']);
+            
+            // Category Management
+            Route::get('/categories', [CategoryController::class, 'adminIndex']);
+            Route::post('/categories', [CategoryController::class, 'store']);
+            Route::get('/categories/{id}', [CategoryController::class, 'show']);
+            Route::put('/categories/{id}', [CategoryController::class, 'update']);
+            Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+            
+            // Photographer Management
+            Route::get('/photographers', [AdminController::class, 'getPhotographers']);
+            Route::post('/photographers', [AdminController::class, 'storePhotographer']);
+            Route::get('/photographers/{id}', [AdminController::class, 'showPhotographer']);
+            Route::put('/photographers/{id}', [AdminController::class, 'updatePhotographer']);
+            Route::delete('/photographers/{id}', [AdminController::class, 'deletePhotographer']);
+            Route::post('/photographers/{id}/verify', [AdminController::class, 'verifyPhotographer']);
+            Route::post('/photographers/{id}/feature', [AdminController::class, 'featurePhotographer']);
+            Route::post('/photographers/{photographer}/onboarding/reset', [\App\Http\Controllers\Api\PhotographerOnboardingController::class, 'resetChecklist']);
+            Route::get('/photographers/onboarding/pending', [\App\Http\Controllers\Api\PhotographerOnboardingController::class, 'getPendingOnboardings']);
+            
+            // Review Management
+            Route::get('/reviews', [AdminReviewController::class, 'index']);
+            Route::get('/reviews/stats', [AdminReviewController::class, 'stats']);
+            Route::put('/reviews/{id}/status', [AdminReviewController::class, 'updateStatus']);
+            Route::post('/reviews/{id}/report', [AdminReviewController::class, 'markAsReported']);
+            Route::delete('/reviews/{id}', [AdminReviewController::class, 'destroy']);
+            Route::post('/reviews/bulk-update', [AdminReviewController::class, 'bulkUpdateStatus']);
+            
+            // Booking Management
+            Route::get('/bookings', [AdminBookingController::class, 'index']);
+            Route::get('/bookings/stats', [AdminBookingController::class, 'stats']);
+            Route::get('/bookings/{id}', [AdminBookingController::class, 'show']);
+            Route::put('/bookings/{id}/status', [AdminBookingController::class, 'updateStatus']);
+            Route::delete('/bookings/{id}', [AdminBookingController::class, 'destroy']);
+            
+            // Transaction Management
+            Route::get('/transactions', [AdminTransactionController::class, 'index']);
+            Route::get('/transactions/stats', [AdminTransactionController::class, 'stats']);
+            Route::get('/transactions/{id}', [AdminTransactionController::class, 'show']);
+            Route::put('/transactions/{id}/status', [AdminTransactionController::class, 'updateStatus']);
+            Route::post('/transactions/{id}/refund', [AdminTransactionController::class, 'refund']);
+            Route::get('/transactions/export', [AdminTransactionController::class, 'export']);
+            
+            // Settings Management
+            Route::get('/settings', [AdminSettingsController::class, 'index']);
+            Route::put('/settings/{key}', [AdminSettingsController::class, 'update']);
+            Route::post('/settings/bulk', [AdminSettingsController::class, 'bulkUpdate']);
+            Route::get('/settings/category/{category}', [AdminSettingsController::class, 'getCategory']);
+            Route::post('/settings/reset', [AdminSettingsController::class, 'reset']);
+            
+            // Error Center - System Error Tracking & Management
+            Route::prefix('error-logs')->group(function () {
+                Route::get('/', [ErrorCenterController::class, 'index']);
+                Route::get('/statistics', [ErrorCenterController::class, 'statistics']);
+                Route::get('{id}', [ErrorCenterController::class, 'show'])->middleware('role:super_admin');
+                Route::post('{id}/resolve', [ErrorCenterController::class, 'markResolved']);
+                Route::post('{id}/unresolve', [ErrorCenterController::class, 'markUnresolved']);
+                Route::post('{id}/mute', [ErrorCenterController::class, 'mute']);
+                Route::post('{id}/unmute', [ErrorCenterController::class, 'unmute']);
+                Route::post('clear-resolved', [ErrorCenterController::class, 'clearResolved'])->middleware('role:super_admin');
+                Route::get('export', [ErrorCenterController::class, 'export']);
+            });
         });
+
+        // User Notices (for any authenticated user)
+        Route::get('/notices/my-notices', [\App\Http\Controllers\Api\Admin\NoticeController::class, 'getMyNotices']);
+        Route::post('/notices/{id}/read', [\App\Http\Controllers\Api\Admin\NoticeController::class, 'markAsRead']);
     });
 });
+

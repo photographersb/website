@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Hashtag;
 use App\Models\PhotoCategory;
 use Illuminate\Http\Request;

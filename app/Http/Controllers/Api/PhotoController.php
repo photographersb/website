@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Photo;
 use App\Models\Album;
+use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 
 class PhotoController extends Controller
 {
+    use ApiResponse;
     /**
      * Add photos to album
      */
@@ -19,10 +21,7 @@ class PhotoController extends Controller
         $photographer = $user->photographer;
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer profile not found',
-            ], 404);
+            return $this->notFound('Photographer profile not found');
         }
 
         // Verify album ownership
@@ -34,6 +33,8 @@ class PhotoController extends Controller
             'photos.*.thumbnail_url' => 'nullable|url',
             'photos.*.title' => 'nullable|string|max:255',
             'photos.*.description' => 'nullable|string|max:500',
+            'photos.*.mime_type' => 'nullable|in:image/jpeg,image/png,image/webp',
+            'photos.*.file_size' => 'nullable|integer|max:5242880',
         ]);
 
         $createdPhotos = [];
@@ -61,11 +62,7 @@ class PhotoController extends Controller
             $album->update(['cover_photo_url' => $createdPhotos[0]->image_url]);
         }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => count($createdPhotos) . ' photo(s) added successfully',
-            'data' => $createdPhotos,
-        ], 201);
+        return $this->created($createdPhotos, count($createdPhotos) . ' photo(s) added successfully');
     }
 
     /**
@@ -107,23 +104,13 @@ class PhotoController extends Controller
                     ];
                 }, $data['photos'] ?? []);
 
-                return response()->json([
-                    'status' => 'success',
-                    'data' => $photos,
-                    'total' => $data['total_results'] ?? 0,
-                ]);
+                return $this->success($photos, 'Photos retrieved from Pexels', 200, ['total' => $data['total_results'] ?? 0]);
             }
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to fetch photos from Pexels',
-            ], 500);
+            return $this->error('Failed to fetch photos from Pexels', 500);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Error connecting to Pexels: ' . $e->getMessage(),
-            ], 500);
+            return $this->error('Error connecting to Pexels: ' . $e->getMessage(), 500);
         }
     }
 
@@ -136,10 +123,7 @@ class PhotoController extends Controller
         $photographer = $user->photographer;
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer profile not found',
-            ], 404);
+            return $this->notFound('Photographer profile not found');
         }
 
         $photo = Photo::where('photographer_id', $photographer->id)->findOrFail($id);
@@ -156,10 +140,7 @@ class PhotoController extends Controller
             $album->update(['cover_photo_url' => $newCover ? $newCover->image_url : null]);
         }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Photo deleted successfully',
-        ]);
+        return $this->success([], 'Photo deleted successfully');
     }
 
     /**
@@ -171,10 +152,7 @@ class PhotoController extends Controller
         $photographer = $user->photographer;
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer profile not found',
-            ], 404);
+            return $this->notFound('Photographer profile not found');
         }
 
         $photo = Photo::where('photographer_id', $photographer->id)->findOrFail($id);
@@ -187,10 +165,6 @@ class PhotoController extends Controller
 
         $photo->update($validated);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Photo updated successfully',
-            'data' => $photo->fresh(),
-        ]);
+        return $this->success($photo->fresh(), 'Photo updated successfully');
     }
 }

@@ -1,21 +1,29 @@
 <template>
-  <div class="admin-users-management">
-    <!-- Page Header -->
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">👥 User Management</h1>
-        <p class="page-subtitle">Manage all platform users and their accounts</p>
-      </div>
-      <button @click="showAddModal = true" class="btn-primary">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        Add User
-      </button>
-    </div>
+  <div class="min-h-screen bg-gray-50">
+    <!-- Admin Header with Back Button & Notifications -->
+    <AdminHeader 
+      title="👥 User Management" 
+      subtitle="Manage all platform users and their accounts"
+    />
 
-    <!-- Stats Cards -->
-    <div class="stats-grid">
+    <!-- Main Content -->
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      
+      <!-- Quick Navigation -->
+      <AdminQuickNav />
+
+      <!-- Add User Button -->
+      <div class="flex justify-end">
+        <button @click="showAddModal = true" class="btn-primary">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Add User
+        </button>
+      </div>
+
+        <!-- Stats Cards -->
+      <div class="stats-grid">
       <div class="stat-card stat-blue">
         <div class="stat-icon">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,8 +73,8 @@
       </div>
     </div>
 
-    <!-- Filters & Search -->
-    <div class="content-card">
+      <!-- Filters & Search -->
+      <div class="content-card">
       <div class="filters-bar">
         <div class="search-box">
           <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,6 +182,16 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
+                  <button v-if="!user.mentor" @click="showPromoteToMentor(user)" class="btn-action btn-mentor" title="Promote to Mentor">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                  </button>
+                  <button v-if="!user.judge" @click="showPromoteToJudge(user)" class="btn-action btn-judge" title="Promote to Judge">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                  </button>
                   <button v-if="!user.is_suspended" @click="suspendUser(user)" class="btn-action btn-warning" title="Suspend User">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -201,6 +219,34 @@
         <div class="pagination-info">
           Showing {{ users.length }} of {{ stats.total }} users
         </div>
+        <div class="pagination-controls">
+          <button 
+            @click="changePage(pagination.currentPage - 1)"
+            :disabled="pagination.currentPage === 1"
+            class="pagination-btn"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Previous
+          </button>
+          
+          <div class="pagination-pages">
+            <span class="pagination-current">Page {{ pagination.currentPage }} of {{ pagination.totalPages }}</span>
+          </div>
+          
+          <button 
+            @click="changePage(pagination.currentPage + 1)"
+            :disabled="pagination.currentPage === pagination.totalPages"
+            class="pagination-btn"
+          >
+            Next
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
       </div>
     </div>
 
@@ -211,8 +257,12 @@
           <h3>User Details</h3>
           <button @click="showViewModal = false" class="modal-close">×</button>
         </div>
-        <div class="modal-body" v-if="selectedUser">
-          <div class="detail-grid">
+        <div class="modal-body">
+          <div v-if="loadingUserDetails" class="loading-state-inline">
+            <div class="spinner-small"></div>
+            <p>Loading user details...</p>
+          </div>
+          <div v-else-if="selectedUser" class="detail-grid">
             <div class="detail-item">
               <span class="detail-label">Name:</span>
               <span class="detail-value">{{ selectedUser.name }}</span>
@@ -242,6 +292,26 @@
               <span class="detail-label">Joined:</span>
               <span>{{ formatDate(selectedUser.created_at) }}</span>
             </div>
+            <div class="detail-item full-width">
+              <span class="detail-label">Additional Roles:</span>
+              <div class="role-badges">
+                <span v-if="selectedUser.photographer" class="badge badge-photographer">
+                  📷 Photographer
+                </span>
+                <span v-if="selectedUser.mentor" class="badge badge-mentor">
+                  🎓 Mentor
+                </span>
+                <span v-if="selectedUser.judge" class="badge badge-judge">
+                  ⚖️ Judge
+                </span>
+                <span v-if="!selectedUser.photographer && !selectedUser.mentor && !selectedUser.judge" class="text-muted">
+                  None yet
+                </span>
+              </div>
+            </div>
+          </div>
+          <div v-else class="empty-state-inline">
+            <p>No user data available</p>
           </div>
         </div>
       </div>
@@ -278,8 +348,11 @@
               <select v-model="userForm.role" required class="form-input">
                 <option value="client">Client</option>
                 <option value="photographer">Photographer</option>
+                <option value="studio_owner">Studio Owner</option>
+                <option value="studio_photographer">Studio Photographer</option>
                 <option value="admin">Admin</option>
                 <option value="super_admin">Super Admin</option>
+                <option value="moderator">Moderator</option>
               </select>
             </div>
             <div class="form-actions">
@@ -291,14 +364,139 @@
       </div>
     </div>
 
-    <!-- Success Toast -->
-    <div v-if="showToast" class="toast">
-      {{ toastMessage }}
+    <!-- Promote to Mentor Modal -->
+    <div v-if="showPromoteMentorModal" class="modal-overlay" @click.self="closePromotionModals">
+      <div class="modal modal-large">
+        <div class="modal-header">
+          <h3>🎓 Promote {{ userToPromote?.name }} to Mentor</h3>
+          <button @click="closePromotionModals" class="modal-close">×</button>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="promoteToMentor" class="user-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Name *</label>
+                <input v-model="mentorForm.name" type="text" required class="form-input" placeholder="Full Name" />
+              </div>
+              <div class="form-group">
+                <label>Title *</label>
+                <input v-model="mentorForm.title" type="text" required class="form-input" placeholder="e.g., Senior Photographer" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Organization</label>
+              <input v-model="mentorForm.organization" type="text" class="form-input" placeholder="Company/Studio Name" />
+            </div>
+            <div class="form-group">
+              <label>Bio *</label>
+              <textarea v-model="mentorForm.bio" required class="form-input" rows="4" placeholder="Professional biography and expertise..."></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Email *</label>
+                <input v-model="mentorForm.email" type="email" required class="form-input" placeholder="email@example.com" />
+              </div>
+              <div class="form-group">
+                <label>Phone</label>
+                <input v-model="mentorForm.phone" type="text" class="form-input" placeholder="+880 1234567890" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Country *</label>
+                <input v-model="mentorForm.country" type="text" required class="form-input" placeholder="Bangladesh" />
+              </div>
+              <div class="form-group">
+                <label>City *</label>
+                <input v-model="mentorForm.city" type="text" required class="form-input" placeholder="Dhaka" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input v-model="mentorForm.is_active" type="checkbox" />
+                <span>Active (visible to users)</span>
+              </label>
+            </div>
+            <div class="form-actions">
+              <button type="button" @click="closePromotionModals" class="btn-secondary">Cancel</button>
+              <button type="submit" class="btn-primary">Promote to Mentor</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Promote to Judge Modal -->
+    <div v-if="showPromoteJudgeModal" class="modal-overlay" @click.self="closePromotionModals">
+      <div class="modal modal-large">
+        <div class="modal-header">
+          <h3>⚖️ Promote {{ userToPromote?.name }} to Judge</h3>
+          <button @click="closePromotionModals" class="modal-close">×</button>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="promoteToJudge" class="user-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Name *</label>
+                <input v-model="judgeForm.name" type="text" required class="form-input" placeholder="Full Name" />
+              </div>
+              <div class="form-group">
+                <label>Title *</label>
+                <input v-model="judgeForm.title" type="text" required class="form-input" placeholder="e.g., Photography Judge" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Organization</label>
+              <input v-model="judgeForm.organization" type="text" class="form-input" placeholder="Professional Association/Studio" />
+            </div>
+            <div class="form-group">
+              <label>Bio *</label>
+              <textarea v-model="judgeForm.bio" required class="form-input" rows="4" placeholder="Professional biography and judging experience..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Email *</label>
+              <input v-model="judgeForm.email" type="email" required class="form-input" placeholder="email@example.com" />
+            </div>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input v-model="judgeForm.is_active" type="checkbox" />
+                <span>Active (can judge competitions)</span>
+              </label>
+            </div>
+            <div class="form-actions">
+              <button type="button" @click="closePromotionModals" class="btn-secondary">Cancel</button>
+              <button type="submit" class="btn-primary">Promote to Judge</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div v-if="showToast" class="toast" :class="toastType">
+      <div class="toast-content">
+        <svg v-if="toastType === 'error'" class="toast-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <svg v-else class="toast-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div class="toast-message">
+          <span>{{ toastMessage }}</span>
+        </div>
+        <button @click="copyToClipboard(toastMessage)" class="toast-copy" title="Copy to clipboard">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import AdminHeader from '../../../components/AdminHeader.vue'
+import AdminQuickNav from '../../../components/AdminQuickNav.vue'
 import { ref, computed, onMounted } from 'vue'
 
 const users = ref([])
@@ -309,6 +507,11 @@ const showEditModal = ref(false)
 const selectedUser = ref(null)
 const showToast = ref(false)
 const toastMessage = ref('')
+const toastType = ref('success')
+const showPromoteMentorModal = ref(false)
+const showPromoteJudgeModal = ref(false)
+const userToPromote = ref(null)
+const loadingUserDetails = ref(false)
 
 const userForm = ref({
   name: '',
@@ -316,6 +519,27 @@ const userForm = ref({
   phone: '',
   password: '',
   role: 'client'
+})
+
+const mentorForm = ref({
+  name: '',
+  title: '',
+  organization: '',
+  bio: '',
+  email: '',
+  phone: '',
+  country: 'Bangladesh',
+  city: '',
+  is_active: true
+})
+
+const judgeForm = ref({
+  name: '',
+  title: '',
+  organization: '',
+  bio: '',
+  email: '',
+  is_active: true
 })
 
 const filters = ref({
@@ -330,13 +554,26 @@ const stats = ref({
   suspended: 0
 })
 
+const pagination = ref({
+  currentPage: 1,
+  perPage: 30,
+  totalPages: 1
+})
+
 let searchTimeout = null
 
 const debounceSearch = () => {
   clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => {
+    pagination.value.currentPage = 1 // Reset to first page on new search
     fetchUsers()
   }, 500)
+}
+
+const changePage = (page) => {
+  if (page < 1 || page > pagination.value.totalPages) return
+  pagination.value.currentPage = page
+  fetchUsers()
 }
 
 const fetchUsers = async () => {
@@ -347,6 +584,8 @@ const fetchUsers = async () => {
     
     if (filters.value.search) params.append('search', filters.value.search)
     if (filters.value.role) params.append('role', filters.value.role)
+    params.append('page', pagination.value.currentPage)
+    params.append('per_page', pagination.value.perPage)
 
     const response = await fetch(`/api/v1/admin/users?${params}`, {
       headers: {
@@ -358,12 +597,19 @@ const fetchUsers = async () => {
     const data = await response.json()
     
     if (data.status === 'success') {
-      users.value = data.data
-      stats.value = {
-        total: data.meta?.total || data.data.length,
-        active: data.data.filter(u => !u.is_suspended).length,
-        photographers: data.data.filter(u => u.role === 'photographer').length,
-        suspended: data.data.filter(u => u.is_suspended).length
+      users.value = data.data.users
+      
+      // Update pagination from meta
+      pagination.value.currentPage = data.meta.current_page
+      pagination.value.perPage = data.meta.per_page
+      pagination.value.totalPages = data.meta.last_page
+      
+      // Use backend-calculated stats (accounts for filters)
+      stats.value = data.data.stats || {
+        total: data.meta.total,
+        active: 0,
+        photographers: 0,
+        suspended: 0
       }
     }
   } catch (error) {
@@ -374,9 +620,49 @@ const fetchUsers = async () => {
   }
 }
 
-const viewUser = (user) => {
-  selectedUser.value = user
-  showViewModal.value = true
+const viewUser = async (user) => {
+  loadingUserDetails.value = true
+  try {
+    const token = localStorage.getItem('auth_token')
+    if (!token) {
+      console.error('No auth token found')
+      selectedUser.value = user
+      showViewModal.value = true
+      loadingUserDetails.value = false
+      return
+    }
+
+    const response = await fetch(`/api/v1/admin/users/${user.id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    })
+    
+    if (!response.ok) {
+      console.error(`API error: ${response.status}`)
+      selectedUser.value = user
+      showViewModal.value = true
+      loadingUserDetails.value = false
+      return
+    }
+
+    const data = await response.json()
+    console.log('User details response:', data)
+    
+    if (data.status === 'success' && data.user) {
+      selectedUser.value = data.user
+    } else {
+      selectedUser.value = user
+    }
+    showViewModal.value = true
+  } catch (error) {
+    console.error('Error fetching user details:', error)
+    selectedUser.value = user
+    showViewModal.value = true
+  } finally {
+    loadingUserDetails.value = false
+  }
 }
 
 const editUser = (user) => {
@@ -454,14 +740,15 @@ const deleteUser = async (user) => {
     const data = await response.json()
     
     if (data.status === 'success') {
-      showToastMessage(data.message)
+      showToastMessage(data.message, 'success')
       fetchUsers()
     } else {
-      showToastMessage(data.message || 'Error deleting user')
+      showToastMessage(data.message || 'Error deleting user', 'error')
     }
   } catch (error) {
     console.error('Error deleting user:', error)
-    showToastMessage('Error deleting user')
+    const errorMsg = error.response?.data?.message || error.message || 'Error deleting user'
+    showToastMessage(errorMsg, 'error')
   }
 }
 
@@ -521,6 +808,101 @@ const unsuspendUser = async (user) => {
   }
 }
 
+const showPromoteToMentor = (user) => {
+  userToPromote.value = user
+  mentorForm.value = {
+    name: user.name,
+    title: '',
+    organization: '',
+    bio: '',
+    email: user.email,
+    phone: user.phone || '',
+    country: 'Bangladesh',
+    city: '',
+    is_active: true
+  }
+  showPromoteMentorModal.value = true
+}
+
+const showPromoteToJudge = (user) => {
+  userToPromote.value = user
+  judgeForm.value = {
+    name: user.name,
+    title: '',
+    organization: '',
+    bio: '',
+    email: user.email,
+    is_active: true
+  }
+  showPromoteJudgeModal.value = true
+}
+
+const promoteToMentor = async () => {
+  if (!userToPromote.value) return
+  
+  try {
+    const token = localStorage.getItem('auth_token')
+    const response = await fetch(`/api/v1/admin/users/${userToPromote.value.id}/promote-to-mentor`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(mentorForm.value)
+    })
+    
+    const data = await response.json()
+    
+    if (data.status === 'success') {
+      showToastMessage(`${userToPromote.value.name} has been promoted to Mentor!`, 'success')
+      showPromoteMentorModal.value = false
+      fetchUsers()
+    } else {
+      showToastMessage(data.message || 'Error promoting user to mentor', 'error')
+    }
+  } catch (error) {
+    console.error('Error promoting to mentor:', error)
+    showToastMessage('Error promoting user to mentor', 'error')
+  }
+}
+
+const promoteToJudge = async () => {
+  if (!userToPromote.value) return
+  
+  try {
+    const token = localStorage.getItem('auth_token')
+    const response = await fetch(`/api/v1/admin/users/${userToPromote.value.id}/promote-to-judge`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(judgeForm.value)
+    })
+    
+    const data = await response.json()
+    
+    if (data.status === 'success') {
+      showToastMessage(`${userToPromote.value.name} has been promoted to Judge!`, 'success')
+      showPromoteJudgeModal.value = false
+      fetchUsers()
+    } else {
+      showToastMessage(data.message || 'Error promoting user to judge', 'error')
+    }
+  } catch (error) {
+    console.error('Error promoting to judge:', error)
+    showToastMessage('Error promoting user to judge', 'error')
+  }
+}
+
+const closePromotionModals = () => {
+  showPromoteMentorModal.value = false
+  showPromoteJudgeModal.value = false
+  userToPromote.value = null
+}
+
 const exportUsers = () => {
   showToastMessage('Export feature coming soon')
 }
@@ -529,27 +911,42 @@ const formatRole = (role) => {
   const roles = {
     'client': 'Client',
     'photographer': 'Photographer',
+    'studio_owner': 'Studio Owner',
+    'studio_photographer': 'Studio Photographer',
     'admin': 'Admin',
-    'super_admin': 'Super Admin'
+    'super_admin': 'Super Admin',
+    'moderator': 'Moderator'
   }
   return roles[role] || role
 }
 
 const formatDate = (date) => {
   if (!date) return 'N/A'
-  return new Date(date).toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
-  })
+  const d = new Date(date)
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const year = d.getFullYear()
+  return `${day}-${month}-${year}` // DD-MM-YYYY for Bangladesh
 }
 
-const showToastMessage = (message) => {
+const showToastMessage = (message, type = 'success') => {
   toastMessage.value = message
+  toastType.value = type
   showToast.value = true
   setTimeout(() => {
     showToast.value = false
-  }, 3000)
+  }, type === 'error' ? 5000 : 3000) // Errors stay longer
+}
+
+const copyToClipboard = (text) => {
+  navigator.clipboard.writeText(text).then(() => {
+    // Show copied feedback
+    const originalMessage = toastMessage.value
+    toastMessage.value = 'Copied to clipboard!'
+    setTimeout(() => {
+      toastMessage.value = originalMessage
+    }, 1000)
+  })
 }
 
 onMounted(() => {
@@ -558,30 +955,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.admin-users-management {
-  padding: 2rem;
-  min-height: 100vh;
-  background: #f9fafb;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.page-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-}
-
-.page-subtitle {
-  color: #6b7280;
-  margin: 0.5rem 0 0 0;
-}
 
 .stats-grid {
   display: grid;
@@ -601,10 +974,10 @@ onMounted(() => {
   border-left: 4px solid;
 }
 
-.stat-blue { border-color: #3b82f6; }
-.stat-green { border-color: #10b981; }
-.stat-purple { border-color: #8b5cf6; }
-.stat-red { border-color: #ef4444; }
+.stat-blue { border-color: var(--admin-brand-primary); }
+.stat-green { border-color: var(--admin-brand-primary); }
+.stat-purple { border-color: var(--admin-brand-primary); }
+.stat-red { border-color: var(--admin-brand-primary); }
 
 .stat-icon {
   width: 3rem;
@@ -616,10 +989,10 @@ onMounted(() => {
   background: rgba(59, 130, 246, 0.1);
 }
 
-.stat-blue .stat-icon { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-.stat-green .stat-icon { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-.stat-purple .stat-icon { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
-.stat-red .stat-icon { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.stat-blue .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-green .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-purple .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-red .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
 
 .stat-content {
   display: flex;
@@ -678,8 +1051,8 @@ onMounted(() => {
 
 .search-input:focus {
   outline: none;
-  border-color: #6c0b1a;
-  box-shadow: 0 0 0 3px rgba(108, 11, 26, 0.1);
+  border-color: var(--admin-brand-primary);
+  box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.12);
 }
 
 .filter-select {
@@ -692,13 +1065,13 @@ onMounted(() => {
 
 .filter-select:focus {
   outline: none;
-  border-color: #6c0b1a;
+  border-color: var(--admin-brand-primary);
 }
 
 .btn-primary {
   display: flex;
   align-items: center;
-  background: #6c0b1a;
+  background: var(--admin-brand-primary);
   color: white;
   padding: 0.75rem 1.5rem;
   border: none;
@@ -709,7 +1082,7 @@ onMounted(() => {
 }
 
 .btn-primary:hover {
-  background: #4a070f;
+  background: var(--admin-brand-primary-dark);
 }
 
 .btn-export {
@@ -727,8 +1100,8 @@ onMounted(() => {
 
 .btn-export:hover {
   background: #f9fafb;
-  border-color: #6c0b1a;
-  color: #6c0b1a;
+  border-color: var(--admin-brand-primary);
+  color: var(--admin-brand-primary);
 }
 
 .loading-state {
@@ -737,14 +1110,36 @@ onMounted(() => {
   color: #6b7280;
 }
 
+.loading-state-inline {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+.empty-state-inline {
+  text-align: center;
+  padding: 2rem;
+  color: #9ca3af;
+}
+
 .spinner {
   width: 3rem;
   height: 3rem;
   border: 3px solid #e5e7eb;
-  border-top-color: #6c0b1a;
+  border-top-color: var(--admin-brand-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem;
+}
+
+.spinner-small {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid #e5e7eb;
+  border-top-color: var(--admin-brand-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 0.5rem;
 }
 
 @keyframes spin {
@@ -789,7 +1184,7 @@ onMounted(() => {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6c0b1a, #9d1429);
+  background: var(--admin-brand-primary);
   color: white;
   display: flex;
   align-items: center;
@@ -833,18 +1228,18 @@ onMounted(() => {
   white-space: nowrap;
 }
 
-.badge-client { background: #dbeafe; color: #1e40af; }
-.badge-photographer { background: #fce7f3; color: #be185d; }
-.badge-admin { background: #fef3c7; color: #92400e; }
-.badge-super_admin { background: #fee2e2; color: #991b1b; }
-.badge-success { background: #d1fae5; color: #065f46; }
-.badge-danger { background: #fee2e2; color: #991b1b; }
+.badge-client { background: var(--admin-info-light); color: var(--admin-info-text); }
+.badge-photographer { background: var(--admin-info-light); color: var(--admin-info-text); }
+.badge-admin { background: var(--admin-info-light); color: var(--admin-info-text); }
+.badge-super_admin { background: var(--admin-info-light); color: var(--admin-info-text); }
+.badge-success { background: var(--admin-success-light); color: var(--admin-success-text); }
+.badge-danger { background: var(--admin-danger-light); color: var(--admin-danger-text); }
 
 .verified-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  color: #059669;
+  color: var(--admin-success);
   font-size: 0.875rem;
   font-weight: 500;
 }
@@ -875,20 +1270,42 @@ onMounted(() => {
 
 .btn-action:hover {
   background: #f9fafb;
-  border-color: #6c0b1a;
-  color: #6c0b1a;
+  border-color: var(--admin-brand-primary);
+  color: var(--admin-brand-primary);
 }
 
 .btn-danger:hover {
-  background: #fee2e2;
-  border-color: #ef4444;
-  color: #ef4444;
+  background: var(--admin-danger-light);
+  border-color: var(--admin-danger);
+  color: var(--admin-danger-text);
 }
 
 .btn-success:hover {
-  background: #d1fae5;
-  border-color: #10b981;
-  color: #10b981;
+  background: var(--admin-success-light);
+  border-color: var(--admin-success);
+  color: var(--admin-success-text);
+}
+
+.btn-mentor {
+  color: #7c3aed;
+  border-color: #7c3aed;
+}
+
+.btn-mentor:hover {
+  background: #ede9fe;
+  border-color: #7c3aed;
+  color: #7c3aed;
+}
+
+.btn-judge {
+  color: #0891b2;
+  border-color: #0891b2;
+}
+
+.btn-judge:hover {
+  background: #cffafe;
+  border-color: #0891b2;
+  color: #0891b2;
 }
 
 .empty-state {
@@ -916,6 +1333,48 @@ onMounted(() => {
   font-size: 0.875rem;
 }
 
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pagination-pages {
+  color: #6b7280;
+  font-size: 0.875rem;
+  padding: 0 1rem;
+}
+
+.pagination-current {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: white;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -938,6 +1397,10 @@ onMounted(() => {
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modal-large {
+  max-width: 800px;
 }
 
 .modal-header {
@@ -993,6 +1456,12 @@ onMounted(() => {
   border-radius: 0.5rem;
 }
 
+.detail-item.full-width {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
 .detail-label {
   font-weight: 600;
   color: #6b7280;
@@ -1000,6 +1469,33 @@ onMounted(() => {
 
 .detail-value {
   color: #1f2937;
+}
+
+.role-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.badge-photographer {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge-mentor {
+  background: #ede9fe;
+  color: #581c87;
+}
+
+.badge-judge {
+  background: #cffafe;
+  color: #164e63;
+}
+
+.text-muted {
+  color: #9ca3af;
+  font-size: 0.875rem;
 }
 
 .user-form {
@@ -1014,6 +1510,12 @@ onMounted(() => {
   gap: 0.5rem;
 }
 
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
 .form-group label {
   font-weight: 600;
   color: #374151;
@@ -1026,12 +1528,27 @@ onMounted(() => {
   border-radius: 0.5rem;
   font-size: 0.875rem;
   transition: all 0.2s;
+  font-family: inherit;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #6c0b1a;
-  box-shadow: 0 0 0 3px rgba(108, 11, 26, 0.1);
+  border-color: var(--admin-brand-primary);
+  box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.1);
+}
+
+.form-input[type="checkbox"] {
+  width: auto;
+  cursor: pointer;
+  margin-right: 0.5rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 500;
+  color: #374151;
 }
 
 .form-hint {
@@ -1059,8 +1576,8 @@ onMounted(() => {
 
 .btn-secondary:hover {
   background: #f9fafb;
-  border-color: #6c0b1a;
-  color: #6c0b1a;
+  border-color: var(--admin-brand-primary);
+  color: var(--admin-brand-primary);
 }
 
 .btn-warning:hover {
@@ -1075,11 +1592,64 @@ onMounted(() => {
   right: 2rem;
   background: #065f46;
   color: white;
-  padding: 1rem 1.5rem;
+  padding: 0;
   border-radius: 0.5rem;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   animation: slideIn 0.3s ease-out;
   z-index: 1001;
+  min-width: 320px;
+  max-width: 500px;
+}
+
+.toast.error {
+  background: #dc2626;
+}
+
+.toast.success {
+  background: #065f46;
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+}
+
+.toast-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  word-break: break-word;
+  user-select: text;
+  cursor: text;
+}
+
+.toast-copy {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.toast-copy:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.toast-copy svg {
+  color: white;
 }
 
 @keyframes slideIn {
@@ -1100,133 +1670,4 @@ onMounted(() => {
 .w-8 { width: 2rem; }
 .h-8 { height: 2rem; }
 .mr-2 { margin-right: 0.5rem; }
-</style>
-
-<style scoped>
-.admin-users-management {
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.page-header {
-  margin-bottom: 2rem;
-}
-
-.page-title {
-  font-size: 2rem;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
-}
-
-.page-subtitle {
-  color: #6b7280;
-}
-
-.content-card {
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  padding: 2rem;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.stat-box {
-  background: #f9fafb;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-label {
-  color: #6b7280;
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
-}
-
-.stat-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.text-green { color: #10b981; }
-.text-red { color: #ef4444; }
-
-.btn-primary {
-  background: #6c0b1a;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.btn-primary:hover {
-  background: #4a070f;
-}
-
-.table-container {
-  overflow-x: auto;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.data-table th {
-  text-align: left;
-  padding: 1rem;
-  background: #f9fafb;
-  color: #6b7280;
-  font-weight: 600;
-  font-size: 0.875rem;
-}
-
-.data-table td {
-  padding: 1rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-.badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.badge-client { background: #dbeafe; color: #1e40af; }
-.badge-photographer { background: #fce7f3; color: #be185d; }
-.badge-admin { background: #fef3c7; color: #92400e; }
-.badge-super_admin { background: #fee2e2; color: #991b1b; }
-.badge-success { background: #d1fae5; color: #065f46; }
-
-.btn-icon {
-  background: none;
-  border: none;
-  font-size: 1.25rem;
-  cursor: pointer;
-  padding: 0.25rem;
-  margin: 0 0.25rem;
-}
-
-.btn-icon:hover {
-  opacity: 0.7;
-}
 </style>

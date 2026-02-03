@@ -49,7 +49,7 @@
                             <div v-if="hashtag.description" class="text-xs text-gray-500">{{ hashtag.description }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span v-if="hashtag.category" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                            <span v-if="hashtag.category" class="badge badge-primary">
                                 {{ hashtag.category.name }}
                             </span>
                             <span v-else class="text-sm text-gray-500">-</span>
@@ -58,11 +58,11 @@
                             {{ hashtag.usage_count || 0 }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span v-if="hashtag.is_featured" class="text-yellow-500">⭐</span>
+                            <span v-if="hashtag.is_featured" class="text-primary-600">⭐</span>
                             <span v-else class="text-gray-300">☆</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button @click="editHashtag(hashtag)" class="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
+                            <button @click="editHashtag(hashtag)" class="text-burgundy hover:text-burgundy-dark mr-3">Edit</button>
                             <button @click="deleteHashtag(hashtag.id)" class="text-red-600 hover:text-red-900">Delete</button>
                         </td>
                     </tr>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authenticating...</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 20px;
+            border: 4px solid #f3f4f6;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .success {
+            color: #059669;
+            background: #d1fae5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner" id="spinner"></div>
+        <h1 id="title">Authenticating...</h1>
+        <p id="message">Please wait while we complete your login.</p>
+    </div>
+
+    <script>
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const provider = window.location.pathname.split('/')[3]; // Extract provider from URL
+            
+            // Handle OAuth callback
+            async function handleCallback() {
+                try {
+                    // Call backend to process OAuth callback
+                    const response = await fetch(`/api/v1/auth/${provider}/callback${window.location.search}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        // Success
+                        document.getElementById('spinner').style.display = 'none';
+                        document.getElementById('title').textContent = 'Success!';
+                        document.getElementById('message').innerHTML = '<div class="success">You have been logged in successfully. Redirecting...</div>';
+
+                        // Send message to parent window (if opened in popup)
+                        if (window.opener) {
+                            window.opener.postMessage({
+                                type: 'oauth_success',
+                                token: data.token,
+                                user: data.user
+                            }, window.location.origin);
+                            
+                            setTimeout(() => {
+                                window.close();
+                            }, 1500);
+                        } else {
+                            // If not popup, redirect to dashboard
+                            setTimeout(() => {
+                                window.location.href = '/dashboard';
+                            }, 1500);
+                        }
+                    } else {
+                        throw new Error(data.message || 'Authentication failed');
+                    }
+                } catch (error) {
+                    console.error('OAuth callback error:', error);
+                    document.getElementById('spinner').style.display = 'none';
+                    document.getElementById('title').textContent = 'Authentication Failed';
+                    document.getElementById('message').innerHTML = `<div class="error">${error.message || 'An error occurred during authentication.'}</div>`;
+
+                    // Send error message to parent window
+                    if (window.opener) {
+                        window.opener.postMessage({
+                            type: 'oauth_error',
+                            error: error.message
+                        }, window.location.origin);
+
+                        setTimeout(() => {
+                            window.close();
+                        }, 3000);
+                    }
+                }
+            }
+
+            // Start callback handling
+            handleCallback();
+        })();
+    </script>
+</body>
+</html>

@@ -1,9 +1,12 @@
 <template>
-  <div class="admin-payments">
-    <div class="page-header">
-      <h1 class="page-title">💰 Payment Gateway Management</h1>
-      <p class="page-subtitle">Configure and monitor payment gateways</p>
-    </div>
+  <div class="min-h-screen bg-gray-50">
+    <AdminHeader 
+      title="💰 Payment Gateway Management" 
+      subtitle="Configure and monitor payment gateways"
+    />
+
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <AdminQuickNav />
 
     <div class="content-card">
       <div class="gateways-grid">
@@ -47,6 +50,7 @@
           </div>
         </div>
       </div>
+    </div>
     </div>
   </div>
 </template>

@@ -1,20 +1,29 @@
 <template>
-  <div class="admin-reviews">
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">⭐ Review Management</h1>
-        <p class="page-subtitle">Monitor and moderate platform reviews</p>
-      </div>
-      <button @click="exportReviews" class="btn-export-main">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        Export
-      </button>
-    </div>
+  <div class="min-h-screen bg-gray-50">
+    <!-- Admin Header with Back Button & Notifications -->
+    <AdminHeader 
+      title="⭐ Review Management" 
+      subtitle="Monitor and moderate platform reviews"
+    />
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
+    <!-- Main Content -->
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      
+      <!-- Quick Navigation -->
+      <AdminQuickNav />
+
+      <!-- Export Button -->
+      <div class="flex justify-end">
+        <button @click="exportReviews" class="btn-export-main">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Export
+        </button>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
       <div class="stat-card stat-blue">
         <div class="stat-icon">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,7 +44,7 @@
         </div>
         <div class="stat-content">
           <span class="stat-label">Average Rating</span>
-          <span class="stat-value">{{ stats.avgRating }} ⭐</span>
+          <span class="stat-value">{{ stats.avg_rating }} ⭐</span>
         </div>
       </div>
 
@@ -46,8 +55,8 @@
           </svg>
         </div>
         <div class="stat-content">
-          <span class="stat-label">Positive (4-5★)</span>
-          <span class="stat-value">{{ stats.positive }}</span>
+          <span class="stat-label">Published</span>
+          <span class="stat-value">{{ stats.published }}</span>
         </div>
       </div>
 
@@ -59,7 +68,7 @@
         </div>
         <div class="stat-content">
           <span class="stat-label">Flagged</span>
-          <span class="stat-value">{{ stats.flagged }}</span>
+          <span class="stat-value">{{ stats.reported }}</span>
         </div>
       </div>
     </div>
@@ -110,7 +119,12 @@
             <div class="reviewer-info">
               <div class="reviewer-avatar">{{ review.booking?.client?.name?.charAt(0).toUpperCase() || 'C' }}</div>
               <div>
-                <div class="reviewer-name">{{ review.booking?.client?.name || 'Anonymous' }}</div>
+                <div class="reviewer-name">
+                  {{ review.booking?.client?.name || 'Anonymous' }}
+                  <span v-if="review.is_anonymous" class="ml-2 badge badge-info" title="This review is displayed as anonymous to the public">
+                    🔒 Public: Anonymous
+                  </span>
+                </div>
                 <div class="review-date">{{ formatDate(review.created_at) }}</div>
               </div>
             </div>
@@ -190,7 +204,12 @@
           <div class="detail-grid">
             <div class="detail-item">
               <span class="detail-label">Client:</span>
-              <span class="detail-value">{{ selectedReview.booking?.client?.name }}</span>
+              <span class="detail-value">
+                {{ selectedReview.booking?.client?.name }}
+                <span v-if="selectedReview.is_anonymous" class="ml-2 badge badge-info">
+                  🔒 Public: Anonymous
+                </span>
+              </span>
             </div>
             <div class="detail-item">
               <span class="detail-label">Photographer:</span>
@@ -221,14 +240,16 @@
         </div>
       </div>
     </div>
-
     <!-- Toast -->
     <div v-if="showToast" class="toast">{{ toastMessage }}</div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import AdminHeader from '../../../components/AdminHeader.vue'
+import AdminQuickNav from '../../../components/AdminQuickNav.vue'
 
 const reviews = ref([])
 const loading = ref(false)
@@ -243,14 +264,13 @@ const filters = ref({
   status: ''
 })
 
-const stats = computed(() => {
-  const total = reviews.value.length
-  const sumRating = reviews.value.reduce((sum, r) => sum + (r.rating || 0), 0)
-  const avgRating = total > 0 ? (sumRating / total).toFixed(1) : '0.0'
-  const positive = reviews.value.filter(r => r.rating >= 4).length
-  const flagged = reviews.value.filter(r => r.is_flagged).length
-  
-  return { total, avgRating, positive, flagged }
+const stats = ref({
+  total: 0,
+  pending: 0,
+  published: 0,
+  rejected: 0,
+  reported: 0,
+  avg_rating: 0
 })
 
 let searchTimeout = null
@@ -266,8 +286,13 @@ const fetchReviews = async () => {
   loading.value = true
   try {
     const token = localStorage.getItem('auth_token')
-    // Using photographer reviews endpoint as example - you may need to adjust
-    const response = await fetch('/api/v1/reviews', {
+    const params = new URLSearchParams()
+    
+    if (filters.value.search) params.append('search', filters.value.search)
+    if (filters.value.status) params.append('status', filters.value.status)
+    if (filters.value.rating) params.append('rating', filters.value.rating)
+    
+    const response = await fetch(`/api/v1/admin/reviews?${params}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json'
@@ -276,7 +301,11 @@ const fetchReviews = async () => {
     
     if (response.ok) {
       const data = await response.json()
-      reviews.value = data.data || []
+      reviews.value = data.data?.data || data.data || []
+      // Use stats from backend
+      if (data.stats) {
+        stats.value = data.stats
+      }
     }
   } catch (error) {
     console.error('Error fetching reviews:', error)
@@ -321,11 +350,11 @@ const exportReviews = () => {
 
 const formatDate = (date) => {
   if (!date) return 'N/A'
-  return new Date(date).toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
-  })
+  const d = new Date(date)
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const year = d.getFullYear()
+  return `${day}-${month}-${year}`
 }
 
 const showToastMessage = (message) => {
@@ -342,25 +371,25 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.admin-reviews { padding: 2rem; min-height: 100vh; background: #f9fafb; }
+.admin-reviews { padding: 2rem; min-height: 100vh; background: var(--admin-bg-page); }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
 .page-title { font-size: 2rem; font-weight: 700; color: #1f2937; margin: 0; }
 .page-subtitle { color: #6b7280; margin: 0.5rem 0 0 0; }
 
-.btn-export-main { display: flex; align-items: center; background: #6c0b1a; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: background 0.2s; }
-.btn-export-main:hover { background: #4a070f; }
+.btn-export-main { display: flex; align-items: center; background: var(--admin-brand-primary); color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+.btn-export-main:hover { background: var(--admin-brand-primary-dark); }
 
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
 .stat-card { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 1rem; border-left: 4px solid; }
-.stat-blue { border-color: #3b82f6; }
-.stat-yellow { border-color: #f59e0b; }
-.stat-green { border-color: #10b981; }
-.stat-red { border-color: #ef4444; }
+.stat-blue { border-color: var(--admin-brand-primary); }
+.stat-yellow { border-color: var(--admin-brand-primary); }
+.stat-green { border-color: var(--admin-brand-primary); }
+.stat-red { border-color: var(--admin-brand-primary); }
 .stat-icon { width: 3rem; height: 3rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; }
-.stat-blue .stat-icon { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-.stat-yellow .stat-icon { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
-.stat-green .stat-icon { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-.stat-red .stat-icon { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.stat-blue .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-yellow .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-green .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-red .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
 .stat-content { display: flex; flex-direction: column; }
 .stat-label { color: #6b7280; font-size: 0.875rem; margin-bottom: 0.25rem; }
 .stat-value { font-size: 2rem; font-weight: 700; color: #1f2937; }
@@ -370,12 +399,12 @@ onMounted(() => {
 .search-box { position: relative; flex: 1; min-width: 300px; }
 .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); width: 1.25rem; height: 1.25rem; color: #9ca3af; }
 .search-input { width: 100%; padding: 0.75rem 1rem 0.75rem 3rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; }
-.search-input:focus { outline: none; border-color: #6c0b1a; box-shadow: 0 0 0 3px rgba(108, 11, 26, 0.1); }
+.search-input:focus { outline: none; border-color: var(--admin-brand-primary); box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.12); }
 .filter-select { padding: 0.75rem 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; cursor: pointer; }
-.filter-select:focus { outline: none; border-color: #6c0b1a; }
+.filter-select:focus { outline: none; border-color: var(--admin-brand-primary); }
 
 .loading-state { text-align: center; padding: 3rem; color: #6b7280; }
-.spinner { width: 3rem; height: 3rem; border: 3px solid #e5e7eb; border-top-color: #6c0b1a; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+.spinner { width: 3rem; height: 3rem; border: 3px solid #e5e7eb; border-top-color: var(--admin-brand-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .reviews-container { display: grid; gap: 1.5rem; }
@@ -384,27 +413,27 @@ onMounted(() => {
 
 .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
 .reviewer-info { display: flex; align-items: center; gap: 0.75rem; }
-.reviewer-avatar { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: linear-gradient(135deg, #6c0b1a, #9d1429); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1rem; }
+.reviewer-avatar { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--admin-brand-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1rem; }
 .reviewer-name { font-weight: 600; color: #1f2937; }
 .review-date { font-size: 0.875rem; color: #6b7280; }
 
 .review-actions { display: flex; gap: 0.5rem; }
 .btn-action { width: 2rem; height: 2rem; border: 1px solid #e5e7eb; background: white; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #6b7280; transition: all 0.2s; }
-.btn-action:hover { background: #f9fafb; border-color: #6c0b1a; color: #6c0b1a; }
-.btn-success:hover { background: #d1fae5; border-color: #10b981; color: #10b981; }
-.btn-warning:hover { background: #fef3c7; border-color: #f59e0b; color: #f59e0b; }
-.btn-danger:hover { background: #fee2e2; border-color: #ef4444; color: #ef4444; }
+.btn-action:hover { background: #f9fafb; border-color: var(--admin-brand-primary); color: var(--admin-brand-primary); }
+.btn-success:hover { background: var(--admin-success-light); border-color: var(--admin-success); color: var(--admin-success-text); }
+.btn-warning:hover { background: var(--admin-warning-light); border-color: var(--admin-warning); color: var(--admin-warning-text); }
+.btn-danger:hover { background: var(--admin-danger-light); border-color: var(--admin-danger); color: var(--admin-danger-text); }
 
 .review-body { display: flex; flex-direction: column; gap: 1rem; }
 .photographer-reviewed { display: flex; align-items: center; gap: 0.5rem; color: #6b7280; font-size: 0.875rem; }
 .rating-stars { display: flex; align-items: center; gap: 0.25rem; }
-.star-filled { color: #f59e0b; font-size: 1.25rem; }
+.star-filled { color: var(--admin-brand-primary); font-size: 1.25rem; }
 .star-empty { color: #d1d5db; font-size: 1.25rem; }
 .rating-number { margin-left: 0.5rem; color: #6b7280; font-size: 0.875rem; font-weight: 600; }
 .review-comment { color: #1f2937; line-height: 1.6; margin: 0; }
 .review-comment-full { color: #1f2937; line-height: 1.6; background: #f9fafb; padding: 1rem; border-radius: 0.5rem; margin: 0; }
 
-.flagged-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: #fef3c7; color: #92400e; padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; }
+.flagged-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--admin-warning-light); color: var(--admin-warning-text); padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; }
 
 .empty-state { text-align: center; padding: 4rem 2rem; color: #9ca3af; }
 .empty-icon { font-size: 5rem; margin-bottom: 1rem; opacity: 0.5; }

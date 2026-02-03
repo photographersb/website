@@ -25,6 +25,8 @@ return new class extends Migration
             $table->decimal('total_amount', 10, 2);
             $table->enum('status', ['pending_payment', 'confirmed', 'in_progress', 'completed', 'cancelled'])->default('pending_payment');
             $table->enum('payment_status', ['pending', 'completed', 'failed', 'refunded'])->default('pending');
+            $table->enum('payment_method', ['card', 'bkash', 'nagad', 'bank_transfer', 'manual'])->default('manual');
+            $table->string('payment_gateway')->default('manual');
             $table->text('cancellation_reason')->nullable();
             $table->timestamp('cancelled_at')->nullable();
             $table->timestamp('confirmed_at')->nullable();

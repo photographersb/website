@@ -1,282 +1,192 @@
 <template>
-  <div class="admin-dashboard">
-    <!-- Modern Header with Gradient -->
-    <div class="dashboard-header-modern">
-      <div class="header-content">
-        <div class="header-left">
-          <h1 class="dashboard-title">
-            <svg class="w-10 h-10 text-burgundy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <div>
-              <span class="title-main">Admin Control Center</span>
-              <p class="title-subtitle">Platform Overview & Management</p>
-            </div>
-          </h1>
-          <div class="welcome-stats">
-            <div class="stat-pill">
-              <span class="stat-pill-icon">🎯</span>
-              <span class="stat-pill-label">Today's Goal:</span>
-              <span class="stat-pill-value">85% Complete</span>
-            </div>
-            <div class="stat-pill">
-              <span class="stat-pill-icon">⚡</span>
-              <span class="stat-pill-label">System Health:</span>
-              <span class="stat-pill-value text-green-600">Excellent</span>
-            </div>
-          </div>
-        </div>
-        <div class="header-right">
-          <button @click="refreshData" class="btn-refresh" :disabled="loading">
-            <svg class="w-5 h-5" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            <span>Refresh</span>
-          </button>
-          <select v-model="timeRange" @change="refreshData" class="form-select-modern">
-            <option value="today">📅 Today</option>
-            <option value="week">📊 This Week</option>
-            <option value="month">📈 This Month</option>
-            <option value="year">🎯 This Year</option>
-          </select>
-          <div class="current-time">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>{{ currentTime }}</span>
-          </div>
-        </div>
+  <div class="admin-dashboard min-h-screen bg-gray-50">
+    <!-- Admin Header with Notifications -->
+    <AdminHeader 
+      title="📊 Platform Dashboard" 
+      subtitle="Real-time analytics & management console"
+      :show-back="false"
+    />
+
+    <!-- Main Content -->
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <!-- Time Range & Refresh Controls -->
+      <div class="flex justify-end items-center gap-4 mb-6">
+        <select v-model="timeRange" @change="refreshData" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="year">This Year</option>
+        </select>
+        <button
+          @click="refreshData"
+          :disabled="loading"
+          class="px-4 py-2 bg-burgundy text-white rounded-lg hover:bg-burgundy-dark disabled:opacity-50 flex items-center gap-2"
+        >
+          <svg v-if="loading" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Refresh
+        </button>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading dashboard data...</p>
+    <div v-if="loading" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-burgundy"></div>
+      <p class="mt-4 text-gray-600">Loading dashboard data...</p>
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="error" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="bg-danger-50 border border-danger-200 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-danger-700">Failed to Load Dashboard</h3>
+        <p class="text-danger-700 mt-2">{{ error }}</p>
+        <button @click="refreshData" class="mt-4 btn-admin-danger">
+          Try Again
+        </button>
+      </div>
     </div>
 
     <!-- Dashboard Content -->
-    <div v-else-if="dashboardData" class="dashboard-content">
+    <div v-else-if="dashboardData" class="space-y-6">
       
-      <!-- Overview Stats - Modern Cards -->
-      <div class="stats-grid-modern">
-        <!-- Total Users -->
-        <div class="stat-card-modern stat-users">
-          <div class="stat-card-header">
-            <div class="stat-icon-modern">
-              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <!-- ⚡ QUICK NAVIGATION - Component Based -->
+      <AdminQuickNav />
+
+      <!-- KEY METRICS - Top Priority -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Users Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-gray-600 text-sm font-medium">Total Users</p>
+              <p class="text-3xl font-bold text-gray-900 mt-2">{{ formatNumber(stats.total_users) }}</p>
+              <p class="text-xs text-gray-500 mt-1">{{ stats.active_users || 0 }} active</p>
+            </div>
+            <div class="text-primary-700 bg-primary-50 p-3 rounded-lg">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             </div>
-            <div class="stat-trend stat-trend-up">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-              <span>+12.5%</span>
-            </div>
           </div>
-          <div class="stat-body">
-            <h3 class="stat-label-modern">Total Users</h3>
-            <p class="stat-value-modern">{{ formatNumber(dashboardData.stats.total_users) }}</p>
-            <div class="stat-footer-modern">
-              <span class="stat-badge-modern stat-badge-blue">
-                {{ dashboardData.stats.active_users }} Active (30d)
-              </span>
+        </div>
+
+        <!-- Total Photographers Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-gray-600 text-sm font-medium">Photographers</p>
+              <p class="text-3xl font-bold text-gray-900 mt-2">{{ formatNumber(stats.total_photographers) }}</p>
+              <p class="text-xs text-gray-500 mt-1">{{ stats.verified_photographers || 0 }} verified</p>
+            </div>
+            <div class="text-primary-700 bg-primary-50 p-3 rounded-lg">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0118.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+              </svg>
             </div>
           </div>
         </div>
 
-        <!-- Total Photographers -->
-        <div class="stat-card-modern stat-photographers">
-          <div class="stat-card-header">
-            <div class="stat-icon-modern">
-              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+        <!-- Total Bookings Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-gray-600 text-sm font-medium">Total Bookings</p>
+              <p class="text-3xl font-bold text-gray-900 mt-2">{{ formatNumber(stats.total_bookings) }}</p>
+              <p class="text-xs text-gray-500 mt-1">{{ stats.pending_bookings || 0 }} pending</p>
             </div>
-            <div class="stat-trend stat-trend-up">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            <div class="text-primary-700 bg-primary-50 p-3 rounded-lg">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
-              <span>+8.2%</span>
-            </div>
-          </div>
-          <div class="stat-body">
-            <h3 class="stat-label-modern">Photographers</h3>
-            <p class="stat-value-modern">{{ formatNumber(dashboardData.stats.total_photographers) }}</p>
-            <div class="stat-footer-modern">
-              <span class="stat-badge-modern stat-badge-purple">
-                {{ dashboardData.stats.verified_photographers }} Verified
-              </span>
             </div>
           </div>
         </div>
 
-        <!-- Total Bookings -->
-        <div class="stat-card-modern stat-bookings">
-          <div class="stat-card-header">
-            <div class="stat-icon-modern">
-              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-              </svg>
+        <!-- Total Revenue Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-gray-600 text-sm font-medium">Total Revenue</p>
+              <p class="text-3xl font-bold text-gray-900 mt-2">৳{{ formatNumber(stats.total_revenue) }}</p>
+              <p class="text-xs text-gray-500 mt-1">৳{{ formatNumber(stats.monthly_revenue || 0) }} this month</p>
             </div>
-            <div class="stat-trend stat-trend-up">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-              <span>+15.3%</span>
-            </div>
-          </div>
-          <div class="stat-body">
-            <h3 class="stat-label-modern">Total Bookings</h3>
-            <p class="stat-value-modern">{{ formatNumber(dashboardData.stats.total_bookings) }}</p>
-            <div class="stat-footer-modern">
-              <span class="stat-badge-modern stat-badge-green">
-                {{ dashboardData.stats.pending_bookings }} Pending
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Total Revenue -->
-        <div class="stat-card-modern stat-revenue">
-          <div class="stat-card-header">
-            <div class="stat-icon-modern">
-              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="text-primary-700 bg-primary-50 p-3 rounded-lg">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <div class="stat-trend stat-trend-up">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-              <span>+22.8%</span>
-            </div>
-          </div>
-          <div class="stat-body">
-            <h3 class="stat-label-modern">Total Revenue</h3>
-            <p class="stat-value-modern">৳{{ formatNumber(dashboardData.stats.total_revenue) }}</p>
-            <div class="stat-footer-modern">
-              <span class="stat-badge-modern stat-badge-orange">
-                ৳{{ formatNumber(dashboardData.stats.monthly_revenue) }} This Month
-              </span>
-            </div>
           </div>
         </div>
       </div>
 
-      <!-- Charts Row -->
-      <div class="charts-row">
-        <!-- Revenue Trend Chart -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3 class="text-lg font-semibold">Revenue Trend (Last 12 Months)</h3>
-            <span class="badge-info">Monthly</span>
-          </div>
-          <div class="chart-container">
-            <canvas ref="revenueChart"></canvas>
-          </div>
+      <!-- Secondary Stats Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-lg shadow p-4">
+          <p class="text-gray-600 text-xs font-medium uppercase">Events</p>
+          <p class="text-2xl font-bold text-gray-900 mt-1">{{ formatNumber(stats.total_events) }}</p>
+          <p class="text-xs text-gray-500 mt-1">{{ stats.published_events || 0 }} published</p>
         </div>
-
-        <!-- User Growth Chart -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3 class="text-lg font-semibold">User Growth (Last 12 Months)</h3>
-            <span class="badge-info">Monthly</span>
-          </div>
-          <div class="chart-container">
-            <canvas ref="userGrowthChart"></canvas>
-          </div>
+        <div class="bg-white rounded-lg shadow p-4">
+          <p class="text-gray-600 text-xs font-medium uppercase">Competitions</p>
+          <p class="text-2xl font-bold text-gray-900 mt-1">{{ formatNumber(stats.total_competitions) }}</p>
+          <p class="text-xs text-gray-500 mt-1">{{ stats.active_competitions || 0 }} active</p>
         </div>
-      </div>
-
-      <!-- Secondary Stats Row -->
-      <div class="secondary-stats-row">
-        <!-- Booking Status Distribution -->
-        <div class="stats-card">
-          <h3 class="stats-card-title">Booking Status</h3>
-          <div class="stats-list">
-            <div v-for="stat in dashboardData.booking_stats" :key="stat.status" class="stats-item">
-              <span class="stats-label" :class="`badge-${getStatusColor(stat.status)}`">
-                {{ capitalizeFirst(stat.status) }}
-              </span>
-              <span class="stats-value">{{ stat.count }}</span>
-            </div>
-          </div>
+        <div class="bg-white rounded-lg shadow p-4">
+          <p class="text-gray-600 text-xs font-medium uppercase">Reviews</p>
+          <p class="text-2xl font-bold text-primary-700 mt-1">{{ parseFloat(stats.avg_rating).toFixed(1) }}★</p>
+          <p class="text-xs text-gray-500 mt-1">{{ stats.total_reviews || 0 }} total</p>
         </div>
-
-        <!-- Payment Gateways -->
-        <div class="stats-card">
-          <h3 class="stats-card-title">Payment Methods</h3>
-          <div class="stats-list">
-            <div v-for="gateway in dashboardData.payment_gateways" :key="gateway.payment_method" class="stats-item">
-              <span class="stats-label">{{ capitalizeFirst(gateway.payment_method) }}</span>
-              <div class="stats-value-group">
-                <span class="stats-count">{{ gateway.count }}</span>
-                <span class="stats-amount">৳{{ formatNumber(gateway.total) }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Platform Health -->
-        <div class="stats-card">
-          <h3 class="stats-card-title">Platform Health</h3>
-          <div class="health-metrics">
-            <div class="health-item">
-              <span class="health-label">Uptime</span>
-              <span class="health-value text-green-600">{{ dashboardData.platform_health.uptime }}</span>
-            </div>
-            <div class="health-item">
-              <span class="health-label">Response Time</span>
-              <span class="health-value text-blue-600">{{ dashboardData.platform_health.avg_response_time }}</span>
-            </div>
-            <div class="health-item">
-              <span class="health-label">Active Sessions</span>
-              <span class="health-value text-purple-600">{{ dashboardData.platform_health.active_sessions }}</span>
-            </div>
-          </div>
+        <div class="bg-white rounded-lg shadow p-4">
+          <p class="text-gray-600 text-xs font-medium uppercase">Active Visitors</p>
+          <p class="text-2xl font-bold text-gray-900 mt-1">{{ formatNumber(stats.active_visitors) }}</p>
+          <p class="text-xs text-gray-500 mt-1">{{ stats.visitors_today || 0 }} today</p>
         </div>
       </div>
 
-      <!-- Top Photographers -->
-      <div class="table-card">
-        <div class="table-header">
-          <h3 class="text-lg font-semibold">Top Rated Photographers</h3>
-          <router-link to="/admin/users" class="text-red-600 hover:text-red-700 text-sm font-medium">
+      <!-- TOP PHOTOGRAPHERS & ACTIVITY -->
+      <div class="space-y-6">
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+          <h2 class="text-lg font-semibold text-gray-900">Top Rated Photographers</h2>
+          <router-link to="/admin/photographers" class="text-burgundy hover:text-burgundy-dark text-sm font-medium">
             View All →
           </router-link>
         </div>
-        <div class="table-responsive">
-          <table class="data-table">
-            <thead>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th>Photographer</th>
-                <th>Email</th>
-                <th>Rating</th>
-                <th>Reviews</th>
-                <th>Status</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Email</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Rating</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Reviews</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
               </tr>
             </thead>
-            <tbody>
-              <tr v-for="photographer in dashboardData.top_photographers" :key="photographer.id">
-                <td>
+            <tbody class="divide-y divide-gray-200">
+              <tr v-for="photographer in topPhotographers" :key="photographer.id" class="hover:bg-gray-50">
+                <td class="px-6 py-4 text-sm">
                   <div class="flex items-center gap-3">
-                    <div class="avatar">{{ photographer.user?.name?.charAt(0) || 'U' }}</div>
+                    <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-xs font-bold text-primary-700">
+                      {{ photographer.user?.name?.charAt(0) || 'U' }}
+                    </div>
                     <span class="font-medium">{{ photographer.user?.name || 'Unknown' }}</span>
                   </div>
                 </td>
-                <td>{{ photographer.user?.email || 'N/A' }}</td>
-                <td>
-                  <span class="rating-badge">
-                    {{ parseFloat(photographer.average_rating).toFixed(1) }}★
+                <td class="px-6 py-4 text-sm text-gray-600">{{ photographer.user?.email || 'N/A' }}</td>
+                <td class="px-6 py-4 text-sm font-semibold text-primary-700">{{ parseFloat(photographer.average_rating).toFixed(1) }}★</td>
+                <td class="px-6 py-4 text-sm">{{ photographer.rating_count }}</td>
+                <td class="px-6 py-4 text-sm">
+                  <span v-if="photographer.is_verified" class="status-active">
+                    Verified
                   </span>
-                </td>
-                <td>{{ photographer.rating_count }}</td>
-                <td>
-                  <span class="badge-success" v-if="photographer.is_verified">Verified</span>
-                  <span class="badge-warning" v-else>Pending</span>
+                  <span v-else class="status-pending">
+                    Pending
+                  </span>
                 </td>
               </tr>
             </tbody>
@@ -284,348 +194,501 @@
         </div>
       </div>
 
-      <!-- Recent Activities -->
-      <div class="activities-row">
+      <!-- Activity Cards -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Recent Bookings -->
-        <div class="activity-card">
-          <div class="activity-header">
-            <h3 class="text-lg font-semibold">Recent Bookings</h3>
-            <router-link to="/admin/bookings" class="view-all-link">View All →</router-link>
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Recent Bookings</h3>
           </div>
-          <div class="activity-list">
-            <div v-for="booking in dashboardData.recent_bookings" :key="booking.id" class="activity-item">
-              <div class="activity-icon bg-green-100 text-green-600">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
+          <div class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+            <div v-for="booking in recentBookings" :key="booking.id" class="px-6 py-4 hover:bg-gray-50">
+              <p class="font-medium text-sm">{{ booking.client?.name || 'N/A' }}</p>
+              <p class="text-xs text-gray-600 mt-1">{{ booking.event_type }} • ৳{{ formatNumber(booking.total_amount) }}</p>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-xs text-gray-500">{{ formatTimeAgo(booking.created_at) }}</span>
+                <span :class="getStatusBadgeClass(booking.status)">
+                  {{ capitalizeFirst(booking.status) }}
+                </span>
               </div>
-              <div class="activity-details">
-                <p class="activity-title">{{ booking.client?.name || 'N/A' }} → {{ booking.photographer?.user?.name || 'N/A' }}</p>
-                <p class="activity-meta">{{ booking.event_type || 'Booking' }} • ৳{{ formatNumber(booking.total_amount) }}</p>
-                <p class="activity-time">{{ formatTimeAgo(booking.created_at) }}</p>
-              </div>
-              <span :class="`badge-${getStatusColor(booking.status)}`">
-                {{ capitalizeFirst(booking.status) }}
-              </span>
             </div>
           </div>
         </div>
 
         <!-- Recent Reviews -->
-        <div class="activity-card">
-          <div class="activity-header">
-            <h3 class="text-lg font-semibold">Recent Reviews</h3>
-            <router-link to="/admin/reviews" class="view-all-link">View All →</router-link>
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Recent Reviews</h3>
           </div>
-          <div class="activity-list">
-            <div v-for="review in dashboardData.recent_reviews" :key="review.id" class="activity-item">
-              <div class="activity-icon bg-yellow-100 text-yellow-600">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                </svg>
-              </div>
-              <div class="activity-details">
-                <p class="activity-title">{{ review.booking?.photographer?.user?.name || 'N/A' }}</p>
-                <p class="activity-meta">{{ review.rating }}★ by {{ review.booking?.client?.name || 'N/A' }}</p>
-                <p class="activity-time">{{ formatTimeAgo(review.created_at) }}</p>
-              </div>
+          <div class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+            <div v-for="review in recentReviews" :key="review.id" class="px-6 py-4 hover:bg-gray-50">
+              <p class="font-medium text-sm">{{ review.booking?.photographer?.user?.name || 'N/A' }}</p>
+              <p class="text-xs text-primary-700 mt-1 font-semibold">{{ review.rating }}★ Rating</p>
+              <p class="text-xs text-gray-600 mt-1">By: {{ review.booking?.client?.name || 'N/A' }}</p>
+              <p class="text-xs text-gray-500 mt-2">{{ formatTimeAgo(review.created_at) }}</p>
             </div>
           </div>
         </div>
 
-        <!-- Recent Transactions -->
-        <div class="activity-card">
-          <div class="activity-header">
-            <h3 class="text-lg font-semibold">Recent Transactions</h3>
-            <router-link to="/admin/transactions" class="view-all-link">View All →</router-link>
+        <!-- Recent Competitions -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Recent Competitions</h3>
           </div>
-          <div class="activity-list">
-            <div v-for="transaction in dashboardData.recent_transactions" :key="transaction.id" class="activity-item">
-              <div class="activity-icon bg-blue-100 text-blue-600">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+          <div class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+            <div v-for="competition in recentCompetitions" :key="competition.id" class="px-6 py-4 hover:bg-gray-50">
+              <p class="font-medium text-sm truncate">{{ competition.title }}</p>
+              <p class="text-xs text-gray-600 mt-1">{{ competition.submissions_count || 0 }} submissions</p>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-xs text-gray-500">Prize: ৳{{ formatNumber(competition.prize_pool || 0) }}</span>
+                <span :class="getCompetitionStatusBadge(competition.status)">
+                  {{ capitalizeFirst(competition.status) }}
+                </span>
               </div>
-              <div class="activity-details">
-                <p class="activity-title">{{ transaction.user?.name || 'N/A' }}</p>
-                <p class="activity-meta">{{ capitalizeFirst(transaction.payment_method) }} • ৳{{ formatNumber(transaction.amount) }}</p>
-                <p class="activity-time">{{ formatTimeAgo(transaction.created_at) }}</p>
-              </div>
-              <span :class="`badge-${getStatusColor(transaction.status)}`">
-                {{ capitalizeFirst(transaction.status) }}
-              </span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Quick Actions -->
-      <div class="quick-actions">
-        <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
-        <div class="actions-grid">
-          <router-link to="/admin/users" class="action-card">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            <span>Manage Users</span>
-          </router-link>
+        </div>
 
-          <router-link to="/admin/verifications" class="action-card">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Verifications</span>
-          </router-link>
-
-          <router-link to="/admin/photographers" class="action-card">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span>Photographers</span>
-          </router-link>
-
-          <router-link to="/admin/bookings" class="action-card">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            <span>Bookings</span>
-          </router-link>
-
-          <router-link to="/admin/competitions" class="action-card">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-            </svg>
-            <span>Competitions</span>
-          </router-link>
-
-          <router-link to="/admin/events" class="action-card">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span>Events</span>
-          </router-link>
-
-          <router-link to="/admin/reviews" class="action-card">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-            </svg>
-            <span>Reviews</span>
-          </router-link>
-
-          <router-link to="/admin/transactions" class="action-card">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            <span>Transactions</span>
-          </router-link>
-
-          <router-link to="/admin/payments" class="action-card">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-            </svg>
-            <span>Payments</span>
-          </router-link>
-
-          <router-link to="/admin/settings" class="action-card">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span>Settings</span>
-          </router-link>
-
-          <router-link to="/admin/audit-logs" class="action-card">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span>Audit Logs</span>
-          </router-link>
-
-          <router-link to="/admin/sponsors" class="action-card">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Sponsors</span>
-          </router-link>
-
-          <router-link to="/admin/photo-categories" class="action-card">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-            </svg>
-            <span>Photo Categories</span>
-          </router-link>
-
-          <router-link to="/admin/hashtags" class="action-card">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
-            </svg>
-            <span>Hashtags</span>
-          </router-link>
+      <!-- ALERTS & PENDING ITEMS -->
+      <div v-if="hasPendingItems" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div v-if="stats.pending_bookings > 0" class="bg-warning-50 border border-warning-200 rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-warning-700 font-semibold">{{ stats.pending_bookings }} Pending Bookings</p>
+              <p class="text-warning-700 text-sm">Awaiting confirmation</p>
+            </div>
+            <router-link to="/admin/bookings?status=pending" class="text-burgundy hover:text-burgundy-dark">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </router-link>
+          </div>
+        </div>
+        <div v-if="stats.pending_verifications > 0" class="bg-warning-50 border border-warning-200 rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-warning-700 font-semibold">{{ stats.pending_verifications }} Pending Verifications</p>
+              <p class="text-warning-700 text-sm">Photographer applications</p>
+            </div>
+            <router-link to="/admin/verifications?status=pending" class="text-burgundy hover:text-burgundy-dark">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </router-link>
+          </div>
+        </div>
+        <div v-if="stats.pending_submissions > 0" class="bg-warning-50 border border-warning-200 rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-warning-700 font-semibold">{{ stats.pending_submissions }} Pending Submissions</p>
+              <p class="text-warning-700 text-sm">Awaiting review</p>
+            </div>
+            <router-link to="/admin/competitions/submissions?status=pending" class="text-burgundy hover:text-burgundy-dark">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </router-link>
+          </div>
+        </div>
+        <div v-if="stats.pending_reviews > 0" class="bg-warning-50 border border-warning-200 rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-warning-700 font-semibold">{{ stats.pending_reviews }} Pending Reviews</p>
+              <p class="text-warning-700 text-sm">Need moderation</p>
+            </div>
+            <router-link to="/admin/reviews?status=pending" class="text-burgundy hover:text-burgundy-dark">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </router-link>
+          </div>
         </div>
       </div>
 
-    </div>
+      <!-- REVENUE ANALYTICS -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-lg font-semibold text-gray-900">💰 Revenue Analytics</h3>
+          <p class="text-sm text-gray-500">Last 12 months</p>
+        </div>
+        <div v-if="revenueTrend.length > 0" class="space-y-4">
+          <div v-for="month in revenueTrend" :key="month.month" class="flex items-center">
+            <div class="w-24 text-sm font-medium text-gray-600">{{ formatMonth(month.month) }}</div>
+            <div class="flex-1 bg-gray-100 rounded-full h-8 flex items-center ml-2" :style="{ width: '100%' }">
+              <div class="bg-burgundy h-8 rounded-full flex items-center justify-end pr-3" :style="{ width: getRevenuePercentage(month.revenue) + '%', minWidth: '5%' }">
+                <span class="text-xs font-semibold text-white">৳{{ formatNumber(month.revenue) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else class="text-center py-8 text-gray-500">
+          <p>No revenue data available</p>
+        </div>
+      </div>
 
-    <!-- Error State -->
-    <div v-else-if="error" class="error-state">
-      <svg class="w-16 h-16 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
-      <h3 class="text-xl font-semibold text-gray-800 mb-2">Failed to Load Dashboard</h3>
-      <p class="text-gray-600 mb-4">{{ error }}</p>
-      <button @click="refreshData" class="btn-primary">Try Again</button>
+      <!-- PAYMENT METHODS & TRAFFIC SOURCES -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Payment Methods -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">💳 Payment Methods</h3>
+          <div v-if="paymentGateways.length > 0" class="space-y-3">
+            <div v-for="gateway in paymentGateways" :key="gateway.payment_method" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div>
+                <p class="font-medium text-gray-800">{{ capitalizeFirst(gateway.payment_method) }}</p>
+                <p class="text-xs text-gray-600">{{ gateway.count }} transactions</p>
+              </div>
+              <div class="text-right">
+                <p class="font-semibold text-gray-900">৳{{ formatNumber(gateway.total) }}</p>
+                <p class="text-xs text-gray-500">{{ getPaymentPercentage(gateway.total) }}%</p>
+              </div>
+            </div>
+          </div>
+          <div v-else class="text-center py-8 text-gray-500">
+            <p>No payment data available</p>
+          </div>
+        </div>
+
+        <!-- Top Traffic Sources -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">🔗 Traffic Sources</h3>
+          <div v-if="trafficSources.length > 0" class="space-y-3">
+            <div v-for="source in trafficSources" :key="source.referrer" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div>
+                <p class="font-medium text-gray-800 truncate">{{ source.referrer || 'Direct' }}</p>
+                <p class="text-xs text-gray-600">{{ source.count }} visits</p>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-semibold text-burgundy">{{ getTrafficPercentage(source.count) }}%</p>
+              </div>
+            </div>
+          </div>
+          <div v-else class="text-center py-8 text-gray-500">
+            <p>No traffic data available</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- DEVICE & PAGE ANALYTICS -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Device Breakdown -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">📱 Device Breakdown</h3>
+          <div v-if="deviceBreakdown.length > 0" class="space-y-3">
+            <div v-for="device in deviceBreakdown" :key="device.device_type" class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <svg v-if="device.device_type === 'mobile'" class="w-5 h-5 text-burgundy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                <svg v-else-if="device.device_type === 'desktop'" class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20m0 0l-.75 3M9 20a.75.75 0 001.5 0m0 0a.75.75 0 00-1.5 0m0 0L3 13m5.25-4L15 4m-6-1h.008v.008H9V3m6 0h.008v.008H15V3" />
+                </svg>
+                <svg v-else class="w-5 h-5 text-burgundy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                <div>
+                  <p class="font-medium text-gray-800">{{ capitalizeFirst(device.device_type) }}</p>
+                  <p class="text-xs text-gray-600">{{ device.count }} visits</p>
+                </div>
+              </div>
+              <p class="text-sm font-semibold text-gray-900">{{ getDevicePercentage(device.count) }}%</p>
+            </div>
+          </div>
+          <div v-else class="text-center py-8 text-gray-500">
+            <p>No device data available</p>
+          </div>
+        </div>
+
+        <!-- Top Pages -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">📄 Top Pages</h3>
+          <div v-if="topPages.length > 0" class="space-y-2">
+            <div v-for="(page, index) in topPages" :key="page.page_title" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div>
+                <p class="font-medium text-gray-800 truncate text-sm">{{ index + 1 }}. {{ page.page_title }}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-semibold text-gray-900">{{ page.views }}</p>
+                <p class="text-xs text-gray-500">views</p>
+              </div>
+            </div>
+          </div>
+          <div v-else class="text-center py-8 text-gray-500">
+            <p>No page data available</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRANSACTIONS TABLE -->
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+          <h2 class="text-lg font-semibold text-gray-900">Recent Transactions</h2>
+          <router-link to="/admin/transactions" class="text-burgundy hover:text-burgundy-dark text-sm font-medium">
+            View All →
+          </router-link>
+        </div>
+        <div v-if="recentTransactions.length > 0" class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">User</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Amount</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Method</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Date</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <tr v-for="transaction in recentTransactions" :key="transaction.id" class="hover:bg-gray-50">
+                <td class="px-6 py-4 text-sm">
+                  <div>
+                    <p class="font-medium text-gray-900">{{ transaction.user_name }}</p>
+                    <p class="text-xs text-gray-500">{{ transaction.user_email }}</p>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-sm font-semibold text-gray-900">৳{{ formatNumber(transaction.amount) }}</td>
+                <td class="px-6 py-4 text-sm text-gray-600">{{ capitalizeFirst(transaction.payment_method || 'N/A') }}</td>
+                <td class="px-6 py-4 text-sm">
+                  <span :class="getTransactionStatusClass(transaction.status)">
+                    {{ capitalizeFirst(transaction.status) }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-600">{{ formatTimeAgo(transaction.created_at) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-else class="p-6 text-center text-gray-500">
+          <p>No transactions available</p>
+        </div>
+      </div>
+
+      <!-- ACTIVITY LOGS -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">📋 Recent Activity Logs</h3>
+          <router-link to="/admin/activity-logs" class="text-burgundy hover:text-burgundy-dark text-sm font-medium">
+            View All →
+          </router-link>
+        </div>
+        <div v-if="recentActivityLogs.length > 0" class="space-y-3 max-h-96 overflow-y-auto">
+          <div v-for="log in recentActivityLogs" :key="log.id" class="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg border-l-4" :class="getActivityLogBorderColor(log.action)">
+            <div class="pt-1">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div class="flex-1">
+              <p class="font-medium text-gray-900 text-sm">{{ log.user_name }}</p>
+              <p class="text-xs text-gray-600 mt-1">{{ log.description || log.action }}</p>
+              <p class="text-xs text-gray-400 mt-1">{{ formatTimeAgo(log.created_at) }}</p>
+            </div>
+          </div>
+        </div>
+        <div v-else class="text-center py-8 text-gray-500">
+          <p>No activity logs available</p>
+        </div>
+      </div>
+
+      <!-- TOP PHOTOGRAPHERS BY BOOKINGS -->
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+          <h2 class="text-lg font-semibold text-gray-900">⭐ Most Booked Photographers</h2>
+          <router-link to="/admin/photographers?sort=bookings" class="text-burgundy hover:text-burgundy-dark text-sm font-medium">
+            View All →
+          </router-link>
+        </div>
+        <div v-if="topPhotographersByBookings.length > 0" class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Rank</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Photographer</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Bookings</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Rating</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <tr v-for="(photographer, index) in topPhotographersByBookings" :key="photographer.id" class="hover:bg-gray-50">
+                <td class="px-6 py-4">
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary-600 to-primary-800 flex items-center justify-center text-white font-bold text-sm">
+                    {{ index + 1 }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-xs font-bold text-primary-700">
+                      {{ photographer.user?.name?.charAt(0) || 'P' }}
+                    </div>
+                    <span class="font-medium">{{ photographer.user?.name || 'Unknown' }}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-sm font-semibold text-primary-700">{{ photographer.total_bookings || 0 }}</td>
+                <td class="px-6 py-4 text-sm font-semibold text-primary-700">{{ parseFloat(photographer.average_rating || 0).toFixed(1) }}★</td>
+                <td class="px-6 py-4 text-sm">
+                  <span v-if="photographer.is_verified" class="status-active">
+                    Verified
+                  </span>
+                  <span v-else class="status-pending">
+                    Pending
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-else class="p-6 text-center text-gray-500">
+          <p>No photographer data available</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted, nextTick } from 'vue';
-import Chart from 'chart.js/auto';
+import { ref, computed, onMounted } from 'vue';
+import api from '../api';
+import AdminHeader from './AdminHeader.vue';
+import AdminQuickNav from './AdminQuickNav.vue';
 
 export default {
   name: 'AdminDashboard',
+  components: {
+    AdminHeader,
+    AdminQuickNav
+  },
   setup() {
     const loading = ref(true);
     const error = ref('');
     const dashboardData = ref(null);
     const timeRange = ref('month');
-    const revenueChart = ref(null);
-    const userGrowthChart = ref(null);
-    let revenueChartInstance = null;
-    let userGrowthChartInstance = null;
+
+    const stats = computed(() => {
+      return dashboardData.value?.stats || {
+        total_users: 0,
+        total_photographers: 0,
+        total_revenue: 0,
+        total_bookings: 0,
+        pending_bookings: 0,
+        total_competitions: 0,
+        active_competitions: 0,
+        total_submissions: 0,
+        pending_submissions: 0,
+        active_visitors: 0,
+        page_views_today: 0,
+        verified_photographers: 0,
+        active_users: 0,
+        visitors_today: 0,
+        monthly_revenue: 0,
+      };
+    });
+
+    const topPhotographers = computed(() => {
+      return dashboardData.value?.top_photographers?.slice(0, 5) || [];
+    });
+
+    const recentBookings = computed(() => {
+      return dashboardData.value?.recent_bookings?.slice(0, 5) || [];
+    });
+
+    const recentReviews = computed(() => {
+      return dashboardData.value?.recent_reviews?.slice(0, 5) || [];
+    });
+
+    const recentCompetitions = computed(() => {
+      return dashboardData.value?.recent_competitions?.slice(0, 5) || [];
+    });
+
+    const platformHealth = computed(() => {
+      return dashboardData.value?.platform_health || {};
+    });
+
+    // NEW COMPUTED PROPERTIES FOR ENHANCED DASHBOARD
+    const revenueTrend = computed(() => {
+      return dashboardData.value?.revenue_trend || [];
+    });
+
+    const userGrowth = computed(() => {
+      return dashboardData.value?.user_growth || [];
+    });
+
+    const bookingStats = computed(() => {
+      return dashboardData.value?.booking_stats || [];
+    });
+
+    const paymentGateways = computed(() => {
+      return dashboardData.value?.payment_gateways || [];
+    });
+
+    const topPhotographersByBookings = computed(() => {
+      return dashboardData.value?.top_photographers_by_bookings || [];
+    });
+
+    const recentTransactions = computed(() => {
+      return dashboardData.value?.recent_transactions?.slice(0, 15) || [];
+    });
+
+    const recentActivityLogs = computed(() => {
+      return dashboardData.value?.recent_activity_logs?.slice(0, 10) || [];
+    });
+
+    const visitorAnalytics = computed(() => {
+      return dashboardData.value?.visitor_analytics || {};
+    });
+
+    const deviceBreakdown = computed(() => {
+      return visitorAnalytics.value?.device_breakdown || [];
+    });
+
+    const topPages = computed(() => {
+      return visitorAnalytics.value?.top_pages?.slice(0, 8) || [];
+    });
+
+    const trafficSources = computed(() => {
+      return visitorAnalytics.value?.traffic_sources?.slice(0, 8) || [];
+    });
+
+    const hasPendingItems = computed(() => {
+      return (stats.value.pending_bookings > 0 || 
+              stats.value.pending_verifications > 0 || 
+              stats.value.pending_submissions > 0 || 
+              stats.value.pending_reviews > 0);
+    });
 
     const fetchDashboardData = async () => {
-      loading.value = true;
-      error.value = '';
-
       try {
+        loading.value = true;
+        error.value = '';
+
         const token = localStorage.getItem('auth_token');
-        console.log('Auth token:', token ? 'Present' : 'Missing');
-        
         if (!token) {
-          error.value = 'Authentication required. Please login first.';
+          error.value = 'Authentication token not found. Please login first.';
           loading.value = false;
           return;
         }
 
-        console.log('Fetching dashboard data from:', '/api/v1/admin/dashboard');
         const response = await fetch('/api/v1/admin/dashboard', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
-            'Content-Type': 'application/json',
           },
-          credentials: 'include',
         });
 
-        console.log('Response status:', response.status);
         const data = await response.json();
-        console.log('Response data:', data);
 
-        if (!response.ok) {
-          if (response.status === 403 || response.status === 401) {
-            error.value = 'Unauthorized. Admin access required. Please login as admin.';
-          } else {
-            error.value = data.message || `Error: ${response.status}`;
-          }
-          console.error('API Error:', response.status, data);
-          loading.value = false;
-          return;
-        }
-
-        if (data.status === 'success' && data.data) {
-          console.log('Dashboard data loaded successfully');
+        if (response.ok && data.status === 'success') {
           dashboardData.value = data.data;
-          
-          // Wait for DOM update before rendering charts
-          await nextTick();
-          renderCharts();
         } else {
-          error.value = data.message || 'Failed to load dashboard data';
-          console.error('Invalid response format:', data);
+          error.value = data.message || 'Failed to load dashboard';
         }
       } catch (err) {
-        error.value = 'Network error: ' + err.message;
-        console.error('Dashboard fetch error:', err);
+        console.error('Dashboard error:', err);
+        error.value = 'Network error. Please check your connection.';
       } finally {
         loading.value = false;
-      }
-    };
-
-    const renderCharts = () => {
-      if (!dashboardData.value) return;
-
-      // Destroy existing charts
-      if (revenueChartInstance) revenueChartInstance.destroy();
-      if (userGrowthChartInstance) userGrowthChartInstance.destroy();
-
-      // Revenue Trend Chart
-      if (revenueChart.value) {
-        const ctx = revenueChart.value.getContext('2d');
-        revenueChartInstance = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: dashboardData.value.revenue_trend.map(item => item.month),
-            datasets: [{
-              label: 'Revenue (৳)',
-              data: dashboardData.value.revenue_trend.map(item => item.revenue),
-              borderColor: 'rgb(234, 179, 8)',
-              backgroundColor: 'rgba(234, 179, 8, 0.1)',
-              tension: 0.4,
-              fill: true,
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: false,
-              },
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: {
-                  callback: (value) => '৳' + value.toLocaleString(),
-                },
-              },
-            },
-          },
-        });
-      }
-
-      // User Growth Chart
-      if (userGrowthChart.value) {
-        const ctx = userGrowthChart.value.getContext('2d');
-        userGrowthChartInstance = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: dashboardData.value.user_growth.map(item => item.month),
-            datasets: [{
-              label: 'New Users',
-              data: dashboardData.value.user_growth.map(item => item.count),
-              backgroundColor: 'rgba(59, 130, 246, 0.8)',
-              borderColor: 'rgb(59, 130, 246)',
-              borderWidth: 1,
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: false,
-              },
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-              },
-            },
-          },
-        });
       }
     };
 
@@ -634,490 +697,232 @@ export default {
     };
 
     const formatNumber = (num) => {
-      return new Intl.NumberFormat('en-BD').format(num || 0);
+      if (num === null || num === undefined || isNaN(num)) return '0';
+      return new Intl.NumberFormat('en-BD').format(num);
+    };
+
+    const formatTimeAgo = (date) => {
+      if (!date) return '';
+      const now = new Date();
+      const then = new Date(date);
+      const diff = now - then;
+      const seconds = Math.floor(diff / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+
+      if (seconds < 60) return 'Just now';
+      if (minutes < 60) return `${minutes}m ago`;
+      if (hours < 24) return `${hours}h ago`;
+      if (days < 7) return `${days}d ago`;
+      return then.toLocaleDateString();
     };
 
     const capitalizeFirst = (str) => {
       if (!str) return '';
-      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+      return str.charAt(0).toUpperCase() + str.slice(1);
     };
 
-    const getStatusColor = (status) => {
-      const colors = {
-        pending: 'warning',
-        confirmed: 'info',
-        completed: 'success',
-        cancelled: 'error',
-        rejected: 'error',
-        active: 'success',
-        expired: 'gray',
+    const getStatusBadgeClass = (status) => {
+      const classes = {
+        confirmed: 'status-approved',
+        pending: 'status-pending',
+        cancelled: 'status-cancelled',
+        completed: 'status-approved',
       };
-      return colors[status] || 'gray';
+      return classes[status] || 'badge bg-gray-100 text-gray-700';
     };
 
-    const formatTimeAgo = (dateString) => {
-      const date = new Date(dateString);
-      const now = new Date();
-      const seconds = Math.floor((now - date) / 1000);
+    const getCompetitionStatusBadge = (status) => {
+      const classes = {
+        active: 'status-active',
+        draft: 'status-draft',
+        upcoming: 'badge badge-primary',
+        judging: 'badge badge-warning',
+        completed: 'badge badge-success',
+        cancelled: 'status-cancelled',
+      };
+      return classes[status] || 'badge bg-gray-100 text-gray-700';
+    };
 
-      if (seconds < 60) return 'Just now';
-      if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-      if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-      if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+    // NEW HELPER FUNCTIONS
+    const formatMonth = (monthStr) => {
+      if (!monthStr) return '';
+      const date = new Date(monthStr + '-01');
+      return date.toLocaleDateString('en-BD', { month: 'short', year: 'numeric' });
+    };
+
+    const getMaxRevenue = computed(() => {
+      if (revenueTrend.value.length === 0) return 1;
+      return Math.max(...revenueTrend.value.map(m => m.revenue || 0));
+    });
+
+    const getRevenuePercentage = (revenue) => {
+      const max = getMaxRevenue.value;
+      if (max === 0) return 0;
+      return Math.round((revenue / max) * 100);
+    };
+
+    const getTotalPayments = computed(() => {
+      return paymentGateways.value.reduce((sum, g) => sum + (g.total || 0), 0);
+    });
+
+    const getPaymentPercentage = (amount) => {
+      const total = getTotalPayments.value;
+      if (total === 0) return 0;
+      return Math.round((amount / total) * 100);
+    };
+
+    const getTotalTraffic = computed(() => {
+      return trafficSources.value.reduce((sum, s) => sum + (s.count || 0), 0);
+    });
+
+    const getTrafficPercentage = (count) => {
+      const total = getTotalTraffic.value;
+      if (total === 0) return 0;
+      return Math.round((count / total) * 100);
+    };
+
+    const getTotalDevices = computed(() => {
+      return deviceBreakdown.value.reduce((sum, d) => sum + (d.count || 0), 0);
+    });
+
+    const getDevicePercentage = (count) => {
+      const total = getTotalDevices.value;
+      if (total === 0) return 0;
+      return Math.round((count / total) * 100);
+    };
+
+    const getTransactionStatusClass = (status) => {
+      const classes = {
+        completed: 'badge badge-success',
+        pending: 'badge badge-warning',
+        failed: 'badge badge-danger',
+        refunded: 'badge badge-info',
+      };
+      return classes[status] || 'badge bg-gray-100 text-gray-700';
+    };
+
+    const getActivityLogBorderColor = (action) => {
+      const colors = {
+        'create': 'border-success-200',
+        'update': 'border-primary-200',
+        'delete': 'border-danger-200',
+        'verify': 'border-warning-200',
+        'approved': 'border-success-200',
+        'rejected': 'border-danger-200',
+      };
       
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    };
-
-    // Current time
-    const currentTime = ref('');
-    const updateTime = () => {
-      const now = new Date();
-      currentTime.value = now.toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
-        minute: '2-digit',
-        hour12: true 
-      });
-    };
-
-    const handleLogout = () => {
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      window.location.href = '/';
+      // Check if action contains any of the keywords
+      for (const [key, color] of Object.entries(colors)) {
+        if (action?.toLowerCase().includes(key)) return color;
+      }
+      return 'border-gray-300';
     };
 
     onMounted(() => {
       fetchDashboardData();
-      updateTime();
-      setInterval(updateTime, 60000); // Update every minute
     });
 
     return {
       loading,
       error,
       dashboardData,
+      stats,
       timeRange,
-      revenueChart,
-      userGrowthChart,
-      currentTime,
+      topPhotographers,
+      recentBookings,
+      recentReviews,
+      recentCompetitions,
+      platformHealth,
+      fetchDashboardData,
       refreshData,
       formatNumber,
-      capitalizeFirst,
-      getStatusColor,
       formatTimeAgo,
-      handleLogout,
+      capitalizeFirst,
+      getStatusBadgeClass,
+      getCompetitionStatusBadge,
+      // NEW PROPERTIES AND METHODS
+      revenueTrend,
+      userGrowth,
+      bookingStats,
+      paymentGateways,
+      topPhotographersByBookings,
+      recentTransactions,
+      recentActivityLogs,
+      visitorAnalytics,
+      deviceBreakdown,
+      topPages,
+      trafficSources,
+      hasPendingItems,
+      formatMonth,
+      getRevenuePercentage,
+      getPaymentPercentage,
+      getTrafficPercentage,
+      getDevicePercentage,
+      getTransactionStatusClass,
+      getActivityLogBorderColor,
     };
   },
 };
 </script>
 
 <style scoped>
-/* Modern Admin Dashboard Styles */
 .admin-dashboard {
-  @apply min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 p-6 font-sans;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f8fafc;
 }
 
-/* Modern Header */
-.dashboard-header-modern {
-  @apply bg-white rounded-3xl shadow-xl mb-8 overflow-hidden border border-gray-100;
+/* International standard section styling */
+.dashboard-section {
+  scroll-margin-top: 80px;
 }
 
-.header-content {
-  @apply flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 p-8 bg-gradient-to-r from-white to-gray-50;
-}
-
-.header-left {
-  @apply flex-1;
-}
-
-.dashboard-title {
-  @apply flex items-center gap-4 mb-4;
-}
-
-.title-main {
-  @apply text-4xl font-black text-gray-900 tracking-tight;
-}
-
-.title-subtitle {
-  @apply text-sm text-gray-500 font-normal mt-1;
-}
-
-.welcome-stats {
-  @apply flex flex-wrap gap-3 mt-4;
-}
-
-.stat-pill {
-  @apply flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-burgundy/10 to-red-50 rounded-full border border-burgundy/20;
-}
-
-.stat-pill-icon {
-  @apply text-lg;
-}
-
-.stat-pill-label {
-  @apply text-xs font-medium text-gray-600;
-}
-
-.stat-pill-value {
-  @apply text-sm font-bold text-gray-900;
-}
-
-.header-right {
-  @apply flex flex-wrap items-center gap-3;
-}
-
-.btn-refresh {
-  @apply flex items-center gap-2 px-5 py-2.5 bg-burgundy text-white rounded-xl hover:bg-burgundy-dark transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-medium;
-}
-
-.btn-refresh svg {
-  @apply w-5 h-5;
-}
-
-.form-select-modern {
-  @apply px-5 py-2.5 bg-white border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-burgundy focus:border-burgundy transition-all duration-200 shadow-sm hover:border-gray-300 font-medium text-gray-700 cursor-pointer;
-}
-
-.current-time {
-  @apply flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-gray-100 to-gray-50 rounded-xl text-gray-700 font-semibold border border-gray-200;
-}
-
-/* Modern Stats Grid */
-.stats-grid-modern {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8;
-}
-
-.stat-card-modern {
-  @apply bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border border-gray-100 hover:border-burgundy/20 transform hover:-translate-y-1;
-}
-
-.stat-card-header {
-  @apply flex items-center justify-between mb-4;
-}
-
-.stat-icon-modern {
-  @apply w-14 h-14 rounded-2xl flex items-center justify-center shadow-md;
-}
-
-.stat-users .stat-icon-modern {
-  @apply bg-gradient-to-br from-blue-500 to-blue-600 text-white;
-}
-
-.stat-photographers .stat-icon-modern {
-  @apply bg-gradient-to-br from-purple-500 to-purple-600 text-white;
-}
-
-.stat-bookings .stat-icon-modern {
-  @apply bg-gradient-to-br from-green-500 to-green-600 text-white;
-}
-
-.stat-revenue .stat-icon-modern {
-  @apply bg-gradient-to-br from-orange-500 to-orange-600 text-white;
-}
-
-.stat-trend {
-  @apply flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold;
-}
-
-.stat-trend-up {
-  @apply bg-green-100 text-green-700;
-}
-
-.stat-trend-down {
-  @apply bg-red-100 text-red-700;
-}
-
-.stat-body {
-  @apply space-y-2;
-}
-
-.stat-label-modern {
-  @apply text-sm font-semibold text-gray-500 uppercase tracking-wider;
-}
-
-.stat-value-modern {
-  @apply text-4xl font-black text-gray-900 tracking-tight;
-}
-
-.stat-footer-modern {
-  @apply flex items-center gap-2 mt-3 pt-3 border-t border-gray-100;
-}
-
-.stat-badge-modern {
-  @apply inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-bold;
-}
-
-.stat-badge-blue {
-  @apply bg-blue-100 text-blue-700;
-}
-
-.stat-badge-purple {
-  @apply bg-purple-100 text-purple-700;
-}
-
-.stat-badge-green {
-  @apply bg-green-100 text-green-700;
-}
-
-.stat-badge-orange {
-  @apply bg-orange-100 text-orange-700;
-}
-
-/* Keep existing styles for other sections */
-.dashboard-header {
-  @apply flex justify-between items-start mb-8;
-}
-
-.btn-secondary {
-  @apply flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50;
-}
-
-.form-select {
-  @apply px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent;
-}
-
-.loading-state {
-  @apply flex flex-col items-center justify-center py-20;
-}
-
-.spinner {
-  @apply w-12 h-12 border-4 border-gray-200 border-t-red-600 rounded-full animate-spin mb-4;
-}
-
-.error-state {
-  @apply flex flex-col items-center justify-center py-20;
-}
-
-.btn-primary {
-  @apply px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors;
-}
-
-/* Stats Grid */
-.stats-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8;
-}
-
+/* Better card styling */
 .stat-card {
-  @apply p-6 rounded-2xl shadow-lg flex items-center gap-4;
+  transition: all 0.3s ease;
 }
 
-.stat-icon {
-  @apply w-16 h-16 rounded-xl bg-white bg-opacity-20 flex items-center justify-center flex-shrink-0;
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
-.stat-details {
-  @apply flex-1;
+/* Table improvements */
+table tbody tr {
+  transition: background-color 0.2s ease;
 }
 
-.stat-label {
-  @apply text-sm opacity-90 mb-1;
+table tbody tr:hover {
+  background-color: rgba(59, 130, 246, 0.05);
 }
 
-.stat-value {
-  @apply text-3xl font-bold mb-1;
+/* Badge styling */
+.status-badge {
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
-.stat-change {
-  @apply text-sm opacity-90;
+/* Section title styling */
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.badge-success {
-  @apply inline-block px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium;
+/* Bar chart styling */
+.revenue-bar {
+  transition: width 0.3s ease;
 }
 
-.badge-warning {
-  @apply inline-block px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-medium;
-}
-
-.badge-info {
-  @apply inline-block px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium;
-}
-
-.badge-error {
-  @apply inline-block px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium;
-}
-
-.badge-gray {
-  @apply inline-block px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium;
-}
-
-/* Charts */
-.charts-row {
-  @apply grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8;
-}
-
-.chart-card {
-  @apply bg-white rounded-2xl shadow-lg p-6;
-}
-
-.chart-header {
-  @apply flex justify-between items-center mb-6;
-}
-
-.chart-container {
-  @apply h-64;
-}
-
-/* Secondary Stats */
-.secondary-stats-row {
-  @apply grid grid-cols-1 md:grid-cols-3 gap-6 mb-8;
-}
-
-.stats-card {
-  @apply bg-white rounded-2xl shadow-lg p-6;
-}
-
-.stats-card-title {
-  @apply text-lg font-semibold mb-4;
-}
-
-.stats-list {
-  @apply space-y-3;
-}
-
-.stats-item {
-  @apply flex justify-between items-center;
-}
-
-.stats-label {
-  @apply text-gray-700 font-medium;
-}
-
-.stats-value {
-  @apply text-gray-900 font-semibold;
-}
-
-.stats-value-group {
-  @apply flex items-center gap-3;
-}
-
-.stats-count {
-  @apply text-gray-600 text-sm;
-}
-
-.stats-amount {
-  @apply text-gray-900 font-semibold;
-}
-
-.health-metrics {
-  @apply space-y-4;
-}
-
-.health-item {
-  @apply flex justify-between items-center;
-}
-
-.health-label {
-  @apply text-gray-600;
-}
-
-.health-value {
-  @apply font-semibold;
-}
-
-/* Table */
-.table-card {
-  @apply bg-white rounded-2xl shadow-lg p-6 mb-8;
-}
-
-.table-header {
-  @apply flex justify-between items-center mb-6;
-}
-
-.table-responsive {
-  @apply overflow-x-auto;
-}
-
-.data-table {
-  @apply w-full;
-}
-
-.data-table thead {
-  @apply bg-gray-50;
-}
-
-.data-table th {
-  @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
-}
-
-.data-table td {
-  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
-}
-
-.data-table tbody tr:hover {
-  @apply bg-gray-50;
-}
-
-.avatar {
-  @apply w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center font-semibold;
-}
-
-.rating-badge {
-  @apply inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium;
-}
-
-/* Activities */
-.activities-row {
-  @apply grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8;
-}
-
-.activity-card {
-  @apply bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6;
-}
-
-.activity-header {
-  @apply flex justify-between items-center mb-6;
-}
-
-.view-all-link {
-  @apply text-red-600 hover:text-red-700 text-sm font-medium;
-}
-
-.activity-list {
-  @apply space-y-4;
-}
-
-.activity-item {
-  @apply flex items-start gap-3;
-}
-
-.activity-icon {
-  @apply w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0;
-}
-
-.activity-details {
-  @apply flex-1 min-w-0;
-}
-
-.activity-title {
-  @apply font-medium text-gray-900 truncate;
-}
-
-.activity-meta {
-  @apply text-sm text-gray-600;
-}
-
-.activity-time {
-  @apply text-xs text-gray-500 mt-1;
-}
-
-/* Quick Actions */
-.quick-actions {
-  @apply bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6;
-}
-
-.actions-grid {
-  @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4;
-}
-
-.action-card {
-  @apply flex flex-col items-center justify-center p-3 md:p-4 bg-gradient-to-br from-red-50 to-white border-2 border-red-100 rounded-lg md:rounded-xl hover:border-red-300 hover:shadow-lg transition-all duration-200 gap-2;
-}
-
-.action-card svg {
-  @apply text-red-600 w-6 h-6 md:w-8 md:h-8;
-}
-
-.action-card span {
-  @apply text-xs md:text-sm font-medium text-gray-700 text-center;
+/* Responsive grid */
+@media (max-width: 768px) {
+  .dashboard-section {
+    margin-bottom: 1.5rem;
+  }
 }
 </style>

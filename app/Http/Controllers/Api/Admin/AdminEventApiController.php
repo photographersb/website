@@ -3,68 +3,77 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\EventStoreRequest;
+use App\Http\Requests\EventUpdateRequest;
+use App\Http\Traits\ApiResponse;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\Rule;
 
 class AdminEventApiController extends Controller
 {
+    use ApiResponse;
+
     /**
      * Get all events (admin view)
      */
     public function index(Request $request)
     {
-        $query = Event::with(['organizer.user', 'city']);
+        try {
+            $query = Event::with(['organizer', 'city']);
 
-        // Filter by status
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
+            // Filter by status
+            if ($request->has('status')) {
+                $query->where('status', $request->status);
+            }
 
-        // Filter by city
-        if ($request->has('city_id')) {
-            $query->where('city_id', $request->city_id);
-        }
+            // Filter by city
+            if ($request->has('city_id')) {
+                $query->where('city_id', $request->city_id);
+            }
 
-        // Filter by event type
-        if ($request->has('event_type')) {
-            $query->where('event_type', $request->event_type);
-        }
+            // Filter by event type
+            if ($request->has('event_type')) {
+                $query->where('event_type', $request->event_type);
+            }
 
-        // Filter by organizer
-        if ($request->has('organizer_id')) {
-            $query->where('organizer_id', $request->organizer_id);
-        }
+            // Filter by organizer
+            if ($request->has('organizer_id')) {
+                $query->where('organizer_id', $request->organizer_id);
+            }
 
-        // Search
-        if ($request->has('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
+            // Search
+            if ($request->has('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%");
+                });
+            }
 
-        // Sort
-        $sortField = $request->get('sort_field', 'event_date');
-        $sortDirection = $request->get('sort_direction', 'desc');
-        $query->orderBy($sortField, $sortDirection);
+            // Sort
+            $sortField = $request->get('sort_field', 'event_date');
+            $sortDirection = $request->get('sort_direction', 'desc');
+            $query->orderBy($sortField, $sortDirection);
 
-        $events = $query->paginate(20);
+            // Get per_page from request, default to 20
+            $perPage = $request->get('per_page', 20);
+            $events = $query->paginate($perPage);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $events->items(),
-            'meta' => [
+            return $this->success($events->items(), 'Events retrieved successfully', 200, [
                 'total' => $events->total(),
                 'per_page' => $events->perPage(),
                 'current_page' => $events->currentPage(),
                 'last_page' => $events->lastPage(),
-            ],
-        ]);
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching events: ' . $e->getMessage(), ['exception' => $e]);
+            return $this->error('Failed to fetch events: ' . $e->getMessage(), 500);
+        }
     }
 
     /**
@@ -74,46 +83,18 @@ class AdminEventApiController extends Controller
     {
         // Support both numeric ID and slug
         $event = is_numeric($id)
-            ? Event::with(['organizer.user', 'city'])->findOrFail($id)
-            : Event::with(['organizer.user', 'city'])->where('slug', $id)->firstOrFail();
+            ? Event::with(['organizer', 'city'])->findOrFail($id)
+            : Event::with(['organizer', 'city'])->where('slug', $id)->firstOrFail();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $event,
-        ]);
+        return $this->success($event, 'Event retrieved successfully');
     }
 
     /**
      * Create new event
      */
-    public function store(Request $request)
+    public function store(EventStoreRequest $request)
     {
-        $validated = $request->validate([
-            'organizer_id' => 'required|exists:photographers,id',
-            'title' => 'required|string|max:255',
-            'description' => 'required|string|min:50',
-            'event_type' => 'required|in:workshop,exhibition,meetup,competition,seminar,other',
-            'hero_image_url' => 'nullable|url',
-            'event_date' => 'required|date|after:now',
-            'event_end_date' => 'nullable|date|after:event_date',
-            'start_time' => 'nullable|date_format:H:i',
-            'end_time' => 'nullable|date_format:H:i|after:start_time',
-            'all_day_event' => 'boolean',
-            'location' => 'required|string|max:255',
-            'address' => 'nullable|string',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
-            'city_id' => 'required|exists:cities,id',
-            'max_attendees' => 'nullable|integer|min:1',
-            'require_registration' => 'boolean',
-            'is_ticketed' => 'boolean',
-            'ticket_price' => 'nullable|numeric|min:0',
-            'status' => 'required|in:draft,published,cancelled',
-            'is_featured' => 'boolean',
-            'featured_until' => 'nullable|date|after:now',
-            'requirements' => 'nullable|string',
-            'duration_hours' => 'nullable|numeric|min:0.5',
-        ]);
+        $validated = $request->validated();
 
         // Generate slug
         $slug = Str::slug($validated['title']);
@@ -137,11 +118,7 @@ class AdminEventApiController extends Controller
                 'admin_id' => auth()->id(),
             ]);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Event created successfully',
-                'data' => $event->load(['organizer.user', 'city']),
-            ], 201);
+            return $this->created($event->load(['organizer.user', 'city']), 'Event created successfully');
         } catch (\Exception $e) {
             Log::error('Failed to create event', [
                 'error' => $e->getMessage(),
@@ -149,49 +126,21 @@ class AdminEventApiController extends Controller
                 'admin_id' => auth()->id(),
             ]);
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to create event. Please try again.',
-            ], 500);
+            return $this->error('Failed to create event. Please try again.', 500);
         }
     }
 
     /**
      * Update event
      */
-    public function update(Request $request, $id)
+    public function update(EventUpdateRequest $request, $id)
     {
         // Support both numeric ID and slug
         $event = is_numeric($id)
             ? Event::findOrFail($id)
             : Event::where('slug', $id)->firstOrFail();
 
-        $validated = $request->validate([
-            'organizer_id' => 'sometimes|exists:photographers,id',
-            'title' => 'sometimes|string|max:255',
-            'description' => 'sometimes|string|min:50',
-            'event_type' => 'sometimes|in:workshop,exhibition,meetup,competition,seminar,other',
-            'hero_image_url' => 'nullable|url',
-            'event_date' => 'sometimes|date',
-            'event_end_date' => 'nullable|date|after:event_date',
-            'start_time' => 'nullable|date_format:H:i',
-            'end_time' => 'nullable|date_format:H:i|after:start_time',
-            'all_day_event' => 'boolean',
-            'location' => 'sometimes|string|max:255',
-            'address' => 'nullable|string',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
-            'city_id' => 'sometimes|exists:cities,id',
-            'max_attendees' => 'nullable|integer|min:1',
-            'require_registration' => 'boolean',
-            'is_ticketed' => 'boolean',
-            'ticket_price' => 'nullable|numeric|min:0',
-            'status' => 'sometimes|in:draft,published,cancelled',
-            'is_featured' => 'boolean',
-            'featured_until' => 'nullable|date|after:now',
-            'requirements' => 'nullable|string',
-            'duration_hours' => 'nullable|numeric|min:0.5',
-        ]);
+        $validated = $request->validated();
 
         // Regenerate slug if title changed
         if (isset($validated['title']) && $validated['title'] !== $event->title) {
@@ -217,11 +166,7 @@ class AdminEventApiController extends Controller
             ]);
             // Clear events stats cache
             Cache::forget('events_stats');
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Event updated successfully',
-                'data' => $event->load(['organizer.user', 'city']),
-            ]);
+            return $this->success($event->load(['organizer.user', 'city']), 'Event updated successfully');
         } catch (\Exception $e) {
             Log::error('Failed to update event', [
                 'event_id' => $event->id,
@@ -229,10 +174,7 @@ class AdminEventApiController extends Controller
                 'admin_id' => auth()->id(),
             ]);
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to update event. Please try again.',
-            ], 500);
+            return $this->error('Failed to update event. Please try again.', 500);
         }
     }
 
@@ -249,10 +191,7 @@ class AdminEventApiController extends Controller
         // Check if event has RSVPs
         $rsvpCount = $event->rsvp_count ?? 0;
         if ($rsvpCount > 0 && $event->status !== 'cancelled') {
-            return response()->json([
-                'status' => 'error',
-                'message' => "Cannot delete event with {$rsvpCount} RSVPs. Please cancel the event first.",
-            ], 422);
+            return $this->validationError(['event' => "Cannot delete event with {$rsvpCount} RSVPs. Please cancel the event first."], 'Validation failed');
         }
 
         try {
@@ -268,10 +207,7 @@ class AdminEventApiController extends Controller
                 'admin_id' => auth()->id(),
             ]);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Event deleted successfully',
-            ]);
+            return $this->success([], 'Event deleted successfully');
         } catch (\Exception $e) {
             Log::error('Failed to delete event', [
                 'event_id' => $id,
@@ -279,10 +215,7 @@ class AdminEventApiController extends Controller
                 'admin_id' => auth()->id(),
             ]);
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to delete event. Please try again.',
-            ], 500);
+            return $this->error('Failed to delete event. Please try again.', 500);
         }
     }
 
@@ -307,20 +240,14 @@ class AdminEventApiController extends Controller
                 'admin_id' => auth()->id(),
             ]);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => "Successfully updated {$updated} events",
-            ]);
+            return $this->success([], "Successfully updated {$updated} events");
         } catch (\Exception $e) {
             Log::error('Failed to bulk update events', [
                 'error' => $e->getMessage(),
                 'admin_id' => auth()->id(),
             ]);
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to update events. Please try again.',
-            ], 500);
+            return $this->error('Failed to update events. Please try again.', 500);
         }
     }
 
@@ -346,11 +273,7 @@ class AdminEventApiController extends Controller
                 'admin_id' => auth()->id(),
             ]);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => $event->is_featured ? 'Event featured' : 'Event unfeatured',
-                'data' => $event,
-            ]);
+            return $this->success($event, $event->is_featured ? 'Event featured' : 'Event unfeatured');
         } catch (\Exception $e) {
             Log::error('Failed to toggle event featured status', [
                 'event_id' => $id,
@@ -358,10 +281,7 @@ class AdminEventApiController extends Controller
                 'admin_id' => auth()->id(),
             ]);
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to update event. Please try again.',
-            ], 500);
+            return $this->error('Failed to update event. Please try again.', 500);
         }
     }
 }

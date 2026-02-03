@@ -165,4 +165,198 @@ class PaymentService
         // For now, return true for testing
         return true;
     }
+
+    /**
+     * Process refund for a transaction
+     * 
+     * @param Transaction $transaction The transaction to refund
+     * @param float $amount The amount to refund
+     * @param string $reason The reason for refund
+     * @return array Refund result with status and details
+     */
+    public function processRefund(Transaction $transaction, float $amount, string $reason): array
+    {
+        // Validate refund amount
+        if ($amount > $transaction->amount) {
+            throw new \Exception('Refund amount cannot exceed transaction amount');
+        }
+
+        // Check if transaction is refundable
+        if ($transaction->status !== 'completed') {
+            throw new \Exception('Only completed transactions can be refunded');
+        }
+
+        // Check if already refunded
+        if ($transaction->refund_status === 'completed') {
+            throw new \Exception('Transaction has already been refunded');
+        }
+
+        // Route to appropriate refund handler based on payment method
+        $result = match($transaction->payment_method) {
+            'sslcommerz' => $this->refundSslCommerz($transaction, $amount, $reason),
+            'bkash' => $this->refundBkash($transaction, $amount, $reason),
+            'nagad' => $this->refundNagad($transaction, $amount, $reason),
+            'bank' => $this->refundBankTransfer($transaction, $amount, $reason),
+            default => throw new \Exception('Refund not supported for this payment method')
+        };
+
+        // Update transaction with refund details
+        $transaction->update([
+            'refund_amount' => $amount,
+            'refund_status' => $result['status'],
+            'refund_reason' => $reason,
+            'refund_reference' => $result['refund_reference'] ?? null,
+            'refunded_at' => $result['status'] === 'completed' ? now() : null,
+        ]);
+
+        // Update booking status if full refund
+        if ($amount >= $transaction->amount && $transaction->booking) {
+            $transaction->booking->update([
+                'payment_status' => 'refunded',
+                'status' => 'cancelled',
+            ]);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Refund via SSLCommerz
+     */
+    private function refundSslCommerz(Transaction $transaction, float $amount, string $reason): array
+    {
+        // SSLCommerz Refund API Integration
+        try {
+            $data = [
+                'refund_amount' => $amount,
+                'refund_remarks' => $reason,
+                'bank_tran_id' => $transaction->gateway_transaction_id ?? $transaction->transaction_id,
+                'store_id' => config('services.sslcommerz.store_id'),
+                'store_passwd' => config('services.sslcommerz.store_password'),
+            ];
+
+            // In production, call SSLCommerz Refund API
+            // $response = Http::post(config('services.sslcommerz.refund_url'), $data);
+            
+            // Mock response for development
+            $mockSuccess = true;
+
+            if ($mockSuccess) {
+                return [
+                    'status' => 'completed',
+                    'refund_reference' => 'REF' . strtoupper(Str::random(10)),
+                    'message' => 'Refund processed successfully via SSLCommerz',
+                    'gateway_response' => ['status' => 'success', 'amount' => $amount]
+                ];
+            }
+
+            return [
+                'status' => 'failed',
+                'message' => 'SSLCommerz refund failed',
+                'gateway_response' => []
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'status' => 'failed',
+                'message' => 'SSLCommerz refund error: ' . $e->getMessage(),
+                'gateway_response' => []
+            ];
+        }
+    }
+
+    /**
+     * Refund via bKash
+     */
+    private function refundBkash(Transaction $transaction, float $amount, string $reason): array
+    {
+        // bKash Refund API Integration
+        try {
+            // In production, integrate with bKash Refund API
+            // 1. Get auth token
+            // 2. Call refund transaction API
+            // 3. Handle response
+
+            // Mock response for development
+            $mockSuccess = true;
+
+            if ($mockSuccess) {
+                return [
+                    'status' => 'completed',
+                    'refund_reference' => 'BKR' . strtoupper(Str::random(10)),
+                    'message' => 'Refund processed successfully via bKash',
+                    'gateway_response' => ['transactionStatus' => 'Completed', 'amount' => $amount]
+                ];
+            }
+
+            return [
+                'status' => 'failed',
+                'message' => 'bKash refund failed',
+                'gateway_response' => []
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'status' => 'failed',
+                'message' => 'bKash refund error: ' . $e->getMessage(),
+                'gateway_response' => []
+            ];
+        }
+    }
+
+    /**
+     * Refund via Nagad
+     */
+    private function refundNagad(Transaction $transaction, float $amount, string $reason): array
+    {
+        // Nagad Refund API Integration
+        try {
+            // In production, integrate with Nagad Refund API
+            // Similar to bKash implementation
+
+            // Mock response for development
+            $mockSuccess = true;
+
+            if ($mockSuccess) {
+                return [
+                    'status' => 'completed',
+                    'refund_reference' => 'NGR' . strtoupper(Str::random(10)),
+                    'message' => 'Refund processed successfully via Nagad',
+                    'gateway_response' => ['status' => 'Success', 'amount' => $amount]
+                ];
+            }
+
+            return [
+                'status' => 'failed',
+                'message' => 'Nagad refund failed',
+                'gateway_response' => []
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'status' => 'failed',
+                'message' => 'Nagad refund error: ' . $e->getMessage(),
+                'gateway_response' => []
+            ];
+        }
+    }
+
+    /**
+     * Refund via Bank Transfer (Manual Process)
+     */
+    private function refundBankTransfer(Transaction $transaction, float $amount, string $reason): array
+    {
+        // Bank transfer refunds are manual
+        // Create a pending refund request for admin to process
+        
+        return [
+            'status' => 'pending',
+            'refund_reference' => 'BTR' . strtoupper(Str::random(10)),
+            'message' => 'Bank transfer refund initiated. Admin will process within 3-5 business days.',
+            'gateway_response' => [
+                'method' => 'manual',
+                'instructions' => 'Please provide your bank account details to receive the refund.'
+            ]
+        ];
+    }
 }

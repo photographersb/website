@@ -1,16 +1,1131 @@
 {
+  "_AdminHeader.js": {
+    "file": "js/AdminHeader.js",
+    "name": "AdminHeader",
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/AdminHeader.css"
+    ]
+  },
+  "_AdminQuickNav.js": {
+    "file": "js/AdminQuickNav.js",
+    "name": "AdminQuickNav",
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/AdminQuickNav.css"
+    ]
+  },
+  "_EmptyState.js": {
+    "file": "js/EmptyState.js",
+    "name": "EmptyState",
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/EmptyState.css"
+    ]
+  },
+  "_FilterOffcanvas.js": {
+    "file": "js/FilterOffcanvas.js",
+    "name": "FilterOffcanvas",
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/FilterOffcanvas.css"
+    ]
+  },
   "resources/css/app.css": {
     "file": "assets/app.css",
     "src": "resources/css/app.css",
     "isEntry": true
+  },
+  "resources/js/Pages/About.vue": {
+    "file": "js/About.js",
+    "name": "About",
+    "src": "resources/js/Pages/About.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/Admin/ActivityLogs/Index.vue": {
+    "file": "js/Index15.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/ActivityLogs/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Index13.css"
+    ]
+  },
+  "resources/js/Pages/Admin/AuditLogs/Index.vue": {
+    "file": "js/Index10.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/AuditLogs/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Index9.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Bookings/Index.vue": {
+    "file": "js/Index5.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Bookings/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Index4.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Categories/Index.vue": {
+    "file": "js/Index19.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Categories/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Index17.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Certificates/Index.vue": {
+    "file": "js/Index12.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Certificates/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/AdminHeader.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Certificates/ManualIssuance.vue": {
+    "file": "js/ManualIssuance.js",
+    "name": "ManualIssuance",
+    "src": "resources/js/Pages/Admin/Certificates/ManualIssuance.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/AdminHeader.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Certificates/Templates.vue": {
+    "file": "js/Templates.js",
+    "name": "Templates",
+    "src": "resources/js/Pages/Admin/Certificates/Templates.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/AdminHeader.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Cities/Index.vue": {
+    "file": "js/Index18.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Cities/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Index16.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Competitions/Create.vue": {
+    "file": "js/Create.js",
+    "name": "Create",
+    "src": "resources/js/Pages/Admin/Competitions/Create.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_AdminHeader.js",
+      "_AdminQuickNav.js",
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/Admin/Competitions/Dashboard.vue": {
+    "file": "js/Dashboard.js",
+    "name": "Dashboard",
+    "src": "resources/js/Pages/Admin/Competitions/Dashboard.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Dashboard.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Competitions/Edit.vue": {
+    "file": "js/Edit.js",
+    "name": "Edit",
+    "src": "resources/js/Pages/Admin/Competitions/Edit.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Edit.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Competitions/Show.vue": {
+    "file": "js/Show.js",
+    "name": "Show",
+    "src": "resources/js/Pages/Admin/Competitions/Show.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Show.css"
+    ]
+  },
+  "resources/js/Pages/Admin/ErrorCenter.vue": {
+    "file": "js/ErrorCenter.js",
+    "name": "ErrorCenter",
+    "src": "resources/js/Pages/Admin/ErrorCenter.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/ErrorCenter.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Events/CheckIn.vue": {
+    "file": "js/CheckIn.js",
+    "name": "CheckIn",
+    "src": "resources/js/Pages/Admin/Events/CheckIn.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ]
+  },
+  "resources/js/Pages/Admin/Events/Create.vue": {
+    "file": "js/Create2.js",
+    "name": "Create",
+    "src": "resources/js/Pages/Admin/Events/Create.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Create.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Events/Edit.vue": {
+    "file": "js/Edit2.js",
+    "name": "Edit",
+    "src": "resources/js/Pages/Admin/Events/Edit.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ]
+  },
+  "resources/js/Pages/Admin/Events/Index.vue": {
+    "file": "js/Index.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Events/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ]
+  },
+  "resources/js/Pages/Admin/Judges/Create.vue": {
+    "file": "js/Create4.js",
+    "name": "Create",
+    "src": "resources/js/Pages/Admin/Judges/Create.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Create3.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Judges/Edit.vue": {
+    "file": "js/Edit4.js",
+    "name": "Edit",
+    "src": "resources/js/Pages/Admin/Judges/Edit.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Edit3.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Judges/Index.vue": {
+    "file": "js/Index14.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Judges/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Index12.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Judges/Show.vue": {
+    "file": "js/Show3.js",
+    "name": "Show",
+    "src": "resources/js/Pages/Admin/Judges/Show.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Show3.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Mentors/Create.vue": {
+    "file": "js/Create3.js",
+    "name": "Create",
+    "src": "resources/js/Pages/Admin/Mentors/Create.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Create2.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Mentors/Edit.vue": {
+    "file": "js/Edit3.js",
+    "name": "Edit",
+    "src": "resources/js/Pages/Admin/Mentors/Edit.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Edit2.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Mentors/Index.vue": {
+    "file": "js/Index13.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Mentors/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Index11.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Mentors/Show.vue": {
+    "file": "js/Show2.js",
+    "name": "Show",
+    "src": "resources/js/Pages/Admin/Mentors/Show.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Show2.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Notices/Index.vue": {
+    "file": "js/Index11.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Notices/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Index10.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Payments/Index.vue": {
+    "file": "js/Index8.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Payments/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/Index7.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Photographers/Index.vue": {
+    "file": "js/Index3.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Photographers/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Index2.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Reviews/Index.vue": {
+    "file": "js/Index6.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Reviews/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Index5.css"
+    ]
+  },
+  "resources/js/Pages/Admin/SEO/Index.vue": {
+    "file": "js/Index17.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/SEO/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Index15.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Settings/ChangeTracking.vue": {
+    "file": "js/ChangeTracking.js",
+    "name": "ChangeTracking",
+    "src": "resources/js/Pages/Admin/Settings/ChangeTracking.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/AdminHeader.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Settings/Index.vue": {
+    "file": "js/Index9.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Settings/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Index8.css"
+    ]
+  },
+  "resources/js/Pages/Admin/ShareFrameGenerator.vue": {
+    "file": "js/ShareFrameGenerator.js",
+    "name": "ShareFrameGenerator",
+    "src": "resources/js/Pages/Admin/ShareFrameGenerator.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/Admin/SubmissionModeration.vue": {
+    "file": "js/SubmissionModeration.js",
+    "name": "SubmissionModeration",
+    "src": "resources/js/Pages/Admin/SubmissionModeration.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ]
+  },
+  "resources/js/Pages/Admin/Transactions/Index.vue": {
+    "file": "js/Index7.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Transactions/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Index6.css"
+    ]
+  },
+  "resources/js/Pages/Admin/UserApproval/Index.vue": {
+    "file": "js/Index16.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/UserApproval/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/Index14.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Users/Index.vue": {
+    "file": "js/Index2.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Users/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Index.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Verifications/Index.vue": {
+    "file": "js/Index4.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Verifications/Index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/Index3.css"
+    ]
+  },
+  "resources/js/Pages/BecomeSponsor.vue": {
+    "file": "js/BecomeSponsor.js",
+    "name": "BecomeSponsor",
+    "src": "resources/js/Pages/BecomeSponsor.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/BookingMessages.vue": {
+    "file": "js/BookingMessages.js",
+    "name": "BookingMessages",
+    "src": "resources/js/Pages/BookingMessages.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/Bookings.vue": {
+    "file": "js/Bookings.js",
+    "name": "Bookings",
+    "src": "resources/js/Pages/Bookings.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/CategoriesLanding.vue": {
+    "file": "js/CategoriesLanding.js",
+    "name": "CategoriesLanding",
+    "src": "resources/js/Pages/CategoriesLanding.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/CategoryPhotographers.vue": {
+    "file": "js/CategoryPhotographers.js",
+    "name": "CategoryPhotographers",
+    "src": "resources/js/Pages/CategoryPhotographers.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_FilterOffcanvas.js"
+    ],
+    "css": [
+      "assets/CategoryPhotographers.css"
+    ]
+  },
+  "resources/js/Pages/CompetitionDetail.vue": {
+    "file": "js/CompetitionDetail.js",
+    "name": "CompetitionDetail",
+    "src": "resources/js/Pages/CompetitionDetail.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/CompetitionGallery.vue": {
+    "file": "js/CompetitionGallery.js",
+    "name": "CompetitionGallery",
+    "src": "resources/js/Pages/CompetitionGallery.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/CompetitionSubmit.vue": {
+    "file": "js/CompetitionSubmit.js",
+    "name": "CompetitionSubmit",
+    "src": "resources/js/Pages/CompetitionSubmit.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/Competitions.vue": {
+    "file": "js/Competitions.js",
+    "name": "Competitions",
+    "src": "resources/js/Pages/Competitions.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_EmptyState.js"
+    ],
+    "css": [
+      "assets/Competitions.css"
+    ]
+  },
+  "resources/js/Pages/Contact.vue": {
+    "file": "js/Contact.js",
+    "name": "Contact",
+    "src": "resources/js/Pages/Contact.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/EventDetail.vue": {
+    "file": "js/EventDetail.js",
+    "name": "EventDetail",
+    "src": "resources/js/Pages/EventDetail.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/Events.vue": {
+    "file": "js/Events.js",
+    "name": "Events",
+    "src": "resources/js/Pages/Events.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/ForgotPassword.vue": {
+    "file": "js/ForgotPassword.js",
+    "name": "ForgotPassword",
+    "src": "resources/js/Pages/ForgotPassword.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/HelpCenter.vue": {
+    "file": "js/HelpCenter.js",
+    "name": "HelpCenter",
+    "src": "resources/js/Pages/HelpCenter.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/HowItWorks.vue": {
+    "file": "js/HowItWorks.js",
+    "name": "HowItWorks",
+    "src": "resources/js/Pages/HowItWorks.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/JudgeScoring.vue": {
+    "file": "js/JudgeScoring.js",
+    "name": "JudgeScoring",
+    "src": "resources/js/Pages/JudgeScoring.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/LocationPhotographers.vue": {
+    "file": "js/LocationPhotographers.js",
+    "name": "LocationPhotographers",
+    "src": "resources/js/Pages/LocationPhotographers.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_FilterOffcanvas.js"
+    ],
+    "css": [
+      "assets/LocationPhotographers.css"
+    ]
+  },
+  "resources/js/Pages/LocationsLanding.vue": {
+    "file": "js/LocationsLanding.js",
+    "name": "LocationsLanding",
+    "src": "resources/js/Pages/LocationsLanding.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/PhotographerAchievements.vue": {
+    "file": "js/PhotographerAchievements.js",
+    "name": "PhotographerAchievements",
+    "src": "resources/js/Pages/PhotographerAchievements.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/PhotographerAchievements.css"
+    ]
+  },
+  "resources/js/Pages/Privacy.vue": {
+    "file": "js/Privacy.js",
+    "name": "Privacy",
+    "src": "resources/js/Pages/Privacy.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/PublicVerification.vue": {
+    "file": "js/PublicVerification.js",
+    "name": "PublicVerification",
+    "src": "resources/js/Pages/PublicVerification.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/Settings.vue": {
+    "file": "js/Settings.js",
+    "name": "Settings",
+    "src": "resources/js/Pages/Settings.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/SubmissionDetail.vue": {
+    "file": "js/SubmissionDetail.js",
+    "name": "SubmissionDetail",
+    "src": "resources/js/Pages/SubmissionDetail.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/Terms.vue": {
+    "file": "js/Terms.js",
+    "name": "Terms",
+    "src": "resources/js/Pages/Terms.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/Pages/VerificationCenter.vue": {
+    "file": "js/VerificationCenter.js",
+    "name": "VerificationCenter",
+    "src": "resources/js/Pages/VerificationCenter.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/VerificationCenter.css"
+    ]
+  },
+  "resources/js/Pages/WinnerAnnouncement.vue": {
+    "file": "js/WinnerAnnouncement.js",
+    "name": "WinnerAnnouncement",
+    "src": "resources/js/Pages/WinnerAnnouncement.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
   },
   "resources/js/app.js": {
     "file": "js/app2.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
+    "dynamicImports": [
+      "resources/js/components/PhotographerSearch.vue",
+      "resources/js/components/PhotographerProfile.vue",
+      "resources/js/components/BookingForm.vue",
+      "resources/js/components/Auth.vue",
+      "resources/js/components/AdminDashboardEnhanced.vue",
+      "resources/js/components/AdminDataHub.vue",
+      "resources/js/components/AdminPhotoCategoryManagement.vue",
+      "resources/js/components/AdminHashtagManagement.vue",
+      "resources/js/Pages/Competitions.vue",
+      "resources/js/Pages/CompetitionDetail.vue",
+      "resources/js/Pages/CompetitionSubmit.vue",
+      "resources/js/Pages/CompetitionGallery.vue",
+      "resources/js/Pages/SubmissionDetail.vue",
+      "resources/js/Pages/Events.vue",
+      "resources/js/Pages/EventDetail.vue",
+      "resources/js/components/PhotographerDashboard.vue",
+      "resources/js/Pages/PhotographerAchievements.vue",
+      "resources/js/components/ReviewForm.vue",
+      "resources/js/components/PaymentCheckout.vue",
+      "resources/js/components/PaymentSuccess.vue",
+      "resources/js/components/PaymentFailed.vue",
+      "resources/js/components/PaymentCancelled.vue",
+      "resources/js/components/TransactionHistory.vue",
+      "resources/js/components/NotificationsInbox.vue",
+      "resources/js/Pages/Admin/Competitions/Dashboard.vue",
+      "resources/js/Pages/Admin/Competitions/Show.vue",
+      "resources/js/Pages/Admin/Competitions/Create.vue",
+      "resources/js/Pages/Admin/Competitions/Edit.vue",
+      "resources/js/Pages/Admin/Events/Index.vue",
+      "resources/js/Pages/Admin/Events/Create.vue",
+      "resources/js/Pages/Admin/Events/Edit.vue",
+      "resources/js/Pages/Admin/Events/CheckIn.vue",
+      "resources/js/Pages/Admin/SubmissionModeration.vue",
+      "resources/js/Pages/JudgeScoring.vue",
+      "resources/js/Pages/WinnerAnnouncement.vue",
+      "resources/js/Pages/Admin/Users/Index.vue",
+      "resources/js/Pages/Admin/Photographers/Index.vue",
+      "resources/js/Pages/Admin/Verifications/Index.vue",
+      "resources/js/Pages/Admin/Bookings/Index.vue",
+      "resources/js/Pages/Admin/Reviews/Index.vue",
+      "resources/js/Pages/Admin/Transactions/Index.vue",
+      "resources/js/Pages/Admin/Payments/Index.vue",
+      "resources/js/Pages/Admin/Settings/Index.vue",
+      "resources/js/Pages/Admin/AuditLogs/Index.vue",
+      "resources/js/Pages/Admin/Notices/Index.vue",
+      "resources/js/Pages/Admin/Certificates/Index.vue",
+      "resources/js/Pages/Admin/Certificates/ManualIssuance.vue",
+      "resources/js/Pages/Admin/Certificates/Templates.vue",
+      "resources/js/Pages/Admin/ShareFrameGenerator.vue",
+      "resources/js/Pages/Admin/Settings/ChangeTracking.vue",
+      "resources/js/Pages/Admin/Mentors/Index.vue",
+      "resources/js/Pages/Admin/Mentors/Create.vue",
+      "resources/js/Pages/Admin/Mentors/Edit.vue",
+      "resources/js/Pages/Admin/Mentors/Show.vue",
+      "resources/js/Pages/Admin/Judges/Index.vue",
+      "resources/js/Pages/Admin/Judges/Create.vue",
+      "resources/js/Pages/Admin/Judges/Edit.vue",
+      "resources/js/Pages/Admin/Judges/Show.vue",
+      "resources/js/Pages/Admin/ActivityLogs/Index.vue",
+      "resources/js/Pages/Admin/UserApproval/Index.vue",
+      "resources/js/Pages/Admin/ErrorCenter.vue",
+      "resources/js/Pages/Admin/SEO/Index.vue",
+      "resources/js/Pages/Admin/Cities/Index.vue",
+      "resources/js/Pages/Admin/Categories/Index.vue",
+      "resources/js/components/AdminSponsors.vue",
+      "resources/js/components/AdminContactMessages.vue",
+      "resources/js/Pages/About.vue",
+      "resources/js/Pages/HowItWorks.vue",
+      "resources/js/Pages/Contact.vue",
+      "resources/js/Pages/HelpCenter.vue",
+      "resources/js/Pages/Privacy.vue",
+      "resources/js/Pages/Terms.vue",
+      "resources/js/Pages/Settings.vue",
+      "resources/js/Pages/BecomeSponsor.vue",
+      "resources/js/Pages/Bookings.vue",
+      "resources/js/Pages/ForgotPassword.vue",
+      "resources/js/Pages/BookingMessages.vue",
+      "resources/js/Pages/VerificationCenter.vue",
+      "resources/js/Pages/PublicVerification.vue",
+      "resources/js/Pages/LocationPhotographers.vue",
+      "resources/js/Pages/CategoryPhotographers.vue",
+      "resources/js/Pages/CategoriesLanding.vue",
+      "resources/js/Pages/LocationsLanding.vue",
+      "resources/js/components/Judge/JudgeDashboard.vue",
+      "resources/js/components/Judge/JudgeCompetitions.vue",
+      "resources/js/components/Judge/JudgeScoringForm.vue",
+      "resources/js/Pages/Admin/UserApproval/Index.vue"
+    ],
     "css": [
       "assets/app2.css"
+    ]
+  },
+  "resources/js/components/AdminContactMessages.vue": {
+    "file": "js/AdminContactMessages.js",
+    "name": "AdminContactMessages",
+    "src": "resources/js/components/AdminContactMessages.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/AdminContactMessages.css"
+    ]
+  },
+  "resources/js/components/AdminDashboardEnhanced.vue": {
+    "file": "js/AdminDashboardEnhanced.js",
+    "name": "AdminDashboardEnhanced",
+    "src": "resources/js/components/AdminDashboardEnhanced.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_AdminHeader.js",
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/AdminDashboardEnhanced.css"
+    ]
+  },
+  "resources/js/components/AdminDataHub.vue": {
+    "file": "js/AdminDataHub.js",
+    "name": "AdminDataHub",
+    "src": "resources/js/components/AdminDataHub.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js"
+    ]
+  },
+  "resources/js/components/AdminHashtagManagement.vue": {
+    "file": "js/AdminHashtagManagement.js",
+    "name": "AdminHashtagManagement",
+    "src": "resources/js/components/AdminHashtagManagement.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/components/AdminPhotoCategoryManagement.vue": {
+    "file": "js/AdminPhotoCategoryManagement.js",
+    "name": "AdminPhotoCategoryManagement",
+    "src": "resources/js/components/AdminPhotoCategoryManagement.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/AdminPhotoCategoryManagement.css"
+    ]
+  },
+  "resources/js/components/AdminSponsors.vue": {
+    "file": "js/AdminSponsors.js",
+    "name": "AdminSponsors",
+    "src": "resources/js/components/AdminSponsors.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AdminHeader.js",
+      "_AdminQuickNav.js"
+    ],
+    "css": [
+      "assets/AdminSponsors.css"
+    ]
+  },
+  "resources/js/components/Auth.vue": {
+    "file": "js/Auth.js",
+    "name": "Auth",
+    "src": "resources/js/components/Auth.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/Auth.css"
+    ]
+  },
+  "resources/js/components/BookingForm.vue": {
+    "file": "js/BookingForm.js",
+    "name": "BookingForm",
+    "src": "resources/js/components/BookingForm.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/components/Judge/JudgeCompetitions.vue": {
+    "file": "js/JudgeCompetitions.js",
+    "name": "JudgeCompetitions",
+    "src": "resources/js/components/Judge/JudgeCompetitions.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/JudgeCompetitions.css"
+    ]
+  },
+  "resources/js/components/Judge/JudgeDashboard.vue": {
+    "file": "js/JudgeDashboard.js",
+    "name": "JudgeDashboard",
+    "src": "resources/js/components/Judge/JudgeDashboard.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/JudgeDashboard.css"
+    ]
+  },
+  "resources/js/components/Judge/JudgeScoringForm.vue": {
+    "file": "js/JudgeScoringForm.js",
+    "name": "JudgeScoringForm",
+    "src": "resources/js/components/Judge/JudgeScoringForm.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/JudgeScoringForm.css"
+    ]
+  },
+  "resources/js/components/NotificationsInbox.vue": {
+    "file": "js/NotificationsInbox.js",
+    "name": "NotificationsInbox",
+    "src": "resources/js/components/NotificationsInbox.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/components/PaymentCancelled.vue": {
+    "file": "js/PaymentCancelled.js",
+    "name": "PaymentCancelled",
+    "src": "resources/js/components/PaymentCancelled.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/components/PaymentCheckout.vue": {
+    "file": "js/PaymentCheckout.js",
+    "name": "PaymentCheckout",
+    "src": "resources/js/components/PaymentCheckout.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/components/PaymentFailed.vue": {
+    "file": "js/PaymentFailed.js",
+    "name": "PaymentFailed",
+    "src": "resources/js/components/PaymentFailed.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/components/PaymentSuccess.vue": {
+    "file": "js/PaymentSuccess.js",
+    "name": "PaymentSuccess",
+    "src": "resources/js/components/PaymentSuccess.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/components/PhotographerDashboard.vue": {
+    "file": "js/PhotographerDashboard.js",
+    "name": "PhotographerDashboard",
+    "src": "resources/js/components/PhotographerDashboard.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_EmptyState.js"
+    ],
+    "css": [
+      "assets/PhotographerDashboard.css"
+    ]
+  },
+  "resources/js/components/PhotographerProfile.vue": {
+    "file": "js/PhotographerProfile.js",
+    "name": "PhotographerProfile",
+    "src": "resources/js/components/PhotographerProfile.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/components/PhotographerSearch.vue": {
+    "file": "js/PhotographerSearch.js",
+    "name": "PhotographerSearch",
+    "src": "resources/js/components/PhotographerSearch.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_EmptyState.js"
+    ],
+    "css": [
+      "assets/PhotographerSearch.css"
+    ]
+  },
+  "resources/js/components/ReviewForm.vue": {
+    "file": "js/ReviewForm.js",
+    "name": "ReviewForm",
+    "src": "resources/js/components/ReviewForm.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/js/components/TransactionHistory.vue": {
+    "file": "js/TransactionHistory.js",
+    "name": "TransactionHistory",
+    "src": "resources/js/components/TransactionHistory.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
     ]
   }
 }

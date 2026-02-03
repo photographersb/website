@@ -10,10 +10,12 @@
         "laravel/framework": "^11.0",
         "laravel/sail": "^1.26",
         "laravel/sanctum": "^4.0",
+        "laravel/socialite": "^5.24",
         "laravel/tinker": "^2.8"
     },
     "require-dev": {
         "fakerphp/faker": "^1.21",
+        "itsgoingd/clockwork": "^5.3",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
         "mockery/mockery": "^1.5",

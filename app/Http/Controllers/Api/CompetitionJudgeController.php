@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Competition;
 use App\Models\CompetitionJudge;
 use App\Models\CompetitionScore;
@@ -18,7 +19,7 @@ class CompetitionJudgeController extends Controller
     public function assignJudge(Request $request, $competitionId)
     {
         $validated = $request->validate([
-            'judge_id' => 'required|exists:users,id',
+            'judge_id' => 'required|exists:judges,id',
             'role' => 'required|in:judge,chief_judge',
             'bio' => 'nullable|string|max:1000',
             'expertise' => 'nullable|string|max:255',
@@ -32,10 +33,7 @@ class CompetitionJudgeController extends Controller
             ->first();
 
         if ($existing) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Judge already assigned to this competition'
-            ], 400);
+            return $this->error('Judge already assigned to this competition', 400);
         }
 
         $judge = CompetitionJudge::create([
@@ -47,11 +45,7 @@ class CompetitionJudgeController extends Controller
             'assigned_at' => now(),
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Judge assigned successfully',
-            'data' => $judge->load('judge')
-        ], 201);
+        return $this->created($judge->load('judge'), 'Judge assigned successfully');
     }
 
     /**
@@ -65,10 +59,7 @@ class CompetitionJudgeController extends Controller
 
         $judge->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Judge removed successfully'
-        ]);
+        return $this->success(null, 'Judge removed successfully');
     }
 
     /**
@@ -81,10 +72,7 @@ class CompetitionJudgeController extends Controller
             ->active()
             ->get();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $judges
-        ]);
+        return $this->success($judges, 'Judges retrieved successfully');
     }
 
     /**
@@ -101,10 +89,7 @@ class CompetitionJudgeController extends Controller
             ->exists();
 
         if (!$isJudge) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Not authorized as judge for this competition'
-            ], 403);
+            return $this->unauthorized('Not authorized as judge for this competition');
         }
 
         // Get all approved submissions with existing scores
@@ -126,10 +111,7 @@ class CompetitionJudgeController extends Controller
             $submission->is_scored = $score && $score->status === 'completed';
         });
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $submissions
-        ]);
+        return $this->success($submissions, 'Assigned submissions retrieved successfully');
     }
 
     /**
@@ -146,10 +128,7 @@ class CompetitionJudgeController extends Controller
             ->exists();
 
         if (!$isJudge) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Not authorized as judge for this competition'
-            ], 403);
+            return $this->unauthorized('Not authorized as judge for this competition');
         }
 
         // Verify submission
@@ -182,11 +161,7 @@ class CompetitionJudgeController extends Controller
         // Update submission's judge_score (average of all judges)
         $this->updateSubmissionJudgeScore($submissionId);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Score submitted successfully',
-            'data' => $score
-        ]);
+        return $this->success($score, 'Score submitted successfully');
     }
 
     /**
@@ -207,17 +182,14 @@ class CompetitionJudgeController extends Controller
 
         $pendingSubmissions = $totalSubmissions - $scoredSubmissions;
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'total' => $totalSubmissions,
-                'scored' => $scoredSubmissions,
-                'pending' => $pendingSubmissions,
-                'progress_percentage' => $totalSubmissions > 0 
-                    ? round(($scoredSubmissions / $totalSubmissions) * 100, 1) 
-                    : 0
-            ]
-        ]);
+        return $this->success([
+            'total' => $totalSubmissions,
+            'scored' => $scoredSubmissions,
+            'pending' => $pendingSubmissions,
+            'progress_percentage' => $totalSubmissions > 0 
+                ? round(($scoredSubmissions / $totalSubmissions) * 100, 1) 
+                : 0
+        ], 'Scoring progress retrieved successfully');
     }
 
     /**
@@ -255,20 +227,17 @@ class CompetitionJudgeController extends Controller
                 ];
             });
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'judges_count' => $judges,
-                'total_submissions' => $totalSubmissions,
-                'total_scores' => $totalScores,
-                'expected_scores' => $expectedScores,
-                'pending_scores' => $pendingScores,
-                'overall_progress' => $expectedScores > 0 
-                    ? round(($totalScores / $expectedScores) * 100, 1) 
-                    : 0,
-                'judge_progress' => $judgeProgress
-            ]
-        ]);
+        return $this->success([
+            'judges_count' => $judges,
+            'total_submissions' => $totalSubmissions,
+            'total_scores' => $totalScores,
+            'expected_scores' => $expectedScores,
+            'pending_scores' => $pendingScores,
+            'overall_progress' => $expectedScores > 0 
+                ? round(($totalScores / $expectedScores) * 100, 1) 
+                : 0,
+            'judge_progress' => $judgeProgress
+        ], 'Scoring statistics retrieved successfully');
     }
 
     /**
@@ -308,18 +277,15 @@ class CompetitionJudgeController extends Controller
         $totalSubmissions = $competitions->sum('total_submissions');
         $totalScored = $competitions->sum('scored_count');
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'competitions' => $competitions,
-                'stats' => [
-                    'total_competitions' => $totalCompetitions,
-                    'total_submissions' => $totalSubmissions,
-                    'scored' => $totalScored,
-                    'pending' => $totalSubmissions - $totalScored,
-                ]
+        return $this->success([
+            'competitions' => $competitions,
+            'stats' => [
+                'total_competitions' => $totalCompetitions,
+                'total_submissions' => $totalSubmissions,
+                'scored' => $totalScored,
+                'pending' => $totalSubmissions - $totalScored,
             ]
-        ]);
+        ], 'My assignments retrieved successfully');
     }
 
     /**

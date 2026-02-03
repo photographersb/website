@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Album;
+use App\Http\Requests\AlbumStoreRequest;
+use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 
 class AlbumController extends Controller
 {
+    use ApiResponse;
     /**
      * Get photographer's albums
      */
@@ -16,10 +19,7 @@ class AlbumController extends Controller
         $photographer = $user->photographer;
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer profile not found',
-            ], 404);
+            return $this->notFound('Photographer profile not found');
         }
 
         $albums = Album::where('photographer_id', $photographer->id)
@@ -28,33 +28,22 @@ class AlbumController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $albums,
-        ]);
+        return $this->success($albums, 'Albums retrieved successfully');
     }
 
     /**
      * Create new album
      */
-    public function store(Request $request)
+    public function store(AlbumStoreRequest $request)
     {
         $user = $request->user();
         $photographer = $user->photographer;
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer profile not found',
-            ], 404);
+            return $this->notFound('Photographer profile not found');
         }
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
-            'is_public' => 'boolean',
-            'display_order' => 'nullable|integer|min:0',
-        ]);
+        $validated = $request->validated();
 
         // Generate slug from name
         $slug = \Illuminate\Support\Str::slug($validated['name']);
@@ -76,11 +65,10 @@ class AlbumController extends Controller
             'display_order' => $validated['display_order'] ?? 0,
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Album created successfully',
-            'data' => $album,
-        ], 201);
+        // Track achievement
+        \App\Services\AchievementService::trackAlbumCreated($photographer->id);
+
+        return $this->created($album, 'Album created successfully');
     }
 
     /**
@@ -92,20 +80,14 @@ class AlbumController extends Controller
         $photographer = $user->photographer;
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer profile not found',
-            ], 404);
+            return $this->notFound('Photographer profile not found');
         }
 
         $album = Album::where('photographer_id', $photographer->id)
             ->with('photos')
             ->findOrFail($id);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $album,
-        ]);
+        return $this->success($album, 'Album retrieved successfully');
     }
 
     /**
@@ -117,10 +99,7 @@ class AlbumController extends Controller
         $photographer = $user->photographer;
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer profile not found',
-            ], 404);
+            return $this->notFound('Photographer profile not found');
         }
 
         $album = Album::where('photographer_id', $photographer->id)
@@ -151,11 +130,7 @@ class AlbumController extends Controller
 
         $album->update($validated);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Album updated successfully',
-            'data' => $album->fresh(),
-        ]);
+        return $this->success($album->fresh(), 'Album updated successfully');
     }
 
     /**
@@ -167,10 +142,7 @@ class AlbumController extends Controller
         $photographer = $user->photographer;
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer profile not found',
-            ], 404);
+            return $this->notFound('Photographer profile not found');
         }
 
         $album = Album::where('photographer_id', $photographer->id)
@@ -182,9 +154,6 @@ class AlbumController extends Controller
         // Delete the album
         $album->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Album deleted successfully',
-        ]);
+        return $this->success([], 'Album deleted successfully');
     }
 }

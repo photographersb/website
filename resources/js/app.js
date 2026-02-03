@@ -5,59 +5,97 @@ import lazyload from './directives/lazyload'
 
 // Components
 import App from './App.vue'
-import PhotographerSearch from './components/PhotographerSearch.vue'
-import PhotographerProfile from './components/PhotographerProfile.vue'
-import BookingForm from './components/BookingForm.vue'
-import Auth from './components/Auth.vue'
-import AdminDashboard from './components/AdminDashboard.vue'
-import AdminSponsorManagement from './components/AdminSponsorManagement.vue'
-import AdminPhotoCategoryManagement from './components/AdminPhotoCategoryManagement.vue'
-import AdminHashtagManagement from './components/AdminHashtagManagement.vue'
-import EventsList from './components/EventsList.vue'
-import CompetitionsList from './components/CompetitionsList.vue'
-import Competitions from './Pages/Competitions.vue'
-import CompetitionDetail from './Pages/CompetitionDetail.vue'
-import CompetitionSubmit from './Pages/CompetitionSubmit.vue'
-import CompetitionGallery from './Pages/CompetitionGallery.vue'
-import SubmissionDetail from './Pages/SubmissionDetail.vue'
-import Events from './Pages/Events.vue'
-import EventDetail from './Pages/EventDetail.vue'
-import PhotographerDashboard from './components/PhotographerDashboard.vue'
-import ReviewForm from './components/ReviewForm.vue'
-import PaymentCheckout from './components/PaymentCheckout.vue'
-import PaymentSuccess from './components/PaymentSuccess.vue'
-import PaymentFailed from './components/PaymentFailed.vue'
-import PaymentCancelled from './components/PaymentCancelled.vue'
-import TransactionHistory from './components/TransactionHistory.vue'
-import NotificationsInbox from './components/NotificationsInbox.vue'
-import AdminCompetitionsIndex from './Pages/Admin/Competitions/Dashboard.vue'
-import AdminCompetitionsCreate from './Pages/Admin/Competitions/Create.vue'
-import AdminCompetitionsEdit from './Pages/Admin/Competitions/Edit.vue'
-import AdminEventsIndex from './Pages/Admin/Events/Index.vue'
-import AdminEventsCreate from './Pages/Admin/Events/Create.vue'
-import AdminEventsEdit from './Pages/Admin/Events/Edit.vue'
-import SubmissionModeration from './Pages/Admin/SubmissionModeration.vue'
-import JudgeScoring from './Pages/JudgeScoring.vue'
-import JudgeDashboard from './Pages/JudgeDashboard.vue'
-import WinnerAnnouncement from './Pages/WinnerAnnouncement.vue'
-import AdminUsersIndex from './Pages/Admin/Users/Index.vue'
-import AdminPhotographersIndex from './Pages/Admin/Photographers/Index.vue'
-import AdminVerificationsIndex from './Pages/Admin/Verifications/Index.vue'
-import AdminBookingsIndex from './Pages/Admin/Bookings/Index.vue'
-import AdminReviewsIndex from './Pages/Admin/Reviews/Index.vue'
-import AdminTransactionsIndex from './Pages/Admin/Transactions/Index.vue'
-import AdminPaymentsIndex from './Pages/Admin/Payments/Index.vue'
-import AdminSettingsIndex from './Pages/Admin/Settings/Index.vue'
-import AdminAuditLogsIndex from './Pages/Admin/AuditLogs/Index.vue'
-import About from './Pages/About.vue'
-import HowItWorks from './Pages/HowItWorks.vue'
-import Contact from './Pages/Contact.vue'
-import HelpCenter from './Pages/HelpCenter.vue'
-import Privacy from './Pages/Privacy.vue'
-import Terms from './Pages/Terms.vue'
-import Settings from './Pages/Settings.vue'
-import Bookings from './Pages/Bookings.vue'
-import ForgotPassword from './Pages/ForgotPassword.vue'
+const PhotographerSearch = () => import('./components/PhotographerSearch.vue')
+const PhotographerProfile = () => import('./components/PhotographerProfile.vue')
+const BookingForm = () => import('./components/BookingForm.vue')
+const Auth = () => import('./components/Auth.vue')
+const AdminDashboard = () => import('./components/AdminDashboardEnhanced.vue')
+const AdminDataHub = () => import('./components/AdminDataHub.vue')
+const AdminSponsorManagement = () => import('./components/AdminSponsorManagement.vue')
+const AdminPhotoCategoryManagement = () => import('./components/AdminPhotoCategoryManagement.vue')
+const AdminHashtagManagement = () => import('./components/AdminHashtagManagement.vue')
+const EventsList = () => import('./components/EventsList.vue')
+const CompetitionsList = () => import('./components/CompetitionsList.vue')
+const Competitions = () => import('./Pages/Competitions.vue')
+const CompetitionDetail = () => import('./Pages/CompetitionDetail.vue')
+const CompetitionSubmit = () => import('./Pages/CompetitionSubmit.vue')
+const CompetitionGallery = () => import('./Pages/CompetitionGallery.vue')
+const SubmissionDetail = () => import('./Pages/SubmissionDetail.vue')
+const Events = () => import('./Pages/Events.vue')
+const EventDetail = () => import('./Pages/EventDetail.vue')
+const PhotographerDashboard = () => import('./components/PhotographerDashboard.vue')
+const PhotographerAchievements = () => import('./pages/PhotographerAchievements.vue')
+const ReviewForm = () => import('./components/ReviewForm.vue')
+const PaymentCheckout = () => import('./components/PaymentCheckout.vue')
+const PaymentSuccess = () => import('./components/PaymentSuccess.vue')
+const PaymentFailed = () => import('./components/PaymentFailed.vue')
+const PaymentCancelled = () => import('./components/PaymentCancelled.vue')
+const TransactionHistory = () => import('./components/TransactionHistory.vue')
+const NotificationsInbox = () => import('./components/NotificationsInbox.vue')
+const AdminCompetitionsIndex = () => import('./Pages/Admin/Competitions/Dashboard.vue')
+const AdminCompetitionsShow = () => import('./Pages/Admin/Competitions/Show.vue')
+const AdminCompetitionsCreate = () => import('./Pages/Admin/Competitions/Create.vue')
+const AdminCompetitionsEdit = () => import('./Pages/Admin/Competitions/Edit.vue')
+const AdminEventsIndex = () => import('./Pages/Admin/Events/Index.vue')
+const AdminEventsCreate = () => import('./Pages/Admin/Events/Create.vue')
+const AdminEventsEdit = () => import('./Pages/Admin/Events/Edit.vue')
+const AdminEventCheckIn = () => import('./Pages/Admin/Events/CheckIn.vue')
+const SubmissionModeration = () => import('./Pages/Admin/SubmissionModeration.vue')
+const JudgeScoring = () => import('./Pages/JudgeScoring.vue')
+const JudgeDashboard = () => import('./Pages/JudgeDashboard.vue')
+const WinnerAnnouncement = () => import('./Pages/WinnerAnnouncement.vue')
+const AdminUsersIndex = () => import('./Pages/Admin/Users/Index.vue')
+const AdminPhotographersIndex = () => import('./Pages/Admin/Photographers/Index.vue')
+const AdminVerificationsIndex = () => import('./Pages/Admin/Verifications/Index.vue')
+const AdminBookingsIndex = () => import('./Pages/Admin/Bookings/Index.vue')
+const AdminReviewsIndex = () => import('./Pages/Admin/Reviews/Index.vue')
+const AdminTransactionsIndex = () => import('./Pages/Admin/Transactions/Index.vue')
+const AdminPaymentsIndex = () => import('./Pages/Admin/Payments/Index.vue')
+const AdminSettingsIndex = () => import('./Pages/Admin/Settings/Index.vue')
+const AdminAuditLogsIndex = () => import('./Pages/Admin/AuditLogs/Index.vue')
+const AdminContactMessagesIndex = () => import('./Pages/Admin/ContactMessages/Index.vue')
+const AdminNoticesIndex = () => import('./Pages/Admin/Notices/Index.vue')
+const AdminCertificatesIndex = () => import('./Pages/Admin/Certificates/Index.vue')
+const AdminCertificatesManualIssuance = () => import('./Pages/Admin/Certificates/ManualIssuance.vue')
+const AdminCertificatesTemplates = () => import('./Pages/Admin/Certificates/Templates.vue')
+const AdminShareFrameGenerator = () => import('./Pages/Admin/ShareFrameGenerator.vue')
+const AdminSettingsChangeTracking = () => import('./Pages/Admin/Settings/ChangeTracking.vue')
+const AdminMentorsIndex = () => import('./Pages/Admin/Mentors/Index.vue')
+const AdminMentorsCreate = () => import('./Pages/Admin/Mentors/Create.vue')
+const AdminMentorsEdit = () => import('./Pages/Admin/Mentors/Edit.vue')
+const AdminMentorsShow = () => import('./Pages/Admin/Mentors/Show.vue')
+const AdminJudgesIndex = () => import('./Pages/Admin/Judges/Index.vue')
+const AdminJudgesCreate = () => import('./Pages/Admin/Judges/Create.vue')
+const AdminJudgesEdit = () => import('./Pages/Admin/Judges/Edit.vue')
+const AdminJudgesShow = () => import('./Pages/Admin/Judges/Show.vue')
+const AdminActivityLogsIndex = () => import('./Pages/Admin/ActivityLogs/Index.vue')
+const AdminUserApprovalIndex = () => import('./Pages/Admin/UserApproval/Index.vue')
+const AdminErrorCenter = () => import('./Pages/Admin/ErrorCenter.vue')
+const AdminSeoIndex = () => import('./Pages/Admin/SEO/Index.vue')
+const AdminCitiesIndex = () => import('./Pages/Admin/Cities/Index.vue')
+const AdminCategoriesIndex = () => import('./Pages/Admin/Categories/Index.vue')
+const AdminSponsors = () => import('./components/AdminSponsors.vue')
+const AdminContactMessages = () => import('./components/AdminContactMessages.vue')
+const About = () => import('./Pages/About.vue')
+const HowItWorks = () => import('./Pages/HowItWorks.vue')
+const Contact = () => import('./Pages/Contact.vue')
+const HelpCenter = () => import('./Pages/HelpCenter.vue')
+const Privacy = () => import('./Pages/Privacy.vue')
+const Terms = () => import('./Pages/Terms.vue')
+const Settings = () => import('./Pages/Settings.vue')
+const BecomeSponsor = () => import('./Pages/BecomeSponsor.vue')
+const Bookings = () => import('./Pages/Bookings.vue')
+const ForgotPassword = () => import('./Pages/ForgotPassword.vue')
+const BookingMessages = () => import('./Pages/BookingMessages.vue')
+const VerificationCenter = () => import('./Pages/VerificationCenter.vue')
+const PublicVerification = () => import('./Pages/PublicVerification.vue')
+const LocationPhotographers = () => import('./Pages/LocationPhotographers.vue')
+const CategoryPhotographers = () => import('./Pages/CategoryPhotographers.vue')
+const CategoriesLanding = () => import('./Pages/CategoriesLanding.vue')
+const LocationsLanding = () => import('./Pages/LocationsLanding.vue')
+const JudgeDashboardComponent = () => import('./components/Judge/JudgeDashboard.vue')
+const JudgeCompetitionsComponent = () => import('./components/Judge/JudgeCompetitions.vue')
+const JudgeScoringFormComponent = () => import('./components/Judge/JudgeScoringForm.vue')
 
 // Routes
 const routes = [
@@ -65,6 +103,35 @@ const routes = [
         path: '/',
         component: PhotographerSearch,
         name: 'home',
+    },
+    {
+        path: '/photographer',
+        component: PhotographerSearch,
+        name: 'photographer-list',
+    },
+    {
+        path: '/photographers/by-location',
+        component: LocationPhotographers,
+        name: 'photographers-by-location',
+    },
+    {
+        path: '/locations',
+        component: LocationsLanding,
+        name: 'locations-landing',
+    },
+    {
+        path: '/photographers/by-category',
+        component: CategoryPhotographers,
+        name: 'photographers-by-category',
+    },
+    {
+        path: '/categories',
+        component: CategoriesLanding,
+        name: 'categories-landing',
+    },
+    {
+        path: '/photographers',
+        redirect: '/photographer',
     },
     {
         path: '/photographer/:slug',
@@ -130,15 +197,54 @@ const routes = [
         meta: { requiresAuth: true },
     },
     {
+        path: '/bookings/:bookingId/messages',
+        component: BookingMessages,
+        name: 'booking-messages',
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/verification',
+        component: VerificationCenter,
+        name: 'verification-center',
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/verify/:slug',
+        component: PublicVerification,
+        name: 'public-verification',
+    },
+    {
         path: '/judge/dashboard',
-        component: JudgeDashboard,
+        component: JudgeDashboardComponent,
         name: 'judge-dashboard',
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/judge/competition/:competitionId',
+        component: JudgeCompetitionsComponent,
+        name: 'judge.competition',
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/judge/submission/:competitionId/:submissionId/score',
+        component: JudgeScoringFormComponent,
+        name: 'judge.score-submission',
         meta: { requiresAuth: true },
     },
     {
         path: '/auth',
         component: Auth,
         name: 'auth',
+    },
+    {
+        path: '/login',
+        component: Auth,
+        name: 'login',
+    },
+    {
+        path: '/admin/login',
+        component: Auth,
+        name: 'admin-login',
     },
     {
         path: '/forgot-password',
@@ -204,9 +310,21 @@ const routes = [
         meta: { requiresAuth: true },
     },
     {
+        path: '/photographer/achievements',
+        component: PhotographerAchievements,
+        name: 'photographer-achievements',
+        meta: { requiresAuth: true },
+    },
+    {
         path: '/admin/dashboard',
         component: AdminDashboard,
         name: 'admin-dashboard',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/data-hub',
+        component: AdminDataHub,
+        name: 'admin-data-hub',
         meta: { requiresAuth: true, requiresAdmin: true },
     },
     {
@@ -225,6 +343,12 @@ const routes = [
         path: '/admin/competitions/create',
         component: AdminCompetitionsCreate,
         name: 'admin-competitions-create',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/competitions/:id',
+        component: AdminCompetitionsShow,
+        name: 'admin-competitions-show',
         meta: { requiresAuth: true, requiresAdmin: true },
     },
     {
@@ -257,11 +381,23 @@ const routes = [
         name: 'admin-events-edit',
         meta: { requiresAuth: true, requiresAdmin: true },
     },
+    {
+        path: '/admin/events/:id/check-in',
+        component: AdminEventCheckIn,
+        name: 'admin-events-check-in',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
     // Placeholder routes for admin navigation (to be implemented)
     {
         path: '/admin/users',
         component: AdminUsersIndex,
         name: 'admin-users',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/pending-users',
+        component: AdminUserApprovalIndex,
+        name: 'admin-pending-users',
         meta: { requiresAuth: true, requiresAdmin: true },
     },
     {
@@ -307,6 +443,42 @@ const routes = [
         meta: { requiresAuth: true, requiresAdmin: true },
     },
     {
+        path: '/admin/certificates',
+        component: AdminCertificatesIndex,
+        name: 'admin-certificates',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/certificates/manual-issuance',
+        component: AdminCertificatesManualIssuance,
+        name: 'admin-certificates-manual-issuance',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/certificates/templates',
+        component: AdminCertificatesTemplates,
+        name: 'admin-certificates-templates',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/settings/changes',
+        component: AdminSettingsChangeTracking,
+        name: 'admin-settings-changes',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/share-frames',
+        component: AdminShareFrameGenerator,
+        name: 'admin-share-frames',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/notifications',
+        component: NotificationsInbox,
+        name: 'admin-notifications',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
         path: '/admin/audit-logs',
         component: AdminAuditLogsIndex,
         name: 'admin-audit-logs',
@@ -314,8 +486,104 @@ const routes = [
     },
     {
         path: '/admin/sponsors',
-        component: AdminSponsorManagement,
+        component: AdminSponsors,
         name: 'admin-sponsors',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/contact-messages',
+        component: AdminContactMessages,
+        name: 'admin-contact-messages',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/notices',
+        component: AdminNoticesIndex,
+        name: 'admin-notices',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/mentors',
+        component: AdminMentorsIndex,
+        name: 'admin-mentors',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/mentors/create',
+        component: AdminMentorsCreate,
+        name: 'admin-mentors-create',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/mentors/:id/edit',
+        component: AdminMentorsEdit,
+        name: 'admin-mentors-edit',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/mentors/:id',
+        component: AdminMentorsShow,
+        name: 'admin-mentors-show',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/judges',
+        component: AdminJudgesIndex,
+        name: 'admin-judges',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/judges/create',
+        component: AdminJudgesCreate,
+        name: 'admin-judges-create',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/judges/:id/edit',
+        component: AdminJudgesEdit,
+        name: 'admin-judges-edit',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/judges/:id',
+        component: AdminJudgesShow,
+        name: 'admin-judges-show',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/activity-logs',
+        component: AdminActivityLogsIndex,
+        name: 'admin-activity-logs',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/error-center',
+        component: AdminErrorCenter,
+        name: 'admin-error-center',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/error-center',
+        component: AdminErrorCenter,
+        name: 'admin-error-center',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/seo',
+        component: AdminSeoIndex,
+        name: 'admin-seo',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/cities',
+        component: AdminCitiesIndex,
+        name: 'admin-cities',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/categories',
+        component: AdminCategoriesIndex,
+        name: 'admin-categories',
         meta: { requiresAuth: true, requiresAdmin: true },
     },
     {
@@ -328,6 +596,12 @@ const routes = [
         path: '/admin/hashtags',
         component: AdminHashtagManagement,
         name: 'admin-hashtags',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/user-approval',
+        component: () => import('./Pages/Admin/UserApproval/Index.vue'),
+        name: 'admin-user-approval',
         meta: { requiresAuth: true, requiresAdmin: true },
     },
     // Footer Pages
@@ -362,10 +636,29 @@ const routes = [
         name: 'terms',
     },
     {
+        path: '/become-sponsor',
+        component: BecomeSponsor,
+        name: 'become-sponsor',
+    },
+    {
         path: '/settings',
         component: Settings,
         name: 'settings',
         meta: { requiresAuth: true },
+    },
+    // Catch-all for @username or direct username access (must be last)
+    {
+        path: '/:username',
+        redirect: to => {
+            const username = to.params.username;
+            // Skip if it looks like a system route
+            const systemRoutes = ['admin', 'api', 'auth', 'payment', 'sitemap', 'storage', 'dashboard', 'photographer', 'competitions', 'events', 'bookings', 'reviews', 'help', 'privacy', 'terms', 'become-sponsor', 'settings'];
+            if (systemRoutes.includes(username)) {
+                return to.path;
+            }
+            // Redirect to photographer profile
+            return `/photographer/${username}`;
+        }
     },
 ]
 
@@ -382,33 +675,31 @@ router.beforeEach((to, from, next) => {
     // Redirect authenticated users from auth page to their dashboard
     if (to.path === '/auth' && token && user.role) {
         if (['admin', 'super_admin'].includes(user.role)) {
-            next('/admin/dashboard')
+            return next('/admin/dashboard')
         } else if (user.role === 'photographer') {
-            next('/dashboard')
+            return next('/dashboard')
         } else {
-            next('/')
+            return next('/')
         }
-        return
     }
 
     // Redirect root path for authenticated users to their dashboard
     if (to.path === '/' && token && user.role) {
         if (['admin', 'super_admin'].includes(user.role)) {
-            next('/admin/dashboard')
+            return next('/admin/dashboard')
         } else if (user.role === 'photographer') {
-            next('/dashboard')
+            return next('/dashboard')
         } else {
-            next()
+            return next()
         }
-        return
     }
 
     if (to.meta.requiresAuth && !token) {
-        next('/auth')
+        return next('/auth')
     } else if (to.meta.requiresAdmin && !['admin', 'super_admin'].includes(user.role)) {
-        next('/')
+        return next('/')
     } else {
-        next()
+        return next()
     }
 })
 

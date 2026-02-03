@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class City extends Model
 {
     protected $fillable = [
         'name',
         'slug',
+        'state',
         'division',
         'latitude',
         'longitude',
@@ -25,5 +27,10 @@ class City extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function photographers(): HasMany
+    {
+        return $this->hasMany(Photographer::class);
     }
 }

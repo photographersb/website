@@ -3,56 +3,55 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Competition;
 use App\Models\CompetitionSubmission;
 use App\Models\CompetitionVote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class CompetitionVoteController extends Controller
 {
     /**
-     * Vote for a submission
+     * Vote for a submission (with distributed lock to prevent race conditions)
      */
     public function vote(Request $request, $competitionId, $submissionId)
     {
         $user = $request->user();
         
-        // Get competition and submission
-        $competition = Competition::findOrFail($competitionId);
-        $submission = CompetitionSubmission::forCompetition($competitionId)
-            ->findOrFail($submissionId);
+        // Distributed lock to prevent duplicate votes from rapid clicking
+        $lockKey = "vote:lock:{$user->id}:{$submissionId}";
+        $lock = Cache::lock($lockKey, 5);
+        
+        if (!$lock->get()) {
+            return $this->error('Please wait before voting again', 429);
+        }
+        
+        try {
+            // Get competition and submission
+            $competition = Competition::findOrFail($competitionId);
+            $submission = CompetitionSubmission::forCompetition($competitionId)
+                ->findOrFail($submissionId);
         
         // Check if submission is approved
         if ($submission->status !== 'approved') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Can only vote on approved submissions'
-            ], 403);
+            return $this->error('Can only vote on approved submissions', 403);
         }
         
         // Check if competition is in voting phase
         if ($competition->status !== 'published' && $competition->status !== 'active') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Competition is not accepting votes at this time'
-            ], 403);
+            return $this->error('Competition is not accepting votes at this time', 403);
         }
         
         // Check voting deadline
         if ($competition->voting_deadline && now()->isAfter($competition->voting_deadline)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Voting deadline has passed'
-            ], 403);
+            return $this->error('Voting deadline has passed', 403);
         }
         
         // Prevent voting on own submission
         if ($submission->photographer_id === $user->id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Cannot vote on your own submission'
-            ], 403);
+            return $this->error('Cannot vote on your own submission', 403);
         }
         
         // Check if user already voted
@@ -61,10 +60,7 @@ class CompetitionVoteController extends Controller
             ->first();
         
         if ($existingVote) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'You have already voted on this submission'
-            ], 400);
+            return $this->error('You have already voted on this submission', 400);
         }
         
         // Create vote
@@ -84,13 +80,15 @@ class CompetitionVoteController extends Controller
             $submission->incrementVoteCount();
         });
         
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Vote recorded successfully',
-            'data' => [
-                'vote_count' => $submission->fresh()->vote_count
-            ]
-        ]);
+        // Clear cache
+        Cache::forget("competition:{$competitionId}:details");
+        
+        return $this->success([
+            'vote_count' => $submission->fresh()->vote_count
+        ], 'Vote recorded successfully');
+        } finally {
+            $lock->release();
+        }
     }
     
     /**
@@ -105,10 +103,7 @@ class CompetitionVoteController extends Controller
             ->first();
         
         if (!$vote) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Vote not found'
-            ], 404);
+            return $this->notFound('Vote not found');
         }
         
         $submission = CompetitionSubmission::findOrFail($submissionId);
@@ -118,13 +113,9 @@ class CompetitionVoteController extends Controller
             $submission->decrementVoteCount();
         });
         
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Vote removed successfully',
-            'data' => [
-                'vote_count' => $submission->fresh()->vote_count
-            ]
-        ]);
+        return $this->success([
+            'vote_count' => $submission->fresh()->vote_count
+        ], 'Vote removed successfully');
     }
     
     /**
@@ -135,24 +126,18 @@ class CompetitionVoteController extends Controller
         $user = $request->user();
         
         if (!$user) {
-            return response()->json([
-                'status' => 'success',
-                'data' => [
-                    'has_voted' => false
-                ]
-            ]);
+            return $this->success([
+                'has_voted' => false
+            ], 'Vote check retrieved successfully');
         }
         
         $hasVoted = CompetitionVote::where('submission_id', $submissionId)
             ->where('voter_id', $user->id)
             ->exists();
         
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'has_voted' => $hasVoted
-            ]
-        ]);
+        return $this->success([
+            'has_voted' => $hasVoted
+        ], 'Vote check retrieved successfully');
     }
     
     /**
@@ -168,10 +153,7 @@ class CompetitionVoteController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
         
-        return response()->json([
-            'status' => 'success',
-            'data' => $votes
-        ]);
+        return $this->success($votes, 'My votes retrieved successfully');
     }
     
     /**
@@ -190,13 +172,10 @@ class CompetitionVoteController extends Controller
             ->limit(10)
             ->get(['id', 'title', 'vote_count', 'thumbnail_url']);
         
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'total_votes' => $totalVotes,
-                'unique_voters' => $uniqueVoters,
-                'top_submissions' => $topSubmissions
-            ]
-        ]);
+        return $this->success([
+            'total_votes' => $totalVotes,
+            'unique_voters' => $uniqueVoters,
+            'top_submissions' => $topSubmissions
+        ], 'Vote statistics retrieved successfully');
     }
 }

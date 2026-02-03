@@ -1,15 +1,19 @@
 <template>
-  <div class="admin-photographers">
-    <!-- Page Header -->
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">📷 Photographer Management</h1>
-        <p class="page-subtitle">Manage photographer profiles, verifications, and portfolios</p>
-      </div>
-    </div>
+  <div class="min-h-screen bg-gray-50">
+    <!-- Admin Header with Back Button & Notifications -->
+    <AdminHeader 
+      title="📷 Photographer Management" 
+      subtitle="Manage photographer profiles, verifications, and portfolios"
+    />
 
-    <!-- Stats Cards -->
-    <div class="stats-grid">
+    <!-- Main Content -->
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      
+      <!-- Quick Navigation -->
+      <AdminQuickNav />
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
       <div class="stat-card stat-blue">
         <div class="stat-icon">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,6 +84,13 @@
           <option value="verified">Verified</option>
           <option value="pending">Pending</option>
           <option value="unverified">Unverified</option>
+        </select>
+
+        <select v-model="filters.city_id" @change="fetchPhotographers" class="filter-select">
+          <option value="">All Cities</option>
+          <option v-for="city in cities" :key="city.id" :value="city.id">
+            {{ city.name }}
+          </option>
         </select>
 
         <select v-model="filters.rating" @change="fetchPhotographers" class="filter-select">
@@ -198,6 +209,82 @@
       </div>
     </div>
 
+    <!-- Edit Modal -->
+    <div v-if="showEditModal" class="modal-overlay" @click.self="showEditModal = false">
+      <div class="modal modal-large">
+        <div class="modal-header">
+          <h3>Edit Photographer</h3>
+          <button @click="showEditModal = false" class="modal-close">×</button>
+        </div>
+        <div class="modal-body" v-if="selectedPhotographer">
+          <form @submit.prevent="savePhotographer" class="edit-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Business Name</label>
+                <input v-model="editForm.business_name" type="text" class="form-input" required />
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input v-model="editForm.email" type="email" class="form-input" required />
+              </div>
+            </div>
+    
+            <div class="form-row">
+              <div class="form-group">
+                <label>Phone</label>
+                <input v-model="editForm.phone" type="text" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label>City</label>
+                <select v-model="editForm.city_id" class="form-input">
+                  <option value="">Select city</option>
+                  <option v-for="city in cities" :key="city.id" :value="city.id">{{ city.name }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Bio</label>
+              <textarea v-model="editForm.bio" class="form-input" rows="4"></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Experience (years)</label>
+                <input v-model.number="editForm.experience_years" type="number" class="form-input" min="0" />
+              </div>
+              <div class="form-group">
+                <label>Service Area Radius (km)</label>
+                <input v-model.number="editForm.service_area_radius" type="number" class="form-input" min="0" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="checkbox-label">
+                  <input v-model="editForm.is_verified" type="checkbox" />
+                  <span>Verified</span>
+                </label>
+              </div>
+              <div class="form-group">
+                <label class="checkbox-label">
+                  <input v-model="editForm.is_featured" type="checkbox" />
+                  <span>Featured</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" @click="showEditModal = false" class="btn-cancel">Cancel</button>
+              <button type="submit" class="btn-save" :disabled="saving">
+                {{ saving ? 'Saving...' : 'Save Changes' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <!-- View Modal -->
     <div v-if="showViewModal" class="modal-overlay" @click.self="showViewModal = false">
       <div class="modal modal-large">
@@ -270,22 +357,30 @@
     <div v-if="showToast" class="toast">
       {{ toastMessage }}
     </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import AdminHeader from '../../../components/AdminHeader.vue'
+import AdminQuickNav from '../../../components/AdminQuickNav.vue'
 
 const photographers = ref([])
+const cities = ref([])
 const loading = ref(false)
 const showViewModal = ref(false)
 const selectedPhotographer = ref(null)
 const showToast = ref(false)
 const toastMessage = ref('')
+const showEditModal = ref(false)
+const editForm = ref({})
+const saving = ref(false)
 
 const filters = ref({
   search: '',
   verification: '',
+  city_id: '',
   rating: ''
 })
 
@@ -296,19 +391,11 @@ const meta = ref({
   per_page: 30
 })
 
-const stats = computed(() => {
-  const verified = photographers.value.filter(p => p.is_verified).length
-  const pending = photographers.value.filter(p => !p.is_verified).length
-  const avgRating = photographers.value.length > 0 
-    ? (photographers.value.reduce((sum, p) => sum + (parseFloat(p.average_rating) || 0), 0) / photographers.value.length).toFixed(1)
-    : '0.0'
-  
-  return {
-    total: meta.value.total,
-    verified,
-    pending,
-    avgRating
-  }
+const stats = ref({
+  total: 0,
+  verified: 0,
+  pending: 0,
+  avgRating: '0.0'
 })
 
 let searchTimeout = null
@@ -327,36 +414,56 @@ const fetchPhotographers = async (page = 1) => {
     const params = new URLSearchParams()
     
     if (filters.value.search) params.append('search', filters.value.search)
+    if (filters.value.verification) params.append('verification', filters.value.verification)
     if (filters.value.rating) params.append('rating', filters.value.rating)
+    if (filters.value.city_id) params.append('city_id', filters.value.city_id)
     params.append('page', page)
+    params.append('per_page', meta.value.per_page)
 
-    // For verification filter, we'll filter client-side since the API doesn't have this filter
-    const response = await fetch(`/api/v1/photographers?${params}`, {
+    // Call ADMIN endpoint, not public endpoint
+    const response = await fetch(`/api/v1/admin/photographers?${params}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json'
       }
     })
     
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`)
+    }
+    
     const data = await response.json()
     
     if (data.status === 'success') {
-      let items = data.data
+      photographers.value = data.data.photographers
       
-      // Apply verification filter client-side
-      if (filters.value.verification === 'verified') {
-        items = items.filter(p => p.is_verified)
-      } else if (filters.value.verification === 'pending' || filters.value.verification === 'unverified') {
-        items = items.filter(p => !p.is_verified)
+      // Update meta from backend - safely handle meta structure
+      if (data.meta) {
+        meta.value = {
+          total: data.meta.total || 0,
+          current_page: data.meta.current_page || 1,
+          last_page: data.meta.last_page || 1,
+          per_page: data.meta.per_page || 20
+        }
+      } else if (data.data.meta) {
+        meta.value = {
+          total: data.data.meta.total || 0,
+          current_page: data.data.meta.current_page || 1,
+          last_page: data.data.meta.last_page || 1,
+          per_page: data.data.meta.per_page || 20
+        }
       }
-      
-      photographers.value = items
-      meta.value = {
-        total: data.meta?.total || items.length,
-        current_page: data.meta?.current_page || 1,
-        last_page: data.meta?.last_page || 1,
-        per_page: data.meta?.per_page || 30
+
+      // Use backend-calculated stats (accounts for filters)
+      if (data.data.stats) {
+        stats.value.total = data.data.stats.total
+        stats.value.verified = data.data.stats.verified
+        stats.value.pending = data.data.stats.pending
+        stats.value.avgRating = data.data.stats.avgRating
       }
+    } else {
+      console.error('API error:', data)
+      showToastMessage('Error: ' + (data.message || 'Failed to load photographers'))
     }
   } catch (error) {
     console.error('Error fetching photographers:', error)
@@ -385,7 +492,50 @@ const verifyPhotographer = (photographer) => {
 }
 
 const editPhotographer = (photographer) => {
-  showToastMessage('Edit feature coming soon')
+  selectedPhotographer.value = photographer
+  editForm.value = {
+    business_name: photographer.business_name || photographer.user?.name,
+    email: photographer.user?.email,
+    phone: photographer.user?.phone || '',
+    city_id: photographer.city_id || '',
+    bio: photographer.bio || '',
+    experience_years: photographer.experience_years || 0,
+    service_area_radius: photographer.service_area_radius || 50,
+    is_verified: photographer.is_verified || false,
+    is_featured: photographer.is_featured || false
+  }
+  showEditModal.value = true
+}
+
+const savePhotographer = async () => {
+  saving.value = true
+  try {
+    const token = localStorage.getItem('auth_token')
+    const response = await fetch(`/api/v1/admin/photographers/${selectedPhotographer.value.id}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(editForm.value)
+    })
+    
+    const data = await response.json()
+    
+    if (response.ok && data.status === 'success') {
+      showToastMessage('Photographer updated successfully')
+      showEditModal.value = false
+      fetchPhotographers(meta.value.current_page)
+    } else {
+      showToastMessage(data.message || 'Error updating photographer')
+    }
+  } catch (error) {
+    console.error('Error updating photographer:', error)
+    showToastMessage('Error updating photographer')
+  } finally {
+    saving.value = false
+  }
 }
 
 const exportPhotographers = () => {
@@ -394,11 +544,11 @@ const exportPhotographers = () => {
 
 const formatDate = (date) => {
   if (!date) return 'N/A'
-  return new Date(date).toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  })
+  const d = new Date(date)
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const year = d.getFullYear()
+  return `${day}-${month}-${year}` // DD-MM-YYYY for Bangladesh
 }
 
 const showToastMessage = (message) => {
@@ -409,7 +559,27 @@ const showToastMessage = (message) => {
   }, 3000)
 }
 
+const fetchCities = async () => {
+  try {
+    const token = localStorage.getItem('auth_token')
+    const response = await fetch('/api/v1/cities', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    })
+    
+    if (response.ok) {
+      const data = await response.json()
+      cities.value = data.data || []
+    }
+  } catch (error) {
+    console.error('Error fetching cities:', error)
+  }
+}
+
 onMounted(() => {
+  fetchCities()
   fetchPhotographers()
 })
 </script>
@@ -458,10 +628,10 @@ onMounted(() => {
   border-left: 4px solid;
 }
 
-.stat-blue { border-color: #3b82f6; }
-.stat-green { border-color: #10b981; }
-.stat-yellow { border-color: #f59e0b; }
-.stat-purple { border-color: #8b5cf6; }
+.stat-blue { border-color: var(--admin-brand-primary); }
+.stat-green { border-color: var(--admin-brand-primary); }
+.stat-yellow { border-color: var(--admin-brand-primary); }
+.stat-purple { border-color: var(--admin-brand-primary); }
 
 .stat-icon {
   width: 3rem;
@@ -472,10 +642,10 @@ onMounted(() => {
   justify-content: center;
 }
 
-.stat-blue .stat-icon { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-.stat-green .stat-icon { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-.stat-yellow .stat-icon { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
-.stat-purple .stat-icon { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+.stat-blue .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-green .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-yellow .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-purple .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
 
 .stat-content {
   display: flex;
@@ -534,8 +704,8 @@ onMounted(() => {
 
 .search-input:focus {
   outline: none;
-  border-color: #6c0b1a;
-  box-shadow: 0 0 0 3px rgba(108, 11, 26, 0.1);
+  border-color: var(--admin-brand-primary);
+  box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.12);
 }
 
 .filter-select {
@@ -548,7 +718,7 @@ onMounted(() => {
 
 .filter-select:focus {
   outline: none;
-  border-color: #6c0b1a;
+  border-color: var(--admin-brand-primary);
 }
 
 .btn-export {
@@ -566,8 +736,8 @@ onMounted(() => {
 
 .btn-export:hover {
   background: #f9fafb;
-  border-color: #6c0b1a;
-  color: #6c0b1a;
+  border-color: var(--admin-brand-primary);
+  color: var(--admin-brand-primary);
 }
 
 .loading-state {
@@ -580,7 +750,7 @@ onMounted(() => {
   width: 3rem;
   height: 3rem;
   border: 3px solid #e5e7eb;
-  border-top-color: #6c0b1a;
+  border-top-color: var(--admin-brand-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem;
@@ -620,7 +790,7 @@ onMounted(() => {
   width: 4rem;
   height: 4rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6c0b1a, #9d1429);
+  background: linear-gradient(135deg, var(--admin-brand-primary), var(--admin-brand-primary-dark));
   color: white;
   display: flex;
   align-items: center;
@@ -727,8 +897,8 @@ onMounted(() => {
 }
 
 .btn-view:hover {
-  background: #6c0b1a;
-  border-color: #6c0b1a;
+  background: var(--admin-brand-primary);
+  border-color: var(--admin-brand-primary);
   color: white;
 }
 
@@ -803,8 +973,8 @@ onMounted(() => {
 
 .pagination-btn:hover:not(:disabled) {
   background: #f9fafb;
-  border-color: #6c0b1a;
-  color: #6c0b1a;
+  border-color: var(--admin-brand-primary);
+  color: var(--admin-brand-primary);
 }
 
 .pagination-btn:disabled {
@@ -897,7 +1067,7 @@ onMounted(() => {
   width: 6rem;
   height: 6rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6c0b1a, #9d1429);
+  background: linear-gradient(135deg, var(--admin-brand-primary), var(--admin-brand-primary-dark));
   color: white;
   display: flex;
   align-items: center;
@@ -1018,4 +1188,99 @@ onMounted(() => {
 .w-8 { width: 2rem; }
 .h-8 { height: 2rem; }
 .mr-2 { margin-right: 0.5rem; }
+
+/* Edit Form Styles */
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.form-input {
+  padding: 0.625rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--admin-brand-primary);
+  box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.1);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 1.125rem;
+  height: 1.125rem;
+  cursor: pointer;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn-cancel {
+  padding: 0.625rem 1.25rem;
+  border: 1px solid #d1d5db;
+  background: white;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+  background: #f3f4f6;
+}
+
+.btn-save {
+  padding: 0.625rem 1.25rem;
+  background: var(--admin-brand-primary);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-save:hover:not(:disabled) {
+  background: var(--admin-brand-primary-hover);
+}
+
+.btn-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 </style>

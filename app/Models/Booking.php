@@ -22,6 +22,8 @@ class Booking extends Model
         'total_amount',
         'status',
         'payment_status',
+        'payment_method',
+        'payment_gateway',
         'cancellation_reason',
         'cancelled_at',
         'confirmed_at',
@@ -75,5 +77,15 @@ class Booking extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(BookingMessage::class);
+    }
+
+    public function statusLogs(): HasMany
+    {
+        return $this->hasMany(BookingStatusLog::class);
     }
 }

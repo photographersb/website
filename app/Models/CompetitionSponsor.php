@@ -8,6 +8,7 @@ class CompetitionSponsor extends Model
 {
     protected $fillable = [
         'competition_id',
+        'sponsor_id',
         'name',
         'logo_url',
         'website_url',
@@ -30,5 +31,10 @@ class CompetitionSponsor extends Model
     public function competition()
     {
         return $this->belongsTo(Competition::class);
+    }
+
+    public function sponsor()
+    {
+        return $this->belongsTo(Sponsor::class);
     }
 }

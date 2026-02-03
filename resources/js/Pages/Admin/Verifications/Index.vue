@@ -1,20 +1,29 @@
 <template>
-  <div class="admin-verifications">
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">✅ Verification Management</h1>
-        <p class="page-subtitle">Review and approve photographer verification requests</p>
-      </div>
-      <button @click="exportVerifications" class="btn-export-main">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        Export
-      </button>
-    </div>
+  <div class="min-h-screen bg-gray-50">
+    <!-- Admin Header with Back Button & Notifications -->
+    <AdminHeader 
+      title="✅ Verification Management" 
+      subtitle="Review and approve photographer verification requests"
+    />
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
+    <!-- Main Content -->
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      
+      <!-- Quick Navigation -->
+      <AdminQuickNav />
+
+      <!-- Export Button -->
+      <div class="flex justify-end">
+        <button @click="exportVerifications" class="btn-export-main">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Export
+        </button>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
       <div class="stat-card stat-yellow">
         <div class="stat-icon">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,20 +74,102 @@
     </div>
 
     <div class="content-card">
+      <!-- P0 Verification Requests -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">Pending Verification Requests (P0)</h3>
+          <button @click="fetchPendingRequests" class="btn-action">Refresh</button>
+        </div>
+
+        <div v-if="pendingLoading" class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading pending requests...</p>
+        </div>
+
+        <div v-else-if="pendingRequests.length" class="verifications-list">
+          <div v-for="request in pendingRequests" :key="request.id" class="verification-card">
+            <div class="verification-header">
+              <div class="photographer-info">
+                <div class="photographer-avatar">{{ request.user?.name?.charAt(0).toUpperCase() || 'U' }}</div>
+                <div>
+                  <div class="photographer-name">{{ request.user?.name || 'N/A' }}</div>
+                  <div class="photographer-email">{{ request.user?.email || 'N/A' }}</div>
+                </div>
+              </div>
+              <span class="badge badge-warning">Pending</span>
+            </div>
+
+            <div class="verification-body">
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Request Type:</span>
+                  <span class="info-value">{{ capitalizeFirst(request.request_type) }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Submitted:</span>
+                  <span class="info-value">{{ formatDate(request.created_at) }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Documents:</span>
+                  <span class="info-value">{{ request.submitted_documents?.length || 0 }} files</span>
+                </div>
+              </div>
+
+              <div v-if="request.submitted_documents?.length" class="notes-section">
+                <strong>Documents:</strong>
+                <div class="mt-2 space-y-1">
+                  <div v-for="(doc, idx) in request.submitted_documents" :key="idx">
+                    <a
+                      :href="`/storage/${doc.path}`"
+                      target="_blank"
+                      rel="noopener"
+                      class="text-sm text-burgundy hover:underline"
+                    >
+                      {{ doc.filename || 'Document' }}
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="verification-actions">
+                <button @click="approveRequest(request)" class="btn-action btn-success">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Approve
+                </button>
+                <button @click="rejectRequest(request)" class="btn-action btn-danger">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Reject
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-else class="empty-state">
+          <div class="empty-icon">✅</div>
+          <p class="empty-title">No pending requests</p>
+          <p class="empty-subtitle">All verification requests have been reviewed.</p>
+        </div>
+      </div>
+
       <!-- Tabs -->
       <div class="verification-tabs">
         <button 
-          @click="currentTab = 'pending'" 
+          @click="currentTab = 'pending'; fetchVerifications()" 
           :class="['tab-btn', { active: currentTab === 'pending' }]">
           Pending ({{ stats.pending }})
         </button>
         <button 
-          @click="currentTab = 'approved'" 
+          @click="currentTab = 'approved'; fetchVerifications()" 
           :class="['tab-btn', { active: currentTab === 'approved' }]">
           Approved ({{ stats.approved }})
         </button>
         <button 
-          @click="currentTab = 'rejected'" 
+          @click="currentTab = 'rejected'; fetchVerifications()" 
           :class="['tab-btn', { active: currentTab === 'rejected' }]">
           Rejected ({{ stats.rejected }})
         </button>
@@ -101,8 +192,8 @@
                 <div class="photographer-email">{{ verification.photographer?.user?.email || 'N/A' }}</div>
               </div>
             </div>
-            <span :class="`badge badge-${getStatusColor(verification.status)}`">
-              {{ capitalizeFirst(verification.status) }}
+            <span :class="`badge badge-${getStatusColor(verification.verification_status)}`">
+              {{ capitalizeFirst(verification.verification_status) }}
             </span>
           </div>
 
@@ -199,8 +290,8 @@
             </div>
             <div class="detail-item">
               <span class="detail-label">Status:</span>
-              <span :class="`badge badge-${getStatusColor(selectedVerification.status)}`">
-                {{ capitalizeFirst(selectedVerification.status) }}
+              <span :class="`badge badge-${getStatusColor(selectedVerification.verification_status)}`">
+                {{ capitalizeFirst(selectedVerification.verification_status) }}
               </span>
             </div>
             <div class="detail-item">
@@ -211,39 +302,46 @@
         </div>
       </div>
     </div>
-
     <!-- Toast -->
     <div v-if="showToast" class="toast">{{ toastMessage }}</div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import AdminHeader from '../../../components/AdminHeader.vue'
+import AdminQuickNav from '../../../components/AdminQuickNav.vue'
 
 const verifications = ref([])
 const loading = ref(false)
 const currentTab = ref('pending')
+const pendingRequests = ref([])
+const pendingLoading = ref(false)
 const showViewModal = ref(false)
 const selectedVerification = ref(null)
 const showToast = ref(false)
 const toastMessage = ref('')
 
-const stats = computed(() => ({
-  pending: verifications.value.filter(v => v.status === 'pending').length,
-  approved: verifications.value.filter(v => v.status === 'approved').length,
-  rejected: verifications.value.filter(v => v.status === 'rejected').length,
-  total: verifications.value.length
-}))
+// Stats from backend (not computed from client data)
+const stats = ref({
+  pending: 0,
+  approved: 0,
+  rejected: 0,
+  total: 0
+})
 
+// Use all verifications from backend (already filtered by status parameter)
 const filteredVerifications = computed(() => {
-  return verifications.value.filter(v => v.status === currentTab.value)
+  return verifications.value
 })
 
 const fetchVerifications = async () => {
   loading.value = true
   try {
     const token = localStorage.getItem('auth_token')
-    const response = await fetch('/api/v1/admin/verifications', {
+    // Send status parameter to get filtered results from backend
+    const response = await fetch(`/api/v1/admin/verifications?status=${currentTab.value}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json'
@@ -253,6 +351,10 @@ const fetchVerifications = async () => {
     if (response.ok) {
       const data = await response.json()
       verifications.value = data.data || []
+      // Update stats from backend response
+      if (data.stats) {
+        stats.value = data.stats
+      }
     }
   } catch (error) {
     console.error('Error fetching verifications:', error)
@@ -262,19 +364,143 @@ const fetchVerifications = async () => {
   }
 }
 
-const approveVerification = (verification) => {
-  if (confirm(`Approve verification for ${verification.photographer?.business_name}?`)) {
-    verification.status = 'approved'
-    showToastMessage('Verification approved successfully')
+const fetchPendingRequests = async () => {
+  pendingLoading.value = true
+  try {
+    const token = localStorage.getItem('auth_token')
+    const response = await fetch('/api/v1/verifications/pending', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      const payload = data.data || {}
+      pendingRequests.value = payload.data || payload || []
+    }
+  } catch (error) {
+    console.error('Error fetching pending requests:', error)
+    showToastMessage('Error loading pending requests')
+  } finally {
+    pendingLoading.value = false
   }
 }
 
-const rejectVerification = (verification) => {
+const approveVerification = async (verification) => {
+  if (!confirm(`Approve verification for ${verification.photographer?.business_name}?`)) return
+  
+  try {
+    const token = localStorage.getItem('auth_token')
+    const response = await fetch(`/api/v1/admin/verifications/${verification.id}/approve`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+    
+    const data = await response.json()
+    
+    if (data.status === 'success') {
+      showToastMessage(data.message || 'Verification approved successfully')
+      fetchVerifications() // Refresh the list
+    } else {
+      showToastMessage(data.message || 'Error approving verification')
+    }
+  } catch (error) {
+    console.error('Error approving verification:', error)
+    showToastMessage('Error approving verification')
+  }
+}
+
+const rejectVerification = async (verification) => {
   const reason = prompt('Enter rejection reason:')
-  if (reason) {
-    verification.status = 'rejected'
-    verification.rejection_reason = reason
-    showToastMessage('Verification rejected')
+  if (!reason) return
+  
+  try {
+    const token = localStorage.getItem('auth_token')
+    const response = await fetch(`/api/v1/admin/verifications/${verification.id}/reject`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ notes: reason })
+    })
+    
+    const data = await response.json()
+    
+    if (data.status === 'success') {
+      showToastMessage(data.message || 'Verification rejected')
+      fetchVerifications() // Refresh the list
+    } else {
+      showToastMessage(data.message || 'Error rejecting verification')
+    }
+  } catch (error) {
+    console.error('Error rejecting verification:', error)
+    showToastMessage('Error rejecting verification')
+  }
+}
+
+const approveRequest = async (request) => {
+  if (!confirm(`Approve verification request for ${request.user?.name || 'user'}?`)) return
+
+  try {
+    const token = localStorage.getItem('auth_token')
+    const response = await fetch(`/api/v1/verifications/${request.id}/approve`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+
+    const data = await response.json()
+
+    if (data.status === 'success') {
+      showToastMessage(data.message || 'Request approved successfully')
+      fetchPendingRequests()
+    } else {
+      showToastMessage(data.message || 'Error approving request')
+    }
+  } catch (error) {
+    console.error('Error approving request:', error)
+    showToastMessage('Error approving request')
+  }
+}
+
+const rejectRequest = async (request) => {
+  const reason = prompt('Enter rejection reason:')
+  if (!reason) return
+
+  try {
+    const token = localStorage.getItem('auth_token')
+    const response = await fetch(`/api/v1/verifications/${request.id}/reject`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ reason })
+    })
+
+    const data = await response.json()
+
+    if (data.status === 'success') {
+      showToastMessage(data.message || 'Request rejected')
+      fetchPendingRequests()
+    } else {
+      showToastMessage(data.message || 'Error rejecting request')
+    }
+  } catch (error) {
+    console.error('Error rejecting request:', error)
+    showToastMessage('Error rejecting request')
   }
 }
 
@@ -312,11 +538,11 @@ const capitalizeFirst = (str) => {
 
 const formatDate = (date) => {
   if (!date) return 'N/A'
-  return new Date(date).toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
-  })
+  const d = new Date(date)
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const year = d.getFullYear()
+  return `${day}-${month}-${year}`
 }
 
 const showToastMessage = (message) => {
@@ -329,29 +555,30 @@ const showToastMessage = (message) => {
 
 onMounted(() => {
   fetchVerifications()
+  fetchPendingRequests()
 })
 </script>
 
 <style scoped>
-.admin-verifications { padding: 2rem; min-height: 100vh; background: #f9fafb; }
+.admin-verifications { padding: 2rem; min-height: 100vh; background: var(--admin-bg-page); }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
 .page-title { font-size: 2rem; font-weight: 700; color: #1f2937; margin: 0; }
 .page-subtitle { color: #6b7280; margin: 0.5rem 0 0 0; }
 
-.btn-export-main { display: flex; align-items: center; background: #6c0b1a; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: background 0.2s; }
-.btn-export-main:hover { background: #4a070f; }
+.btn-export-main { display: flex; align-items: center; background: var(--admin-brand-primary); color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+.btn-export-main:hover { background: var(--admin-brand-primary-dark); }
 
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
 .stat-card { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 1rem; border-left: 4px solid; }
-.stat-blue { border-color: #3b82f6; }
-.stat-yellow { border-color: #f59e0b; }
-.stat-green { border-color: #10b981; }
-.stat-red { border-color: #ef4444; }
+.stat-blue { border-color: var(--admin-brand-primary); }
+.stat-yellow { border-color: var(--admin-brand-primary); }
+.stat-green { border-color: var(--admin-brand-primary); }
+.stat-red { border-color: var(--admin-brand-primary); }
 .stat-icon { width: 3rem; height: 3rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; }
-.stat-blue .stat-icon { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-.stat-yellow .stat-icon { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
-.stat-green .stat-icon { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-.stat-red .stat-icon { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.stat-blue .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-yellow .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-green .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-red .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
 .stat-content { flex: 1; }
 .stat-label { display: block; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem; }
 .stat-value { display: block; font-size: 2rem; font-weight: 700; color: #1f2937; }
@@ -359,11 +586,11 @@ onMounted(() => {
 .content-card { background: white; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem; }
 .verification-tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 2px solid #e5e7eb; }
 .tab-btn { background: none; border: none; padding: 1rem 1.5rem; cursor: pointer; font-weight: 600; color: #6b7280; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
-.tab-btn:hover { color: #6c0b1a; }
-.tab-btn.active { color: #6c0b1a; border-bottom-color: #6c0b1a; }
+.tab-btn:hover { color: var(--admin-brand-primary); }
+.tab-btn.active { color: var(--admin-brand-primary); border-bottom-color: var(--admin-brand-primary); }
 
 .loading-state { text-align: center; padding: 3rem; color: #6b7280; }
-.spinner { width: 3rem; height: 3rem; border: 3px solid #e5e7eb; border-top-color: #6c0b1a; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+.spinner { width: 3rem; height: 3rem; border: 3px solid #e5e7eb; border-top-color: var(--admin-brand-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .verifications-list { display: grid; gap: 1.5rem; }
@@ -372,7 +599,7 @@ onMounted(() => {
 
 .verification-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
 .photographer-info { display: flex; align-items: center; gap: 0.75rem; }
-.photographer-avatar { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: linear-gradient(135deg, #6c0b1a, #9d1429); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1rem; }
+.photographer-avatar { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--admin-brand-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1rem; }
 .photographer-name { font-weight: 600; color: #1f2937; }
 .photographer-email { font-size: 0.875rem; color: #6b7280; }
 
@@ -386,16 +613,16 @@ onMounted(() => {
 
 .verification-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
 .btn-action { display: flex; align-items: center; padding: 0.5rem 1rem; border: 1px solid #e5e7eb; background: white; border-radius: 0.375rem; cursor: pointer; font-weight: 500; color: #6b7280; transition: all 0.2s; }
-.btn-action:hover { background: #f9fafb; border-color: #6c0b1a; color: #6c0b1a; }
-.btn-success { border-color: #10b981; color: #10b981; }
-.btn-success:hover { background: #d1fae5; border-color: #10b981; color: #065f46; }
-.btn-danger { border-color: #ef4444; color: #ef4444; }
-.btn-danger:hover { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+.btn-action:hover { background: #f9fafb; border-color: var(--admin-brand-primary); color: var(--admin-brand-primary); }
+.btn-success { border-color: var(--admin-success); color: var(--admin-success); }
+.btn-success:hover { background: var(--admin-success-light); border-color: var(--admin-success); color: var(--admin-success-text); }
+.btn-danger { border-color: var(--admin-danger); color: var(--admin-danger); }
+.btn-danger:hover { background: var(--admin-danger-light); border-color: var(--admin-danger); color: var(--admin-danger-text); }
 
 .badge { display: inline-flex; align-items: center; padding: 0.375rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-.badge-success { background: #d1fae5; color: #065f46; }
-.badge-warning { background: #fef3c7; color: #92400e; }
-.badge-danger { background: #fee2e2; color: #991b1b; }
+.badge-success { background: var(--admin-success-light); color: var(--admin-success-text); }
+.badge-warning { background: var(--admin-warning-light); color: var(--admin-warning-text); }
+.badge-danger { background: var(--admin-danger-light); color: var(--admin-danger-text); }
 .badge-gray { background: #f3f4f6; color: #6b7280; }
 
 .empty-state { text-align: center; padding: 4rem 2rem; color: #9ca3af; }

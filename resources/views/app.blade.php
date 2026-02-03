@@ -46,6 +46,9 @@
     <meta name="theme-color" content="#8E0E3F">
     <meta name="msapplication-TileColor" content="#8E0E3F">
     
+    <!-- Dynamic SEO Meta Tags (Page-specific) -->
+    @yield('meta')
+    
     <!-- Preconnect for Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,7 +62,7 @@
     {
         "@context": "https://schema.org",
         "@type": "WebSite",
-        "name": "Photographar",
+        "name": "Photographer SB",
         "alternateName": "Photographers Across Bangladesh - A Somogro Bangladesh Project",
         "url": "https://photographersb.com",
         "description": "Bangladesh's premier photography marketplace by Somogro Bangladesh, connecting professional photographers with clients nationwide",
@@ -80,7 +83,7 @@
     {
         "@context": "https://schema.org",
         "@type": "Organization",
-        "name": "Photographar",
+        "name": "Photographer SB",
         "alternateName": "A Somogro Bangladesh Project",
         "url": "https://photographersb.com",
         "logo": "https://photographersb.com/images/logo.svg",

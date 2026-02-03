@@ -5,21 +5,20 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Inquiry;
 use App\Models\Quote;
+use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class QuoteController extends Controller
 {
+    use ApiResponse;
     public function send(Request $request, $inquiryId)
     {
         $inquiry = Inquiry::with('user')->findOrFail($inquiryId);
 
         // Check if authenticated user is the photographer for this inquiry
         if ($request->user()->photographer->id !== $inquiry->photographer_id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized to send quote for this inquiry'
-            ], 403);
+            return $this->unauthorized('Unauthorized to send quote for this inquiry');
         }
 
         $validator = Validator::make($request->all(), [
@@ -34,11 +33,7 @@ class QuoteController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
+            return $this->validationError($validator->errors(), 'Validation failed');
         }
 
         // Create quote
@@ -61,11 +56,7 @@ class QuoteController extends Controller
         // Send notification to client
         $inquiry->user->notify(new \App\Notifications\QuoteReceived($quote));
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Quote sent successfully',
-            'data' => $quote->load('package')
-        ], 201);
+        return $this->created($quote->load('package'), 'Quote sent successfully');
     }
 
     public function update(Request $request, $id)
@@ -74,18 +65,12 @@ class QuoteController extends Controller
 
         // Check authorization
         if ($request->user()->photographer->id !== $quote->photographer_id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized'
-            ], 403);
+            return $this->unauthorized('Unauthorized');
         }
 
         // Can only update if status is 'sent' or 'countered'
         if (!in_array($quote->status, ['sent', 'countered'])) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Cannot update quote with status: ' . $quote->status
-            ], 400);
+            return $this->error('Cannot update quote with status: ' . $quote->status, 400);
         }
 
         $validator = Validator::make($request->all(), [
@@ -97,10 +82,7 @@ class QuoteController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'errors' => $validator->errors()
-            ], 422);
+            return $this->validationError($validator->errors(), 'Validation failed');
         }
 
         $updateData = $request->only(['amount', 'description', 'terms_conditions', 'deliverables']);
@@ -116,11 +98,7 @@ class QuoteController extends Controller
 
         $quote->update($updateData);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Quote updated successfully',
-            'data' => $quote->fresh()
-        ]);
+        return $this->success($quote->fresh(), 'Quote updated successfully');
     }
 
     public function list(Request $request)
@@ -132,10 +110,7 @@ class QuoteController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $quotes
-        ]);
+        return $this->paginated($quotes, 'Quotes retrieved successfully');
     }
 
     public function show(Request $request, $id)
@@ -149,15 +124,9 @@ class QuoteController extends Controller
         $isClient = $user->id === $quote->inquiry->user_id;
 
         if (!$isPhotographer && !$isClient) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized'
-            ], 403);
+            return $this->unauthorized('Unauthorized');
         }
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $quote
-        ]);
+        return $this->success($quote, 'Quote retrieved successfully');
     }
 }

@@ -1,26 +1,17 @@
 <template>
-  <div class="min-h-screen bg-gray-100 py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Header -->
-      <div class="mb-8">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h1 class="text-3xl font-bold text-gray-900">Submission Moderation</h1>
-            <p class="mt-1 text-sm text-gray-600">Review and moderate competition submissions</p>
-          </div>
-          <router-link 
-            to="/admin/competitions" 
-            class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium"
-          >
-            Back to Competitions
-          </router-link>
-        </div>
+  <div class="min-h-screen bg-gray-50">
+    <AdminHeader 
+      title="Submission Moderation" 
+      subtitle="Review and moderate competition submissions"
+    />
 
-        <!-- Competition Info -->
-        <div v-if="competition" class="bg-white rounded-lg shadow-md p-4">
-          <h2 class="font-bold text-xl text-gray-900">{{ competition.title }}</h2>
-          <p class="text-sm text-gray-600">{{ competition.description }}</p>
-        </div>
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <AdminQuickNav />
+
+      <!-- Competition Info -->
+      <div v-if="competition" class="bg-white rounded-lg shadow-md p-4">
+        <h2 class="font-bold text-xl text-gray-900">{{ competition.title }}</h2>
+        <p class="text-sm text-gray-600">{{ competition.description }}</p>
       </div>
 
       <!-- Statistics -->
@@ -29,17 +20,17 @@
           <p class="text-sm text-gray-600">Total</p>
           <p class="text-2xl font-bold text-gray-900">{{ stats.total }}</p>
         </div>
-        <div class="bg-yellow-50 rounded-lg shadow p-4 border-2 border-yellow-200">
-          <p class="text-sm text-yellow-700">Pending</p>
-          <p class="text-2xl font-bold text-yellow-800">{{ stats.pending }}</p>
+        <div class="bg-warning-50 rounded-lg shadow p-4 border-2 border-warning-200">
+          <p class="text-sm text-warning-700">Pending</p>
+          <p class="text-2xl font-bold text-warning-700">{{ stats.pending }}</p>
         </div>
-        <div class="bg-green-50 rounded-lg shadow p-4">
-          <p class="text-sm text-green-700">Approved</p>
-          <p class="text-2xl font-bold text-green-800">{{ stats.approved }}</p>
+        <div class="bg-success-50 rounded-lg shadow p-4">
+          <p class="text-sm text-success-700">Approved</p>
+          <p class="text-2xl font-bold text-success-700">{{ stats.approved }}</p>
         </div>
-        <div class="bg-red-50 rounded-lg shadow p-4">
-          <p class="text-sm text-red-700">Rejected</p>
-          <p class="text-2xl font-bold text-red-800">{{ stats.rejected }}</p>
+        <div class="bg-danger-50 rounded-lg shadow p-4">
+          <p class="text-sm text-danger-700">Rejected</p>
+          <p class="text-2xl font-bold text-danger-700">{{ stats.rejected }}</p>
         </div>
         <div class="bg-gray-50 rounded-lg shadow p-4">
           <p class="text-sm text-gray-700">Disqualified</p>
@@ -55,7 +46,7 @@
             <select 
               v-model="statusFilter"
               @change="fetchSubmissions"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
             >
               <option value="">All Status</option>
               <option value="pending">Pending Review</option>
@@ -72,7 +63,7 @@
               @input="debouncedSearch"
               type="text" 
               placeholder="Search by title or photographer..."
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
             />
           </div>
         </div>
@@ -80,7 +71,7 @@
 
       <!-- Loading -->
       <div v-if="loading" class="text-center py-12">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-burgundy"></div>
         <p class="mt-4 text-gray-600">Loading submissions...</p>
       </div>
 
@@ -121,7 +112,7 @@
                   </div>
 
                   <!-- Rejection Reason -->
-                  <div v-if="submission.rejection_reason" class="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
+                  <div v-if="submission.rejection_reason" class="alert alert-danger mb-3">
                     <p class="text-sm font-medium text-red-800">Rejection Reason:</p>
                     <p class="text-sm text-red-700">{{ submission.rejection_reason }}</p>
                   </div>
@@ -144,7 +135,7 @@
                   v-if="submission.status === 'pending_review'"
                   @click="approveSubmission(submission)"
                   :disabled="processing"
-                  class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
+                  class="btn-admin-success px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
                 >
                   ✓ Approve
                 </button>
@@ -153,7 +144,7 @@
                   v-if="submission.status === 'pending_review'"
                   @click="openRejectModal(submission)"
                   :disabled="processing"
-                  class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
+                  class="btn-admin-danger px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
                 >
                   ✗ Reject
                 </button>
@@ -249,7 +240,7 @@
           <button 
             @click="confirmReject"
             :disabled="!rejectReason || processing"
-            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="btn-admin-danger px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Confirm Reject
           </button>
@@ -305,6 +296,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import api from '../../api';
+import AdminHeader from '../../components/AdminHeader.vue'
+import AdminQuickNav from '../../components/AdminQuickNav.vue'
 
 const route = useRoute();
 
@@ -512,9 +505,9 @@ const closeImageModal = () => {
 
 const getStatusClass = (status) => {
   const classes = {
-    pending_review: 'bg-yellow-100 text-yellow-800 border border-yellow-300',
-    approved: 'bg-green-100 text-green-800 border border-green-300',
-    rejected: 'bg-red-100 text-red-800 border border-red-300',
+    pending_review: 'status-pending_review',
+    approved: 'status-approved',
+    rejected: 'status-rejected',
     disqualified: 'bg-gray-100 text-gray-800 border border-gray-300'
   };
   return classes[status] || 'bg-gray-100 text-gray-800';

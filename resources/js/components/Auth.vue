@@ -16,7 +16,7 @@
             A Project by <a href="https://somogrobangladesh.com/" target="_blank" rel="noopener" class="underline hover:text-white/80 transition-colors">Somogro Bangladesh</a>
           </p>
         </div>
-        <h1 class="text-3xl md:text-5xl font-bold mb-2 tracking-tight">Join Photographar</h1>
+        <h1 class="text-3xl md:text-5xl font-bold mb-2 tracking-tight">Join Photographer SB</h1>
         <p class="text-base md:text-lg text-gray-100">Connect with photographers or showcase your work</p>
       </div>
     </section>
@@ -253,7 +253,9 @@ const login = async () => {
   loginError.value = '';
 
   try {
+    console.log('Login attempt:', { email: loginForm.value.email, password: '***' });
     const { data } = await api.post('/auth/login', loginForm.value);
+    console.log('Login response:', data);
 
     if (data.status === 'success') {
       // Check if email is verified
@@ -269,6 +271,12 @@ const login = async () => {
 
       localStorage.setItem('auth_token', data.data.token);
       localStorage.setItem('user', JSON.stringify(data.data.user));
+      localStorage.setItem('user_role', data.data.user.role);
+      localStorage.setItem('user_name', data.data.user.name);
+      localStorage.setItem('user_email', data.data.user.email);
+      localStorage.setItem('user_id', data.data.user.id);
+      
+      notifySuccess('Welcome back!', 'Login Successful');
       
       // Redirect based on user role
       const userRole = data.data.user.role;
@@ -281,8 +289,10 @@ const login = async () => {
       }
     }
   } catch (error) {
+    console.error('Login error:', error.response?.data || error);
     const message = error.response?.data?.message || error.response?.data?.errors?.email?.[0] || 'Login failed. Please check your credentials.';
     loginError.value = message;
+    notifyError(message, 'Login Failed');
   } finally {
     loginLoading.value = false;
   }

@@ -130,12 +130,12 @@
           
           <h3 class="text-lg font-bold mb-2">Your Content</h3>
           <p class="text-gray-700 mb-3">
-            You retain ownership of content you post (photos, descriptions, reviews). By posting, you grant Photographar a non-exclusive license to use, display, and distribute your content on our platform.
+            You retain ownership of content you post (photos, descriptions, reviews). By posting, you grant Photographer SB a non-exclusive license to use, display, and distribute your content on our platform.
           </p>
 
           <h3 class="text-lg font-bold mb-2">Platform Content</h3>
           <p class="text-gray-700">
-            All platform design, logos, and functionality are owned by Photographar and protected by intellectual property laws. You may not copy or reproduce platform elements without permission.
+            All platform design, logos, and functionality are owned by Photographer SB and protected by intellectual property laws. You may not copy or reproduce platform elements without permission.
           </p>
         </section>
 

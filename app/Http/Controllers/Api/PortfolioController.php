@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Album;
 use App\Models\Photo;
+use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 
 class PortfolioController extends Controller
 {
+    use ApiResponse;
     /**
      * Get photographer albums
      */
@@ -16,10 +18,7 @@ class PortfolioController extends Controller
         $photographer = \App\Models\Photographer::find($request->get('photographer_id'));
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer not found',
-            ], 404);
+            return $this->notFound('Photographer not found');
         }
 
         $albums = $photographer->albums()
@@ -27,14 +26,7 @@ class PortfolioController extends Controller
             ->orderBy('display_order')
             ->paginate(20);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $albums->items(),
-            'meta' => [
-                'total' => $albums->total(),
-                'per_page' => $albums->perPage(),
-            ],
-        ]);
+        return $this->paginated($albums, 'Albums retrieved successfully');
     }
 
     /**
@@ -58,11 +50,7 @@ class PortfolioController extends Controller
             'slug' => str()->slug($validated['name']),
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Album created',
-            'data' => $album,
-        ], 201);
+        return $this->created($album, 'Album created');
     }
 
     /**
@@ -90,11 +78,7 @@ class PortfolioController extends Controller
 
         $album->increment('photo_count', count($validated['photos']));
 
-        return response()->json([
-            'status' => 'success',
-            'message' => count($validated['photos']) . ' photos uploaded',
-            'data' => $album->photos,
-        ]);
+        return $this->success($album->photos, count($validated['photos']) . ' photos uploaded');
     }
 
     /**
@@ -107,9 +91,6 @@ class PortfolioController extends Controller
         $album->photos()->delete();
         $album->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Album deleted',
-        ]);
+        return $this->success([], 'Album deleted');
     }
 }

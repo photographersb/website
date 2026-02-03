@@ -1,31 +1,32 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- Header -->
-    <div class="bg-white shadow">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="md:flex md:items-center md:justify-between">
-          <div class="flex-1 min-w-0">
-            <h1 class="text-2xl font-bold text-gray-900">Event Management</h1>
-            <p class="mt-1 text-sm text-gray-600">Manage all photography events on the platform</p>
-          </div>
-          <div class="mt-4 flex md:mt-0 md:ml-4">
-            <button
-              @click="$router.push('/admin/events/create')"
-              class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-burgundy hover:bg-rose-800"
-            >
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
-              Create Event
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Admin Header with Back Button & Notifications -->
+    <AdminHeader 
+      title="Event Management" 
+      subtitle="Manage all photography events on the platform"
+    />
 
-    <!-- Filters -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div class="bg-white rounded-lg shadow p-6 mb-6">
+    <!-- Main Content -->
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      
+      <!-- Quick Navigation -->
+      <AdminQuickNav />
+
+      <!-- Action Button -->
+      <div class="flex justify-end">
+        <button
+          @click="$router.push('/admin/events/create')"
+          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-burgundy hover:bg-burgundy-dark"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Create Event
+        </button>
+      </div>
+
+      <!-- Filters -->
+      <div class="bg-white rounded-lg shadow p-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
@@ -75,7 +76,7 @@
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div class="bg-white rounded-lg shadow p-6">
           <div class="flex items-center">
-            <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+            <div class="flex-shrink-0 bg-primary-100 text-primary-700 rounded-md p-3">
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -89,7 +90,7 @@
 
         <div class="bg-white rounded-lg shadow p-6">
           <div class="flex items-center">
-            <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+            <div class="flex-shrink-0 bg-success-100 text-success-700 rounded-md p-3">
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -103,7 +104,7 @@
 
         <div class="bg-white rounded-lg shadow p-6">
           <div class="flex items-center">
-            <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
+            <div class="flex-shrink-0 bg-warning-100 text-warning-700 rounded-md p-3">
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -117,7 +118,7 @@
 
         <div class="bg-white rounded-lg shadow p-6">
           <div class="flex items-center">
-            <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
+            <div class="flex-shrink-0 bg-primary-100 text-primary-700 rounded-md p-3">
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
@@ -151,11 +152,26 @@
                 <p class="mt-2">Loading events...</p>
               </td>
             </tr>
-            <tr v-else-if="events.length === 0">
-              <td colspan="7" class="px-6 py-12 text-center text-gray-500">
-                No events found
-              </td>
-            </tr>
+             <tr v-else-if="events.length === 0">
+               <td colspan="7" class="px-12 py-16">
+                 <div class="flex flex-col items-center justify-center">
+                   <svg class="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                   </svg>
+                   <h3 class="text-lg font-semibold text-gray-900 mb-1">No events yet</h3>
+                   <p class="text-gray-600 mb-6">Get started by creating your first photography event</p>
+                   <button 
+                     @click="$router.push('/admin/events/create')"
+                     class="inline-flex items-center px-4 py-2 bg-burgundy text-white rounded-md hover:bg-burgundy-dark transition-colors"
+                   >
+                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                     </svg>
+                     Create Event
+                   </button>
+                 </div>
+               </td>
+             </tr>
             <tr v-else v-for="event in events" :key="event.id" class="hover:bg-gray-50">
               <td class="px-6 py-4">
                 <div class="flex items-center">
@@ -179,7 +195,7 @@
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                <span class="badge badge-primary">
                   {{ event.event_type || 'other' }}
                 </span>
               </td>
@@ -197,24 +213,39 @@
                 <span :class="getStatusClass(event.status)">
                   {{ event.status }}
                 </span>
-                <span v-if="event.is_featured" class="ml-1 text-yellow-500" title="Featured">⭐</span>
+                <span v-if="event.is_featured" class="ml-1 text-primary-600" title="Featured">⭐</span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div class="flex justify-end gap-2">
                   <button
                     @click="viewEvent(event)"
-                    class="text-blue-600 hover:text-blue-900"
+                    class="text-burgundy hover:text-burgundy-dark"
                     title="View"
+                                     aria-label="View event details"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                           aria-hidden="true"
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   </button>
                   <router-link
+                    :to="`/admin/events/${event.id}/check-in`"
+                    class="text-burgundy hover:text-burgundy-dark"
+                    title="Check-in"
+                                     aria-label="Mark attendance for event"
+                                       aria-hidden="true"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </router-link>
+                  <router-link
                     :to="`/admin/events/edit/${event.slug || event.id}`"
-                    class="text-indigo-600 hover:text-indigo-900"
+                    class="text-burgundy hover:text-burgundy-dark"
                     title="Edit"
+                                     aria-label="Edit event details"
+                                       aria-hidden="true"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -222,10 +253,12 @@
                   </router-link>
                   <button
                     @click="toggleFeatured(event)"
-                    :class="event.is_featured ? 'text-yellow-600 hover:text-yellow-900' : 'text-gray-400 hover:text-gray-600'"
+                    :class="event.is_featured ? 'text-primary-600 hover:text-primary-800' : 'text-gray-400 hover:text-gray-600'"
                     :title="event.is_featured ? 'Unfeature' : 'Feature'"
+                                     :aria-label="event.is_featured ? 'Remove from featured events' : 'Add to featured events'"
                   >
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                           aria-hidden="true"
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
                   </button>
@@ -233,6 +266,8 @@
                     @click="deleteEvent(event)"
                     class="text-red-600 hover:text-red-900"
                     title="Delete"
+                                     aria-label="Delete event permanently"
+                                       aria-hidden="true"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -297,6 +332,8 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '../../../api';
+import AdminHeader from '../../../components/AdminHeader.vue';
+import AdminQuickNav from '../../../components/AdminQuickNav.vue';
 
 const router = useRouter();
 
@@ -329,14 +366,15 @@ const fetchCities = async () => {
 
 const fetchStats = async () => {
   try {
-    const { data } = await api.get('/admin/events');
-    if (data.status === 'success') {
-      const allEvents = data.data;
+    // Get first page without filters to get an overview
+    const { data } = await api.get('/admin/events?per_page=1');
+    if (data.status === 'success' && data.meta) {
+      // Calculate stats based on total from meta
       stats.value = {
-        total: allEvents.length,
-        published: allEvents.filter(e => e.status === 'published').length,
-        draft: allEvents.filter(e => e.status === 'draft').length,
-        total_rsvps: allEvents.reduce((sum, e) => sum + (e.rsvp_count || 0), 0)
+        total: data.meta.total || 0,
+        published: 0,  // Would need a dedicated endpoint to get accurate count
+        draft: 0,      // Would need a dedicated endpoint to get accurate count
+        total_rsvps: 0 // Would need a dedicated endpoint to get accurate count
       };
     }
   } catch (error) {
@@ -359,12 +397,22 @@ const fetchEvents = async () => {
 
     if (data.status === 'success') {
       events.value = data.data;
-      lastPage.value = data.meta.last_page;
-      currentPage.value = data.meta.current_page;
+      // Safely handle meta with fallbacks
+      if (data.meta) {
+        lastPage.value = data.meta.last_page || 1;
+        currentPage.value = data.meta.current_page || 1;
+      } else {
+        console.warn('No meta data in response:', data);
+        lastPage.value = 1;
+        currentPage.value = 1;
+      }
+    } else {
+      console.error('API returned non-success status:', data);
+      alert('Failed to load events: ' + (data.message || 'Unknown error'));
     }
   } catch (error) {
     console.error('Error fetching events:', error);
-    alert('Failed to load events');
+    alert('Failed to load events: ' + (error.response?.data?.message || error.message || 'Unknown error'));
   } finally {
     loading.value = false;
   }
@@ -419,9 +467,9 @@ const formatDate = (date) => {
 
 const getStatusClass = (status) => {
   const classes = {
-    draft: 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800',
-    published: 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800',
-    cancelled: 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800'
+    draft: 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800',
+    published: 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800',
+    cancelled: 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800'
   };
   return classes[status] || classes.draft;
 };

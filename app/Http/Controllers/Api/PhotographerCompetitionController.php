@@ -5,17 +5,20 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Competition;
 use App\Models\Photographer;
+use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class PhotographerCompetitionController extends Controller
 {
+    use ApiResponse;
     /**
      * Check if photographer is verified
      */
     protected function checkVerifiedPhotographer()
     {
-        $photographer = Photographer::where('user_id', auth()->id())->first();
+        $photographer = Photographer::where('user_id', Auth::id())->first();
         
         if (!$photographer || !$photographer->is_verified) {
             abort(403, 'Only verified photographers can create competitions');
@@ -42,16 +45,8 @@ class PhotographerCompetitionController extends Controller
             'completed' => Competition::where('organizer_id', $photographer->id)->where('status', 'completed')->count(),
         ];
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $competitions->items(),
+        return $this->paginated($competitions, 'Competitions retrieved successfully', 200, [
             'stats' => $stats,
-            'meta' => [
-                'total' => $competitions->total(),
-                'per_page' => $competitions->perPage(),
-                'current_page' => $competitions->currentPage(),
-                'last_page' => $competitions->lastPage(),
-            ],
         ]);
     }
 
@@ -83,7 +78,7 @@ class PhotographerCompetitionController extends Controller
 
         // Auto-generate slug if not provided
         if (empty($validated['slug'])) {
-            $validated['slug'] = \Str::slug($validated['title']);
+            $validated['slug'] = Str::slug($validated['title']);
             
             // Ensure uniqueness
             $originalSlug = $validated['slug'];
@@ -96,7 +91,7 @@ class PhotographerCompetitionController extends Controller
 
         // Set organizer
         $validated['organizer_id'] = $photographer->id;
-        $validated['admin_id'] = auth()->id(); // Track who created it
+        $validated['admin_id'] = Auth::id(); // Track who created it
         
         // Photographer competitions default settings
         $validated['status'] = 'draft'; // Must be approved by admin
@@ -108,11 +103,7 @@ class PhotographerCompetitionController extends Controller
 
         $competition = Competition::create($validated);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Competition created successfully! It will be reviewed by admins before going live.',
-            'data' => $competition,
-        ], 201);
+        return $this->created($competition, 'Competition created successfully! It will be reviewed by admins before going live.');
     }
 
     /**
@@ -128,10 +119,7 @@ class PhotographerCompetitionController extends Controller
             ->withCount(['submissions', 'votes'])
             ->firstOrFail();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $competition,
-        ]);
+        return $this->success($competition, 'Competition retrieved successfully');
     }
 
     /**
@@ -145,12 +133,12 @@ class PhotographerCompetitionController extends Controller
             ->where('id', $id)
             ->firstOrFail();
 
+        // Explicit authorization check
+        $this->authorize('update', $competition);
+
         // Can only edit draft competitions
         if ($competition->status !== 'draft') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Cannot edit competition that is already active or completed',
-            ], 422);
+            return $this->validationError([], 'Cannot edit competition that is already active or completed');
         }
 
         $validated = $request->validate([
@@ -174,11 +162,7 @@ class PhotographerCompetitionController extends Controller
 
         $competition->update($validated);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Competition updated successfully',
-            'data' => $competition->fresh(),
-        ]);
+        return $this->success($competition->fresh(), 'Competition updated successfully');
     }
 
     /**
@@ -192,26 +176,20 @@ class PhotographerCompetitionController extends Controller
             ->where('id', $id)
             ->firstOrFail();
 
+        // Explicit authorization check
+        $this->authorize('delete', $competition);
+
         // Can only delete draft competitions with no submissions
         if ($competition->status !== 'draft') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Cannot delete competition that is already active or completed',
-            ], 422);
+            return $this->validationError([], 'Cannot delete competition that is already active or completed');
         }
 
         if ($competition->total_submissions > 0) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Cannot delete competition with existing submissions',
-            ], 422);
+            return $this->validationError([], 'Cannot delete competition with existing submissions');
         }
 
         $competition->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Competition deleted successfully',
-        ]);
+        return $this->success([], 'Competition deleted successfully');
     }
 }

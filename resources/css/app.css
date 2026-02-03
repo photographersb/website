@@ -1,3 +1,5 @@
+@import './admin-theme.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -37,6 +39,16 @@ html {
 }
 
 .hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Alternative class name for horizontal scrollable tabs */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }

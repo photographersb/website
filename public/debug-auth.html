@@ -1,0 +1,81 @@
+<html>
+<head>
+    <title>Debug - localStorage and Auth</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #f5f5f5; }
+        .box { background: white; padding: 15px; margin: 10px 0; border-radius: 5px; border: 1px solid #ddd; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        h2 { margin-top: 20px; color: #333; }
+    </style>
+</head>
+<body>
+    <h1>Debug - Auth State & localStorage</h1>
+    
+    <div class="box">
+        <h2>Current localStorage Contents:</h2>
+        <div id="storage"></div>
+    </div>
+
+    <div class="box">
+        <h2>Actions:</h2>
+        <button onclick="testLogin()">1. Test Login API</button>
+        <button onclick="navigateToCreate()">2. Go to /admin/competitions/create</button>
+        <button onclick="location.reload()">3. Reload This Page</button>
+        <div id="status" style="margin-top: 10px;"></div>
+    </div>
+
+    <script>
+        function updateStorage() {
+            const storage = document.getElementById('storage');
+            const token = localStorage.getItem('auth_token');
+            const user = localStorage.getItem('user');
+            const role = localStorage.getItem('user_role');
+            
+            storage.innerHTML = `
+                <p><strong>auth_token:</strong> <span class="${token ? 'success' : 'error'}">${token ? 'SET (' + token.substring(0, 20) + '...)' : 'NOT SET'}</span></p>
+                <p><strong>user:</strong> <span class="${user ? 'success' : 'error'}">${user ? 'SET: ' + user : 'NOT SET'}</span></p>
+                <p><strong>user_role:</strong> <span class="${role ? 'success' : 'error'}">${role ? 'SET: ' + role : 'NOT SET'}</span></p>
+            `;
+        }
+
+        function testLogin() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<p class="info">Testing login API...</p>';
+            
+            fetch('/api/v1/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: 'mahidulislamnakib@gmail.com',
+                    password: 'password123'
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    localStorage.setItem('auth_token', data.data.token);
+                    localStorage.setItem('user', JSON.stringify(data.data.user));
+                    localStorage.setItem('user_role', data.data.user.role);
+                    status.innerHTML = '<p class="success">✓ Login successful!</p>';
+                    updateStorage();
+                } else {
+                    status.innerHTML = '<p class="error">✗ Login failed: ' + data.message + '</p>';
+                }
+            })
+            .catch(e => {
+                status.innerHTML = '<p class="error">✗ Error: ' + e.message + '</p>';
+            });
+        }
+
+        function navigateToCreate() {
+            window.location.href = '/admin/competitions/create';
+        }
+
+        updateStorage();
+    </script>
+</body>
+</html>

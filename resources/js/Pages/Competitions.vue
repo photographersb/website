@@ -91,19 +91,18 @@
       </div>
 
       <!-- Loading State -->
-      <div v-if="loading" class="text-center py-16">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
-        <p class="text-gray-600 mt-4">Loading competitions...</p>
+      <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+        <LoadingSkeleton v-for="n in 6" :key="n" type="card" />
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="competitions.length === 0" class="bg-white rounded-lg shadow p-12 text-center">
-        <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <h3 class="text-xl font-semibold text-gray-900 mb-2">No Competitions Found</h3>
-        <p class="text-gray-600">Try adjusting your filters or check back later for new competitions.</p>
-      </div>
+      <EmptyState
+        v-else-if="competitions.length === 0"
+        icon="trophy"
+        title="No Competitions Found"
+        description="Try adjusting your filters or check back later for new photography competitions."
+        variant="burgundy"
+      />
 
       <!-- Competitions Grid -->
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
@@ -111,6 +110,12 @@
           <!-- Image -->
           <div class="relative h-56 overflow-hidden">
             <img :src="competition.hero_image || competition.banner_image || 'https://placehold.co/400x250/8E0E3F/FFFFFF?text=Competition'" :alt="competition.title" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" @error="$event.target.src='https://placehold.co/400x250/8E0E3F/FFFFFF?text=No+Image'" />
+            
+            <!-- Countdown Timer Overlay (if active and deadline within 7 days) -->
+            <div v-if="competition.status === 'active' && isDeadlineSoon(competition.submission_deadline)" class="absolute bottom-3 right-3 bg-red-500 text-white px-3 py-2 rounded-lg font-bold shadow-lg">
+              <CountdownTimer :deadline="competition.submission_deadline" :showIcon="true" format="short" />
+            </div>
+            
             <div class="absolute top-4 right-4">
               <span :class="`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(competition.status)}`">
                 {{ formatStatus(competition.status) }}
@@ -220,7 +225,10 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
+import axios from '../bootstrap';
+import LoadingSkeleton from '../components/ui/LoadingSkeleton.vue';
+import EmptyState from '../components/ui/EmptyState.vue';
+import CountdownTimer from '../components/ui/CountdownTimer.vue';
 
 const router = useRouter();
 const competitions = ref([]);

@@ -1,20 +1,29 @@
 <template>
-  <div class="admin-transactions">
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">💳 Transaction Management</h1>
-        <p class="page-subtitle">Monitor all financial transactions</p>
-      </div>
-      <button @click="exportTransactions" class="btn-export-main">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        Export
-      </button>
-    </div>
+  <div class="min-h-screen bg-gray-50">
+    <!-- Admin Header with Back Button & Notifications -->
+    <AdminHeader 
+      title="💳 Transaction Management" 
+      subtitle="Monitor all financial transactions"
+    />
 
-    <!-- Revenue Summary Cards -->
-    <div class="revenue-grid">
+    <!-- Main Content -->
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      
+      <!-- Quick Navigation -->
+      <AdminQuickNav />
+
+      <!-- Export Button -->
+      <div class="flex justify-end">
+        <button @click="exportTransactions" class="btn-export-main">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Export
+        </button>
+      </div>
+
+      <!-- Revenue Summary Cards -->
+      <div class="revenue-grid">
       <div class="revenue-card revenue-primary">
         <div class="revenue-icon">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,14 +231,16 @@
         </div>
       </div>
     </div>
-
     <!-- Toast -->
     <div v-if="showToast" class="toast">{{ toastMessage }}</div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import AdminHeader from '../../../components/AdminHeader.vue'
+import AdminQuickNav from '../../../components/AdminQuickNav.vue'
 
 const transactions = ref([])
 const loading = ref(false)
@@ -245,18 +256,21 @@ const filters = ref({
   date: ''
 })
 
-const stats = computed(() => {
-  const totalRevenue = transactions.value.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0)
-  const monthlyRevenue = transactions.value
-    .filter(t => isThisMonth(t.created_at))
-    .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0)
-  const pendingRevenue = transactions.value
-    .filter(t => t.status === 'pending')
-    .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0)
-  const pendingCount = transactions.value.filter(t => t.status === 'pending').length
-  const growth = 12.5 // Mock growth percentage
-  
-  return { totalRevenue, monthlyRevenue, pendingRevenue, pendingCount, growth }
+// Stats now come from backend API
+const stats = ref({
+  totalRevenue: 0,
+  monthlyRevenue: 0,
+  pendingRevenue: 0,
+  pendingCount: 0,
+  growth: 0,
+  total: 0,
+  completed: 0,
+  pending: 0,
+  failed: 0,
+  refunded: 0,
+  total_revenue: 0,
+  today_revenue: 0,
+  yearly_revenue: 0
 })
 
 let searchTimeout = null
@@ -278,7 +292,14 @@ const fetchTransactions = async () => {
   loading.value = true
   try {
     const token = localStorage.getItem('auth_token')
-    const response = await fetch('/api/v1/payments/transactions', {
+    const params = new URLSearchParams()
+    
+    if (filters.value.search) params.append('search', filters.value.search)
+    if (filters.value.status) params.append('status', filters.value.status)
+    if (filters.value.method) params.append('gateway', filters.value.method)
+    if (filters.value.date) params.append('date_from', filters.value.date)
+    
+    const response = await fetch(`/api/v1/admin/transactions?${params}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json'
@@ -286,8 +307,20 @@ const fetchTransactions = async () => {
     })
     
     if (response.ok) {
-      const data = await response.json()
-      transactions.value = data.data || []
+      const result = await response.json()
+      transactions.value = result.data?.data || []
+      
+      // Update stats from backend response
+      if (result.stats) {
+        stats.value = {
+          totalRevenue: result.stats.total_revenue || 0,
+          monthlyRevenue: result.stats.monthly_revenue || 0,
+          pendingRevenue: 0, // Can be calculated if needed
+          pendingCount: result.stats.pending || 0,
+          growth: 12.5, // Mock growth - can be calculated backend later
+          ...result.stats
+        }
+      }
     }
   } catch (error) {
     console.error('Error fetching transactions:', error)
@@ -337,13 +370,11 @@ const formatNumber = (num) => {
 
 const formatDate = (date) => {
   if (!date) return 'N/A'
-  return new Date(date).toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  const d = new Date(date)
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const year = d.getFullYear()
+  return `${day}-${month}-${year}`
 }
 
 const showToastMessage = (message) => {
@@ -360,18 +391,18 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.admin-transactions { padding: 2rem; min-height: 100vh; background: #f9fafb; }
+.admin-transactions { padding: 2rem; min-height: 100vh; background: var(--admin-bg-page); }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
 .page-title { font-size: 2rem; font-weight: 700; color: #1f2937; margin: 0; }
 .page-subtitle { color: #6b7280; margin: 0.5rem 0 0 0; }
 
-.btn-export-main { display: flex; align-items: center; background: #6c0b1a; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: background 0.2s; }
-.btn-export-main:hover { background: #4a070f; }
+.btn-export-main { display: flex; align-items: center; background: var(--admin-brand-primary); color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+.btn-export-main:hover { background: var(--admin-brand-primary-dark); }
 
 .revenue-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-.revenue-card { background: linear-gradient(135deg, #6c0b1a, #4a070f); color: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 1.5rem; }
-.revenue-secondary { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-.revenue-tertiary { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.revenue-card { background: linear-gradient(135deg, var(--admin-brand-primary), var(--admin-brand-primary-dark)); color: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 1.5rem; }
+.revenue-secondary { background: linear-gradient(135deg, var(--admin-brand-primary-light), var(--admin-brand-primary)); }
+.revenue-tertiary { background: linear-gradient(135deg, var(--admin-brand-primary), var(--admin-brand-primary-dark)); }
 .revenue-icon { width: 4rem; height: 4rem; background: rgba(255,255,255,0.2); border-radius: 1rem; display: flex; align-items: center; justify-content: center; }
 .revenue-content h3 { font-size: 1rem; margin: 0 0 0.5rem 0; opacity: 0.9; }
 .revenue-amount { font-size: 2rem; font-weight: 700; margin: 0 0 0.5rem 0; }
@@ -382,12 +413,12 @@ onMounted(() => {
 .search-box { position: relative; flex: 1; min-width: 300px; }
 .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); width: 1.25rem; height: 1.25rem; color: #9ca3af; }
 .search-input { width: 100%; padding: 0.75rem 1rem 0.75rem 3rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; }
-.search-input:focus { outline: none; border-color: #6c0b1a; box-shadow: 0 0 0 3px rgba(108, 11, 26, 0.1); }
+.search-input:focus { outline: none; border-color: var(--admin-brand-primary); box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.12); }
 .filter-select, .filter-input { padding: 0.75rem 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; cursor: pointer; }
-.filter-select:focus, .filter-input:focus { outline: none; border-color: #6c0b1a; }
+.filter-select:focus, .filter-input:focus { outline: none; border-color: var(--admin-brand-primary); }
 
 .loading-state { text-align: center; padding: 3rem; color: #6b7280; }
-.spinner { width: 3rem; height: 3rem; border: 3px solid #e5e7eb; border-top-color: #6c0b1a; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+.spinner { width: 3rem; height: 3rem; border: 3px solid #e5e7eb; border-top-color: var(--admin-brand-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .table-container { overflow-x: auto; }
@@ -396,28 +427,28 @@ onMounted(() => {
 .data-table td { padding: 1rem; border-bottom: 1px solid #f3f4f6; }
 .transaction-row:hover { background: #f9fafb; }
 
-.transaction-id { font-weight: 600; color: #6c0b1a; }
+.transaction-id { font-weight: 600; color: var(--admin-brand-primary); }
 .user-cell { display: flex; align-items: center; gap: 0.75rem; }
-.user-avatar { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: linear-gradient(135deg, #6c0b1a, #9d1429); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1rem; }
+.user-avatar { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--admin-brand-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1rem; }
 .user-name { font-weight: 600; color: #1f2937; }
 .user-email { font-size: 0.75rem; color: #6b7280; }
 .transaction-type { color: #6b7280; }
 .amount-text, .date-text { color: #1f2937; font-weight: 500; }
 
 .badge, .gateway-badge { display: inline-flex; align-items: center; padding: 0.375rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-.badge-success { background: #d1fae5; color: #065f46; }
-.badge-warning { background: #fef3c7; color: #92400e; }
-.badge-danger { background: #fee2e2; color: #991b1b; }
-.badge-info { background: #dbeafe; color: #1e40af; }
-.badge-blue { background: #dbeafe; color: #1e40af; }
-.badge-pink { background: #fce7f3; color: #be185d; }
-.badge-orange { background: #ffedd5; color: #c2410c; }
-.badge-purple { background: #e9d5ff; color: #6b21a8; }
+.badge-success { background: var(--admin-success-light); color: var(--admin-success-text); }
+.badge-warning { background: var(--admin-warning-light); color: var(--admin-warning-text); }
+.badge-danger { background: var(--admin-danger-light); color: var(--admin-danger-text); }
+.badge-info { background: var(--admin-info-light); color: var(--admin-info-text); }
+.badge-blue { background: var(--admin-info-light); color: var(--admin-info-text); }
+.badge-pink { background: var(--admin-info-light); color: var(--admin-info-text); }
+.badge-orange { background: var(--admin-warning-light); color: var(--admin-warning-text); }
+.badge-purple { background: var(--admin-info-light); color: var(--admin-info-text); }
 .badge-gray { background: #f3f4f6; color: #6b7280; }
 
 .action-buttons { display: flex; gap: 0.5rem; }
 .btn-action { width: 2rem; height: 2rem; border: 1px solid #e5e7eb; background: white; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #6b7280; transition: all 0.2s; }
-.btn-action:hover { background: #f9fafb; border-color: #6c0b1a; color: #6c0b1a; }
+.btn-action:hover { background: #f9fafb; border-color: var(--admin-brand-primary); color: var(--admin-brand-primary); }
 
 .empty-state { text-align: center; padding: 4rem 2rem; color: #9ca3af; }
 .empty-icon { font-size: 5rem; margin-bottom: 1rem; opacity: 0.5; }

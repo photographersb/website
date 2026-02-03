@@ -45,7 +45,7 @@
           </div>
           <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center border border-white/20 hover:bg-white/15 transition-all">
             <div class="text-3xl md:text-4xl font-bold">{{ stats.total_rsvps || 0 }}</div>
-            <div class="text-sm md:text-base text-gray-200 mt-1">RSVPs</div>
+            <div class="text-sm md:text-base text-gray-200 mt-1">Registrations</div>
           </div>
         </div>
       </div>
@@ -220,7 +220,7 @@
                   <svg class="w-4 h-4 mr-2 text-burgundy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
-                  <span>{{ event.organizer?.user?.name || 'Unknown' }}</span>
+                  <span>{{ event.organizer?.name || 'Unknown' }}</span>
                 </div>
 
                 <!-- Price (if ticketed) -->
@@ -232,13 +232,13 @@
                 </div>
               </div>
 
-              <!-- RSVP Status -->
+              <!-- Registration Status -->
               <div class="flex items-center justify-between">
                 <div class="flex items-center text-xs sm:text-sm text-gray-600">
                   <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
-                  {{ event.rsvp_count || 0 }} RSVPs
+                  {{ event.rsvp_count || 0 }} Registrations
                 </div>
                 <button
                   @click.stop="toggleRsvp(event)"
@@ -248,7 +248,7 @@
                       : 'bg-burgundy text-white hover:bg-rose-800'
                   }`"
                 >
-                  {{ isRsvped(event) ? '✓ Going' : 'RSVP' }}
+                  {{ isRsvped(event) ? '✓ Registered' : 'Register' }}
                 </button>
               </div>
             </div>
@@ -352,10 +352,11 @@ const fetchEvents = async () => {
 
     const { data } = await api.get(`/events?${params}`);
 
-    if (data.status === 'success') {
+    // Handle standard Laravel pagination response
+    if (data.data) {
       events.value = data.data;
-      totalPages.value = data.meta?.last_page || 1;
-      currentPage.value = data.meta?.current_page || 1;
+      totalPages.value = data.last_page || 1;
+      currentPage.value = data.current_page || 1;
     }
   } catch (error) {
     console.error('Error fetching events:', error);
@@ -394,9 +395,7 @@ const toggleRsvp = async (event) => {
 
   try {
     const rsvpStatus = isRsvped(event) ? 'not_going' : 'going';
-    const { data } = await api.post(`/events/${event.id}/rsvp`, { 
-      rsvp_status: rsvpStatus 
-    });
+    const { data } = await api.post(`/events/${event.slug}/rsvp`);
 
     if (data.status === 'success') {
       if (rsvpStatus === 'going') {

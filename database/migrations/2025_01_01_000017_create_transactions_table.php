@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('reference_table')->nullable(); // bookings, subscriptions, etc.
             $table->decimal('amount', 10, 2);
             $table->string('currency')->default('BDT');
-            $table->enum('payment_method', ['card', 'bkash', 'nagad', 'bank_transfer', 'manual'])->default('card');
+            $table->enum('payment_method', ['card', 'bkash', 'nagad', 'bank_transfer', 'manual'])->default('manual');
             $table->string('gateway_reference')->nullable(); // SSLCommerz ref, bKash ref, etc.
             $table->enum('status', ['pending', 'completed', 'failed', 'cancelled', 'refunded'])->default('pending');
             $table->decimal('commission_amount', 10, 2)->default(0);

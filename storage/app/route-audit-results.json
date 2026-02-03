@@ -1,0 +1,4499 @@
+[
+    {
+        "method": "GET",
+        "uri": "sanctum\/csrf-cookie",
+        "name": "sanctum.csrf-cookie",
+        "action": "Laravel\\Sanctum\\Http\\Controllers\\CsrfCookieController@show",
+        "middleware": [
+            "web"
+        ],
+        "status": 204,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "_ignition\/health-check",
+        "name": "ignition.healthCheck",
+        "action": "Spatie\\LaravelIgnition\\Http\\Controllers\\HealthCheckController",
+        "middleware": [
+            "Spatie\\LaravelIgnition\\Http\\Middleware\\RunnableSolutionsEnabled"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "POST",
+        "uri": "_ignition\/execute-solution",
+        "name": "ignition.executeSolution",
+        "action": "Spatie\\LaravelIgnition\\Http\\Controllers\\ExecuteSolutionController",
+        "middleware": [
+            "Spatie\\LaravelIgnition\\Http\\Middleware\\RunnableSolutionsEnabled"
+        ],
+        "status": 422,
+        "ok": false,
+        "error": "{\"message\":\"The solution field is required.\",\"errors\":{\"solution\":[\"The solution field is required.\"]}}"
+    },
+    {
+        "method": "POST",
+        "uri": "_ignition\/update-config",
+        "name": "ignition.updateConfig",
+        "action": "Spatie\\LaravelIgnition\\Http\\Controllers\\UpdateConfigController",
+        "middleware": [
+            "Spatie\\LaravelIgnition\\Http\\Middleware\\RunnableSolutionsEnabled"
+        ],
+        "status": 422,
+        "ok": false,
+        "error": "{\"message\":\"The theme field is required. (and 2 more errors)\",\"errors\":{\"theme\":[\"The theme field is required.\"],\"editor\":[\"The editor field is required.\"],\"hide_solutions\":[\"The hide solutions field is required.\"]}}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/auth\/register",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AuthController@register",
+        "middleware": [
+            "api",
+            "throttle:5,1"
+        ],
+        "status": 201,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/auth\/login",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AuthController@login",
+        "middleware": [
+            "api",
+            "throttle:5,1"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/auth\/forgot-password",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AuthController@forgotPassword",
+        "middleware": [
+            "api",
+            "throttle:3,60"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/auth\/reset-password",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AuthController@resetPassword",
+        "middleware": [
+            "api",
+            "throttle:3,60"
+        ],
+        "status": 429,
+        "ok": false,
+        "error": "{\n    \"message\": \"Too Many Attempts.\",\n    \"exception\": \"Illuminate\\\\Http\\\\Exceptions\\\\ThrottleRequestsException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\Middleware\\\\ThrottleRequests.php\",\n    \"line\": 245,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\Middleware\\\\ThrottleRequests.php\",\n            \"line\": 155,\n            \"function\": \"buildExce"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/auth\/verify-email",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AuthController@verifyEmail",
+        "middleware": [
+            "api",
+            "throttle:10,60"
+        ],
+        "status": 422,
+        "ok": false,
+        "error": "{\"message\":\"The id field is required. (and 1 more error)\",\"errors\":{\"id\":[\"The id field is required.\"],\"hash\":[\"The hash field is required.\"]}}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/auth\/resend-verification",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AuthController@resendVerification",
+        "middleware": [
+            "api",
+            "throttle:3,60"
+        ],
+        "status": 429,
+        "ok": false,
+        "error": "{\n    \"message\": \"Too Many Attempts.\",\n    \"exception\": \"Illuminate\\\\Http\\\\Exceptions\\\\ThrottleRequestsException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\Middleware\\\\ThrottleRequests.php\",\n    \"line\": 245,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\Middleware\\\\ThrottleRequests.php\",\n            \"line\": 155,\n            \"function\": \"buildExce"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/auth\/send-phone-otp",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AuthController@sendPhoneOtp",
+        "middleware": [
+            "api",
+            "throttle:3,60"
+        ],
+        "status": 429,
+        "ok": false,
+        "error": "{\n    \"message\": \"Too Many Attempts.\",\n    \"exception\": \"Illuminate\\\\Http\\\\Exceptions\\\\ThrottleRequestsException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\Middleware\\\\ThrottleRequests.php\",\n    \"line\": 245,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\Middleware\\\\ThrottleRequests.php\",\n            \"line\": 155,\n            \"function\": \"buildExce"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/auth\/verify-phone-otp",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AuthController@verifyPhoneOtp",
+        "middleware": [
+            "api",
+            "throttle:5,60"
+        ],
+        "status": 422,
+        "ok": false,
+        "error": "{\"message\":\"The phone field is required. (and 1 more error)\",\"errors\":{\"phone\":[\"The phone field is required.\"],\"otp\":[\"The otp field is required.\"]}}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/auth\/resend-phone-otp",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AuthController@resendPhoneOtp",
+        "middleware": [
+            "api",
+            "throttle:2,60"
+        ],
+        "status": 429,
+        "ok": false,
+        "error": "{\n    \"message\": \"Too Many Attempts.\",\n    \"exception\": \"Illuminate\\\\Http\\\\Exceptions\\\\ThrottleRequestsException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\Middleware\\\\ThrottleRequests.php\",\n    \"line\": 245,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\Middleware\\\\ThrottleRequests.php\",\n            \"line\": 155,\n            \"function\": \"buildExce"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/auth\/{provider}\/redirect",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\SocialAuthController@redirectToProvider",
+        "middleware": [
+            "api",
+            "throttle:5,1"
+        ],
+        "status": 429,
+        "ok": false,
+        "error": "{\n    \"message\": \"Too Many Attempts.\",\n    \"exception\": \"Illuminate\\\\Http\\\\Exceptions\\\\ThrottleRequestsException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\Middleware\\\\ThrottleRequests.php\",\n    \"line\": 245,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\Middleware\\\\ThrottleRequests.php\",\n            \"line\": 155,\n            \"function\": \"buildExce"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/auth\/{provider}\/callback",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\SocialAuthController@handleProviderCallback",
+        "middleware": [
+            "api",
+            "throttle:10,1"
+        ],
+        "status": 500,
+        "ok": false,
+        "error": "{\"error\":\"Authentication failed\",\"message\":\"Missing required configuration keys [client_id, client_secret, redirect] for [Laravel\\\\Socialite\\\\Two\\\\GoogleProvider] OAuth provider.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/categories",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CategoryController@index",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/cities",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CityController@index",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/hashtags",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\HashtagController@index",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/hashtags\/featured",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\HashtagController@featured",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photo-categories",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\PhotoCategoryController@index",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/mentors",
+        "name": null,
+        "action": "Closure",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/mentors\/{mentor}",
+        "name": null,
+        "action": "Closure",
+        "middleware": [
+            "api"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\Mentor] 5\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\NotFoundHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n    \"line\": 636,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n            \"line\": 584,\n     "
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/judges",
+        "name": null,
+        "action": "Closure",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/judges\/{judge}",
+        "name": null,
+        "action": "Closure",
+        "middleware": [
+            "api"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\Judge] 10\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\NotFoundHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n    \"line\": 636,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n            \"line\": 584,\n     "
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographers",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerController@index",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographers\/search",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerController@search",
+        "middleware": [
+            "api"
+        ],
+        "status": 422,
+        "ok": false,
+        "error": "{\"status\":\"error\",\"message\":\"Search query must be at least 2 characters\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographers\/{photographer}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerController@show",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographers\/{photographerId}\/awards",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerAwardController@index",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/events\/stats",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\EventController@stats",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/events",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\EventController@index",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/events\/{slug}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\EventController@show",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@index",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions\/stats",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@stats",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions\/{competition}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@show",
+        "middleware": [
+            "api"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\Competition] 11\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\NotFoundHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n    \"line\": 636,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n            \"line\": 584,"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions\/{competition}\/leaderboard",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@leaderboard",
+        "middleware": [
+            "api"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\Competition] 11\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\NotFoundHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n    \"line\": 636,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n            \"line\": 584,"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions\/{competition}\/winners",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@getWinners",
+        "middleware": [
+            "api"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\Competition] 11\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\NotFoundHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n    \"line\": 636,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n            \"line\": 584,"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions\/{competition}\/full-leaderboard",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@getLeaderboard",
+        "middleware": [
+            "api"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\Competition] 11\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\NotFoundHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n    \"line\": 636,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n            \"line\": 584,"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions\/{competition}\/submissions",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@index",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions\/{competition}\/submissions\/{submission}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@show",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions\/{competition}\/voting\/stats",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionVoteController@stats",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions\/{competition}\/categories",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionCategoryController@index",
+        "middleware": [
+            "api"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\Competition] 11\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\NotFoundHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n    \"line\": 636,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n            \"line\": 584,"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/categories\/{category}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionCategoryController@show",
+        "middleware": [
+            "api"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\CompetitionCategory] 48\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\NotFoundHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n    \"line\": 636,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n            \"lin"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/categories\/{category}\/leaderboard",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionCategoryController@leaderboard",
+        "middleware": [
+            "api"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\CompetitionCategory] 48\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\NotFoundHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n    \"line\": 636,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n            \"lin"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions\/{competition}\/winners-by-category",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionCategoryController@winnersByCategory",
+        "middleware": [
+            "api"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\Competition] 11\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\NotFoundHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n    \"line\": 636,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n            \"line\": 584,"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions\/{competition}\/sponsors",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSponsorController@index",
+        "middleware": [
+            "api"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\Competition] 11\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\NotFoundHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n    \"line\": 636,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n            \"line\": 584,"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/sponsors\/{sponsor}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSponsorController@show",
+        "middleware": [
+            "api"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\"status\":\"error\",\"message\":\"Sponsor not found\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/sponsors",
+        "name": null,
+        "action": "Closure",
+        "middleware": [
+            "api"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/sponsor-inquiry",
+        "name": null,
+        "action": "Closure",
+        "middleware": [
+            "api"
+        ],
+        "status": 422,
+        "ok": false,
+        "error": "{\"message\":\"The company name field is required. (and 3 more errors)\",\"errors\":{\"company_name\":[\"The company name field is required.\"],\"contact_person\":[\"The contact person field is required.\"],\"email\":[\"The email field is required.\"],\"message\":[\"The message field is required.\"]}}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/contact",
+        "name": null,
+        "action": "Closure",
+        "middleware": [
+            "api"
+        ],
+        "status": 422,
+        "ok": false,
+        "error": "{\"message\":\"The name field is required. (and 3 more errors)\",\"errors\":{\"name\":[\"The name field is required.\"],\"email\":[\"The email field is required.\"],\"subject\":[\"The subject field is required.\"],\"message\":[\"The message field is required.\"]}}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/certificates\/{certificate_id}\/download",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@downloadCertificate",
+        "middleware": [
+            "api"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\"status\":\"error\",\"message\":\"Certificate not found\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/certificates\/{certificate_id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@getCertificateDetails",
+        "middleware": [
+            "api"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\"status\":\"error\",\"message\":\"Certificate not found\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/auth\/logout",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AuthController@logout",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/auth\/me",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AuthController@me",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/auth\/link-social-account",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\SocialAuthController@linkAccount",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "throttle:5,60"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/auth\/unlink-social-account",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\SocialAuthController@unlinkAccount",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "throttle:5,60"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/auth\/linked-accounts",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\SocialAuthController@getLinkedAccounts",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/bookings\/inquiry",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\BookingController@createInquiry",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "throttle:10,1"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/bookings",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\BookingController@myBookings",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/bookings\/{booking}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\BookingController@getBooking",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PATCH",
+        "uri": "api\/v1\/bookings\/{booking}\/status",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\BookingController@updateStatus",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PATCH",
+        "uri": "api\/v1\/bookings\/{booking}\/cancel",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\BookingController@cancelBooking",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/bookings\/{booking}\/invoice\/generate",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\BookingController@generateInvoice",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "throttle:5,60"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/bookings\/{booking}\/invoice\/download",
+        "name": "bookings.invoice.download",
+        "action": "App\\Http\\Controllers\\Api\\BookingController@downloadInvoice",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/bookings\/{booking}\/invoice\/email",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\BookingController@emailInvoice",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "throttle:3,60"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/reviews",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\ReviewController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/reviews",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\ReviewController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "throttle:5,60"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographers\/{photographer_id}\/reviews",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\ReviewController@getPhotographerReviews",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/events\/{event}\/rsvp",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\EventController@rsvp",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "throttle:20,60"
+        ],
+        "status": 405,
+        "ok": false,
+        "error": "{\n    \"message\": \"The POST method is not supported for route api\/v1\/events\/\/rsvp. Supported methods: GET, HEAD.\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\MethodNotAllowedHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\AbstractRouteCollection.php\",\n    \"line\": 123,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\Abstrac"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/competitions\/{competition}\/submit",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@submit",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/competition-submissions\/{submission}\/vote",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@vote",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/competitions\/{competition}\/submissions",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "throttle:10,60"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions\/{competition}\/my-submissions",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@mySubmissions",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/competitions\/{competition}\/submissions\/{submission}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "throttle:10,60"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/competitions\/{competition}\/submissions\/{submission}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/competitions\/{competition}\/submissions\/{submission}\/vote",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionVoteController@vote",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "throttle:60,60"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/competitions\/{competition}\/submissions\/{submission}\/vote",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionVoteController@unvote",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "throttle:60,60"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions\/{competition}\/submissions\/{submission}\/vote-status",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionVoteController@checkVote",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions\/{competition}\/my-votes",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionVoteController@myVotes",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/judge\/assignments",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionJudgeController@getMyAssignments",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions\/{competition}\/judge\/submissions",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionJudgeController@getAssignedSubmissions",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/competitions\/{competition}\/submissions\/{submission}\/score",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionJudgeController@submitScore",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "throttle:30,60"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/competitions\/{competition}\/judge\/progress",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionJudgeController@getScoringProgress",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographer\/dashboard",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerController@dashboard",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/photographer\/profile\/avatar",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerController@updateAvatar",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PATCH",
+        "uri": "api\/v1\/photographer\/profile",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerController@updateProfile",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographer\/albums",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AlbumController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/photographer\/albums",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AlbumController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographer\/albums\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AlbumController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/photographer\/albums\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AlbumController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/photographer\/albums\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AlbumController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/photographer\/albums\/{albumId}\/photos",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotoController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/photographer\/photos\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotoController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/photographer\/photos\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotoController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographer\/photos\/search-pexels",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotoController@searchPexels",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographer\/packages",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PackageController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/photographer\/packages",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PackageController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographer\/packages\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PackageController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/photographer\/packages\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PackageController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/photographer\/packages\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PackageController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographer\/awards",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerAwardController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/photographer\/awards",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerAwardController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/photographer\/awards\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerAwardController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/photographer\/awards\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerAwardController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographer\/submissions",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerController@getMySubmissions",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographer\/event-rsvps",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerController@getMyEventRsvps",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographer\/notifications",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerController@getNotifications",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographer\/notifications\/unread-count",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerController@getUnreadNotificationCount",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/photographer\/notifications\/{id}\/read",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerController@markNotificationAsRead",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/photographer\/notifications\/mark-all-read",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerController@markAllNotificationsAsRead",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/photographer\/notifications\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerController@deleteNotification",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographer\/achievements",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerController@getAchievements",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographer\/competitions",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Photographer\\PhotographerCompetitionController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/photographer\/competitions",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Photographer\\PhotographerCompetitionController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographer\/competitions\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Photographer\\PhotographerCompetitionController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/photographer\/competitions\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Photographer\\PhotographerCompetitionController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/photographer\/competitions\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Photographer\\PhotographerCompetitionController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographer\/events",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Photographer\\PhotographerEventController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/photographer\/events",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Photographer\\PhotographerEventController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/photographer\/events\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Photographer\\PhotographerEventController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/photographer\/events\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Photographer\\PhotographerEventController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/photographer\/events\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Photographer\\PhotographerEventController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/photographer\/events\/{id}\/cancel",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Photographer\\PhotographerEventController@cancel",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/photographer\/awards\/reorder",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PhotographerAwardController@reorder",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/payments\/initiate",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PaymentController@initiatePayment",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/payments\/transactions",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PaymentController@myTransactions",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/payments\/transactions\/{transactionId}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PaymentController@getTransaction",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/payments\/{transactionId}\/refund",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PaymentController@refund",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "throttle:3,60"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/notifications",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\NotificationController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/notifications\/unread-count",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\NotificationController@unreadCount",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/notifications\/{id}\/read",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\NotificationController@markAsRead",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/notifications\/mark-all-read",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\NotificationController@markAllAsRead",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/notifications\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\NotificationController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/notifications\/create-test",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\NotificationTestController@createTestNotification",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/notifications\/create-admin",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\NotificationTestController@createAdminNotification",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/my-activity",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\ActivityLogController@myActivity",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/notification-preferences",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\NotificationPreferenceController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/notification-preferences",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\NotificationPreferenceController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/notification-preferences\/reset",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\NotificationPreferenceController@reset",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/notification-channels",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\NotificationPreferenceController@channels",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/judge\/dashboard",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Judge\\JudgeDashboardController@dashboard",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:judge"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/judge\/competitions",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Judge\\JudgeDashboardController@myCompetitions",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:judge"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/judge\/competitions\/{competition}\/submissions",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Judge\\JudgeDashboardController@competitionSubmissions",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:judge"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/judge\/competitions\/{competition}\/submissions\/{submission}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Judge\\JudgeDashboardController@getSubmission",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:judge"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/judge\/competitions\/{competition}\/submissions\/{submission}\/score",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Judge\\JudgeDashboardController@submitScore",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:judge"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/judge\/scoring-history",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Judge\\JudgeDashboardController@scoringHistory",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:judge"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/dashboard",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@dashboard",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/users",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@users",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/users",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@storeUser",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/users\/{user}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@showUser",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/users\/{user}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@updateUser",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/users\/{user}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@deleteUser",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/users\/{user}\/suspend",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@suspendUser",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/users\/{user}\/unsuspend",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@unsuspendUser",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/users\/{user}\/promote-to-mentor",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@promoteToMentor",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/users\/{user}\/promote-to-judge",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@promoteToJudge",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/verifications",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@getVerifications",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/verifications\/{verification}\/approve",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@approveVerification",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 405,
+        "ok": false,
+        "error": "{\n    \"message\": \"The POST method is not supported for route api\/v1\/admin\/verifications\/\/approve. Supported methods: GET, HEAD.\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\MethodNotAllowedHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\AbstractRouteCollection.php\",\n    \"line\": 123,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/verifications\/{verification}\/reject",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@rejectVerification",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 405,
+        "ok": false,
+        "error": "{\n    \"message\": \"The POST method is not supported for route api\/v1\/admin\/verifications\/\/reject. Supported methods: GET, HEAD.\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\MethodNotAllowedHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\AbstractRouteCollection.php\",\n    \"line\": 123,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\R"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/audit-logs",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@auditLogs",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/activity-logs",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\ActivityLogController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/activity-logs\/statistics",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\ActivityLogController@statistics",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/activity-logs\/export",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\ActivityLogController@export",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/activity-logs\/model\/{modelType}\/{modelId}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\ActivityLogController@modelActivity",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/competitions",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminCompetitionApiController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator",
+            {}
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminCompetitionApiController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator",
+            {}
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/competitions\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminCompetitionApiController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator",
+            {}
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/competitions\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminCompetitionApiController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator",
+            {}
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/competitions\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminCompetitionApiController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator",
+            {}
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/calculate-winners",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@calculateWinners",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/announce-winners",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@announceWinners",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/winners",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Admin\\CompetitionController@getWinners",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/leaderboard",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Admin\\CompetitionController@getLeaderboard",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/events",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminEventApiController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/events",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminEventApiController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/events\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminEventApiController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/events\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminEventApiController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/events\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminEventApiController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/events\/bulk-update-status",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminEventApiController@bulkUpdateStatus",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/events\/{id}\/toggle-featured",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminEventApiController@toggleFeatured",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/events\/{event}\/check-in",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\EventCheckInController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/events\/{event}\/check-in\/scan",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\EventCheckInController@scan",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 405,
+        "ok": false,
+        "error": "{\n    \"message\": \"The POST method is not supported for route api\/v1\/admin\/events\/\/check-in\/scan. Supported methods: GET, HEAD.\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\MethodNotAllowedHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\AbstractRouteCollection.php\",\n    \"line\": 123,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\R"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/events\/{event}\/check-in\/registrations",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\EventCheckInController@getRegistrations",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/events\/{event}\/check-in\/qr\/{qrToken}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\EventCheckInController@getByQrToken",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/events\/{event}\/check-in\/manual",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\EventCheckInController@manualCheckIn",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 405,
+        "ok": false,
+        "error": "{\n    \"message\": \"The POST method is not supported for route api\/v1\/admin\/events\/\/check-in\/manual. Supported methods: GET, HEAD.\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\MethodNotAllowedHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\AbstractRouteCollection.php\",\n    \"line\": 123,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/registrations\/{registration}\/check-in\/undo",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\EventCheckInController@undoCheckIn",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/events\/{event}\/check-in\/export",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\EventCheckInController@exportCheckInReport",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/submissions",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@allSubmissions",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/submissions\/stats",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@allStats",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/submissions",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@adminIndex",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/submissions\/stats",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@stats",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/submissions\/{submission}\/approve",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@approve",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/submissions\/{submission}\/reject",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@reject",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/submissions\/{submission}\/disqualify",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@disqualify",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/judges",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionJudgeController@assignJudge",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/judges\/{judge}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionJudgeController@removeJudge",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/judges",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionJudgeController@getJudges",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/scoring\/stats",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionJudgeController@getScoringStats",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/generate-certificate",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@generateSingleCertificate",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/generate-certificates",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@generateAllCertificates",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/set-prize",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@setPrize",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/set-all-prizes",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@setAllPrizes",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/update-prize-status",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@updatePrizeStatus",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/prize-report",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@getPrizeReport",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/prizes\/pending",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@getPendingPrizes",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/prizes\/statistics",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionController@getGlobalPrizeStats",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/categories",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionCategoryController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/categories\/{category}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionCategoryController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/categories\/{category}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionCategoryController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/categories\/bulk",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionCategoryController@bulkCreate",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/categories\/{category}\/toggle-active",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionCategoryController@toggleActive",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/categories\/statistics",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionCategoryController@statistics",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/platform-sponsors",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\SponsorController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/platform-sponsors",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\SponsorController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/platform-sponsors\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\SponsorController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/platform-sponsors\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\SponsorController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/platform-sponsors\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\SponsorController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/upload-logo",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\SponsorController@uploadLogo",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/contact-messages",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/contact-messages",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/contact-messages\/stats",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@stats",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/contact-messages\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/contact-messages\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/contact-messages\/{id}\/respond",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@markAsResponded",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/contact-messages\/{id}\/archive",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@archive",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PATCH",
+        "uri": "api\/v1\/admin\/contact-messages\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@updateStatus",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/contact-messages\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/pending-users",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\UserApprovalController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/approval-stats",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\UserApprovalController@stats",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/users\/{id}\/approve",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\UserApprovalController@approve",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/users\/{id}\/reject",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\UserApprovalController@reject",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/users\/bulk-approve",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\UserApprovalController@bulkApprove",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/sponsors",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSponsorController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/competition-sponsors\/{sponsor}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSponsorController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/competition-sponsors\/{sponsor}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSponsorController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/sponsors\/bulk",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSponsorController@bulkCreate",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competition-sponsors\/{sponsor}\/toggle-active",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSponsorController@toggleActive",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/sponsors\/reorder",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSponsorController@reorder",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/competitions\/{competition}\/sponsors\/statistics",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSponsorController@statistics",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/competition-sponsors\/global-statistics",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CompetitionSponsorController@globalStatistics",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/photo-categories",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\PhotoCategoryController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/photo-categories\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\PhotoCategoryController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/photo-categories\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\PhotoCategoryController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/photo-categories\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\PhotoCategoryController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/hashtags",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\HashtagController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/hashtags\/featured",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\HashtagController@featured",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/hashtags",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\HashtagController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/hashtags\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\HashtagController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/hashtags\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\HashtagController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/hashtags\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\HashtagController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/mentors",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\MentorController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/mentors",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\MentorController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/mentors\/{mentor}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\MentorController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/mentors\/{mentor}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\MentorController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/mentors\/{mentor}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\MentorController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/mentors\/{mentor}\/toggle-status",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\MentorController@toggleStatus",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/mentors\/reorder",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\MentorController@updateOrder",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/judges",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\JudgeController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/judges",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\JudgeController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/judges\/{judge}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\JudgeController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/judges\/{judge}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\JudgeController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/judges\/{judge}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\JudgeController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/judges\/{judge}\/toggle-status",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\JudgeController@toggleStatus",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/notices",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\NoticeController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/notices",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\NoticeController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/notices\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\NoticeController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/notices\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\NoticeController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/notices\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\NoticeController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/notices\/roles\/available",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\NoticeController@getRoles",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/seo\/all",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\SeoMetaController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/seo",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\SeoMetaController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/seo",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\SeoMetaController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/seo\/generate",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\SeoMetaController@generate",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/seo\/preview",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\SeoMetaController@preview",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/seo",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\SeoMetaController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/cities",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CityController@adminIndex",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/cities",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CityController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/cities\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CityController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/cities\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CityController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/cities\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CityController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/categories",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CategoryController@adminIndex",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/categories",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CategoryController@store",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/categories\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CategoryController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/categories\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CategoryController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/categories\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\CategoryController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/photographers",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@getPhotographers",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/photographers",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@storePhotographer",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/photographers\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@showPhotographer",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/photographers\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@updatePhotographer",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/photographers\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@deletePhotographer",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/photographers\/{id}\/verify",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@verifyPhotographer",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/photographers\/{id}\/feature",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\AdminController@featurePhotographer",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/reviews",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminReviewController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/reviews\/stats",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminReviewController@stats",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/reviews\/{id}\/status",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminReviewController@updateStatus",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/reviews\/{id}\/report",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminReviewController@markAsReported",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/reviews\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminReviewController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/reviews\/bulk-update",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminReviewController@bulkUpdateStatus",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/bookings",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminBookingController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/bookings\/stats",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminBookingController@stats",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/bookings\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminBookingController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/bookings\/{id}\/status",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminBookingController@updateStatus",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "DELETE",
+        "uri": "api\/v1\/admin\/bookings\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminBookingController@destroy",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/transactions",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminTransactionController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/transactions\/stats",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminTransactionController@stats",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/transactions\/{id}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminTransactionController@show",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/transactions\/{id}\/status",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminTransactionController@updateStatus",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/transactions\/{id}\/refund",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminTransactionController@refund",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/transactions\/export",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminTransactionController@export",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/settings",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminSettingsController@index",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "PUT",
+        "uri": "api\/v1\/admin\/settings\/{key}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminSettingsController@update",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 405,
+        "ok": false,
+        "error": "{\n    \"message\": \"The PUT method is not supported for route api\/v1\/admin\/settings. Supported methods: GET, HEAD.\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\MethodNotAllowedHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\AbstractRouteCollection.php\",\n    \"line\": 123,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Routing\\\\Abstra"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/settings\/bulk",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminSettingsController@bulkUpdate",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/admin\/settings\/category\/{category}",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminSettingsController@getCategory",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/admin\/settings\/reset",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\AdminSettingsController@reset",
+        "middleware": [
+            "api",
+            "auth:sanctum",
+            "role:admin,super_admin,moderator"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/v1\/notices\/my-notices",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\NoticeController@getMyNotices",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "POST",
+        "uri": "api\/v1\/notices\/{id}\/read",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\Admin\\NoticeController@markAsRead",
+        "middleware": [
+            "api",
+            "auth:sanctum"
+        ],
+        "status": 401,
+        "ok": false,
+        "error": "{\"message\":\"Unauthenticated.\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "up",
+        "name": null,
+        "action": "Closure",
+        "middleware": [],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "payment\/callback\/success",
+        "name": "payment.success",
+        "action": "App\\Http\\Controllers\\Api\\PaymentController@successCallback",
+        "middleware": [
+            "web"
+        ],
+        "status": 500,
+        "ok": false,
+        "error": "{\n    \"message\": \"App\\\\Services\\\\PaymentService::handleCallback(): Argument #1 ($transactionId) must be of type string, null given, called in C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\app\\\\Http\\\\Controllers\\\\Api\\\\PaymentController.php on line 70\",\n    \"exception\": \"TypeError\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\app\\\\Services\\\\PaymentService.php\",\n    \"line\": 131,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\app\\\\Http\\\\Controllers\\\\Api\\\\PaymentControll"
+    },
+    {
+        "method": "POST",
+        "uri": "payment\/callback\/success",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PaymentController@successCallback",
+        "middleware": [
+            "web"
+        ],
+        "status": 419,
+        "ok": false,
+        "error": "{\n    \"message\": \"CSRF token mismatch.\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\HttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n    \"line\": 641,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n            \"line\": 584,\n            \"function\": \"prepareException\","
+    },
+    {
+        "method": "GET",
+        "uri": "payment\/callback\/fail",
+        "name": "payment.fail",
+        "action": "App\\Http\\Controllers\\Api\\PaymentController@failCallback",
+        "middleware": [
+            "web"
+        ],
+        "status": 500,
+        "ok": false,
+        "error": "{\n    \"message\": \"App\\\\Services\\\\PaymentService::handleCallback(): Argument #1 ($transactionId) must be of type string, null given, called in C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\app\\\\Http\\\\Controllers\\\\Api\\\\PaymentController.php on line 87\",\n    \"exception\": \"TypeError\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\app\\\\Services\\\\PaymentService.php\",\n    \"line\": 131,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\app\\\\Http\\\\Controllers\\\\Api\\\\PaymentControll"
+    },
+    {
+        "method": "POST",
+        "uri": "payment\/callback\/fail",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PaymentController@failCallback",
+        "middleware": [
+            "web"
+        ],
+        "status": 419,
+        "ok": false,
+        "error": "{\n    \"message\": \"CSRF token mismatch.\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\HttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n    \"line\": 641,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n            \"line\": 584,\n            \"function\": \"prepareException\","
+    },
+    {
+        "method": "GET",
+        "uri": "payment\/callback\/cancel",
+        "name": "payment.cancel",
+        "action": "App\\Http\\Controllers\\Api\\PaymentController@cancelCallback",
+        "middleware": [
+            "web"
+        ],
+        "status": 500,
+        "ok": false,
+        "error": "{\n    \"message\": \"App\\\\Services\\\\PaymentService::handleCallback(): Argument #1 ($transactionId) must be of type string, null given, called in C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\app\\\\Http\\\\Controllers\\\\Api\\\\PaymentController.php on line 103\",\n    \"exception\": \"TypeError\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\app\\\\Services\\\\PaymentService.php\",\n    \"line\": 131,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\app\\\\Http\\\\Controllers\\\\Api\\\\PaymentControl"
+    },
+    {
+        "method": "POST",
+        "uri": "payment\/callback\/cancel",
+        "name": null,
+        "action": "App\\Http\\Controllers\\Api\\PaymentController@cancelCallback",
+        "middleware": [
+            "web"
+        ],
+        "status": 419,
+        "ok": false,
+        "error": "{\n    \"message\": \"CSRF token mismatch.\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\HttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n    \"line\": 641,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Exceptions\\\\Handler.php\",\n            \"line\": 584,\n            \"function\": \"prepareException\","
+    },
+    {
+        "method": "GET",
+        "uri": "sitemap.xml",
+        "name": null,
+        "action": "App\\Http\\Controllers\\SitemapController@index",
+        "middleware": [
+            "web"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "sitemap\/main.xml",
+        "name": null,
+        "action": "App\\Http\\Controllers\\SitemapController@main",
+        "middleware": [
+            "web"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "sitemap\/photographers.xml",
+        "name": null,
+        "action": "App\\Http\\Controllers\\SitemapController@photographers",
+        "middleware": [
+            "web"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "sitemap\/events.xml",
+        "name": null,
+        "action": "App\\Http\\Controllers\\SitemapController@events",
+        "middleware": [
+            "web"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "sitemap\/competitions.xml",
+        "name": null,
+        "action": "App\\Http\\Controllers\\SitemapController@competitions",
+        "middleware": [
+            "web"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "sitemap\/cities.xml",
+        "name": null,
+        "action": "App\\Http\\Controllers\\SitemapController@cities",
+        "middleware": [
+            "web"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "sitemap\/categories.xml",
+        "name": null,
+        "action": "App\\Http\\Controllers\\SitemapController@categories",
+        "middleware": [
+            "web"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "@{username}",
+        "name": "photographer.profile.public",
+        "action": "App\\Http\\Controllers\\PublicPhotographerController@showByUsername",
+        "middleware": [
+            "web"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\n    \"message\": \"Photographer not found\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\NotFoundHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Application.php\",\n    \"line\": 1423,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\helpers.php\",\n            \"line\": 47,\n            \"function\": \"abort\",\n            \"class\":"
+    },
+    {
+        "method": "GET",
+        "uri": "photographer\/{id}",
+        "name": "photographer.profile.legacy",
+        "action": "App\\Http\\Controllers\\PublicPhotographerController@showById",
+        "middleware": [
+            "web"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\n    \"message\": \"Photographer not found\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\NotFoundHttpException\",\n    \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\Application.php\",\n    \"line\": 1423,\n    \"trace\": [\n        {\n            \"file\": \"C:\\\\xampp\\\\htdocs\\\\Photographar SB\\\\vendor\\\\laravel\\\\framework\\\\src\\\\Illuminate\\\\Foundation\\\\helpers.php\",\n            \"line\": 47,\n            \"function\": \"abort\",\n            \"class\":"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/photographers\/@{username}\/portfolio",
+        "name": "photographer.portfolio.api",
+        "action": "App\\Http\\Controllers\\PublicPhotographerController@getPortfolio",
+        "middleware": [
+            "web"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\"error\":\"Photographer not found\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/photographers\/@{username}\/packages",
+        "name": "photographer.packages.api",
+        "action": "App\\Http\\Controllers\\PublicPhotographerController@getPackages",
+        "middleware": [
+            "web"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\"error\":\"Photographer not found\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/photographers\/@{username}\/reviews",
+        "name": "photographer.reviews.api",
+        "action": "App\\Http\\Controllers\\PublicPhotographerController@getReviews",
+        "middleware": [
+            "web"
+        ],
+        "status": 404,
+        "ok": false,
+        "error": "{\"error\":\"Photographer not found\"}"
+    },
+    {
+        "method": "GET",
+        "uri": "api\/photographers\/search",
+        "name": "photographer.search.api",
+        "action": "App\\Http\\Controllers\\PublicPhotographerController@search",
+        "middleware": [
+            "web"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    },
+    {
+        "method": "GET",
+        "uri": "{any?}",
+        "name": null,
+        "action": "Closure",
+        "middleware": [
+            "web"
+        ],
+        "status": 200,
+        "ok": true,
+        "error": null
+    }
+]

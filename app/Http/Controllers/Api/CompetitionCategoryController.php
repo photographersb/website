@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Competition;
 use App\Models\CompetitionCategory;
 use App\Services\CategoryManagementService;
@@ -18,9 +19,7 @@ class CompetitionCategoryController extends Controller
         $activeOnly = $request->boolean('active_only', false);
         $result = $categoryService->getCategories($competition, $activeOnly);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $result['data'],
+        return $this->success($result['data'], 'Categories retrieved successfully', 200, [
             'total' => $result['total']
         ]);
     }
@@ -32,10 +31,7 @@ class CompetitionCategoryController extends Controller
     {
         $result = $categoryService->getCategoryDetails($category);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $result['data']
-        ]);
+        return $this->success($result['data'], 'Category details retrieved successfully');
     }
 
     /**
@@ -53,11 +49,11 @@ class CompetitionCategoryController extends Controller
 
         $result = $categoryService->createCategory($competition, $request->all());
 
-        return response()->json([
-            'status' => $result['success'] ? 'success' : 'error',
-            'message' => $result['message'],
-            'data' => $result['data'] ?? null
-        ], $result['success'] ? 201 : 400);
+        if (!$result['success']) {
+            return $this->error($result['message'], 400);
+        }
+
+        return $this->created($result['data'], $result['message']);
     }
 
     /**
@@ -75,11 +71,11 @@ class CompetitionCategoryController extends Controller
 
         $result = $categoryService->updateCategory($category, $request->all());
 
-        return response()->json([
-            'status' => $result['success'] ? 'success' : 'error',
-            'message' => $result['message'],
-            'data' => $result['data'] ?? null
-        ], $result['success'] ? 200 : 400);
+        if (!$result['success']) {
+            return $this->error($result['message'], 400);
+        }
+
+        return $this->success($result['data'], $result['message']);
     }
 
     /**
@@ -89,10 +85,11 @@ class CompetitionCategoryController extends Controller
     {
         $result = $categoryService->deleteCategory($category);
 
-        return response()->json([
-            'status' => $result['success'] ? 'success' : 'error',
-            'message' => $result['message']
-        ], $result['success'] ? 200 : 400);
+        if (!$result['success']) {
+            return $this->error($result['message'], 400);
+        }
+
+        return $this->success(null, $result['message']);
     }
 
     /**
@@ -111,11 +108,11 @@ class CompetitionCategoryController extends Controller
 
         $result = $categoryService->bulkCreateCategories($competition, $request->categories);
 
-        return response()->json([
-            'status' => $result['success'] ? 'success' : 'error',
-            'message' => $result['message'],
-            'data' => $result['data'] ?? null
-        ], $result['success'] ? 201 : 400);
+        if (!$result['success']) {
+            return $this->error($result['message'], 400);
+        }
+
+        return $this->created($result['data'], $result['message']);
     }
 
     /**
@@ -125,11 +122,11 @@ class CompetitionCategoryController extends Controller
     {
         $result = $categoryService->toggleActiveStatus($category);
 
-        return response()->json([
-            'status' => $result['success'] ? 'success' : 'error',
-            'message' => $result['message'],
-            'data' => $result['data'] ?? null
-        ], $result['success'] ? 200 : 400);
+        if (!$result['success']) {
+            return $this->error($result['message'], 400);
+        }
+
+        return $this->success($result['data'], $result['message']);
     }
 
     /**
@@ -140,10 +137,7 @@ class CompetitionCategoryController extends Controller
         $limit = $request->input('limit', 20);
         $result = $categoryService->getCategoryLeaderboard($category, $limit);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $result['data']
-        ]);
+        return $this->success($result['data'], 'Leaderboard retrieved successfully');
     }
 
     /**
@@ -153,10 +147,7 @@ class CompetitionCategoryController extends Controller
     {
         $result = $categoryService->getWinnersByCategory($competition);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $result['data']
-        ]);
+        return $this->success($result['data'], 'Winners by category retrieved successfully');
     }
 
     /**
@@ -166,9 +157,6 @@ class CompetitionCategoryController extends Controller
     {
         $result = $categoryService->getCategoryStatistics($competition);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $result['data']
-        ]);
+        return $this->success($result['data'], 'Category statistics retrieved successfully');
     }
 }

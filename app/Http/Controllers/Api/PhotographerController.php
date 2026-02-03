@@ -5,18 +5,31 @@ namespace App\Http\Controllers\Api;
 use App\Models\Photographer;
 use App\Models\Category;
 use App\Models\City;
+use App\Models\EventRsvp;
+use App\Rules\SocialMediaUrl;
+use App\Http\Requests\StorePhotographerRequest;
+use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class PhotographerController extends Controller
 {
+    use ApiResponse;
+
     /**
      * Get all photographers with filters
      */
     public function index(Request $request)
     {
+        // Enforce pagination limits to prevent DoS
+        $perPage = min($request->get('per_page', 15), 100);
+        $page = $request->get('page', 1);
+
         $query = Photographer::where('is_verified', true)
-            ->with(['user', 'trustScore', 'categories', 'photos']);
+            ->with(['user', 'city', 'trustScore', 'categories', 'photos']);
 
         // Filter by city
         if ($request->has('city')) {
@@ -43,23 +56,38 @@ class PhotographerController extends Controller
 
         // Sort
         $sort = $request->get('sort', 'relevance');
+        $featuredScope = $request->get('featured_scope', 'global');
+        $now = now();
+
+        if ($featuredScope === 'area' && isset($city) && $city) {
+            $query->orderByRaw(
+                "CASE WHEN is_featured = 1 AND (featured_until IS NULL OR featured_until >= ?) AND city_id = ? THEN 2 WHEN is_featured = 1 AND (featured_until IS NULL OR featured_until >= ?) THEN 1 ELSE 0 END DESC",
+                [$now, $city->id, $now]
+            );
+        } elseif ($featuredScope === 'category' && isset($category) && $category) {
+            $query->orderByRaw(
+                "CASE WHEN is_featured = 1 AND (featured_until IS NULL OR featured_until >= ?) AND EXISTS (SELECT 1 FROM photographer_category pc WHERE pc.photographer_id = photographers.id AND pc.category_id = ?) THEN 2 WHEN is_featured = 1 AND (featured_until IS NULL OR featured_until >= ?) THEN 1 ELSE 0 END DESC",
+                [$now, $category->id, $now]
+            );
+        } else {
+            $query->orderByRaw(
+                "CASE WHEN is_featured = 1 AND (featured_until IS NULL OR featured_until >= ?) THEN 1 ELSE 0 END DESC",
+                [$now]
+            );
+        }
+
         match ($sort) {
-            'rating' => $query->orderBy('average_rating', 'desc'),
-            'newest' => $query->orderBy('created_at', 'desc'),
-            default => $query->orderBy('is_featured', 'desc')->orderBy('average_rating', 'desc'),
+            'rating' => $query->orderByRaw('CASE WHEN is_verified = 1 THEN 0 ELSE 1 END')
+                             ->orderBy('average_rating', 'desc'),
+            'newest' => $query->orderByRaw('CASE WHEN is_verified = 1 THEN 0 ELSE 1 END')
+                             ->orderBy('created_at', 'desc'),
+            default => $query->orderByRaw('CASE WHEN is_verified = 1 THEN 0 ELSE 1 END')
+                            ->orderBy('average_rating', 'desc'),
         };
 
-        $photographers = $query->paginate(30);
+        $photographers = $query->paginate($perPage, ['*'], 'page', $page);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $photographers->items(),
-            'meta' => [
-                'total' => $photographers->total(),
-                'per_page' => $photographers->perPage(),
-                'current_page' => $photographers->currentPage(),
-                'last_page' => $photographers->lastPage(),
-            ],
+        return $this->paginated($photographers, 'Photographers retrieved successfully', 200, [
             'links' => [
                 'first' => $photographers->url(1),
                 'last' => $photographers->url($photographers->lastPage()),
@@ -79,13 +107,20 @@ class PhotographerController extends Controller
             ? Photographer::findOrFail($photographerSlugOrId)
             : Photographer::where('slug', $photographerSlugOrId)->firstOrFail();
 
+        // Track profile view (async, don't wait for it)
+        \App\Services\AchievementService::trackProfileView($photographer->id);
+
         // Eagerly load relationships to avoid N+1
         $photographer->load([
             'user',
+            'city',
             'trustScore',
             'categories',
             'albums' => function ($q) {
                 $q->where('is_public', true)->orderBy('display_order');
+            },
+            'albums.photos' => function ($q) {
+                $q->where('is_featured', true)->orWhere('is_featured', false)->orderBy('is_featured', 'desc')->orderBy('created_at', 'desc');
             },
             'packages' => function ($q) {
                 $q->where('is_active', true)->orderBy('display_order');
@@ -95,12 +130,82 @@ class PhotographerController extends Controller
             },
             'reviews.booking', // Eager load booking for reviews
             'reviews.reviewer', // Eager load reviewer (client) for reviews
+            'awards' => function ($q) {
+                $q->orderBy('year', 'desc')->orderBy('display_order');
+            },
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $photographer,
-        ]);
+        // Get competition wins
+        $competitionWins = \App\Models\CompetitionSubmission::where('photographer_id', $photographer->id)
+            ->where('is_winner', true)
+            ->with('competition')
+            ->orderByRaw('COALESCE(ranking, 999)')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($submission) {
+                return [
+                    'id' => $submission->id,
+                    'competition_title' => $submission->competition->title ?? 'Competition',
+                    'position' => $submission->winner_position ?? $submission->ranking ?? 1,
+                    'prize_amount' => $submission->prize_amount ?? 0,
+                    'submission_title' => $submission->title,
+                    'image_url' => $submission->image_url,
+                    'created_at' => $submission->created_at,
+                ];
+            });
+
+        // Get photographer stats and achievements
+        $stats = \App\Models\PhotographerStats::where('photographer_id', $photographer->id)->first();
+        $achievementSummary = null;
+        if ($stats) {
+            $unlockedAchievements = \App\Models\PhotographerAchievement::where('photographer_id', $photographer->id)
+                ->where('is_unlocked', true)
+                ->with('achievement')
+                ->orderBy('unlocked_at', 'desc')
+                ->limit(5)
+                ->get();
+            
+            $achievementSummary = [
+                'level' => $stats->level,
+                'total_points' => $stats->total_points,
+                'unlocked_count' => $unlockedAchievements->count(),
+                'recent_achievements' => $unlockedAchievements->map(function ($pa) {
+                    return [
+                        'name' => $pa->achievement->name,
+                        'icon' => $pa->achievement->icon,
+                        'badge_color' => $pa->achievement->badge_color,
+                        'points' => $pa->achievement->points,
+                        'unlocked_at' => $pa->unlocked_at,
+                    ];
+                }),
+            ];
+        }
+
+        $photographerData = $photographer->toArray();
+        $photographerData['competition_wins'] = $competitionWins;
+        $photographerData['events_joined'] = Schema::hasTable('event_rsvps')
+            ? EventRsvp::where('user_id', $photographer->user_id)
+                ->where('rsvp_status', 'going')
+                ->distinct('event_id')
+                ->count('event_id')
+            : 0;
+        $photographerData['competitions_tried'] = Schema::hasTable('competition_submissions')
+            ? \App\Models\CompetitionSubmission::where('photographer_id', $photographer->id)
+                ->distinct('competition_id')
+                ->count('competition_id')
+            : 0;
+        $photographerData['awards_won'] = $photographer->awards->count();
+        
+        // Add stats and achievement data
+        $photographerData['stats'] = $stats;
+        $photographerData['achievements'] = $achievementSummary;
+        $photographerData['starting_price'] = $photographer->packages()->where('is_active', true)->min('base_price') ?? $photographer->starting_price ?? null;
+        $photographerData['profile_views'] = $stats ? $stats->profile_views : 0;
+        $photographerData['response_rate'] = $stats ? $stats->response_rate : null;
+        $photographerData['average_response_time'] = $stats ? $stats->average_response_time : null;
+        $photographerData['portfolio_completeness'] = $stats ? $stats->portfolio_completeness : 0;
+
+        return $this->success($photographerData, 'Photographer profile retrieved successfully');
     }
 
     /**
@@ -111,10 +216,7 @@ class PhotographerController extends Controller
         $query = $request->get('q', '');
 
         if (strlen($query) < 2) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Search query must be at least 2 characters',
-            ], 422);
+            return $this->validationError(['q' => 'Search query must be at least 2 characters'], 'Search query must be at least 2 characters');
         }
 
         $photographers = Photographer::where('is_verified', true)
@@ -126,10 +228,7 @@ class PhotographerController extends Controller
             ->limit(10)
             ->get();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $photographers,
-        ]);
+        return $this->success($photographers, 'Search results retrieved successfully');
     }
 
     /**
@@ -145,16 +244,13 @@ class PhotographerController extends Controller
         $photographer = $user->photographer;
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer profile not found',
-            ], 404);
+            return $this->notFound('Photographer profile not found');
         }
 
         try {
             // Delete old avatar if exists
-            if ($photographer->profile_picture && \Storage::disk('public')->exists($photographer->profile_picture)) {
-                \Storage::disk('public')->delete($photographer->profile_picture);
+            if ($photographer->profile_picture && Storage::disk('public')->exists($photographer->profile_picture)) {
+                Storage::disk('public')->delete($photographer->profile_picture);
             }
 
             // Store new avatar
@@ -165,23 +261,16 @@ class PhotographerController extends Controller
                 'profile_picture' => $path,
             ]);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Profile picture updated successfully',
-                'data' => [
-                    'profile_picture' => \Storage::url($path),
-                ],
-            ]);
+            return $this->success([
+                'profile_picture' => Storage::url($path),
+            ], 'Profile picture updated successfully');
         } catch (\Exception $e) {
-            \Log::error('Avatar upload failed', [
+            Log::error('Avatar upload failed', [
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to upload avatar. Please try again.',
-            ], 500);
+            return $this->error('Failed to upload avatar. Please try again.', 500);
         }
     }
 
@@ -194,10 +283,7 @@ class PhotographerController extends Controller
         $photographer = $user->photographer;
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer profile not found',
-            ], 404);
+            return $this->notFound('Photographer profile not found');
         }
 
         // Get dashboard statistics
@@ -207,13 +293,12 @@ class PhotographerController extends Controller
             'average_rating' => round($photographer->reviews()->avg('rating') ?? 0, 1),
             'total_revenue' => $photographer->transactions()
                 ->where('status', 'completed')
-                ->where('type', 'credit')
-                ->sum('amount'),
+                ->sum('net_amount') ?? 0,
         ];
 
         // Get recent bookings
         $bookings = $photographer->bookings()
-            ->with(['client', 'service'])
+            ->with('client')
             ->latest()
             ->limit(5)
             ->get();
@@ -238,66 +323,368 @@ class PhotographerController extends Controller
             ->orderBy('display_order')
             ->get();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'stats' => $stats,
-                'photographer' => $photographer,
-                'user' => $user,
-                'bookings' => $bookings,
-                'reviews' => $reviews,
-                'albums' => $albums,
-                'packages' => $packages,
-            ],
-        ]);
+        // Get competition submissions
+        $competitionSubmissions = \App\Models\CompetitionSubmission::where('photographer_id', $photographer->id)
+            ->with(['competition:id,title,slug,status,submission_deadline,voting_end_at'])
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Get event RSVPs (events user registered for)
+        $eventRsvps = \App\Models\EventRsvp::where('user_id', $user->id)
+            ->where('rsvp_status', 'going')
+            ->with(['event', 'event.city'])
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        return $this->success([
+            'stats' => $stats,
+            'photographer' => $photographer,
+            'user' => $user,
+            'bookings' => $bookings,
+            'reviews' => $reviews,
+            'albums' => $albums,
+            'packages' => $packages,
+            'competition_submissions' => $competitionSubmissions,
+            'event_rsvps' => $eventRsvps,
+        ], 'Dashboard data retrieved successfully');
     }
 
     /**
      * Update photographer profile information
      */
-    public function updateProfile(Request $request)
+    public function updateProfile(StorePhotographerRequest $request)
     {
         $user = $request->user();
         $photographer = $user->photographer;
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer profile not found',
-            ], 404);
+            return $this->notFound('Photographer profile not found');
+        }
+
+        try {
+            $validated = $request->validated();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->validationError($e->errors(), 'Validation failed');
+        }
+
+        try {
+            // Extract category_ids before updating photographer
+            $categoryIds = $validated['category_ids'] ?? null;
+            unset($validated['category_ids']);
+            
+            // Convert empty string to null for city_id
+            if (isset($validated['city_id']) && $validated['city_id'] === '') {
+                $validated['city_id'] = null;
+            }
+            
+            // Remove empty social media URLs
+            foreach (['facebook_url', 'instagram_url', 'twitter_url', 'linkedin_url', 'youtube_url', 'website_url'] as $field) {
+                if (isset($validated[$field]) && empty($validated[$field])) {
+                    $validated[$field] = null;
+                }
+            }
+            
+            $photographer->update($validated);
+            
+            // Sync categories if provided
+            if ($categoryIds !== null) {
+                $photographer->categories()->sync($categoryIds);
+            }
+
+            // Track profile update achievement
+            \App\Services\AchievementService::trackProfileUpdate($photographer->id);
+
+            return $this->success($photographer->fresh()->load('categories', 'city'), 'Profile updated successfully');
+        } catch (\Exception $e) {
+            Log::error('Profile update failed', [
+                'user_id' => $user->id,
+                'photographer_id' => $photographer->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return $this->error('Failed to update profile: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get photographer's awards
+     */
+    public function getAwards(Request $request)
+    {
+        $photographer = $request->user()->photographer;
+
+        if (!$photographer) {
+            return $this->notFound('Photographer profile not found');
+        }
+
+        $awards = $photographer->awards()
+            ->orderBy('year', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return $this->success($awards, 'Awards retrieved successfully');
+    }
+
+    /**
+     * Store a new award
+     */
+    public function storeAward(Request $request)
+    {
+        $photographer = $request->user()->photographer;
+
+        if (!$photographer) {
+            return $this->notFound('Photographer profile not found');
         }
 
         $validated = $request->validate([
-            'business_name' => 'nullable|string|max:255',
-            'bio' => 'nullable|string|max:1000',
-            'phone' => 'nullable|string|max:20',
-            'whatsapp' => 'nullable|string|max:20',
-            'website' => 'nullable|url|max:255',
-            'facebook_url' => 'nullable|url|max:255',
-            'instagram_url' => 'nullable|url|max:255',
-            'experience_years' => 'nullable|integer|min:0|max:50',
-            'starting_price' => 'nullable|numeric|min:0',
-            'city_id' => 'nullable|exists:cities,id',
+            'title' => 'required|string|max:255',
+            'organization' => 'nullable|string|max:255',
+            'year' => 'required|integer|min:1950|max:' . (date('Y') + 1),
+            'type' => 'required|in:award,achievement,recognition,certification',
+            'description' => 'nullable|string|max:1000',
+            'certificate_file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120', // 5MB
         ]);
 
-        try {
-            $photographer->update($validated);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Profile updated successfully',
-                'data' => $photographer->fresh(),
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('Profile update failed', [
-                'user_id' => $user->id,
-                'error' => $e->getMessage(),
-            ]);
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to update profile. Please try again.',
-            ], 500);
+        // Handle certificate upload
+        if ($request->hasFile('certificate_file')) {
+            $path = $request->file('certificate_file')->store('certificates', 'public');
+            $validated['certificate_url'] = '/storage/' . $path;
         }
+
+        $award = $photographer->awards()->create($validated);
+
+        return $this->created($award, 'Award added successfully');
+    }
+
+    /**
+     * Update an award
+     */
+    public function updateAward(Request $request, $id)
+    {
+        $photographer = $request->user()->photographer;
+
+        if (!$photographer) {
+            return $this->notFound('Photographer profile not found');
+        }
+
+        $award = $photographer->awards()->findOrFail($id);
+
+        $validated = $request->validate([
+            'title' => 'sometimes|required|string|max:255',
+            'organization' => 'nullable|string|max:255',
+            'year' => 'sometimes|required|integer|min:1950|max:' . (date('Y') + 1),
+            'type' => 'sometimes|required|in:award,achievement,recognition,certification',
+            'description' => 'nullable|string|max:1000',
+            'certificate_file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+        ]);
+
+        // Handle certificate upload
+        if ($request->hasFile('certificate_file')) {
+            // Delete old certificate if exists
+            if ($award->certificate_url) {
+                $oldPath = str_replace('/storage/', '', $award->certificate_url);
+                Storage::disk('public')->delete($oldPath);
+            }
+            
+            $path = $request->file('certificate_file')->store('certificates', 'public');
+            $validated['certificate_url'] = '/storage/' . $path;
+        }
+
+        $award->update($validated);
+
+        return $this->success($award->fresh(), 'Award updated successfully');
+    }
+
+    /**
+     * Delete an award
+     */
+    public function deleteAward(Request $request, $id)
+    {
+        $photographer = $request->user()->photographer;
+
+        if (!$photographer) {
+            return $this->notFound('Photographer profile not found');
+        }
+
+        $award = $photographer->awards()->findOrFail($id);
+
+        // Delete certificate file if exists
+        if ($award->certificate_url) {
+            $path = str_replace('/storage/', '', $award->certificate_url);
+            Storage::disk('public')->delete($path);
+        }
+
+        $award->delete();
+
+        return $this->success([], 'Award deleted successfully');
+    }
+
+    /**
+     * Get my competition submissions
+     */
+    public function getMySubmissions(Request $request)
+    {
+        $photographer = $request->user()->photographer;
+
+        if (!$photographer) {
+            return $this->notFound('Photographer profile not found');
+        }
+
+        $submissions = \App\Models\CompetitionSubmission::where('photographer_id', $photographer->id)
+            ->with([
+                'competition:id,title,slug,status,submission_deadline,voting_start_at,voting_end_at,judging_end_at',
+                'votes'
+            ])
+            ->withCount('votes')
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        return $this->paginated($submissions, 'Competition submissions retrieved successfully');
+    }
+
+    /**
+     * Get my event RSVPs
+     */
+    public function getMyEventRsvps(Request $request)
+    {
+        $user = $request->user();
+
+        $rsvps = \App\Models\EventRsvp::where('user_id', $user->id)
+            ->with(['event', 'event.city'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        return $this->paginated($rsvps, 'Event RSVPs retrieved successfully');
+    }
+
+    /**
+     * Get notifications
+     */
+    public function getNotifications(Request $request)
+    {
+        $photographer = $request->user()->photographer;
+
+        if (!$photographer) {
+            return $this->notFound('Photographer profile not found');
+        }
+
+        $perPage = $request->get('per_page', 20);
+        $unreadOnly = $request->get('unread_only', false);
+
+        $query = $photographer->notifications();
+
+        if ($unreadOnly) {
+            $query->unread();
+        }
+
+        $notifications = $query->paginate($perPage);
+
+        return $this->paginated($notifications, 'Notifications retrieved successfully', 200, [
+            'unread_count' => $photographer->unreadNotifications()->count(),
+        ]);
+    }
+
+    /**
+     * Mark notification as read
+     */
+    public function markNotificationAsRead(Request $request, $id)
+    {
+        $photographer = $request->user()->photographer;
+
+        if (!$photographer) {
+            return $this->notFound('Photographer profile not found');
+        }
+
+        $notification = \App\Models\PhotographerNotification::where('id', $id)
+            ->where('photographer_id', $photographer->id)
+            ->first();
+
+        if (!$notification) {
+            return $this->notFound('Notification not found');
+        }
+
+        $notification->markAsRead();
+
+        return $this->success($notification, 'Notification marked as read');
+    }
+
+    /**
+     * Mark all notifications as read
+     */
+    public function markAllNotificationsAsRead(Request $request)
+    {
+        $photographer = $request->user()->photographer;
+
+        if (!$photographer) {
+            return $this->notFound('Photographer profile not found');
+        }
+
+        $photographer->unreadNotifications()->update([
+            'is_read' => true,
+            'read_at' => now(),
+        ]);
+
+        return $this->success([], 'All notifications marked as read');
+    }
+
+    /**
+     * Delete notification
+     */
+    public function deleteNotification(Request $request, $id)
+    {
+        $photographer = $request->user()->photographer;
+
+        if (!$photographer) {
+            return $this->notFound('Photographer profile not found');
+        }
+
+        $notification = \App\Models\PhotographerNotification::where('id', $id)
+            ->where('photographer_id', $photographer->id)
+            ->first();
+
+        if (!$notification) {
+            return $this->notFound('Notification not found');
+        }
+
+        $notification->delete();
+
+        return $this->success([], 'Notification deleted');
+    }
+
+    /**
+     * Get unread notification count
+     */
+    public function getUnreadNotificationCount(Request $request)
+    {
+        $photographer = $request->user()->photographer;
+
+        if (!$photographer) {
+            return $this->notFound('Photographer profile not found');
+        }
+
+        $count = $photographer->unreadNotifications()->count();
+
+        return $this->success([
+            'unread_count' => $count,
+        ], 'Unread notification count retrieved');
+    }
+
+    /**
+     * Get photographer's achievements and stats
+     */
+    public function getAchievements(Request $request)
+    {
+        $photographer = $request->user()->photographer;
+
+        if (!$photographer) {
+            return $this->notFound('Photographer profile not found');
+        }
+
+        $achievementData = \App\Services\AchievementService::getAchievementStats($photographer->id);
+
+        return $this->success($achievementData, 'Achievements retrieved successfully');
     }
 }

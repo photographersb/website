@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Package;
+use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 
 class PackageController extends Controller
 {
+    use ApiResponse;
     /**
      * Get photographer's packages
      */
@@ -16,10 +18,7 @@ class PackageController extends Controller
         $photographer = $user->photographer;
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer profile not found',
-            ], 404);
+            return $this->notFound('Photographer profile not found');
         }
 
         $packages = Package::where('photographer_id', $photographer->id)
@@ -27,10 +26,7 @@ class PackageController extends Controller
             ->orderBy('price', 'asc')
             ->get();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $packages,
-        ]);
+        return $this->success($packages, 'Packages retrieved successfully');
     }
 
     /**
@@ -42,10 +38,7 @@ class PackageController extends Controller
         $photographer = $user->photographer;
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer profile not found',
-            ], 404);
+            return $this->notFound('Photographer profile not found');
         }
 
         $validated = $request->validate([
@@ -76,15 +69,13 @@ class PackageController extends Controller
             'delivery_days' => $validated['delivery_days'],
             'is_active' => $validated['is_active'] ?? true,
             'cover_image' => $validated['cover_image'] ?? null,
-            'sample_images' => isset($validated['sample_images']) ? json_encode($validated['sample_images']) : null,
+            'sample_images' => $validated['sample_images'] ?? null,
         ]);
 
+        // Track achievement
+        \App\Services\AchievementService::trackPackageCreated($photographer->id);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Package created successfully',
-            'data' => $package,
-        ], 201);
+        return $this->created($package, 'Package created successfully');
     }
 
     /**
@@ -96,19 +87,13 @@ class PackageController extends Controller
         $photographer = $user->photographer;
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer profile not found',
-            ], 404);
+            return $this->notFound('Photographer profile not found');
         }
 
         $package = Package::where('photographer_id', $photographer->id)
             ->findOrFail($id);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $package,
-        ]);
+        return $this->success($package, 'Package retrieved successfully');
     }
 
     /**
@@ -120,10 +105,7 @@ class PackageController extends Controller
         $photographer = $user->photographer;
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer profile not found',
-            ], 404);
+            return $this->notFound('Photographer profile not found');
         }
 
         $package = Package::where('photographer_id', $photographer->id)
@@ -143,11 +125,6 @@ class PackageController extends Controller
             'sample_images.*' => 'url',
         ]);
 
-        // Handle JSON encoding for sample_images if provided
-        if (isset($validated['sample_images'])) {
-            $validated['sample_images'] = json_encode($validated['sample_images']);
-        }
-
         // Map price to base_price for DB compatibility
         if (isset($validated['price'])) {
             $validated['base_price'] = $validated['price'];
@@ -158,11 +135,7 @@ class PackageController extends Controller
 
         $package->update($validated);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Package updated successfully',
-            'data' => $package->fresh(),
-        ]);
+        return $this->success($package->fresh(), 'Package updated successfully');
     }
 
     /**
@@ -174,10 +147,7 @@ class PackageController extends Controller
         $photographer = $user->photographer;
 
         if (!$photographer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Photographer profile not found',
-            ], 404);
+            return $this->notFound('Photographer profile not found');
         }
 
         $package = Package::where('photographer_id', $photographer->id)
@@ -185,9 +155,6 @@ class PackageController extends Controller
 
         $package->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Package deleted successfully',
-        ]);
+        return $this->success([], 'Package deleted successfully');
     }
 }

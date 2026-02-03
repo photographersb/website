@@ -48,7 +48,7 @@
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             <div class="bg-white rounded-lg shadow-md p-3 sm:p-4 text-center">
               <div class="text-2xl sm:text-3xl font-bold text-burgundy">{{ event.rsvp_count || 0 }}</div>
-              <div class="text-xs sm:text-sm text-gray-600 mt-1">RSVPs</div>
+              <div class="text-xs sm:text-sm text-gray-600 mt-1">Registrations</div>
             </div>
             <div class="bg-white rounded-lg shadow-md p-3 sm:p-4 text-center">
               <div class="text-2xl sm:text-3xl font-bold text-burgundy">{{ event.view_count || 0 }}</div>
@@ -95,10 +95,13 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <div>
+                <div class="flex-1">
                   <p class="text-xs sm:text-sm text-gray-600">Location</p>
-                  <p class="font-semibold text-sm sm:text-base">{{ event.location }}</p>
-                  <p v-if="event.city" class="text-xs sm:text-sm text-gray-600">{{ event.city.name }}</p>
+                  <p v-if="event.venue_name" class="font-semibold text-sm sm:text-base">{{ event.venue_name }}</p>
+                  <p v-else-if="event.location" class="font-semibold text-sm sm:text-base">{{ event.location }}</p>
+                  <p v-if="event.venue_address" class="text-xs sm:text-sm text-gray-700 mt-1">{{ event.venue_address }}</p>
+                  <p v-else-if="event.address" class="text-xs sm:text-sm text-gray-700 mt-1">{{ event.address }}</p>
+                  <p v-if="event.city" class="text-xs sm:text-sm text-gray-600 mt-0.5">{{ event.city.name }}</p>
                 </div>
               </div>
 
@@ -121,7 +124,7 @@
                 <div>
                   <p class="text-xs sm:text-sm text-gray-600">Capacity</p>
                   <p class="font-semibold text-sm sm:text-base">{{ event.max_attendees }} attendees</p>
-                  <p class="text-xs text-gray-500">{{ event.rsvp_count || 0 }} confirmed</p>
+                  <p class="text-xs text-gray-500">{{ event.rsvp_count || 0 }} registered</p>
                 </div>
               </div>
             </div>
@@ -158,7 +161,7 @@
                   : 'bg-burgundy text-white hover:bg-rose-800'
               }`"
             >
-              {{ isEventFull ? 'Event Full' : isRsvped ? '✓ You\'re Going' : 'RSVP Now' }}
+              {{ isEventFull ? 'Event Full' : isRsvped ? '✓ Registered' : 'Register Now' }}
             </button>
 
             <div v-if="!isEventFull" class="mt-3 sm:mt-4 text-center text-xs sm:text-sm text-gray-600">
@@ -268,30 +271,16 @@ const fetchEvent = async () => {
     const slug = route.params.slug;
     const { data } = await api.get(`/events/${slug}`);
 
-    if (data.status === 'success') {
-      event.value = data.data;
-      // Check if user has RSVPed (you might want to add this to the API response)
-      checkRsvpStatus();
+    if (data.event || data.data) {
+      event.value = data.event || data.data;
+      // Check if user has already registered
+      isRsvped.value = data.user_registration && data.user_registration.rsvp_status === 'going';
     }
   } catch (error) {
     console.error('Error fetching event:', error);
     event.value = null;
   } finally {
     loading.value = false;
-  }
-};
-
-const checkRsvpStatus = async () => {
-  const token = localStorage.getItem('auth_token');
-  if (!token || !event.value) return;
-
-  try {
-    const { data } = await api.get(`/events/${event.value.id}/rsvp-status`);
-    if (data.status === 'success') {
-      isRsvped.value = data.data.is_rsvped;
-    }
-  } catch (error) {
-    // Silent fail - user probably not logged in
   }
 };
 
@@ -306,9 +295,7 @@ const handleRsvp = async () => {
 
   try {
     const rsvpStatus = isRsvped.value ? 'not_going' : 'going';
-    const { data } = await api.post(`/events/${event.value.id}/rsvp`, { 
-      rsvp_status: rsvpStatus 
-    });
+    const { data } = await api.post(`/events/${event.value.slug}/rsvp`);
 
     if (data.status === 'success') {
       isRsvped.value = !isRsvped.value;

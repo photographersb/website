@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Preview - Improved Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2C3E50;
+            font-size: 42px;
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 15px;
+            font-weight: 900;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #5A6C7D;
+            font-size: 16px;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        
+        .controls {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        
+        .control-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #4A5568;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        input, select {
+            padding: 12px 15px;
+            border: 2px solid #E2E8F0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #D4AF37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+        
+        .rank-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 8px;
+        }
+        
+        .rank-button {
+            padding: 15px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+        
+        .rank-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .rank-button.active {
+            border-color: currentColor;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        .rank-1st {
+            background: linear-gradient(135deg, #F4E5C1 0%, #FFE5B4 100%);
+            color: #D4AF37;
+        }
+        
+        .rank-2nd {
+            background: linear-gradient(135deg, #E8E8E8 0%, #F5F5F5 100%);
+            color: #AAA9AD;
+        }
+        
+        .rank-3rd {
+            background: linear-gradient(135deg, #E6C8A9 0%, #F5DEB3 100%);
+            color: #CD7F32;
+        }
+        
+        .rank-honorable {
+            background: linear-gradient(135deg, #ECF0F1 0%, #F8F9FA 100%);
+            color: #2C3E50;
+        }
+        
+        .certificate-frame {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+            margin-bottom: 30px;
+        }
+        
+        .certificate-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .certificate {
+            width: 297mm;
+            height: 210mm;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-origin: center;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e8ba3 100%);
+        }
+        
+        @media (max-width: 1400px) {
+            .certificate {
+                transform: scale(0.8);
+            }
+        }
+        
+        @media (max-width: 1100px) {
+            .certificate {
+                transform: scale(0.6);
+            }
+        }
+        
+        @media (max-width: 800px) {
+            .certificate {
+                transform: scale(0.4);
+            }
+        }
+        
+        .certificate-inner {
+            background: linear-gradient(to bottom, #ffffff 0%, #fefefe 100%);
+            border: 3px solid var(--award-color);
+            box-shadow: inset 0 0 0 8px #ffffff, inset 0 0 0 12px var(--award-color), 
+                        0 30px 80px rgba(0,0,0,0.25);
+            padding: 40px 60px;
+            text-align: center;
+            position: relative;
+            width: 94%;
+            height: 92%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        /* Corner decorations */
+        .corner-decoration {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            opacity: 0.15;
+        }
+        .corner-tl {
+            top: 25px;
+            left: 25px;
+            background: radial-gradient(circle at top left, var(--award-color) 0%, transparent 70%);
+        }
+        .corner-tr {
+            top: 25px;
+            right: 25px;
+            background: radial-gradient(circle at top right, var(--award-color) 0%, transparent 70%);
+        }
+        .corner-bl {
+            bottom: 25px;
+            left: 25px;
+            background: radial-gradient(circle at bottom left, var(--award-color) 0%, transparent 70%);
+        }
+        .corner-br {
+            bottom: 25px;
+            right: 25px;
+            background: radial-gradient(circle at bottom right, var(--award-color) 0%, transparent 70%);
+        }
+        
+        .decorative-line {
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--award-color), transparent);
+            margin: 15px auto;
+            width: 60%;
+        }
+        
+        .header {
+            margin-bottom: 10px;
+        }
+        
+        .platform-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #2C3E50;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .platform-logo::before,
+        .platform-logo::after {
+            content: '';
+            width: 40px;
+            height: 2px;
+            background: var(--award-color);
+        }
+        
+        .certificate-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 52px;
+            font-weight: 900;
+            color: var(--award-color);
+            margin: 15px 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .certificate-subtitle {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            font-weight: 400;
+            color: #5A6C7D;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        
+        .award-section {
+            margin: 20px 0;
+        }
+        
+        .award-badge {
+            font-size: 90px;
+            margin: 10px 0;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+        
+        .award-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--award-color);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin: 10px 0;
+            padding: 12px 30px;
+            background: var(--award-color-light);
+            border-radius: 50px;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .recipient-section {
+            margin: 20px 0;
+        }
+        
+        .recipient-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            font-weight: 300;
+            color: #5A6C7D;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+        
+        .recipient-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            font-weight: 700;
+            color: #1A202C;
+            margin: 15px 0 25px 0;
+            padding-bottom: 15px;
+            border-bottom: 4px double var(--award-color);
+            display: inline-block;
+            line-height: 1.2;
+        }
+        
+        .description {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            line-height: 1.9;
+            color: #4A5568;
+            margin: 20px auto;
+            max-width: 85%;
+            font-weight: 300;
+        }
+        
+        .description strong {
+            font-weight: 600;
+            color: #2C3E50;
+        }
+        
+        .photo-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-style: italic;
+            color: #2C3E50;
+            margin: 20px 0;
+            padding: 0 20px;
+        }
+        
+        .photo-title::before,
+        .photo-title::after {
+            content: '"';
+            color: var(--award-color);
+            font-size: 32px;
+            font-weight: 700;
+        }
+        
+        .score-box {
+            background: linear-gradient(135deg, var(--award-color-light) 0%, #ffffff 100%);
+            padding: 20px 35px;
+            border-radius: 15px;
+            display: inline-block;
+            margin: 20px 0;
+            border: 2px solid var(--award-color);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+        
+        .score-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            color: #5A6C7D;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .score-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            font-weight: 900;
+            color: var(--award-color);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            padding-top: 20px;
+            border-top: 1px solid #E2E8F0;
+        }
+        
+        .signature {
+            text-align: center;
+            flex: 1;
+            margin: 0 20px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #2C3E50;
+            width: 180px;
+            margin: 0 auto 8px;
+        }
+        
+        .signature-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            color: #5A6C7D;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .date-section {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .date-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            color: #5A6C7D;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .date {
+            font-family: 'Playfair Display', serif;
+            font-size: 14px;
+            color: #2C3E50;
+            font-weight: 600;
+        }
+        
+        .certificate-id {
+            position: absolute;
+            bottom: 15px;
+            right: 25px;
+            font-family: 'Courier New', monospace;
+            font-size: 9px;
+            color: #A0AEC0;
+            letter-spacing: 1px;
+        }
+        
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 120px;
+            color: var(--award-color);
+            opacity: 0.03;
+            font-weight: 900;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .info-box h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .info-box li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .info-box li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Photographer SB Certificate Preview</h1>
+        <p class="subtitle">Improved Professional Design</p>
+        
+        <div class="controls">
+            <div class="control-group">
+                <div class="form-field">
+                    <label for="photographerName">Photographer Name</label>
+                    <input type="text" id="photographerName" value="John Anderson" oninput="updateCertificate()">
+                </div>
+                
+                <div class="form-field">
+                    <label for="competitionName">Competition Name</label>
+                    <input type="text" id="competitionName" value="Wildlife Photography 2024" oninput="updateCertificate()">
+                </div>
+                
+                <div class="form-field">
+                    <label for="photoTitle">Photo Title</label>
+                    <input type="text" id="photoTitle" value="Sunset Over The Mountains" oninput="updateCertificate()">
+                </div>
+                
+                <div class="form-field">
+                    <label for="finalScore">Final Score</label>
+                    <input type="number" id="finalScore" value="95" min="0" max="100" oninput="updateCertificate()">
+                </div>
+            </div>
+            
+            <div class="form-field" style="margin-top: 20px;">
+                <label>Award Rank</label>
+                <div class="rank-buttons">
+                    <div class="rank-button rank-1st active" onclick="selectRank(1)">
+                        🥇<br>FIRST<br>PLACE
+                    </div>
+                    <div class="rank-button rank-2nd" onclick="selectRank(2)">
+                        🥈<br>SECOND<br>PLACE
+                    </div>
+                    <div class="rank-button rank-3rd" onclick="selectRank(3)">
+                        🥉<br>THIRD<br>PLACE
+                    </div>
+                    <div class="rank-button rank-honorable" onclick="selectRank(4)">
+                        🏆<br>HONORABLE<br>MENTION
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="certificate-frame">
+            <div class="certificate-wrapper">
+                <div class="certificate" id="certificate">
+                    <div class="certificate-inner">
+                        <!-- Corner decorations -->
+                        <div class="corner-decoration corner-tl"></div>
+                        <div class="corner-decoration corner-tr"></div>
+                        <div class="corner-decoration corner-bl"></div>
+                        <div class="corner-decoration corner-br"></div>
+                        
+                        <!-- Watermark -->
+                        <div class="watermark">PHOTOGRAPHER SB</div>
+                        
+                        <!-- Header -->
+                        <div class="header">
+                            <div class="platform-logo">Photographer SB</div>
+                            <div class="certificate-title">Certificate</div>
+                            <div class="certificate-subtitle">Of Excellence</div>
+                            <div class="decorative-line"></div>
+                        </div>
+                        
+                        <!-- Award section -->
+                        <div class="award-section">
+                            <div class="award-badge" id="awardBadge">🥇</div>
+                            <div class="award-title" id="awardTitle">FIRST PLACE</div>
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="content">
+                            <div class="recipient-section">
+                                <div class="recipient-label">This Certificate is Proudly Presented to</div>
+                                <div class="recipient-name" id="recipientName">John Anderson</div>
+                            </div>
+                            
+                            <div class="description">
+                                For demonstrating exceptional excellence and outstanding creativity in the art of photography,
+                                participating in <strong id="compName">Wildlife Photography 2024</strong>, and achieving recognition
+                                with the remarkable photograph
+                            </div>
+                            
+                            <div class="photo-title" id="photoTitleDisplay">Sunset Over The Mountains</div>
+                            
+                            <div class="decorative-line"></div>
+                            
+                            <div class="score-box">
+                                <div class="score-label">Final Achievement Score</div>
+                                <div class="score-value"><span id="scoreDisplay">95</span>/100</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="footer">
+                            <div class="signature">
+                                <div class="signature-line"></div>
+                                <div class="signature-label">Competition Director</div>
+                            </div>
+                            
+                            <div class="date-section">
+                                <div class="date-label">Date of Issue</div>
+                                <div class="date" id="dateDisplay"></div>
+                            </div>
+                            
+                            <div class="signature">
+                                <div class="signature-line"></div>
+                                <div class="signature-label">Platform Administrator</div>
+                            </div>
+                        </div>
+                        
+                        <div class="certificate-id">CERT-ID: PSBC-2024-00123</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <h2>✨ Design Improvements</h2>
+            <ul>
+                <li><strong>Premium Typography:</strong> Elegant Playfair Display for headings, Montserrat for body</li>
+                <li><strong>Sophisticated Color Palette:</strong> Rich Gold (#D4AF37), Bright Silver, Bronze with gradients</li>
+                <li><strong>Professional Layout:</strong> Triple border system with inset shadows for depth</li>
+                <li><strong>Elegant Decorations:</strong> Gradient corner patterns and decorative lines</li>
+                <li><strong>Better Visual Hierarchy:</strong> Improved spacing, sizing, and text emphasis</li>
+                <li><strong>Enhanced Score Display:</strong> Gradient background with prominent typography</li>
+                <li><strong>Refined Footer:</strong> Better signature sections with proper alignment</li>
+                <li><strong>Watermark Security:</strong> Subtle rotated platform name for authenticity</li>
+                <li><strong>Print Optimized:</strong> A4 landscape, 300 DPI, exact color reproduction</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        let currentRank = 1;
+        
+        const rankData = {
+            1: {
+                color: '#D4AF37',
+                colorLight: '#F4E5C1',
+                emoji: '🥇',
+                title: 'FIRST PLACE'
+            },
+            2: {
+                color: '#AAA9AD',
+                colorLight: '#E8E8E8',
+                emoji: '🥈',
+                title: 'SECOND PLACE'
+            },
+            3: {
+                color: '#CD7F32',
+                colorLight: '#E6C8A9',
+                emoji: '🥉',
+                title: 'THIRD PLACE'
+            },
+            4: {
+                color: '#2C3E50',
+                colorLight: '#ECF0F1',
+                emoji: '🏆',
+                title: 'HONORABLE MENTION'
+            }
+        };
+        
+        function selectRank(rank) {
+            currentRank = rank;
+            
+            // Update button active states
+            document.querySelectorAll('.rank-button').forEach((btn, idx) => {
+                btn.classList.toggle('active', idx + 1 === rank);
+            });
+            
+            updateCertificate();
+        }
+        
+        function updateCertificate() {
+            const data = rankData[currentRank];
+            const cert = document.getElementById('certificate');
+            
+            // Update CSS variables
+            cert.style.setProperty('--award-color', data.color);
+            cert.style.setProperty('--award-color-light', data.colorLight);
+            
+            // Update content
+            document.getElementById('awardBadge').textContent = data.emoji;
+            document.getElementById('awardTitle').textContent = data.title;
+            document.getElementById('recipientName').textContent = document.getElementById('photographerName').value;
+            document.getElementById('compName').textContent = document.getElementById('competitionName').value;
+            document.getElementById('photoTitleDisplay').textContent = document.getElementById('photoTitle').value;
+            document.getElementById('scoreDisplay').textContent = document.getElementById('finalScore').value;
+            
+            // Update date
+            const today = new Date();
+            document.getElementById('dateDisplay').textContent = today.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+        
+        // Initialize on load
+        updateCertificate();
+    </script>
+</body>
+</html>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Competition;
 use App\Models\CompetitionSubmission;
+use App\Services\WinnerCalculationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 // use Inertia\Inertia; // Not using Inertia - using API approach with Vue Router
@@ -77,6 +78,7 @@ class CompetitionController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:competitions,slug',
+            'category_id' => 'nullable|exists:categories,id',
             'theme' => 'required|string',
             'description' => 'nullable|string',
             'submission_start_date' => 'required|date',
@@ -87,7 +89,7 @@ class CompetitionController extends Controller
             'prize_pool' => 'nullable|numeric|min:0',
             'max_submissions_per_user' => 'nullable|integer|min:1|max:10',
             'rules' => 'nullable|string',
-            'terms' => 'nullable|string',
+            'terms_and_conditions' => 'nullable|string',
             'status' => 'required|in:draft,published,closed',
             'featured' => 'boolean',
         ]);
@@ -275,5 +277,67 @@ class CompetitionController extends Controller
         // Notification::send($winnerUser, new CompetitionWinnerNotification($competition));
 
         return back()->with('success', 'Winner announced successfully!');
+    }
+
+    /**
+     * Calculate winners for a competition
+     */
+    public function calculateWinners(Request $request, Competition $competition)
+    {
+        $validated = $request->validate([
+            'vote_weight' => 'nullable|numeric|min:0|max:1',
+            'judge_weight' => 'nullable|numeric|min:0|max:1',
+            'number_of_winners' => 'nullable|integer|min:1|max:10',
+            'honorable_mentions' => 'nullable|integer|min:0|max:20',
+        ]);
+
+        $winnerService = new WinnerCalculationService();
+        $result = $winnerService->calculateWinners($competition, $validated);
+
+        return response()->json($result);
+    }
+
+    /**
+     * Announce winners (save to database)
+     */
+    public function announceWinners(Request $request, Competition $competition)
+    {
+        $validated = $request->validate([
+            'vote_weight' => 'nullable|numeric|min:0|max:1',
+            'judge_weight' => 'nullable|numeric|min:0|max:1',
+            'number_of_winners' => 'nullable|integer|min:1|max:10',
+            'honorable_mentions' => 'nullable|integer|min:0|max:20',
+        ]);
+
+        $winnerService = new WinnerCalculationService();
+        $result = $winnerService->announceWinners($competition, $validated);
+
+        return response()->json($result);
+    }
+
+    /**
+     * Get winners for a competition
+     */
+    public function getWinners(Competition $competition)
+    {
+        $winnerService = new WinnerCalculationService();
+        $result = $winnerService->getWinners($competition);
+
+        return response()->json($result);
+    }
+
+    /**
+     * Get leaderboard for a competition
+     */
+    public function getLeaderboard(Request $request, Competition $competition)
+    {
+        $limit = $request->input('limit', 20);
+        
+        $winnerService = new WinnerCalculationService();
+        $leaderboard = $winnerService->getLeaderboard($competition, $limit);
+
+        return response()->json([
+            'leaderboard' => $leaderboard
+        ]);
     }
 }

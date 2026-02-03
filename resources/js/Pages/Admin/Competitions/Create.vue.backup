@@ -1,0 +1,637 @@
+<template>
+  <div class="min-h-screen bg-gray-50">
+    <AdminHeader
+      title="Edit Competition"
+      subtitle="Update competition details"
+    />
+
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <AdminQuickNav />
+
+      <!-- Form -->
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <form @submit.prevent="submitForm" class="space-y-6">
+          <!-- Basic Information -->
+          <div class="bg-white rounded-lg shadow-card p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Basic Information</h2>
+
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Title *</label>
+                <input
+                  v-model="form.title"
+                  type="text"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                />
+                <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Slug</label>
+                <input
+                  v-model="form.slug"
+                  type="text"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                />
+                <p class="mt-1 text-sm text-gray-500">Leave blank to auto-generate from title</p>
+                <p v-if="errors.slug" class="mt-1 text-sm text-red-600">{{ errors.slug }}</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Theme *</label>
+                <input
+                  v-model="form.theme"
+                  type="text"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                />
+                <p v-if="errors.theme" class="mt-1 text-sm text-red-600">{{ errors.theme }}</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                <select
+                  v-model="form.category_id"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                  <option :value="null">Select a category (optional)</option>
+                  <option v-for="category in categories" :key="category.id" :value="category.id">
+                    {{ category.name }}
+                  </option>
+                </select>
+                <p v-if="errors.category_id" class="mt-1 text-sm text-red-600">{{ errors.category_id[0] }}</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea
+                  v-model="form.description"
+                  rows="4"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                ></textarea>
+                <p v-if="errors.description" class="mt-1 text-sm text-red-600">{{ errors.description }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <div class="bg-white rounded-lg shadow-card p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Competition Timeline</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Submission Start Date *</label>
+                <input
+                  v-model="form.submission_start"
+                  type="datetime-local"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Submission Deadline *</label>
+                <input
+                  v-model="form.submission_deadline"
+                  type="datetime-local"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                />
+                <p v-if="errors.submission_deadline" class="mt-1 text-sm text-red-600">{{ errors.submission_deadline[0] }}</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Voting Start Date *</label>
+                <input
+                  v-model="form.voting_start"
+                  type="datetime-local"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                />
+                <p v-if="errors.voting_start_at" class="mt-1 text-sm text-red-600">{{ errors.voting_start_at[0] }}</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Voting End Date *</label>
+                <input
+                  v-model="form.voting_end"
+                  type="datetime-local"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                />
+                <p v-if="errors.voting_end_at" class="mt-1 text-sm text-red-600">{{ errors.voting_end_at[0] }}</p>
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Winner Announcement Date *</label>
+                <input
+                  v-model="form.announcement_date"
+                  type="datetime-local"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                />
+                <p v-if="errors.results_announcement_date" class="mt-1 text-sm text-red-600">{{ errors.results_announcement_date[0] }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Competition Details -->
+          <div class="bg-white rounded-lg shadow-card p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Competition Details</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Total Prize Pool (৳)</label>
+                <input
+                  v-model.number="form.total_prize_pool"
+                  type="number"
+                  min="0"
+                  step="100"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                />
+                <p v-if="errors.total_prize_pool" class="mt-1 text-sm text-red-600">{{ errors.total_prize_pool[0] }}</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Max Submissions Per User</label>
+                <input
+                  v-model.number="form.max_submissions_per_user"
+                  type="number"
+                  min="1"
+                  max="10"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                />
+                <p v-if="errors.max_submissions_per_user" class="mt-1 text-sm text-red-600">{{ errors.max_submissions_per_user }}</p>
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Rules</label>
+                <textarea
+                  v-model="form.rules"
+                  rows="4"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                ></textarea>
+                <p v-if="errors.rules" class="mt-1 text-sm text-red-600">{{ errors.rules }}</p>
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Terms & Conditions</label>
+                <textarea
+                  v-model="form.terms_and_conditions"
+                  rows="4"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                ></textarea>
+                <p v-if="errors.terms_and_conditions" class="mt-1 text-sm text-red-600">{{ errors.terms_and_conditions[0] }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sponsors Section -->
+          <div class="bg-white rounded-lg shadow-card p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Sponsors</h2>
+
+            <div class="space-y-3">
+              <input
+                v-model="sponsorSearch"
+                type="text"
+                placeholder="Search sponsors..."
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+              />
+
+              <div class="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-3 space-y-2">
+                <div v-if="filteredSponsors.length === 0" class="text-sm text-gray-500">
+                  No active sponsors found.
+                </div>
+                <label
+                  v-for="sponsor in filteredSponsors"
+                  :key="sponsor.id"
+                  class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50"
+                >
+                  <input
+                    type="checkbox"
+                    :value="sponsor.id"
+                    v-model="form.sponsor_ids"
+                    class="h-4 w-4 text-burgundy-600 focus:ring-burgundy-500 border-gray-300 rounded"
+                  />
+                  <img
+                    v-if="sponsor.logo"
+                    :src="sponsor.logo"
+                    :alt="sponsor.name"
+                    class="w-8 h-8 rounded object-cover border border-gray-200"
+                  />
+                  <div>
+                    <div class="font-medium text-gray-900">{{ sponsor.name }}</div>
+                    <div class="text-xs text-gray-500">{{ sponsor.website || 'No website' }}</div>
+                  </div>
+                </label>
+              </div>
+              <p class="text-sm text-gray-500">Selected: {{ form.sponsor_ids.length }}</p>
+              <p v-if="errors.sponsor_ids" class="mt-1 text-sm text-red-600">{{ errors.sponsor_ids[0] }}</p>
+            </div>
+          </div>
+
+          <!-- Judges Section -->
+          <div class="bg-white rounded-lg shadow-card p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Judges</h2>
+
+            <div class="space-y-3">
+              <input
+                v-model="judgeSearch"
+                type="text"
+                placeholder="Search judges..."
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+              />
+
+              <div class="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-3 space-y-2">
+                <div v-if="filteredJudges.length === 0" class="text-sm text-gray-500">
+                  No active judges found.
+                </div>
+                <label
+                  v-for="judge in filteredJudges"
+                  :key="judge.id"
+                  class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50"
+                >
+                  <input
+                    type="checkbox"
+                    :value="judge.id"
+                    v-model="form.judge_ids"
+                    class="h-4 w-4 text-burgundy-600 focus:ring-burgundy-500 border-gray-300 rounded"
+                  />
+                  <div>
+                    <div class="font-medium text-gray-900">{{ judge.name }}</div>
+                    <div class="text-xs text-gray-500">{{ judge.email || 'No email' }}</div>
+                  </div>
+                </label>
+              </div>
+              <p class="text-sm text-gray-500">Selected: {{ form.judge_ids.length }}</p>
+              <p v-if="errors.judge_ids" class="mt-1 text-sm text-red-600">{{ errors.judge_ids[0] }}</p>
+            </div>
+          </div>
+
+          <!-- Status & Settings -->
+          <div class="bg-white rounded-lg shadow-card p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Status & Settings</h2>
+
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Status *</label>
+                <select
+                  v-model="form.status"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                  <option value="draft">Draft (Not visible to public)</option>
+                  <option value="published">Published (Visible to public)</option>
+                </select>
+                <p v-if="errors.status" class="mt-1 text-sm text-red-600">{{ errors.status }}</p>
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  v-model="form.is_featured"
+                  type="checkbox"
+                  class="h-4 w-4 text-burgundy-600 focus:ring-burgundy-500 border-gray-300 rounded"
+                />
+                <label class="ml-2 block text-sm text-gray-900">
+                  Featured Competition (Show prominently on homepage)
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div class="flex items-center justify-end gap-4">
+            <a
+              href="/admin/competitions"
+              class="px-6 py-3 bg-white text-burgundy-600 border-2 border-burgundy-600 rounded-lg font-medium hover:bg-burgundy-50 transition-all"
+            >
+              Cancel
+            </a>
+            <button
+              type="submit"
+              :disabled="processing"
+              class="px-6 py-3 bg-burgundy-600 text-white rounded-lg font-medium hover:bg-burgundy-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {{ processing ? 'Updating...' : 'Update Competition' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Toast Notification -->
+      <div v-if="showToast" :class="['toast', toastType]">{{ toastMessage }}</div>
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+import AdminHeader from '../../../components/AdminHeader.vue'
+import AdminQuickNav from '../../../components/AdminQuickNav.vue'
+
+export default {
+  components: {
+    AdminHeader,
+    AdminQuickNav
+  },
+
+  data() {
+    return {
+      processing: false,
+      errors: {},
+      categories: [],
+      availableSponsors: [],
+      availableJudges: [],
+      sponsorSearch: '',
+      judgeSearch: '',
+      showToast: false,
+      toastMessage: '',
+      toastType: 'success',
+      form: {
+        title: '',
+        slug: '',
+        theme: '',
+        description: '',
+        category_id: null,
+        submission_start: '',
+        submission_deadline: '',
+        voting_start: '',
+        voting_end: '',
+        announcement_date: '',
+        total_prize_pool: null,
+        max_submissions_per_user: 3,
+        rules: '',
+        terms_and_conditions: '',
+        status: 'draft',
+        is_featured: false,
+        sponsor_ids: [],
+        judge_ids: [],
+      },
+    };
+  },
+
+  computed: {
+    filteredSponsors() {
+      const term = (this.sponsorSearch || '').toLowerCase();
+      if (!term) return this.availableSponsors;
+      return this.availableSponsors.filter(s =>
+        (s.name || '').toLowerCase().includes(term) ||
+        (s.website || '').toLowerCase().includes(term)
+      );
+    },
+    filteredJudges() {
+      const term = (this.judgeSearch || '').toLowerCase();
+      if (!term) return this.availableJudges;
+      return this.availableJudges.filter(j =>
+        (j.name || '').toLowerCase().includes(term) ||
+        (j.email || '').toLowerCase().includes(term)
+      );
+    }
+  },
+
+  mounted() {
+    this.fetchCategories();
+    this.fetchAvailableSponsors();
+    this.fetchAvailableJudges();
+    this.fetchCompetition();
+  },
+
+  methods: {
+    async fetchCompetition() {
+      try {
+        const token = localStorage.getItem('auth_token');
+        const competitionId = this.$route.params.id;
+        const response = await axios.get(`/api/v1/admin/competitions/${competitionId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+
+        if (response.data.status === 'success') {
+          const comp = response.data.data;
+          this.form = {
+            title: comp.title || '',
+            slug: comp.slug || '',
+            theme: comp.theme || '',
+            description: comp.description || '',
+            category_id: comp.category_id || null,
+            submission_start: this.formatDateForInput(comp.submission_start_at || comp.submission_start),
+            submission_deadline: this.formatDateForInput(comp.submission_deadline),
+            voting_start: this.formatDateForInput(comp.voting_start_at),
+            voting_end: this.formatDateForInput(comp.voting_end_at),
+            announcement_date: this.formatDateForInput(comp.results_announcement_date),
+            total_prize_pool: comp.total_prize_pool || 0,
+            max_submissions_per_user: comp.max_submissions_per_user || 3,
+            rules: comp.rules || '',
+            terms_and_conditions: comp.terms_and_conditions || '',
+            status: comp.status === 'active' ? 'published' : (comp.status || 'draft'),
+            is_featured: !!comp.is_featured,
+            sponsor_ids: (comp.sponsor_records || []).map(s => s.id),
+            judge_ids: (comp.judges || []).map(j => j.judge_id),
+          };
+        }
+      } catch (error) {
+        console.error('Error loading competition:', error);
+        this.showToastMessage('Error loading competition', 'error');
+      }
+    },
+
+    async fetchCategories() {
+      try {
+        const response = await axios.get('/api/v1/categories');
+        if (response.data.status === 'success') {
+          this.categories = response.data.data;
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    },
+
+    async fetchAvailableSponsors() {
+      try {
+        const token = localStorage.getItem('auth_token');
+        const response = await axios.get('/api/v1/admin/platform-sponsors', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+        if (response.data && response.data.data) {
+          this.availableSponsors = response.data.data.filter(s => s.status === 'active');
+        }
+      } catch (error) {
+        console.error('Error fetching sponsors:', error);
+      }
+    },
+
+    async fetchAvailableJudges() {
+      try {
+        const token = localStorage.getItem('auth_token');
+
+        const [judgeProfilesResponse, judgeUsersResponse] = await Promise.all([
+          axios.get('/api/v1/admin/judges?status=active&per_page=200', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/json'
+            }
+          }),
+          axios.get('/api/v1/admin/users?role=judge', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/json'
+            }
+          })
+        ]);
+
+        const judgeProfiles = judgeProfilesResponse?.data?.data?.data || [];
+        const judgeUsers = judgeUsersResponse?.data?.data || [];
+
+        const options = [];
+        const seenUserIds = new Set();
+
+        judgeProfiles.forEach(profile => {
+          if (!profile.user_id) return;
+          if (seenUserIds.has(profile.user_id)) return;
+          options.push({
+            id: profile.user_id,
+            name: profile.name || profile.user?.name,
+            email: profile.email || profile.user?.email,
+            source: 'profile',
+            profile_id: profile.id,
+          });
+          seenUserIds.add(profile.user_id);
+        });
+
+        judgeUsers.forEach(user => {
+          if (seenUserIds.has(user.id)) return;
+          options.push({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            source: 'user',
+          });
+          seenUserIds.add(user.id);
+        });
+
+        this.availableJudges = options;
+      } catch (error) {
+        console.error('Error fetching judges:', error);
+      }
+    },
+
+    async submitForm() {
+      this.processing = true;
+      this.errors = {};
+
+      try {
+        const token = localStorage.getItem('auth_token');
+        const competitionId = this.$route.params.id;
+
+        const formData = {
+          title: this.form.title,
+          slug: this.form.slug || null,
+          theme: this.form.theme,
+          description: this.form.description,
+          category_id: this.form.category_id,
+          submission_deadline: this.form.submission_deadline,
+          voting_start_at: this.form.voting_start,
+          voting_end_at: this.form.voting_end,
+          results_announcement_date: this.form.announcement_date,
+          total_prize_pool: this.form.total_prize_pool || 0,
+          max_submissions_per_user: this.form.max_submissions_per_user || 3,
+          rules: this.form.rules,
+          terms_and_conditions: this.form.terms_and_conditions,
+          status: this.form.status,
+          is_featured: this.form.is_featured ? 1 : 0,
+          sponsor_ids: this.form.sponsor_ids,
+          judge_ids: this.form.judge_ids,
+        };
+
+        const response = await axios.put(`/api/v1/admin/competitions/${competitionId}`, formData, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.data.status === 'success') {
+          this.showToastMessage('Competition updated successfully!', 'success');
+          setTimeout(() => {
+            window.location.href = '/admin/competitions';
+          }, 1500);
+        }
+      } catch (error) {
+        console.error('Error updating competition:', error);
+        if (error.response && error.response.data) {
+          if (error.response.data.errors) {
+            this.errors = error.response.data.errors;
+          }
+          this.showToastMessage(error.response.data.message || 'Error updating competition', 'error');
+        } else {
+          this.showToastMessage('Error updating competition. Please try again.', 'error');
+        }
+      } finally {
+        this.processing = false;
+      }
+    },
+
+    showToastMessage(message, type = 'success') {
+      this.toastMessage = message;
+      this.toastType = type;
+      this.showToast = true;
+      setTimeout(() => {
+        this.showToast = false;
+      }, 3000);
+    },
+
+    formatDateForInput(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    },
+  },
+};
+</script>
+
+<style scoped>
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease-out;
+  z-index: 1000;
+  font-weight: 600;
+}
+
+.toast.success {
+  background: #16a34a;
+  color: white;
+}
+
+.toast.error {
+  background: #dc2626;
+  color: white;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+</style>

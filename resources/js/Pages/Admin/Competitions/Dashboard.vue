@@ -1,18 +1,21 @@
 <template>
-  <div class="competitions-dashboard">
-    <!-- Page Header -->
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">🏆 Competition Dashboard</h1>
-        <p class="page-subtitle">Comprehensive overview and management of photography competitions</p>
+  <div class="min-h-screen bg-gray-50">
+    <AdminHeader 
+      title="🏆 Competition Dashboard" 
+      subtitle="Comprehensive overview and management of photography competitions"
+    />
+
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <AdminQuickNav />
+
+      <div class="flex justify-end">
+        <router-link to="/admin/competitions/create" class="px-4 py-2 bg-burgundy text-white rounded-lg hover:bg-burgundy-dark flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Create Competition
+        </router-link>
       </div>
-      <router-link to="/admin/competitions/create" class="btn-primary">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        Create Competition
-      </router-link>
-    </div>
 
     <!-- Loading State -->
     <div v-if="loading" class="loading-container">
@@ -129,21 +132,20 @@
 
       <!-- Main Content Grid -->
       <div class="dashboard-grid">
-        <!-- Active Competitions -->
+        <!-- All Competitions -->
         <div class="dashboard-card full-width">
           <div class="card-header">
-            <h2 class="card-title">🎯 Active Competitions</h2>
-            <router-link to="/admin/competitions" class="card-link">View All →</router-link>
+            <h2 class="card-title">📋 All Competitions ({{ allCompetitions.length }})</h2>
           </div>
-          <div v-if="activeCompetitions.length > 0" class="competitions-grid">
-            <div v-for="comp in activeCompetitions" :key="comp.id" class="competition-card">
+          <div v-if="allCompetitions.length > 0" class="competitions-grid">
+            <div v-for="comp in allCompetitions" :key="comp.id" class="competition-card">
               <div class="competition-header">
                 <div class="competition-title">
                   <h3>{{ comp.title }}</h3>
                   <span :class="['status-badge', statusClass(comp.status)]">{{ comp.status }}</span>
                 </div>
                 <div class="competition-actions">
-                  <router-link :to="`/admin/competitions/${comp.id}`" class="btn-icon" title="View">
+                  <router-link :to="`/admin/competitions/${comp.id}`" class="btn-icon" title="View Details">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -154,6 +156,21 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </router-link>
+                  <router-link :to="`/admin/competitions/${comp.id}/submissions`" class="btn-icon" title="View Submissions">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </router-link>
+                  <button @click="archiveCompetition(comp.id)" class="btn-icon btn-archive" title="Archive">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9-3h4m-4 0a1 1 0 11-2 0m2 0a1 1 0 10-2 0m-6 5h2m4 0h2" />
+                    </svg>
+                  </button>
+                  <button @click="deleteCompetition(comp.id)" class="btn-icon btn-delete" title="Delete">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
                 </div>
               </div>
               <div class="competition-body">
@@ -188,7 +205,7 @@
             <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p>No active competitions</p>
+            <p>No competitions created yet. Create one to get started!</p>
           </div>
         </div>
 
@@ -219,13 +236,18 @@
             <h2 class="card-title">⏰ Upcoming Deadlines</h2>
           </div>
           <div v-if="upcomingDeadlines.length > 0" class="deadlines-list">
-            <div v-for="comp in upcomingDeadlines" :key="comp.id" class="deadline-item">
+            <router-link
+              v-for="comp in upcomingDeadlines"
+              :key="comp.id"
+              :to="`/admin/competitions/${comp.id}/edit`"
+              class="deadline-item cursor-pointer hover:bg-gray-50 transition-colors"
+            >
               <div class="deadline-info">
                 <div class="deadline-title">{{ comp.title }}</div>
                 <div class="deadline-date">{{ formatDate(comp.submission_deadline) }}</div>
               </div>
               <div class="deadline-countdown">{{ getDaysUntil(comp.submission_deadline) }} days</div>
-            </div>
+            </router-link>
           </div>
           <div v-else class="empty-state-small">
             <p>No upcoming deadlines</p>
@@ -268,13 +290,20 @@
 
     <!-- Toast -->
     <div v-if="showToast" class="toast">{{ toastMessage }}</div>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import AdminHeader from '../../../components/AdminHeader.vue'
+import AdminQuickNav from '../../../components/AdminQuickNav.vue'
 
 export default {
+  components: {
+    AdminHeader,
+    AdminQuickNav
+  },
   data() {
     return {
       stats: {
@@ -288,12 +317,18 @@ export default {
         pendingSubmissions: 0
       },
       activeCompetitions: [],
+      upcomingCompetitions: [],
+      completedCompetitions: [],
+      allCompetitions: [],
       recentSubmissions: [],
       upcomingDeadlines: [],
       loading: true,
       showToast: false,
       toastMessage: ''
     };
+  },
+
+  computed: {
   },
 
   mounted() {
@@ -305,27 +340,30 @@ export default {
       try {
         this.loading = true;
         
-        // Fetch from API
-        const response = await axios.get('/api/v1/admin/competitions');
+        const token = localStorage.getItem('auth_token');
+        
+        // Fetch from API (axios already has /api/v1 as base URL)
+        const response = await axios.get('/admin/competitions?stats_scope=dashboard', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
         
         if (response.data.status === 'success') {
-          // Update stats
+          // Update stats from API (don't recalculate)
           if (response.data.stats) {
             this.stats = { ...this.stats, ...response.data.stats };
           }
           
-          // Extract active competitions (top 3)
+          const lists = response.data.lists || {};
+          this.activeCompetitions = lists.active || [];
+          this.upcomingCompetitions = lists.upcoming || [];
+          this.completedCompetitions = lists.completed || [];
+
           const allComps = response.data.data || [];
-          this.activeCompetitions = allComps.filter(c => c.status === 'active').slice(0, 3);
-          
-          // Calculate additional stats
-          this.stats.totalSubmissions = allComps.reduce((sum, comp) => sum + (comp.submissions_count || 0), 0);
-          this.stats.totalPrizePool = allComps.reduce((sum, comp) => sum + (comp.total_prize_pool || 0), 0);
-          this.stats.totalParticipants = Math.floor(this.stats.totalSubmissions * 0.8);
-          this.stats.pendingSubmissions = allComps
-            .filter(c => c.status === 'active' || c.status === 'judging')
-            .reduce((sum, comp) => sum + (comp.submissions_count || 0), 0);
-          
+          this.allCompetitions = allComps;
+
           // Extract upcoming deadlines (next 7 days)
           const now = new Date();
           const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -336,13 +374,9 @@ export default {
             })
             .sort((a, b) => new Date(a.submission_deadline) - new Date(b.submission_deadline))
             .slice(0, 5);
-          
-          // Mock recent submissions (would come from API)
-          this.recentSubmissions = [
-            { id: 1, user: { name: 'John Doe' }, competition: { title: 'Nature Photography' }, status: 'pending', created_at: new Date(Date.now() - 3600000) },
-            { id: 2, user: { name: 'Jane Smith' }, competition: { title: 'Portrait Contest' }, status: 'approved', created_at: new Date(Date.now() - 7200000) },
-            { id: 3, user: { name: 'Mike Johnson' }, competition: { title: 'Landscape Challenge' }, status: 'pending', created_at: new Date(Date.now() - 10800000) },
-          ].slice(0, Math.min(3, this.stats.totalSubmissions));
+
+          // Clear mock data - submissions will be shown only when fetched from real API
+          this.recentSubmissions = [];
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -380,6 +414,9 @@ export default {
     },
 
     formatNumber(num) {
+      if (num === null || num === undefined || isNaN(num)) {
+        return '0';
+      }
       return new Intl.NumberFormat('en-US').format(num);
     },
 
@@ -410,6 +447,59 @@ export default {
       const diffDays = Math.ceil(diffMs / 86400000);
       
       return diffDays > 0 ? diffDays : 0;
+    },
+
+    async deleteCompetition(id) {
+      if (!confirm('Are you sure you want to delete this competition? This action cannot be undone.')) {
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('auth_token');
+        const response = await axios.delete(`/api/v1/admin/competitions/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+
+        if (response.data.status === 'success') {
+          this.showToastMessage('Competition deleted successfully', 'success');
+          // Refresh the list
+          this.fetchDashboardData();
+        }
+      } catch (error) {
+        console.error('Error deleting competition:', error);
+        this.showToastMessage('Failed to delete competition', 'error');
+      }
+    },
+
+    async archiveCompetition(id) {
+      if (!confirm('Are you sure you want to archive this competition?')) {
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('auth_token');
+        const response = await axios.put(`/api/v1/admin/competitions/${id}`, 
+          { is_archived: true },
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/json'
+            }
+          }
+        );
+
+        if (response.data.status === 'success' || response.status === 200) {
+          this.showToastMessage('Competition archived successfully', 'success');
+          // Refresh the list
+          this.fetchDashboardData();
+        }
+      } catch (error) {
+        console.error('Error archiving competition:', error);
+        this.showToastMessage('Failed to archive competition', 'error');
+      }
     },
 
     showToastMessage(message) {
@@ -453,7 +543,7 @@ export default {
   display: inline-flex;
   align-items: center;
   padding: 0.75rem 1.5rem;
-  background: #6c0b1a;
+  background: var(--admin-brand-primary);
   color: white;
   border-radius: 0.5rem;
   font-weight: 600;
@@ -462,9 +552,9 @@ export default {
 }
 
 .btn-primary:hover {
-  background: #8b0d20;
+  background: var(--admin-brand-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(108, 11, 26, 0.3);
+  box-shadow: 0 4px 12px rgba(139, 21, 56, 0.3);
 }
 
 .loading-container {
@@ -480,7 +570,7 @@ export default {
   width: 48px;
   height: 48px;
   border: 4px solid #e5e7eb;
-  border-top-color: #6c0b1a;
+  border-top-color: var(--admin-brand-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -513,10 +603,10 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.stat-blue { border-color: #3b82f6; }
-.stat-green { border-color: #10b981; }
-.stat-yellow { border-color: #f59e0b; }
-.stat-purple { border-color: #8b5cf6; }
+.stat-blue { border-color: var(--admin-info); }
+.stat-green { border-color: var(--admin-success); }
+.stat-yellow { border-color: var(--admin-warning); }
+.stat-purple { border-color: var(--admin-info); }
 
 .stat-icon {
   padding: 1rem;
@@ -524,10 +614,10 @@ export default {
   flex-shrink: 0;
 }
 
-.stat-blue .stat-icon { background: #dbeafe; color: #3b82f6; }
-.stat-green .stat-icon { background: #d1fae5; color: #10b981; }
-.stat-yellow .stat-icon { background: #fef3c7; color: #f59e0b; }
-.stat-purple .stat-icon { background: #ede9fe; color: #8b5cf6; }
+.stat-blue .stat-icon { background: var(--admin-info-light); color: var(--admin-info); }
+.stat-green .stat-icon { background: var(--admin-success-light); color: var(--admin-success); }
+.stat-yellow .stat-icon { background: var(--admin-warning-light); color: var(--admin-warning); }
+.stat-purple .stat-icon { background: var(--admin-info-light); color: var(--admin-info); }
 
 .stat-content {
   display: flex;
@@ -571,9 +661,9 @@ export default {
 
 .stat-box-icon {
   padding: 0.75rem;
-  background: #f3f4f6;
+  background: var(--admin-brand-primary-soft);
   border-radius: 0.5rem;
-  color: #6c0b1a;
+  color: var(--admin-brand-primary);
 }
 
 .stat-box-content {
@@ -627,7 +717,7 @@ export default {
 }
 
 .card-link {
-  color: #6c0b1a;
+  color: var(--admin-brand-primary);
   font-size: 0.875rem;
   font-weight: 600;
   text-decoration: none;
@@ -635,7 +725,7 @@ export default {
 }
 
 .card-link:hover {
-  color: #8b0d20;
+  color: var(--admin-brand-primary-hover);
 }
 
 .competitions-grid {
@@ -652,7 +742,7 @@ export default {
 }
 
 .competition-card:hover {
-  border-color: #6c0b1a;
+  border-color: var(--admin-brand-primary);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -684,8 +774,16 @@ export default {
 }
 
 .btn-icon:hover {
-  background: #f3f4f6;
-  color: #6c0b1a;
+  background: var(--admin-bg-hover);
+  color: var(--admin-brand-primary);
+}
+
+.btn-archive:hover {
+  color: #f59e0b;
+}
+
+.btn-delete:hover {
+  color: #ef4444;
 }
 
 .competition-meta {
@@ -730,13 +828,13 @@ export default {
   font-weight: 600;
 }
 
-.status-draft { background: #f3f4f6; color: #6b7280; }
-.status-upcoming { background: #fef3c7; color: #f59e0b; }
-.status-active { background: #d1fae5; color: #10b981; }
-.status-judging { background: #dbeafe; color: #3b82f6; }
-.status-completed { background: #ede9fe; color: #8b5cf6; }
-.status-cancelled { background: #fee2e2; color: #ef4444; }
-.status-pending { background: #fef3c7; color: #f59e0b; }
+.status-draft { background: var(--admin-bg-hover); color: var(--admin-text-secondary); }
+.status-upcoming { background: var(--admin-warning-light); color: var(--admin-warning-text); }
+.status-active { background: var(--admin-success-light); color: var(--admin-success-text); }
+.status-judging { background: var(--admin-info-light); color: var(--admin-info-text); }
+.status-completed { background: var(--admin-info-light); color: var(--admin-info-text); }
+.status-cancelled { background: var(--admin-danger-light); color: var(--admin-danger-text); }
+.status-pending { background: var(--admin-warning-light); color: var(--admin-warning-text); }
 
 .submissions-list, .deadlines-list {
   display: flex;
@@ -784,7 +882,7 @@ export default {
 
 .deadline-countdown {
   padding: 0.5rem 1rem;
-  background: #6c0b1a;
+  background: var(--admin-brand-primary);
   color: white;
   border-radius: 0.5rem;
   font-weight: 700;
@@ -832,11 +930,11 @@ export default {
 }
 
 .action-button:hover {
-  background: #6c0b1a;
-  border-color: #6c0b1a;
+  background: var(--admin-brand-primary);
+  border-color: var(--admin-brand-primary);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(108, 11, 26, 0.3);
+  box-shadow: 0 4px 12px rgba(139, 21, 56, 0.3);
 }
 
 .toast {

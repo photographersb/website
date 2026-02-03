@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Competition;
 use App\Models\CompetitionSponsor;
 use App\Services\SponsorshipService;
@@ -18,9 +19,7 @@ class CompetitionSponsorController extends Controller
         $activeOnly = $request->boolean('active_only', true);
         $result = $sponsorshipService->getSponsors($competition, $activeOnly);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $result['data'],
+        return $this->success($result['data'], 'Sponsors retrieved successfully', 200, [
             'total' => $result['total']
         ]);
     }
@@ -33,18 +32,12 @@ class CompetitionSponsorController extends Controller
         $sponsor = CompetitionSponsor::find($sponsorId);
         
         if (!$sponsor) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Sponsor not found'
-            ], 404);
+            return $this->notFound('Sponsor not found');
         }
         
         $result = $sponsorshipService->getSponsorDetails($sponsor);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $result['data']
-        ]);
+        return $this->success($result['data'], 'Sponsor details retrieved successfully');
     }
 
     /**
@@ -65,11 +58,11 @@ class CompetitionSponsorController extends Controller
 
         $result = $sponsorshipService->addSponsor($competition, $request->all());
 
-        return response()->json([
-            'status' => $result['success'] ? 'success' : 'error',
-            'message' => $result['message'],
-            'data' => $result['data'] ?? null
-        ], $result['success'] ? 201 : 400);
+        if (!$result['success']) {
+            return $this->error($result['message'], 400);
+        }
+
+        return $this->created($result['data'], $result['message']);
     }
 
     /**
@@ -90,11 +83,11 @@ class CompetitionSponsorController extends Controller
 
         $result = $sponsorshipService->updateSponsor($sponsor, $request->all());
 
-        return response()->json([
-            'status' => $result['success'] ? 'success' : 'error',
-            'message' => $result['message'],
-            'data' => $result['data'] ?? null
-        ], $result['success'] ? 200 : 400);
+        if (!$result['success']) {
+            return $this->error($result['message'], 400);
+        }
+
+        return $this->success($result['data'], $result['message']);
     }
 
     /**
@@ -104,10 +97,11 @@ class CompetitionSponsorController extends Controller
     {
         $result = $sponsorshipService->deleteSponsor($sponsor);
 
-        return response()->json([
-            'status' => $result['success'] ? 'success' : 'error',
-            'message' => $result['message']
-        ], $result['success'] ? 200 : 400);
+        if (!$result['success']) {
+            return $this->error($result['message'], 400);
+        }
+
+        return $this->success(null, $result['message']);
     }
 
     /**
@@ -129,11 +123,11 @@ class CompetitionSponsorController extends Controller
 
         $result = $sponsorshipService->bulkAddSponsors($competition, $request->sponsors);
 
-        return response()->json([
-            'status' => $result['success'] ? 'success' : 'error',
-            'message' => $result['message'],
-            'data' => $result['data'] ?? null
-        ], $result['success'] ? 201 : 400);
+        if (!$result['success']) {
+            return $this->error($result['message'], 400);
+        }
+
+        return $this->created($result['data'], $result['message']);
     }
 
     /**
@@ -143,11 +137,11 @@ class CompetitionSponsorController extends Controller
     {
         $result = $sponsorshipService->toggleActiveStatus($sponsor);
 
-        return response()->json([
-            'status' => $result['success'] ? 'success' : 'error',
-            'message' => $result['message'],
-            'data' => $result['data'] ?? null
-        ], $result['success'] ? 200 : 400);
+        if (!$result['success']) {
+            return $this->error($result['message'], 400);
+        }
+
+        return $this->success($result['data'], $result['message']);
     }
 
     /**
@@ -163,10 +157,11 @@ class CompetitionSponsorController extends Controller
 
         $result = $sponsorshipService->reorderSponsors($competition, $request->order);
 
-        return response()->json([
-            'status' => $result['success'] ? 'success' : 'error',
-            'message' => $result['message']
-        ], $result['success'] ? 200 : 400);
+        if (!$result['success']) {
+            return $this->error($result['message'], 400);
+        }
+
+        return $this->success(null, $result['message']);
     }
 
     /**
@@ -176,10 +171,7 @@ class CompetitionSponsorController extends Controller
     {
         $result = $sponsorshipService->getSponsorshipStatistics($competition);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $result['data']
-        ]);
+        return $this->success($result['data'], 'Sponsorship statistics retrieved successfully');
     }
 
     /**
@@ -189,9 +181,6 @@ class CompetitionSponsorController extends Controller
     {
         $result = $sponsorshipService->getGlobalStatistics();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $result['data']
-        ]);
+        return $this->success($result['data'], 'Global sponsorship statistics retrieved successfully');
     }
 }

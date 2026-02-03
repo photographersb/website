@@ -1,20 +1,29 @@
 <template>
-  <div class="admin-bookings">
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">📋 Booking Management</h1>
-        <p class="page-subtitle">Monitor and manage all platform bookings</p>
-      </div>
-      <button @click="exportBookings" class="btn-export-main">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        Export Data
-      </button>
-    </div>
+  <div class="min-h-screen bg-gray-50">
+    <!-- Admin Header with Back Button & Notifications -->
+    <AdminHeader 
+      title="📋 Booking Management" 
+      subtitle="Monitor and manage all platform bookings"
+    />
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
+    <!-- Main Content -->
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      
+      <!-- Quick Navigation -->
+      <AdminQuickNav />
+
+      <!-- Export Button -->
+      <div class="flex justify-end">
+        <button @click="exportBookings" class="btn-export-main">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Export Data
+        </button>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
       <div class="stat-card stat-blue">
         <div class="stat-icon">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -265,14 +274,16 @@
         </div>
       </div>
     </div>
-
     <!-- Toast -->
     <div v-if="showToast" class="toast">{{ toastMessage }}</div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import AdminHeader from '../../../components/AdminHeader.vue'
+import AdminQuickNav from '../../../components/AdminQuickNav.vue'
 
 const bookings = ref([])
 const loading = ref(false)
@@ -287,12 +298,17 @@ const filters = ref({
   date: ''
 })
 
-const stats = computed(() => ({
-  total: bookings.value.length,
-  pending: bookings.value.filter(b => b.status === 'pending').length,
-  confirmed: bookings.value.filter(b => b.status === 'confirmed').length,
-  revenue: bookings.value.reduce((sum, b) => sum + parseFloat(b.total_amount || 0), 0)
-}))
+// Stats from backend (not computed from client data)
+const stats = ref({
+  total: 0,
+  pending: 0,
+  confirmed: 0,
+  in_progress: 0,
+  completed: 0,
+  cancelled: 0,
+  revenue: 0,
+  monthly_revenue: 0
+})
 
 let searchTimeout = null
 
@@ -307,7 +323,13 @@ const fetchBookings = async () => {
   loading.value = true
   try {
     const token = localStorage.getItem('auth_token')
-    const response = await fetch('/api/v1/bookings', {
+    const params = new URLSearchParams()
+    
+    if (filters.value.search) params.append('search', filters.value.search)
+    if (filters.value.status) params.append('status', filters.value.status)
+    if (filters.value.date) params.append('event_date', filters.value.date)
+    
+    const response = await fetch(`/api/v1/admin/bookings?${params}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json'
@@ -315,8 +337,12 @@ const fetchBookings = async () => {
     })
     
     const data = await response.json()
-    if (data.status === 'success') {
+    if (response.ok) {
       bookings.value = data.data || []
+      // Update stats from backend response
+      if (data.stats) {
+        stats.value = data.stats
+      }
     }
   } catch (error) {
     console.error('Error fetching bookings:', error)
@@ -357,11 +383,11 @@ const formatNumber = (num) => {
 
 const formatDate = (date) => {
   if (!date) return 'N/A'
-  return new Date(date).toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
-  })
+  const d = new Date(date)
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const year = d.getFullYear()
+  return `${day}-${month}-${year}`
 }
 
 const showToastMessage = (message) => {
@@ -378,25 +404,25 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.admin-bookings { padding: 2rem; min-height: 100vh; background: #f9fafb; }
+.admin-bookings { padding: 2rem; min-height: 100vh; background: var(--admin-bg-page); }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
 .page-title { font-size: 2rem; font-weight: 700; color: #1f2937; margin: 0; }
 .page-subtitle { color: #6b7280; margin: 0.5rem 0 0 0; }
 
-.btn-export-main { display: flex; align-items: center; background: #6c0b1a; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: background 0.2s; }
-.btn-export-main:hover { background: #4a070f; }
+.btn-export-main { display: flex; align-items: center; background: var(--admin-brand-primary); color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+.btn-export-main:hover { background: var(--admin-brand-primary-dark); }
 
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
 .stat-card { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 1rem; border-left: 4px solid; }
-.stat-blue { border-color: #3b82f6; }
-.stat-yellow { border-color: #f59e0b; }
-.stat-green { border-color: #10b981; }
-.stat-purple { border-color: #8b5cf6; }
+.stat-blue { border-color: var(--admin-brand-primary); }
+.stat-yellow { border-color: var(--admin-brand-primary); }
+.stat-green { border-color: var(--admin-brand-primary); }
+.stat-purple { border-color: var(--admin-brand-primary); }
 .stat-icon { width: 3rem; height: 3rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; }
-.stat-blue .stat-icon { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-.stat-yellow .stat-icon { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
-.stat-green .stat-icon { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-.stat-purple .stat-icon { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+.stat-blue .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-yellow .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-green .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-purple .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
 .stat-content { display: flex; flex-direction: column; }
 .stat-label { color: #6b7280; font-size: 0.875rem; margin-bottom: 0.25rem; }
 .stat-value { font-size: 2rem; font-weight: 700; color: #1f2937; }
@@ -406,12 +432,12 @@ onMounted(() => {
 .search-box { position: relative; flex: 1; min-width: 300px; }
 .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); width: 1.25rem; height: 1.25rem; color: #9ca3af; }
 .search-input { width: 100%; padding: 0.75rem 1rem 0.75rem 3rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; }
-.search-input:focus { outline: none; border-color: #6c0b1a; box-shadow: 0 0 0 3px rgba(108, 11, 26, 0.1); }
+.search-input:focus { outline: none; border-color: var(--admin-brand-primary); box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.12); }
 .filter-select, .filter-input { padding: 0.75rem 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; cursor: pointer; }
-.filter-select:focus, .filter-input:focus { outline: none; border-color: #6c0b1a; }
+.filter-select:focus, .filter-input:focus { outline: none; border-color: var(--admin-brand-primary); }
 
 .loading-state { text-align: center; padding: 3rem; color: #6b7280; }
-.spinner { width: 3rem; height: 3rem; border: 3px solid #e5e7eb; border-top-color: #6c0b1a; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+.spinner { width: 3rem; height: 3rem; border: 3px solid #e5e7eb; border-top-color: var(--admin-brand-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .table-container { overflow-x: auto; }
@@ -420,26 +446,26 @@ onMounted(() => {
 .data-table td { padding: 1rem; border-bottom: 1px solid #f3f4f6; }
 .booking-row:hover { background: #f9fafb; }
 
-.booking-id { font-weight: 600; color: #6c0b1a; }
+.booking-id { font-weight: 600; color: var(--admin-brand-primary); }
 .user-cell { display: flex; align-items: center; gap: 0.75rem; }
-.user-avatar { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: linear-gradient(135deg, #6c0b1a, #9d1429); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1rem; }
-.photographer-avatar { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+.user-avatar { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--admin-brand-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1rem; }
+.photographer-avatar { background: var(--admin-brand-primary); }
 .user-name { font-weight: 600; color: #1f2937; }
 .user-email { font-size: 0.75rem; color: #6b7280; }
 .event-type { color: #6b7280; }
 .date-text, .amount-text { color: #1f2937; font-weight: 500; }
 
 .badge { display: inline-flex; align-items: center; padding: 0.375rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-.badge-warning { background: #fef3c7; color: #92400e; }
-.badge-success { background: #d1fae5; color: #065f46; }
-.badge-info { background: #dbeafe; color: #1e40af; }
-.badge-purple { background: #e9d5ff; color: #6b21a8; }
-.badge-danger { background: #fee2e2; color: #991b1b; }
+.badge-warning { background: var(--admin-warning-light); color: var(--admin-warning-text); }
+.badge-success { background: var(--admin-success-light); color: var(--admin-success-text); }
+.badge-info { background: var(--admin-info-light); color: var(--admin-info-text); }
+.badge-purple { background: var(--admin-info-light); color: var(--admin-info-text); }
+.badge-danger { background: var(--admin-danger-light); color: var(--admin-danger-text); }
 .badge-gray { background: #f3f4f6; color: #6b7280; }
 
 .action-buttons { display: flex; gap: 0.5rem; }
 .btn-action { width: 2rem; height: 2rem; border: 1px solid #e5e7eb; background: white; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #6b7280; transition: all 0.2s; }
-.btn-action:hover { background: #f9fafb; border-color: #6c0b1a; color: #6c0b1a; }
+.btn-action:hover { background: #f9fafb; border-color: var(--admin-brand-primary); color: var(--admin-brand-primary); }
 
 .empty-state { text-align: center; padding: 4rem 2rem; color: #9ca3af; }
 .empty-icon { font-size: 5rem; margin-bottom: 1rem; opacity: 0.5; }
@@ -467,7 +493,7 @@ onMounted(() => {
 .detail-value { color: #1f2937; }
 .detail-notes { color: #6b7280; line-height: 1.6; background: #f9fafb; padding: 1rem; border-radius: 0.5rem; }
 
-.toast { position: fixed; bottom: 2rem; right: 2rem; background: #065f46; color: white; padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); animation: slideIn 0.3s ease-out; z-index: 1001; }
+.toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--admin-success); color: white; padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); animation: slideIn 0.3s ease-out; z-index: 1001; }
 @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
 .w-4 { width: 1rem; }

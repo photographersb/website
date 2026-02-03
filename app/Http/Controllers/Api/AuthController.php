@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 use App\Models\User;
 use App\Models\Photographer;
+use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -11,6 +15,7 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    use ApiResponse;
     /**
      * Register new user
      */
@@ -50,18 +55,14 @@ class AuthController extends Controller
         try {
             $user->sendEmailVerificationNotification();
         } catch (\Exception $e) {
-            \Log::error('Email verification failed: ' . $e->getMessage());
+            Log::error('Email verification failed: ' . $e->getMessage());
             // Continue registration even if email fails
         }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Registration successful. Please check your email to verify your account.',
-            'data' => [
-                'user_id' => $user->id,
-                'email' => $user->email,
-            ],
-        ], 201);
+        return $this->created([
+            'user_id' => $user->id,
+            'email' => $user->email,
+        ], 'Registration successful. Please check your email to verify your account.');
     }
 
     /**
@@ -84,19 +85,21 @@ class AuthController extends Controller
 
         // Check if email is verified
         if (!$user->hasVerifiedEmail()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Please verify your email before logging in. Check your inbox for verification link.',
-                'code' => 'EMAIL_NOT_VERIFIED',
-            ], 403);
+            return $this->error('Please verify your email before logging in. Check your inbox for verification link.', 403);
+        }
+
+        // Check if account is approved
+        if ($user->approval_status === 'pending') {
+            return $this->error('Your account is pending admin approval. You will receive an email once approved.', 403);
+        }
+
+        if ($user->approval_status === 'rejected') {
+            return $this->error('Your account registration was rejected. Reason: ' . ($user->rejection_reason ?? 'Not specified'), 403);
         }
 
         // Check if account is suspended
         if ($user->is_suspended) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Your account has been suspended',
-            ], 403);
+            return $this->error('Your account has been suspended', 403);
         }
 
         // Update last login
@@ -125,14 +128,10 @@ class AuthController extends Controller
         // Check if user is also a judge
         $isJudge = $user->isJudge();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Login successful',
-            'data' => [
-                'user' => array_merge($user->toArray(), ['is_judge' => $isJudge]),
-                'token' => $token,
-            ],
-        ]);
+        return $this->success([
+            'user' => array_merge($user->toArray(), ['is_judge' => $isJudge]),
+            'token' => $token,
+        ], 'Login successful');
     }
 
     /**
@@ -142,10 +141,7 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Logged out successfully',
-        ]);
+        return $this->success([], 'Logged out successfully');
     }
 
     /**
@@ -159,10 +155,7 @@ class AuthController extends Controller
             $user->load('photographer');
         }
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $user,
-        ]);
+        return $this->success($user, 'User data retrieved successfully');
     }
 
     /**
@@ -179,25 +172,16 @@ class AuthController extends Controller
 
         // Verify hash
         if (!hash_equals((string) $validated['hash'], sha1($user->getEmailForVerification()))) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Invalid verification link',
-            ], 403);
+            return $this->error('Invalid verification link', 403);
         }
 
         if ($user->hasVerifiedEmail()) {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Email already verified',
-            ]);
+            return $this->success([], 'Email already verified');
         }
 
         $user->markEmailAsVerified();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Email verified successfully. You can now log in.',
-        ]);
+        return $this->success([], 'Email verified successfully. You can now log in.');
     }
 
     /**
@@ -212,23 +196,14 @@ class AuthController extends Controller
         $user = User::where('email', $validated['email'])->first();
 
         if ($user->hasVerifiedEmail()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Email already verified',
-            ], 400);
+            return $this->error('Email already verified', 400);
         }
 
         try {
             $user->sendEmailVerificationNotification();
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Verification email sent successfully',
-            ]);
+            return $this->success([], 'Verification email sent successfully');
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to send verification email',
-            ], 500);
+            return $this->error('Failed to send verification email', 500);
         }
     }
 
@@ -243,10 +218,7 @@ class AuthController extends Controller
 
         // TODO: Generate reset token and send email
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Password reset link sent to email',
-        ]);
+        return $this->success([], 'Password reset link sent to email');
     }
 
     /**
@@ -265,9 +237,123 @@ class AuthController extends Controller
         $user = User::where('email', $validated['email'])->first();
         $user->update(['password' => Hash::make($validated['password'])]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Password reset successfully',
+        return $this->success([], 'Password reset successfully');
+    }
+
+    /**
+     * Send OTP to phone number (Bangladesh format: +8801XXXXXXXXX)
+     */
+    public function sendPhoneOtp(Request $request)
+    {
+        $validated = $request->validate([
+            'phone' => 'required|regex:/^\+88\d{10}$/', // Bangladesh phone format
         ]);
+
+        $phone = $validated['phone'];
+
+        // Generate 6-digit OTP
+        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        // Store OTP in cache with 5-minute expiry
+        \Illuminate\Support\Facades\Cache::put("phone_otp_{$phone}", $otp, now()->addMinutes(5));
+
+        // TODO: Send OTP via Twilio
+        // For now, log to console in development
+        if (app()->environment('local')) {
+            Log::info("Phone OTP for {$phone}: {$otp}");
+        }
+
+        return $this->success([
+            'phone' => $phone,
+            'expires_in_seconds' => 300
+        ], 'OTP sent to your phone number');
+    }
+
+    /**
+     * Verify phone OTP
+     */
+    public function verifyPhoneOtp(Request $request)
+    {
+        $validated = $request->validate([
+            'phone' => 'required|regex:/^\+88\d{10}$/',
+            'otp' => 'required|numeric|digits:6',
+        ]);
+
+        $phone = $validated['phone'];
+        $otp = $validated['otp'];
+
+        // Get stored OTP from cache
+        $storedOtp = \Illuminate\Support\Facades\Cache::get("phone_otp_{$phone}");
+
+        // Check if OTP exists and matches
+        if (!$storedOtp || $storedOtp !== $otp) {
+            return $this->validationError(['otp' => ['Invalid or expired OTP']], 'Invalid or expired OTP');
+        }
+
+        // Find or update user
+        $user = null;
+        if (Auth::check()) {
+            // If user is logged in, mark their phone as verified
+            $user = Auth::user();
+            $user->update([
+                'phone_verified_at' => now(),
+            ]);
+        } else {
+            // Find user by phone
+            $user = User::where('phone', $phone)->first();
+            if ($user) {
+                $user->update([
+                    'phone_verified_at' => now(),
+                ]);
+            }
+        }
+
+        // Delete used OTP
+        \Illuminate\Support\Facades\Cache::forget("phone_otp_{$phone}");
+
+        return $this->success([
+            'phone' => $phone,
+            'verified_at' => now()->toDateTimeString(),
+            'user' => $user ? [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone_verified_at' => $user->phone_verified_at
+            ] : null
+        ], 'Phone number verified successfully');
+    }
+
+    /**
+     * Resend OTP to phone
+     */
+    public function resendPhoneOtp(Request $request)
+    {
+        $validated = $request->validate([
+            'phone' => 'required|regex:/^\+88\d{10}$/',
+        ]);
+
+        $phone = $validated['phone'];
+
+        // Check if user already requested OTP recently (rate limit: 1 per minute)
+        $lastAttempt = \Illuminate\Support\Facades\Cache::get("phone_otp_attempt_{$phone}");
+        if ($lastAttempt) {
+            return $this->error('Please wait before requesting another OTP', 429);
+        }
+
+        // Generate new OTP
+        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        // Store OTP and attempt tracker
+        \Illuminate\Support\Facades\Cache::put("phone_otp_{$phone}", $otp, now()->addMinutes(5));
+        \Illuminate\Support\Facades\Cache::put("phone_otp_attempt_{$phone}", true, now()->addMinute());
+
+        if (app()->environment('local')) {
+            Log::info("Resent Phone OTP for {$phone}: {$otp}");
+        }
+
+        return $this->success([
+            'phone' => $phone,
+            'expires_in_seconds' => 300
+        ], 'OTP resent to your phone number');
     }
 }

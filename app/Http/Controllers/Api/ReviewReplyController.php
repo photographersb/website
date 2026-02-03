@@ -5,29 +5,25 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Review;
 use App\Models\ReviewReply;
+use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ReviewReplyController extends Controller
 {
+    use ApiResponse;
     public function store(Request $request, $reviewId)
     {
         $review = Review::with('booking')->findOrFail($reviewId);
 
         // Check if authenticated user is the photographer for this review
         if ($request->user()->photographer->id !== $review->photographer_id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized to reply to this review'
-            ], 403);
+            return $this->unauthorized('Unauthorized to reply to this review');
         }
 
         // Check if reply already exists
         if ($review->reply) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'You have already replied to this review'
-            ], 400);
+            return $this->error('You have already replied to this review', 400);
         }
 
         $validator = Validator::make($request->all(), [
@@ -35,11 +31,7 @@ class ReviewReplyController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
+            return $this->validationError($validator->errors(), 'Validation failed');
         }
 
         $reviewReply = ReviewReply::create([
@@ -50,11 +42,7 @@ class ReviewReplyController extends Controller
         // Notify the client about the reply
         $review->booking->user->notify(new \App\Notifications\ReviewReplyReceived($reviewReply));
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Reply posted successfully',
-            'data' => $reviewReply
-        ], 201);
+        return $this->created($reviewReply, 'Reply posted successfully');
     }
 
     public function update(Request $request, $id)
@@ -63,10 +51,7 @@ class ReviewReplyController extends Controller
 
         // Check authorization
         if ($request->user()->photographer->id !== $reviewReply->review->photographer_id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized'
-            ], 403);
+            return $this->unauthorized('Unauthorized');
         }
 
         $validator = Validator::make($request->all(), [
@@ -74,21 +59,14 @@ class ReviewReplyController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'errors' => $validator->errors()
-            ], 422);
+            return $this->validationError($validator->errors(), 'Validation failed');
         }
 
         $reviewReply->update([
             'reply' => $request->reply,
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Reply updated successfully',
-            'data' => $reviewReply
-        ]);
+        return $this->success($reviewReply, 'Reply updated successfully');
     }
 
     public function destroy(Request $request, $id)
@@ -97,17 +75,11 @@ class ReviewReplyController extends Controller
 
         // Check authorization
         if ($request->user()->photographer->id !== $reviewReply->review->photographer_id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized'
-            ], 403);
+            return $this->unauthorized('Unauthorized');
         }
 
         $reviewReply->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Reply deleted successfully'
-        ]);
+        return $this->success([], 'Reply deleted successfully');
     }
 }

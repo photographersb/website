@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Competition;
 use Illuminate\Http\Request;
 
 class AdminCompetitionApiController extends Controller
 {
+    use ApiResponse;
     /**
      * Get all competitions for admin
      */
@@ -54,10 +56,15 @@ class AdminCompetitionApiController extends Controller
             'completed' => Competition::where('status', 'completed')->count(),
         ];
 
-        return response()->json([
-            'competitions' => $competitions,
-            'stats' => $stats,
+        return $this->success([
+            'competitions' => $competitions->items(),
             'filters' => $request->only(['search', 'status', 'date_filter']),
+        ], 'Competitions retrieved successfully', 200, [
+            'stats' => $stats,
+            'total' => $competitions->total(),
+            'per_page' => $competitions->perPage(),
+            'current_page' => $competitions->currentPage(),
+            'last_page' => $competitions->lastPage(),
         ]);
     }
 
@@ -68,7 +75,7 @@ class AdminCompetitionApiController extends Controller
     {
         $competition = Competition::with(['admin', 'organizer'])->findOrFail($id);
         
-        return response()->json(['competition' => $competition]);
+        return $this->success($competition, 'Competition retrieved successfully');
     }
 
     /**
@@ -76,11 +83,17 @@ class AdminCompetitionApiController extends Controller
      */
     public function store(Request $request)
     {
+        // Check authorization - only admins can create competitions
+        if (!in_array(auth()->user()->role, ['admin', 'super_admin'])) {
+            return $this->unauthorized('This action is unauthorized.');
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:competitions,slug',
             'theme' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'category_id' => 'nullable|exists:photography_categories,id',
             'hero_image' => 'nullable|url',
             'banner_image' => 'nullable|url',
             'submission_deadline' => 'required|date|after:now',
@@ -94,6 +107,8 @@ class AdminCompetitionApiController extends Controller
             'participation_fee' => 'nullable|numeric|min:0',
             'is_paid_competition' => 'boolean',
             'max_submissions_per_user' => 'required|integer|min:1|max:10',
+            'rules' => 'nullable|string',
+            'terms_and_conditions' => 'nullable|string',
             'allow_public_voting' => 'boolean',
             'allow_judge_scoring' => 'boolean',
             'allow_watermark' => 'boolean',
@@ -101,6 +116,15 @@ class AdminCompetitionApiController extends Controller
             'is_public' => 'boolean',
             'is_featured' => 'boolean',
             'status' => 'required|in:draft,active,judging,completed,cancelled',
+            'prizes' => 'nullable|array',
+            'prizes.*.rank' => 'nullable|string|max:50',
+            'prizes.*.type' => 'nullable|string|max:50',
+            'prizes.*.amount' => 'nullable|numeric|min:0',
+            'prizes.*.description' => 'nullable|string|max:255',
+            'sponsor_ids' => 'nullable|array',
+            'sponsor_ids.*' => 'exists:sponsors,id',
+            'judge_ids' => 'nullable|array',
+            'judge_ids.*' => 'exists:users,id',
         ]);
 
         // Auto-generate slug if not provided
@@ -120,13 +144,36 @@ class AdminCompetitionApiController extends Controller
         $validated['admin_id'] = auth()->id();
         $validated['organizer_id'] = $request->organizer_id ?? null;
 
-        $competition = Competition::create($validated);
+        // Store sponsors and judges for later attachment
+        $sponsorIds = $validated['sponsor_ids'] ?? [];
+        $judgeIds = $validated['judge_ids'] ?? [];
+        
+        // Remove these from validated to avoid mass assignment errors
+        unset($validated['sponsor_ids']);
+        unset($validated['judge_ids']);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Competition created successfully',
-            'competition' => $competition,
-        ], 201);
+        try {
+            \DB::beginTransaction();
+
+            $competition = Competition::create($validated);
+
+            // Attach sponsors if provided
+            if (!empty($sponsorIds)) {
+                $competition->sponsorRecords()->attach($sponsorIds);
+            }
+
+            // Attach judges if provided
+            if (!empty($judgeIds)) {
+                $competition->judgeUsers()->attach($judgeIds);
+            }
+
+            \DB::commit();
+
+            return $this->created($competition->load(['sponsorRecords', 'judgeUsers']), 'Competition created successfully');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return $this->validationError([], 'Error creating competition: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -134,6 +181,11 @@ class AdminCompetitionApiController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // Check authorization - only admins can update competitions
+        if (!in_array(auth()->user()->role, ['admin', 'super_admin'])) {
+            return $this->unauthorized('This action is unauthorized.');
+        }
+
         $competition = Competition::findOrFail($id);
 
         $validated = $request->validate([
@@ -141,6 +193,7 @@ class AdminCompetitionApiController extends Controller
             'slug' => 'nullable|string|max:255|unique:competitions,slug,' . $id,
             'theme' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
+            'category_id' => 'nullable|exists:photography_categories,id',
             'hero_image' => 'nullable|url',
             'banner_image' => 'nullable|url',
             'submission_deadline' => 'sometimes|required|date',
@@ -154,6 +207,8 @@ class AdminCompetitionApiController extends Controller
             'participation_fee' => 'nullable|numeric|min:0',
             'is_paid_competition' => 'boolean',
             'max_submissions_per_user' => 'sometimes|required|integer|min:1|max:10',
+            'rules' => 'nullable|string',
+            'terms_and_conditions' => 'nullable|string',
             'allow_public_voting' => 'boolean',
             'allow_judge_scoring' => 'boolean',
             'allow_watermark' => 'boolean',
@@ -161,15 +216,47 @@ class AdminCompetitionApiController extends Controller
             'is_public' => 'boolean',
             'is_featured' => 'boolean',
             'status' => 'sometimes|required|in:draft,active,judging,completed,cancelled',
+            'prizes' => 'nullable|array',
+            'prizes.*.rank' => 'nullable|string|max:50',
+            'prizes.*.type' => 'nullable|string|max:50',
+            'prizes.*.amount' => 'nullable|numeric|min:0',
+            'prizes.*.description' => 'nullable|string|max:255',
+            'sponsor_ids' => 'nullable|array',
+            'sponsor_ids.*' => 'exists:sponsors,id',
+            'judge_ids' => 'nullable|array',
+            'judge_ids.*' => 'exists:users,id',
         ]);
 
-        $competition->update($validated);
+        // Store sponsors and judges for later attachment
+        $sponsorIds = $validated['sponsor_ids'] ?? null;
+        $judgeIds = $validated['judge_ids'] ?? null;
+        
+        // Remove these from validated to avoid mass assignment errors
+        unset($validated['sponsor_ids']);
+        unset($validated['judge_ids']);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Competition updated successfully',
-            'competition' => $competition->fresh(),
-        ]);
+        try {
+            \DB::beginTransaction();
+
+            $competition->update($validated);
+
+            // Update sponsors if provided
+            if ($sponsorIds !== null) {
+                $competition->sponsorRecords()->sync($sponsorIds);
+            }
+
+            // Update judges if provided
+            if ($judgeIds !== null) {
+                $competition->judgeUsers()->sync($judgeIds);
+            }
+
+            \DB::commit();
+
+            return $this->success($competition->fresh()->load(['sponsorRecords', 'judgeUsers']), 'Competition updated successfully');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return $this->validationError([], 'Error updating competition: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -181,17 +268,11 @@ class AdminCompetitionApiController extends Controller
         
         // Check if competition has submissions
         if ($competition->total_submissions > 0) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Cannot delete competition with existing submissions. Archive it instead.',
-            ], 422);
+            return $this->validationError(['competition' => 'Cannot delete competition with existing submissions. Archive it instead.'], 'Validation failed');
         }
 
         $competition->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Competition deleted successfully',
-        ]);
+        return $this->success([], 'Competition deleted successfully');
     }
 }

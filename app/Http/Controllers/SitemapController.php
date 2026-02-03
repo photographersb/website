@@ -43,6 +43,10 @@ class SitemapController extends Controller
         $urls = [
             ['loc' => url('/'), 'changefreq' => 'daily', 'priority' => '1.0'],
             ['loc' => url('/photographers'), 'changefreq' => 'daily', 'priority' => '0.9'],
+            ['loc' => url('/categories'), 'changefreq' => 'weekly', 'priority' => '0.8'],
+            ['loc' => url('/locations'), 'changefreq' => 'weekly', 'priority' => '0.8'],
+            ['loc' => url('/photographers/by-category'), 'changefreq' => 'weekly', 'priority' => '0.7'],
+            ['loc' => url('/photographers/by-location'), 'changefreq' => 'weekly', 'priority' => '0.7'],
             ['loc' => url('/events'), 'changefreq' => 'daily', 'priority' => '0.8'],
             ['loc' => url('/competitions'), 'changefreq' => 'daily', 'priority' => '0.8'],
             ['loc' => url('/about'), 'changefreq' => 'monthly', 'priority' => '0.5'],
@@ -114,7 +118,7 @@ class SitemapController extends Controller
 
         $urls = $cities->map(function ($city) {
             return [
-                'loc' => url("/{$city->slug}-photographers"),
+                'loc' => url('/photographers/by-location') . '?city=' . $city->slug,
                 'changefreq' => 'weekly',
                 'priority' => '0.9', // High priority for local SEO
             ];
@@ -131,7 +135,7 @@ class SitemapController extends Controller
         
         foreach ($categories as $category) {
             $urls[] = [
-                'loc' => url("/{$category->slug}-photographers"),
+                'loc' => url('/photographers/by-category') . '?category=' . $category->slug,
                 'changefreq' => 'weekly',
                 'priority' => '0.9',
             ];

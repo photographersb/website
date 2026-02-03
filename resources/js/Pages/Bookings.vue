@@ -15,7 +15,7 @@
             :class="[
               'px-4 py-2 rounded-lg transition-colors text-sm font-medium',
               filter === 'all'
-                ? 'bg-burgundy text-white'
+                ? 'btn-primary'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             ]"
           >
@@ -26,7 +26,7 @@
             :class="[
               'px-4 py-2 rounded-lg transition-colors text-sm font-medium',
               filter === 'pending'
-                ? 'bg-burgundy text-white'
+                ? 'btn-primary'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             ]"
           >
@@ -37,7 +37,7 @@
             :class="[
               'px-4 py-2 rounded-lg transition-colors text-sm font-medium',
               filter === 'confirmed'
-                ? 'bg-burgundy text-white'
+                ? 'btn-primary'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             ]"
           >
@@ -48,7 +48,7 @@
             :class="[
               'px-4 py-2 rounded-lg transition-colors text-sm font-medium',
               filter === 'completed'
-                ? 'bg-burgundy text-white'
+                ? 'btn-primary'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             ]"
           >
@@ -59,7 +59,7 @@
             :class="[
               'px-4 py-2 rounded-lg transition-colors text-sm font-medium',
               filter === 'cancelled'
-                ? 'bg-burgundy text-white'
+                ? 'btn-primary'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             ]"
           >
@@ -70,7 +70,7 @@
 
       <!-- Loading State -->
       <div v-if="loading" class="flex justify-center items-center py-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-burgundy"></div>
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style="border-bottom-color: var(--admin-brand-primary);"></div>
       </div>
 
       <!-- Bookings List -->
@@ -124,7 +124,7 @@
                   <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span class="font-semibold text-burgundy">৳{{ Number(booking.total_price).toLocaleString() }}</span>
+                  <span class="font-semibold" style="color: var(--admin-brand-primary);">৳{{ Number(booking.total_price).toLocaleString() }}</span>
                 </div>
               </div>
 
@@ -138,7 +138,7 @@
               <button
                 v-if="booking.status === 'completed' && !booking.review"
                 @click="writeReview(booking)"
-                class="px-4 py-2 bg-burgundy text-white rounded-lg hover:bg-burgundy-dark transition-colors text-sm font-medium"
+                class="btn-primary text-sm font-medium"
               >
                 Write Review
               </button>
@@ -155,6 +155,12 @@
               >
                 View Details
               </button>
+              <router-link
+                :to="`/bookings/${booking.id}/messages`"
+                class="px-4 py-2 bg-burgundy-100 text-burgundy-700 rounded-lg hover:bg-burgundy-200 transition-colors text-sm font-medium text-center"
+              >
+                Messages
+              </router-link>
               <router-link
                 :to="`/photographer/${booking.photographer?.slug || booking.photographer_id}`"
                 class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium text-center"
@@ -185,7 +191,7 @@
         <p class="text-gray-600 mb-4">You haven't made any bookings yet</p>
         <router-link
           to="/"
-          class="inline-block px-6 py-2 bg-burgundy text-white rounded-lg hover:bg-burgundy-dark transition-colors"
+          class="inline-block px-6 py-2 btn-primary transition-colors"
         >
           Find Photographers
         </router-link>
@@ -249,12 +255,10 @@ const capitalizeFirst = (str) => {
 const formatDate = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    weekday: 'short',
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
 };
 
 const writeReview = (booking) => {

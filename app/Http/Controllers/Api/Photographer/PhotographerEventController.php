@@ -3,19 +3,22 @@
 namespace App\Http\Controllers\Api\Photographer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Event;
 use App\Models\Photographer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class PhotographerEventController extends Controller
 {
+    use ApiResponse;
     /**
      * Check if user is a verified photographer
      */
     private function checkVerifiedPhotographer()
     {
-        $photographer = Photographer::where('user_id', auth()->id())->first();
+        $photographer = Photographer::where('user_id', Auth::id())->first();
 
         if (!$photographer) {
             abort(403, 'You must have a photographer profile to create events');
@@ -29,7 +32,7 @@ class PhotographerEventController extends Controller
      */
     public function index(Request $request)
     {
-        $photographer = Photographer::where('user_id', auth()->id())->first();
+        $photographer = Photographer::where('user_id', Auth::id())->first();
 
         if (!$photographer) {
             return response()->json([
@@ -149,6 +152,9 @@ class PhotographerEventController extends Controller
             ->where('organizer_id', $photographer->id)
             ->firstOrFail();
 
+        // Explicit authorization check
+        $this->authorize('update', $event);
+
         // Can only edit draft or upcoming events
         if ($event->status === 'cancelled' || ($event->event_date < now() && $event->status === 'published')) {
             return response()->json([
@@ -222,6 +228,9 @@ class PhotographerEventController extends Controller
             ->where('organizer_id', $photographer->id)
             ->firstOrFail();
 
+        // Explicit authorization check
+        $this->authorize('delete', $event);
+
         // Can only delete draft events or events with no RSVPs
         if ($event->status === 'published' && ($event->rsvp_count ?? 0) > 0) {
             return response()->json([
@@ -248,6 +257,9 @@ class PhotographerEventController extends Controller
         $event = Event::where('id', $id)
             ->where('organizer_id', $photographer->id)
             ->firstOrFail();
+
+        // Explicit authorization check
+        $this->authorize('delete', $event);
 
         if ($event->status === 'cancelled') {
             return response()->json([

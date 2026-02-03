@@ -1,20 +1,24 @@
 <template>
-  <div class="admin-audit-logs">
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">📝 Audit Logs</h1>
-        <p class="page-subtitle">Track all admin actions and system events</p>
-      </div>
-      <button @click="exportLogs" class="btn-export-main">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        Export Logs
-      </button>
-    </div>
+  <div class="min-h-screen bg-gray-50">
+    <AdminHeader 
+      title="📝 Audit Logs" 
+      subtitle="Track all admin actions and system events"
+    />
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <AdminQuickNav />
+
+      <div class="flex justify-end">
+        <button @click="exportLogs" class="px-4 py-2 bg-burgundy text-white rounded-lg hover:bg-burgundy-dark flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Export Logs
+        </button>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
       <div class="stat-card stat-blue">
         <div class="stat-icon">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,11 +155,14 @@
 
     <!-- Toast -->
     <div v-if="showToast" class="toast">{{ toastMessage }}</div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import AdminHeader from '../../../components/AdminHeader.vue'
+import AdminQuickNav from '../../../components/AdminQuickNav.vue'
 
 const logs = ref([])
 const loading = ref(false)
@@ -280,25 +287,25 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.admin-audit-logs { padding: 2rem; min-height: 100vh; background: #f9fafb; }
+.admin-audit-logs { padding: 2rem; min-height: 100vh; background: var(--admin-bg-page); }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
 .page-title { font-size: 2rem; font-weight: 700; color: #1f2937; margin: 0; }
 .page-subtitle { color: #6b7280; margin: 0.5rem 0 0 0; }
 
-.btn-export-main { display: flex; align-items: center; background: #6c0b1a; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: background 0.2s; }
-.btn-export-main:hover { background: #4a070f; }
+.btn-export-main { display: flex; align-items: center; background: var(--admin-brand-primary); color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+.btn-export-main:hover { background: var(--admin-brand-primary-dark); }
 
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
 .stat-card { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 1rem; border-left: 4px solid; }
-.stat-blue { border-color: #3b82f6; }
-.stat-green { border-color: #10b981; }
-.stat-yellow { border-color: #f59e0b; }
-.stat-purple { border-color: #8b5cf6; }
+.stat-blue { border-color: var(--admin-brand-primary); }
+.stat-green { border-color: var(--admin-brand-primary); }
+.stat-yellow { border-color: var(--admin-brand-primary); }
+.stat-purple { border-color: var(--admin-brand-primary); }
 .stat-icon { width: 3rem; height: 3rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; }
-.stat-blue .stat-icon { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-.stat-green .stat-icon { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-.stat-yellow .stat-icon { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
-.stat-purple .stat-icon { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+.stat-blue .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-green .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-yellow .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
+.stat-purple .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
 .stat-content { flex: 1; }
 .stat-label { display: block; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem; }
 .stat-value { display: block; font-size: 2rem; font-weight: 700; color: #1f2937; }
@@ -308,23 +315,23 @@ onMounted(() => {
 .search-box { position: relative; flex: 1; min-width: 300px; }
 .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); width: 1.25rem; height: 1.25rem; color: #9ca3af; }
 .search-input { width: 100%; padding: 0.75rem 1rem 0.75rem 3rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; }
-.search-input:focus { outline: none; border-color: #6c0b1a; box-shadow: 0 0 0 3px rgba(108, 11, 26, 0.1); }
+.search-input:focus { outline: none; border-color: var(--admin-brand-primary); box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.12); }
 .filter-select, .filter-input { padding: 0.75rem 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; cursor: pointer; }
-.filter-select:focus, .filter-input:focus { outline: none; border-color: #6c0b1a; }
+.filter-select:focus, .filter-input:focus { outline: none; border-color: var(--admin-brand-primary); }
 
 .loading-state { text-align: center; padding: 3rem; color: #6b7280; }
-.spinner { width: 3rem; height: 3rem; border: 3px solid #e5e7eb; border-top-color: #6c0b1a; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+.spinner { width: 3rem; height: 3rem; border: 3px solid #e5e7eb; border-top-color: var(--admin-brand-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .logs-timeline { position: relative; }
 .log-entry { display: grid; grid-template-columns: 2.5rem 1fr; gap: 1rem; margin-bottom: 1.5rem; }
 .log-timeline-marker { position: relative; display: flex; flex-direction: column; align-items: center; }
 .log-icon { width: 2.5rem; height: 2.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; z-index: 1; }
-.log-icon-green { background: #10b981; }
-.log-icon-blue { background: #3b82f6; }
-.log-icon-red { background: #ef4444; }
-.log-icon-purple { background: #8b5cf6; }
-.log-icon-orange { background: #f59e0b; }
+.log-icon-green { background: var(--admin-success); }
+.log-icon-blue { background: var(--admin-brand-primary); }
+.log-icon-red { background: var(--admin-danger); }
+.log-icon-purple { background: var(--admin-brand-primary); }
+.log-icon-orange { background: var(--admin-warning); }
 .log-icon-gray { background: #6b7280; }
 .log-timeline-line { width: 2px; height: 100%; background: #e5e7eb; flex: 1; margin-top: 0.5rem; }
 
@@ -333,12 +340,12 @@ onMounted(() => {
 .log-info { display: flex; align-items: center; gap: 0.75rem; }
 .log-user { font-weight: 600; color: #1f2937; }
 .log-action { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-.badge-green { background: #d1fae5; color: #065f46; }
-.badge-blue { background: #dbeafe; color: #1e40af; }
-.badge-red { background: #fee2e2; color: #991b1b; }
-.badge-purple { background: #e9d5ff; color: #6b21a8; }
-.badge-orange { background: #ffedd5; color: #c2410c; }
-.badge-gray { background: #f3f4f6; color: #6b7280; }
+.badge-green { background: var(--admin-success-light); color: var(--admin-success-text); }
+.badge-blue { background: var(--admin-info-light); color: var(--admin-info-text); }
+.badge-red { background: var(--admin-danger-light); color: var(--admin-danger-text); }
+.badge-purple { background: var(--admin-info-light); color: var(--admin-info-text); }
+.badge-orange { background: var(--admin-warning-light); color: var(--admin-warning-text); }
+.badge-gray { background: var(--admin-bg-hover); color: var(--admin-text-secondary); }
 .log-time { font-size: 0.875rem; color: #6b7280; }
 .log-description { color: #1f2937; margin: 0; line-height: 1.5; }
 .log-metadata { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb; }

@@ -3,21 +3,50 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CompetitionStoreRequest;
+use App\Http\Requests\CompetitionUpdateRequest;
+use App\Http\Traits\ApiResponse;
 use App\Models\Competition;
+use App\Models\CompetitionJudge;
+use App\Models\Judge;
+use App\Models\Sponsor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 
 class AdminCompetitionApiController extends Controller
 {
+    use ApiResponse;
+    /**
+     * Create the controller instance.
+     */
+    public function __construct()
+    {
+        // Check admin authorization for all methods in this controller
+        $this->middleware(function ($request, $next) {
+            if (!Auth::check()) {
+                return $this->unauthorized('Unauthenticated');
+            }
+
+            $user = Auth::user();
+            // Allow admin, super_admin, and moderator roles
+            if (!in_array($user->role ?? null, ['admin', 'super_admin', 'moderator'])) {
+                return $this->unauthorized('Unauthorized. Admin access required.');
+            }
+
+            return $next($request);
+        });
+    }
+
     /**
      * Get all competitions (admin view)
      */
     public function index(Request $request)
     {
-        $query = Competition::with(['category'])->withCount('submissions');
+        $query = Competition::with(['prizes', 'sponsorRecords', 'category'])
+            ->withCount('submissions');
 
         // Filter by status
         if ($request->has('status')) {
@@ -25,8 +54,13 @@ class AdminCompetitionApiController extends Controller
         }
 
         // Filter by category
-        if ($request->has('category_id')) {
+        if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
+        }
+
+        // Filter by featured
+        if ($request->filled('featured')) {
+            $query->where('is_featured', filter_var($request->featured, FILTER_VALIDATE_BOOLEAN));
         }
 
         // Search
@@ -34,6 +68,8 @@ class AdminCompetitionApiController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%")
+                  ->orWhere('theme', 'like', "%{$search}%")
                   ->orWhere('description', 'like', "%{$search}%");
             });
         }
@@ -43,30 +79,62 @@ class AdminCompetitionApiController extends Controller
         $sortDirection = $request->get('sort_direction', 'desc');
         $query->orderBy($sortField, $sortDirection);
 
-        $competitions = $query->paginate(20);
-        
-        // Calculate stats
-        $allCompetitions = Competition::all();
+        $competitions = $query->paginate($request->get('per_page', 20));
+
+        $statsScope = $request->get('stats_scope', 'all');
+        $baseStatsQuery = $statsScope === 'dashboard'
+            ? Competition::published()
+            : Competition::query();
+
+        $baseIds = $baseStatsQuery->pluck('id');
+
+        // Calculate stats using shared scopes
         $stats = [
-            'total' => $allCompetitions->count(),
-            'active' => $allCompetitions->where('status', 'active')->count(),
-            'upcoming' => $allCompetitions->where('status', 'upcoming')->count(),
-            'completed' => $allCompetitions->where('status', 'completed')->count(),
-            'totalSubmissions' => DB::table('competition_submissions')->count(),
-            'totalParticipants' => DB::table('competition_submissions')->distinct('photographer_id')->count(),
-            'totalPrizePool' => $allCompetitions->sum('prize_pool'),
+            'total' => (clone $baseStatsQuery)->count(),
+            'active' => Competition::active()->count(),
+            'upcoming' => Competition::upcoming()->count(),
+            'completed' => Competition::completed()->count(),
+            'draft' => Competition::where('status', 'draft')->count(),
+            'archived' => Competition::where('status', 'archived')->count(),
+            'featured' => (clone $baseStatsQuery)->where('is_featured', true)->count(),
+            'totalSubmissions' => DB::table('competition_submissions')
+                ->whereIn('competition_id', $baseIds)
+                ->count(),
+            'totalParticipants' => DB::table('competition_submissions')
+                ->whereIn('competition_id', $baseIds)
+                ->distinct('photographer_id')
+                ->count('photographer_id'),
+            'totalPrizePool' => DB::table('competition_prizes')
+                ->whereIn('competition_id', $baseIds)
+                ->sum('cash_amount'),
+            'pendingSubmissions' => DB::table('competition_submissions')
+                ->whereIn('competition_id', $baseIds)
+                ->where('status', 'pending')
+                ->count(),
         ];
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $competitions->items(),
+        $lists = [
+            'active' => Competition::active()
+                ->orderBy('submission_deadline')
+                ->limit(6)
+                ->get(['id', 'title', 'status', 'submission_deadline', 'published_at']),
+            'upcoming' => Competition::upcoming()
+                ->orderBy('published_at')
+                ->limit(6)
+                ->get(['id', 'title', 'status', 'submission_deadline', 'published_at']),
+            'completed' => Competition::completed()
+                ->orderByDesc('submission_deadline')
+                ->limit(6)
+                ->get(['id', 'title', 'status', 'submission_deadline', 'published_at']),
+        ];
+
+        return $this->success($competitions->items(), 'Competitions retrieved successfully', 200, [
             'stats' => $stats,
-            'meta' => [
-                'total' => $competitions->total(),
-                'per_page' => $competitions->perPage(),
-                'current_page' => $competitions->currentPage(),
-                'last_page' => $competitions->lastPage(),
-            ],
+            'lists' => $lists,
+            'total' => $competitions->total(),
+            'per_page' => $competitions->perPage(),
+            'current_page' => $competitions->currentPage(),
+            'last_page' => $competitions->lastPage(),
         ]);
     }
 
@@ -75,99 +143,87 @@ class AdminCompetitionApiController extends Controller
      */
     public function show($id)
     {
-        $competition = Competition::with(['category', 'submissions', 'judges'])
+        $competition = Competition::with(['prizes', 'sponsorRecords', 'category', 'judges.judge', 'judges.judgeProfile'])
             ->withCount('submissions')
             ->findOrFail($id);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $competition,
-        ]);
+        return $this->success($competition, 'Competition retrieved successfully');
     }
 
     /**
      * Create new competition
      */
-    public function store(Request $request)
+    public function store(CompetitionStoreRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'nullable|string|unique:competitions,slug',
-            'description' => 'nullable|string',
-            'theme' => 'nullable|string|max:255',
-            'category_id' => 'nullable|exists:categories,id',
-            'submission_start' => 'required|date',
-            'submission_deadline' => 'required|date|after:submission_start',
-            'voting_start' => 'required|date|after:submission_deadline',
-            'voting_end' => 'required|date|after:voting_start',
-            'announcement_date' => 'required|date|after:voting_end',
-            'total_prize_pool' => 'nullable|numeric|min:0',
-            'max_submissions_per_user' => 'required|integer|min:1|max:10',
-            'rules' => 'nullable|string',
-            'terms_and_conditions' => 'nullable|string',
-            'status' => 'required|in:draft,published,closed',
-            'is_featured' => 'boolean',
-            'prizes' => 'nullable|array',
-            'prizes.*.rank' => 'required|string',
-            'prizes.*.title' => 'required|string',
-            'prizes.*.description' => 'nullable|string',
-            'prizes.*.cash_amount' => 'nullable|numeric|min:0',
-            'prizes.*.physical_prizes' => 'nullable|string',
-            'prizes.*.display_order' => 'nullable|integer|min:0',
-            'sponsors' => 'nullable|array',
-            'sponsors.*.name' => 'required|string',
-            'sponsors.*.tier' => 'required|in:platinum,gold,silver,bronze',
-            'sponsors.*.logo_url' => 'nullable|url',
-            'sponsors.*.website_url' => 'nullable|url',
-            'sponsors.*.description' => 'nullable|string',
-            'sponsors.*.contribution_amount' => 'nullable|numeric|min:0',
-            'sponsors.*.display_order' => 'nullable|integer|min:0',
-        ]);
+        $validated = $request->validated();
 
-        // Auto-generate slug if not provided
-        if (empty($validated['slug'])) {
-            $validated['slug'] = \Illuminate\Support\Str::slug($validated['title']);
-            
-            // Ensure uniqueness
-            $originalSlug = $validated['slug'];
-            $counter = 1;
-            while (Competition::where('slug', $validated['slug'])->exists()) {
-                $validated['slug'] = $originalSlug . '-' . $counter;
-                $counter++;
-            }
-        }
-
-        // Set admin_id
-        $validated['admin_id'] = auth()->id();
-
-        // Map status for database
-        $statusMap = [
-            'draft' => 'draft',
-            'published' => 'active',
-            'closed' => 'completed',
-        ];
-        $validated['status'] = $statusMap[$validated['status']] ?? 'draft';
-
-        // Extract prizes and sponsors before creating competition
+        // Extract nested data
         $prizes = $validated['prizes'] ?? [];
-        $sponsors = $validated['sponsors'] ?? [];
-        unset($validated['prizes'], $validated['sponsors']);
+        $sponsorIds = $validated['sponsor_ids'] ?? [];
+        $judgeIds = $validated['judge_ids'] ?? [];
+        unset($validated['prizes'], $validated['sponsor_ids'], $validated['judge_ids']);
+
+        $validated['admin_id'] = Auth::id();
 
         try {
-            $competition = DB::transaction(function () use ($validated, $prizes, $sponsors) {
+            $competition = DB::transaction(function () use ($validated, $prizes, $sponsorIds, $judgeIds) {
                 $competition = Competition::create($validated);
 
                 // Create prizes
                 if (!empty($prizes)) {
                     foreach ($prizes as $prize) {
-                        $competition->prizes()->create($prize);
+                        $rank = $prize['position'] ?? 'Prize';
+                        $title = $prize['title'] ?? $rank . ' Place';
+                        
+                        $competition->prizes()->create([
+                            'rank' => $rank,
+                            'title' => $title,
+                            'cash_amount' => $prize['amount'] ?? 0,
+                            'description' => $prize['description'] ?? null,
+                        ]);
                     }
                 }
 
-                // Create sponsors
-                if (!empty($sponsors)) {
-                    foreach ($sponsors as $sponsor) {
-                        $competition->sponsors()->create($sponsor);
+                // Sync sponsors from platform sponsors
+                if (!empty($sponsorIds)) {
+                    $sponsors = Sponsor::whereIn('id', $sponsorIds)->get()->keyBy('id');
+                    $syncData = [];
+                    foreach ($sponsorIds as $index => $sponsorId) {
+                        $sponsor = $sponsors->get($sponsorId);
+                        if ($sponsor) {
+                            $syncData[$sponsorId] = [
+                                'name' => $sponsor->name,
+                                'logo_url' => $sponsor->logo,
+                                'website_url' => $sponsor->website,
+                                'description' => $sponsor->description,
+                                'tier' => 'bronze',
+                                'contribution_amount' => null,
+                                'display_order' => $index,
+                                'is_active' => true,
+                            ];
+                        }
+                    }
+                    if (!empty($syncData)) {
+                        $competition->sponsorRecords()->sync($syncData);
+                    }
+                }
+
+                // Assign judges
+                if (!empty($judgeIds)) {
+                    // Fetch judges and get their user_ids
+                    $judgeProfiles = Judge::whereIn('id', $judgeIds)->get();
+                    
+                    foreach ($judgeProfiles as $index => $profile) {
+                        $competition->judges()->create([
+                            'judge_id' => $profile->user_id,
+                            'judge_profile_id' => $profile->id,
+                            'role' => 'judge',
+                            'bio' => $profile->bio,
+                            'expertise' => null,
+                            'is_active' => true,
+                            'sort_order' => $index,
+                            'assigned_at' => now(),
+                        ]);
                     }
                 }
 
@@ -177,79 +233,119 @@ class AdminCompetitionApiController extends Controller
             Log::info('Competition created successfully', [
                 'competition_id' => $competition->id,
                 'title' => $competition->title,
-                'prizes_count' => count($prizes),
-                'sponsors_count' => count($sponsors),
-                'admin_id' => auth()->id(),
+                'slug' => $competition->slug,
+                'admin_id' => Auth::id(),
             ]);
 
-            // Clear competition stats cache
             Cache::forget('competition_stats');
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Competition created successfully',
-                'data' => $competition->load(['prizes', 'sponsors']),
-            ], 201);
+            return $this->created($competition->load(['prizes', 'sponsorRecords', 'category', 'judges.judge', 'judges.judgeProfile']), 'Competition created successfully');
         } catch (\Exception $e) {
             Log::error('Failed to create competition', [
                 'error' => $e->getMessage(),
-                'title' => $validated['title'] ?? null,
-                'admin_id' => auth()->id(),
+                'admin_id' => Auth::id(),
             ]);
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to create competition. Please try again.',
-            ], 500);
+            return $this->error('Failed to create competition: ' . $e->getMessage(), 500);
         }
     }
 
     /**
      * Update competition
      */
-    public function update(Request $request, $id)
+    public function update(CompetitionUpdateRequest $request, $id)
     {
         $competition = Competition::findOrFail($id);
+        $validated = $request->validated();
 
-        $validated = $request->validate([
-            'title' => 'sometimes|string|max:255',
-            'description' => 'sometimes|string',
-            'category_id' => 'sometimes|exists:categories,id',
-            'submission_start' => 'sometimes|date',
-            'submission_deadline' => 'sometimes|date',
-            'voting_start' => 'sometimes|date',
-            'voting_end' => 'sometimes|date',
-            'total_prize_pool' => 'nullable|numeric|min:0',
-            'max_submissions_per_user' => 'sometimes|integer|min:1',
-            'rules' => 'nullable|string',
-            'status' => 'sometimes|in:draft,upcoming,active,judging,completed,cancelled',
-        ]);
+        // Extract nested data
+        $prizes = $validated['prizes'] ?? null;
+        $sponsorIds = $validated['sponsor_ids'] ?? null;
+        $judgeIds = $validated['judge_ids'] ?? null;
+        unset($validated['prizes'], $validated['sponsor_ids'], $validated['judge_ids']);
 
         try {
-            $competition->update($validated);
+            $competition = DB::transaction(function () use ($competition, $validated, $prizes, $sponsorIds, $judgeIds) {
+                $competition->update($validated);
+
+                // Update prizes if provided
+                if ($prizes !== null) {
+                    $competition->prizes()->delete();
+                    foreach ($prizes as $prize) {
+                        $rank = $prize['position'] ?? 'Prize';
+                        $title = $prize['title'] ?? $rank . ' Place';
+                        
+                        $competition->prizes()->create([
+                            'rank' => $rank,
+                            'title' => $title,
+                            'cash_amount' => $prize['amount'] ?? 0,
+                            'description' => $prize['description'] ?? null,
+                        ]);
+                    }
+                }
+
+                // Sync sponsors if provided
+                if ($sponsorIds !== null) {
+                    $sponsors = Sponsor::whereIn('id', $sponsorIds)->get()->keyBy('id');
+                    $syncData = [];
+                    foreach ($sponsorIds as $index => $sponsorId) {
+                        $sponsor = $sponsors->get($sponsorId);
+                        if ($sponsor) {
+                            $syncData[$sponsorId] = [
+                                'name' => $sponsor->name,
+                                'logo_url' => $sponsor->logo,
+                                'website_url' => $sponsor->website,
+                                'description' => $sponsor->description,
+                                'tier' => 'bronze',
+                                'contribution_amount' => null,
+                                'display_order' => $index,
+                                'is_active' => true,
+                            ];
+                        }
+                    }
+                    $competition->sponsorRecords()->sync($syncData);
+                }
+
+                // Update judges if provided
+                if ($judgeIds !== null) {
+                    $competition->judges()->delete();
+                    // Fetch judges and get their user_ids
+                    $judgeProfiles = Judge::whereIn('id', $judgeIds)->get();
+                    
+                    foreach ($judgeProfiles as $index => $profile) {
+                        $competition->judges()->create([
+                            'judge_id' => $profile->user_id,
+                            'judge_profile_id' => $profile->id,
+                            'role' => 'judge',
+                            'bio' => $profile->bio,
+                            'expertise' => null,
+                            'is_active' => true,
+                            'sort_order' => $index,
+                            'assigned_at' => now(),
+                        ]);
+                    }
+                }
+
+                return $competition;
+            });
 
             Log::info('Competition updated successfully', [
                 'competition_id' => $competition->id,
                 'title' => $competition->title,
-                'admin_id' => auth()->id(),
+                'admin_id' => Auth::id(),
             ]);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Competition updated successfully',
-                'data' => $competition->fresh(),
-            ]);
+            Cache::forget('competition_stats');
+
+            return $this->success($competition->fresh()->load(['prizes', 'sponsorRecords', 'category', 'judges.judge', 'judges.judgeProfile']), 'Competition updated successfully');
         } catch (\Exception $e) {
             Log::error('Failed to update competition', [
                 'competition_id' => $id,
                 'error' => $e->getMessage(),
-                'admin_id' => auth()->id(),
+                'admin_id' => Auth::id(),
             ]);
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to update competition. Please try again.',
-            ], 500);
+            return $this->error('Failed to update competition: ' . $e->getMessage(), 500);
         }
     }
 
@@ -260,43 +356,50 @@ class AdminCompetitionApiController extends Controller
     {
         $competition = Competition::findOrFail($id);
 
-        // Check if competition has submissions
+        // If competition has submissions, archive instead of deleting
         if ($competition->submissions()->count() > 0) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Cannot delete competition with existing submissions. Consider changing status to cancelled instead.'
-            ], 422);
+            $competition->update([
+                'status' => 'archived',
+                'is_public' => false,
+                'is_featured' => false,
+            ]);
+
+            Log::info('Competition archived instead of deleted', [
+                'competition_id' => $id,
+                'title' => $competition->title,
+                'admin_id' => Auth::id(),
+            ]);
+
+            Cache::forget('competition_stats');
+
+            return $this->success($competition->fresh(), 'Competition has submissions, so it was archived instead of deleted.');
         }
 
         try {
             DB::transaction(function () use ($competition) {
-                // Delete related records
                 $competition->prizes()->delete();
-                $competition->sponsors()->delete();
+                $competition->sponsorRecords()->detach();
+                $competition->judges()->delete();
                 $competition->delete();
             });
 
             Log::info('Competition deleted successfully', [
                 'competition_id' => $id,
                 'title' => $competition->title,
-                'admin_id' => auth()->id(),
+                'admin_id' => Auth::id(),
             ]);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Competition deleted successfully',
-            ]);
+            Cache::forget('competition_stats');
+
+            return $this->success([], 'Competition deleted successfully');
         } catch (\Exception $e) {
             Log::error('Failed to delete competition', [
                 'competition_id' => $id,
                 'error' => $e->getMessage(),
-                'admin_id' => auth()->id(),
+                'admin_id' => Auth::id(),
             ]);
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to delete competition. Please try again.',
-            ], 500);
+            return $this->error('Failed to delete competition: ' . $e->getMessage(), 500);
         }
     }
 }

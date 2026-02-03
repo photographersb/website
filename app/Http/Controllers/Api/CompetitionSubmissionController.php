@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Competition;
 use App\Models\CompetitionSubmission;
+use App\Services\PhotoMetadataService;
+use App\Services\ImageProcessingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
@@ -49,10 +53,7 @@ class CompetitionSubmissionController extends Controller
         
         $submissions = $query->paginate(20);
         
-        return response()->json([
-            'status' => 'success',
-            'data' => $submissions
-        ]);
+        return $this->paginated($submissions, 'Approved submissions retrieved successfully');
     }
 
     /**
@@ -67,33 +68,24 @@ class CompetitionSubmissionController extends Controller
         // Increment view count
         $submission->incrementViewCount();
         
-        return response()->json([
-            'status' => 'success',
-            'data' => $submission
-        ]);
+        return $this->success($submission, 'Submission details retrieved successfully');
     }
 
     /**
      * Submit a photo to competition (authenticated photographers)
      */
-    public function store(Request $request, $competitionId)
+    public function store(Request $request, $competitionId, PhotoMetadataService $metadataService, ImageProcessingService $imageService)
     {
         $competition = Competition::findOrFail($competitionId);
         
         // Check if competition accepts submissions
         if ($competition->status !== 'active') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Competition is not accepting submissions'
-            ], 403);
+            return $this->error('Competition is not accepting submissions', 403);
         }
         
         // Check submission deadline
         if (now()->isAfter($competition->submission_deadline)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Submission deadline has passed'
-            ], 403);
+            return $this->error('Submission deadline has passed', 403);
         }
         
         $user = $request->user();
@@ -104,16 +96,13 @@ class CompetitionSubmissionController extends Controller
             ->count();
         
         if ($existingCount >= $competition->max_submissions_per_user) {
-            return response()->json([
-                'status' => 'error',
-                'message' => "Maximum {$competition->max_submissions_per_user} submissions allowed"
-            ], 403);
+            return $this->error("Maximum {$competition->max_submissions_per_user} submissions allowed", 403);
         }
         
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
-            'image' => 'required|image|mimes:jpeg,jpg,png|max:10240', // 10MB max
+            'image' => 'required|image|mimes:jpeg,jpg,png,webp|max:10240', // 10MB max
             'location' => 'nullable|string|max:255',
             'date_taken' => 'nullable|date',
             'camera_make' => 'nullable|string|max:255',
@@ -123,31 +112,93 @@ class CompetitionSubmissionController extends Controller
             'is_watermarked' => 'boolean'
         ]);
         
-        // Handle image upload
+        // Handle image upload with error handling
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $filename = Str::uuid() . '.' . $image->getClientOriginalExtension();
-            $path = 'competitions/' . $competitionId . '/submissions/';
             
-            // Store original
-            $imagePath = $image->storeAs($path, $filename, 'public');
-            $imageUrl = Storage::url($imagePath);
+            // Validate image before processing
+            $validation = $imageService->validateImage($image, [
+                'max_size' => 10240, // 10MB
+                'min_width' => 1920,
+                'min_height' => 1080,
+                'allowed_mimes' => ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+            ]);
             
-            // Create thumbnail using Intervention Image v3
-            $thumbnailFilename = 'thumb_' . $filename;
-            $thumbnailPath = storage_path('app/public/' . $path . $thumbnailFilename);
+            if (!$validation['valid']) {
+                return $this->validationError([], $validation['error']);
+            }
             
-            // Create thumbnail with Intervention Image v3 ImageManager
-            $manager = new ImageManager(new Driver());
-            $img = $manager->read($image->getRealPath());
-            $img->cover(400, 400);
-            $img->save($thumbnailPath);
-            
-            $thumbnailUrl = Storage::url($path . $thumbnailFilename);
-            
-            $validated['image_path'] = $imagePath;
-            $validated['image_url'] = $imageUrl;
-            $validated['thumbnail_url'] = $thumbnailUrl;
+            try {
+                // Extract EXIF metadata before processing
+                $exifData = $metadataService->extractMetadata($image);
+                
+                // Merge EXIF with user input (user input takes priority)
+                $validated = array_merge($exifData, $validated);
+                
+                $path = 'competitions/' . $competitionId . '/submissions';
+                
+                // Process and save image with error handling
+                $result = $imageService->processAndSave($image, $path, [
+                    'max_width' => 2048,
+                    'max_height' => 2048,
+                    'quality' => 85,
+                    'format' => 'jpg'
+                ]);
+                
+                if (!$result['success']) {
+                    Log::error('Competition submission image processing failed', [
+                        'competition_id' => $competitionId,
+                        'user_id' => $user->id,
+                        'error' => $result['error']
+                    ]);
+                    
+                    return $this->error('Failed to process image: ' . $result['error'], 500);
+                }
+                
+                $imageUrl = $result['url'];
+                $imagePath = $result['path'];
+                
+                // Create thumbnail with error handling
+                try {
+                    if (!$imageService->isAvailable()) {
+                        // No thumbnail, use full image
+                        $thumbnailUrl = $imageUrl;
+                        Log::warning('Thumbnail generation skipped - image processing not available');
+                    } else {
+                        $thumbnailResult = $imageService->processAndSave($image, $path, [
+                            'max_width' => 400,
+                            'max_height' => 400,
+                            'quality' => 80,
+                            'format' => 'jpg'
+                        ]);
+                        
+                        $thumbnailUrl = $thumbnailResult['success'] ? $thumbnailResult['url'] : $imageUrl;
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('Thumbnail generation failed, using full image', [
+                        'error' => $e->getMessage()
+                    ]);
+                    $thumbnailUrl = $imageUrl;
+                }
+                
+                $validated['image_path'] = $imagePath;
+                $validated['image_url'] = $imageUrl;
+                $validated['thumbnail_url'] = $thumbnailUrl;
+                
+                if (isset($result['warning'])) {
+                    Log::info('Image uploaded with warning: ' . $result['warning']);
+                }
+                
+            } catch (\Exception $e) {
+                Log::error('Competition submission failed', [
+                    'competition_id' => $competitionId,
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                
+                return $this->error('Failed to process your image. Please ensure it is a valid image file.', 500);
+            }
         }
         
         $submission = CompetitionSubmission::create([
@@ -168,11 +219,7 @@ class CompetitionSubmissionController extends Controller
             'status' => 'pending_review'
         ]);
         
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Submission uploaded successfully! It will be reviewed before appearing in the gallery.',
-            'data' => $submission
-        ], 201);
+        return $this->created($submission, 'Submission uploaded successfully! It will be reviewed before appearing in the gallery.');
     }
 
     /**
@@ -188,10 +235,7 @@ class CompetitionSubmissionController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
         
-        return response()->json([
-            'status' => 'success',
-            'data' => $submissions
-        ]);
+        return $this->success($submissions, 'My submissions retrieved successfully');
     }
 
     /**
@@ -207,18 +251,12 @@ class CompetitionSubmissionController extends Controller
         
         // Check if can edit
         if ($submission->status !== 'pending_review') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Cannot edit submission after it has been reviewed'
-            ], 403);
+            return $this->error('Cannot edit submission after it has been reviewed', 403);
         }
         
         $competition = $submission->competition;
         if (now()->isAfter($competition->submission_deadline)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Submission deadline has passed'
-            ], 403);
+            return $this->error('Submission deadline has passed', 403);
         }
         
         $validated = $request->validate([
@@ -235,11 +273,7 @@ class CompetitionSubmissionController extends Controller
         
         $submission->update($validated);
         
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Submission updated successfully',
-            'data' => $submission
-        ]);
+        return $this->success($submission, 'Submission updated successfully');
     }
 
     /**
@@ -255,10 +289,7 @@ class CompetitionSubmissionController extends Controller
         
         // Check if can delete
         if ($submission->vote_count > 0) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Cannot delete submission that has received votes'
-            ], 403);
+            return $this->error('Cannot delete submission that has received votes', 403);
         }
         
         // Delete image files
@@ -272,10 +303,7 @@ class CompetitionSubmissionController extends Controller
         
         $submission->delete();
         
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Submission deleted successfully'
-        ]);
+        return $this->success(null, 'Submission deleted successfully');
     }
 
     /**
@@ -311,10 +339,7 @@ class CompetitionSubmissionController extends Controller
         
         $submissions = $query->orderBy('created_at', 'desc')->paginate(20);
         
-        return response()->json([
-            'status' => 'success',
-            'data' => $submissions
-        ]);
+        return $this->paginated($submissions, 'Submissions retrieved successfully');
     }
 
     /**
@@ -326,10 +351,7 @@ class CompetitionSubmissionController extends Controller
             ->findOrFail($submissionId);
         
         if ($submission->status !== 'pending_review') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Only pending submissions can be approved'
-            ], 400);
+            return $this->error('Only pending submissions can be approved', 400);
         }
         
         $submission->update([
@@ -337,11 +359,7 @@ class CompetitionSubmissionController extends Controller
             'rejection_reason' => null
         ]);
         
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Submission approved successfully',
-            'data' => $submission
-        ]);
+        return $this->success($submission, 'Submission approved successfully');
     }
 
     /**
@@ -357,10 +375,7 @@ class CompetitionSubmissionController extends Controller
             ->findOrFail($submissionId);
         
         if ($submission->status !== 'pending_review') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Only pending submissions can be rejected'
-            ], 400);
+            return $this->error('Only pending submissions can be rejected', 400);
         }
         
         $submission->update([
@@ -368,11 +383,7 @@ class CompetitionSubmissionController extends Controller
             'rejection_reason' => $validated['reason']
         ]);
         
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Submission rejected successfully',
-            'data' => $submission
-        ]);
+        return $this->success($submission, 'Submission rejected successfully');
     }
 
     /**
@@ -392,11 +403,7 @@ class CompetitionSubmissionController extends Controller
             'rejection_reason' => $validated['reason']
         ]);
         
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Submission disqualified successfully',
-            'data' => $submission
-        ]);
+        return $this->success($submission, 'Submission disqualified successfully');
     }
 
     /**
@@ -410,16 +417,13 @@ class CompetitionSubmissionController extends Controller
         $rejected = CompetitionSubmission::forCompetition($competitionId)->where('status', 'rejected')->count();
         $disqualified = CompetitionSubmission::forCompetition($competitionId)->where('status', 'disqualified')->count();
         
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'total' => $total,
-                'pending' => $pending,
-                'approved' => $approved,
-                'rejected' => $rejected,
-                'disqualified' => $disqualified
-            ]
-        ]);
+        return $this->success([
+            'total' => $total,
+            'pending' => $pending,
+            'approved' => $approved,
+            'rejected' => $rejected,
+            'disqualified' => $disqualified
+        ], 'Submission statistics retrieved successfully');
     }
 
     /**
@@ -457,10 +461,7 @@ class CompetitionSubmissionController extends Controller
         
         $submissions = $query->orderBy('created_at', 'desc')->paginate(20);
         
-        return response()->json([
-            'status' => 'success',
-            'data' => $submissions
-        ]);
+        return $this->paginated($submissions, 'All submissions retrieved successfully');
     }
 
     /**
@@ -474,16 +475,13 @@ class CompetitionSubmissionController extends Controller
         $rejected = CompetitionSubmission::where('status', 'rejected')->count();
         $disqualified = CompetitionSubmission::where('status', 'disqualified')->count();
         
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'total' => $total,
-                'pending' => $pending,
-                'approved' => $approved,
-                'rejected' => $rejected,
-                'disqualified' => $disqualified
-            ]
-        ]);
+        return $this->success([
+            'total' => $total,
+            'pending' => $pending,
+            'approved' => $approved,
+            'rejected' => $rejected,
+            'disqualified' => $disqualified
+        ], 'All submission statistics retrieved successfully');
     }
 }
 

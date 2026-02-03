@@ -18,11 +18,12 @@ export default {
       // Update or create meta tags
       updateMetaTag('description', meta.description || 'Discover verified professional photographers in Bangladesh. Book wedding photographers, event photography, portrait sessions and more. Trusted by thousands of clients.');
       updateMetaTag('keywords', meta.keywords || 'photographer bangladesh, wedding photographer dhaka, event photography, portrait photographer, professional photography');
+      updateMetaTag('robots', meta.robots || 'index, follow');
       
       // Open Graph tags
       updateMetaTag('og:title', meta.title || 'Photographar SB - Find Perfect Photographers in Bangladesh', 'property');
       updateMetaTag('og:description', meta.description || 'Discover verified professional photographers in Bangladesh.', 'property');
-      updateMetaTag('og:image', meta.image || `${window.location.origin}/images/og-default.jpg`, 'property');
+      updateMetaTag('og:image', meta.image || `${window.location.origin}/images/og-default.svg`, 'property');
       updateMetaTag('og:url', window.location.href, 'property');
       updateMetaTag('og:type', meta.type || 'website', 'property');
       updateMetaTag('og:site_name', 'Photographar SB', 'property');
@@ -31,7 +32,7 @@ export default {
       updateMetaTag('twitter:card', 'summary_large_image', 'name');
       updateMetaTag('twitter:title', meta.title || 'Photographar SB', 'name');
       updateMetaTag('twitter:description', meta.description || 'Find verified photographers in Bangladesh', 'name');
-      updateMetaTag('twitter:image', meta.image || `${window.location.origin}/images/og-default.jpg`, 'name');
+      updateMetaTag('twitter:image', meta.image || `${window.location.origin}/images/og-default.svg`, 'name');
       
       // Canonical URL
       updateLinkTag('canonical', meta.canonical || window.location.href);
@@ -73,9 +74,18 @@ export default {
       script.textContent = JSON.stringify(data);
     };
 
+    const toTitleCase = (value = '') => {
+      return value
+        .replace(/[-_]+/g, ' ')
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+    };
+
     const getRouteMetaTags = () => {
       const routeName = route.name;
       const params = route.params;
+      const query = route.query;
+      const origin = window.location.origin;
+      const currentUrl = `${origin}${route.fullPath}`;
 
       const metaMap = {
         'home': {
@@ -98,6 +108,80 @@ export default {
           title: `${params.slug} - Professional Photographer | Photographar SB`,
           description: `View portfolio, packages, and reviews for ${params.slug}. Book verified professional photographer in Bangladesh.`,
           type: 'profile'
+        },
+        'photographers-by-category': {
+          title: query.category
+            ? `${toTitleCase(query.category)} Photographers in Bangladesh | Photographar SB`
+            : 'Photographers by Category | Photographar SB',
+          description: query.category
+            ? `Browse verified ${toTitleCase(query.category)} photographers across Bangladesh. Compare portfolios, reviews, and pricing.`
+            : 'Browse photographers by category. Discover wedding, portrait, event, and commercial photography specialists in Bangladesh.',
+          image: `${origin}/images/og-categories.svg`,
+          canonical: currentUrl,
+          structuredData: {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": query.category
+              ? `${toTitleCase(query.category)} Photographers`
+              : 'Photographers by Category',
+            "url": currentUrl,
+            "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                { "@type": "ListItem", "position": 1, "name": "Home", "item": origin },
+                { "@type": "ListItem", "position": 2, "name": "Categories", "item": `${origin}/categories` },
+                { "@type": "ListItem", "position": 3, "name": query.category ? toTitleCase(query.category) : 'Browse', "item": currentUrl }
+              ]
+            }
+          }
+        },
+        'photographers-by-location': {
+          title: query.city
+            ? `${toTitleCase(query.city)} Photographers | Photographar SB`
+            : 'Photographers by Location | Photographar SB',
+          description: query.city
+            ? `Find verified photographers in ${toTitleCase(query.city)}. Compare portfolios, reviews, and pricing.`
+            : 'Browse photographers by location across Bangladesh. Discover local professionals near you.',
+          image: `${origin}/images/og-locations.svg`,
+          canonical: currentUrl,
+          structuredData: {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": query.city ? `${toTitleCase(query.city)} Photographers` : 'Photographers by Location',
+            "url": currentUrl,
+            "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                { "@type": "ListItem", "position": 1, "name": "Home", "item": origin },
+                { "@type": "ListItem", "position": 2, "name": "Locations", "item": `${origin}/locations` },
+                { "@type": "ListItem", "position": 3, "name": query.city ? toTitleCase(query.city) : 'Browse', "item": currentUrl }
+              ]
+            }
+          }
+        },
+        'categories-landing': {
+          title: 'Photography Categories in Bangladesh | Photographar SB',
+          description: 'Browse photography categories to find the right specialist. Wedding, portrait, event, product, and more.',
+          image: `${origin}/images/og-categories.svg`,
+          canonical: currentUrl,
+          structuredData: {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": "Photography Categories",
+            "url": currentUrl
+          }
+        },
+        'locations-landing': {
+          title: 'Photographers by City in Bangladesh | Photographar SB',
+          description: 'Explore photographers by city across Bangladesh. Find professionals near you.',
+          image: `${origin}/images/og-locations.svg`,
+          canonical: currentUrl,
+          structuredData: {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": "Photography Locations",
+            "url": currentUrl
+          }
         },
         'events': {
           title: 'Photography Events in Bangladesh | Photographar SB',
@@ -128,7 +212,7 @@ export default {
     };
 
     // Watch for route changes
-    watch(() => route.path, () => {
+    watch(() => route.fullPath, () => {
       const meta = getRouteMetaTags();
       updateMetaTags(meta);
     }, { immediate: true });

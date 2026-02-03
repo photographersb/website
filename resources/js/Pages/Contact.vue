@@ -246,6 +246,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import api from '../api'
 
 const form = ref({
   name: '',
@@ -265,8 +266,13 @@ const submitForm = async () => {
   message.value = ''
 
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    await api.post('/contact', {
+      name: form.value.name,
+      email: form.value.email,
+      phone: form.value.phone,
+      subject: form.value.subject,
+      message: form.value.message
+    })
     
     message.value = 'Thank you for contacting us! We\'ll get back to you within 24 hours.'
     error.value = false
@@ -280,6 +286,7 @@ const submitForm = async () => {
       message: ''
     }
   } catch (err) {
+    console.error('Contact form error:', err)
     message.value = 'Something went wrong. Please try again.'
     error.value = true
   } finally {

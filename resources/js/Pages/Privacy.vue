@@ -12,10 +12,10 @@
         <section>
           <h2 class="text-2xl font-bold mb-4 text-burgundy">Introduction</h2>
           <p class="text-gray-700 mb-4">
-            At Photographar ("we", "us", "our"), we are committed to protecting your privacy and personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform.
+            At Photographer SB ("we", "us", "our"), we are committed to protecting your privacy and personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform.
           </p>
           <p class="text-gray-700">
-            By accessing or using Photographar, you agree to this Privacy Policy. If you do not agree with our policies and practices, please do not use our services.
+            By accessing or using Photographer SB, you agree to this Privacy Policy. If you do not agree with our policies and practices, please do not use our services.
           </p>
         </section>
 

@@ -1,25 +1,12 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- Header -->
-    <div class="bg-white shadow">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-3xl font-bold text-gray-900">Edit Event</h1>
-            <p class="mt-1 text-sm text-gray-600">Update event details</p>
-          </div>
-          <router-link
-            to="/admin/events"
-            class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-all"
-          >
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to List
-          </router-link>
-        </div>
-      </div>
-    </div>
+    <AdminHeader 
+      title="Edit Event" 
+      subtitle="Update event details"
+    />
+
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <AdminQuickNav />
 
     <!-- Loading State -->
     <div v-if="loading" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
@@ -28,7 +15,7 @@
 
     <!-- Form -->
     <div v-else class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <form @submit.prevent="submitForm" class="space-y-6">
+      <form @submit.prevent="submitForm" class="space-y-6" novalidate>
         <!-- Basic Information -->
         <div class="bg-white rounded-lg shadow-card p-6">
           <h2 class="text-xl font-bold text-gray-900 mb-4">Basic Information</h2>
@@ -39,7 +26,7 @@
               <input
                 v-model="form.title"
                 type="text"
-                required
+                :required="form.status !== 'draft'"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
               />
               <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</p>
@@ -49,7 +36,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">Event Type *</label>
               <select
                 v-model="form.event_type"
-                required
+                :required="form.status !== 'draft'"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
               >
                 <option value="">Select event type</option>
@@ -97,8 +84,8 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">Event Date *</label>
               <input
                 v-model="form.event_date"
-                type="datetime-local"
-                required
+                type="date"
+                :required="form.status !== 'draft'"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
               />
               <p v-if="errors.event_date" class="mt-1 text-sm text-red-600">{{ errors.event_date }}</p>
@@ -122,7 +109,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">City *</label>
               <select
                 v-model="form.city_id"
-                required
+                :required="form.status !== 'draft'"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
               >
                 <option value="">Select city</option>
@@ -130,19 +117,60 @@
                   {{ city.name }}
                 </option>
               </select>
+              <router-link to="/admin/cities" class="mt-1 inline-block text-sm text-burgundy hover:text-burgundy-dark">
+                Manage cities →
+              </router-link>
+              <p v-if="cities.length === 0" class="mt-1 text-sm text-warning-700">⚠️ No cities available. Please add cities from Admin → Locations first.</p>
               <p v-if="errors.city_id" class="mt-1 text-sm text-red-600">{{ errors.city_id }}</p>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Location/Venue *</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Venue Name *</label>
+              <input
+                v-model="form.venue_name"
+                type="text"
+                :required="form.status !== 'draft'"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                placeholder="e.g., ICCB, Hotel InterContinental, Dhaka Club"
+              />
+              <p v-if="errors.venue_name" class="mt-1 text-sm text-red-600">{{ errors.venue_name }}</p>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Venue Full Address *</label>
+              <textarea
+                v-model="form.venue_address"
+                rows="2"
+                :required="form.status !== 'draft'"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                placeholder="e.g., 123 Main Street, Building Name, Floor 2, Near Landmark"
+              ></textarea>
+              <p v-if="errors.venue_address" class="mt-1 text-sm text-red-600">{{ errors.venue_address }}</p>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Location Display Name *</label>
               <input
                 v-model="form.location"
                 type="text"
-                required
+                :required="form.status !== 'draft'"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                placeholder="123 Main Street, Building Name"
+                placeholder="Optional: Short location label for listings"
               />
+              <p class="mt-1 text-sm text-gray-500">Short name for event listings (e.g., "Gulshan 2"). Required when publishing.</p>
               <p v-if="errors.location" class="mt-1 text-sm text-red-600">{{ errors.location }}</p>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Additional Address Notes</label>
+              <input
+                v-model="form.address"
+                type="text"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                placeholder="Optional: Additional directions or notes"
+              />
+              <p class="mt-1 text-sm text-gray-500">Optional additional address information</p>
+              <p v-if="errors.address" class="mt-1 text-sm text-red-600">{{ errors.address }}</p>
             </div>
           </div>
         </div>
@@ -198,15 +226,21 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Organizer/Photographer ID *</label>
-              <input
-                v-model.number="form.organizer_id"
-                type="number"
-                required
+              <label class="block text-sm font-medium text-gray-700 mb-2">Organizer/Photographer *</label>
+              <select
+                v-model="form.organizer_id"
+                :required="form.status !== 'draft'"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                placeholder="Photographer ID"
-              />
-              <p class="mt-1 text-sm text-gray-500">Enter the photographer ID who is organizing this event</p>
+              >
+                <option value="">Select photographer</option>
+                <option v-for="photographer in photographers" :key="photographer.id" :value="photographer.id">
+                  {{ photographer.user?.name || photographer.business_name || `Photographer #${photographer.id}` }}
+                </option>
+              </select>
+              <router-link to="/admin/photographers" class="mt-1 inline-block text-sm text-burgundy hover:text-burgundy-dark">
+                Manage photographers →
+              </router-link>
+              <p class="mt-1 text-sm text-gray-500">Select the photographer organizing this event</p>
               <p v-if="errors.organizer_id" class="mt-1 text-sm text-red-600">{{ errors.organizer_id }}</p>
             </div>
           </div>
@@ -235,7 +269,7 @@
               <input
                 v-model="form.is_featured"
                 type="checkbox"
-                class="h-4 w-4 text-burgundy-600 focus:ring-burgundy-500 border-gray-300 rounded"
+                class="h-4 w-4 text-burgundy focus:ring-burgundy border-gray-300 rounded"
               />
               <label class="ml-2 block text-sm text-gray-900">
                 Featured Event (Show prominently on events page)
@@ -246,7 +280,7 @@
               <input
                 v-model="form.is_verified"
                 type="checkbox"
-                class="h-4 w-4 text-burgundy-600 focus:ring-burgundy-500 border-gray-300 rounded"
+                class="h-4 w-4 text-burgundy focus:ring-burgundy border-gray-300 rounded"
               />
               <label class="ml-2 block text-sm text-gray-900">
                 Verified Event (Official/trusted event)
@@ -264,14 +298,23 @@
             Cancel
           </router-link>
           <button
+            type="button"
+            @click="saveDraft"
+            :disabled="processing"
+            class="px-6 py-3 bg-gray-100 text-gray-800 rounded-lg font-medium hover:bg-gray-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Save Draft
+          </button>
+          <button
             type="submit"
             :disabled="processing"
-            class="px-6 py-3 bg-burgundy-600 text-white rounded-lg font-medium hover:bg-burgundy-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            class="px-6 py-3 bg-burgundy text-white rounded-lg font-medium hover:bg-burgundy-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {{ processing ? 'Updating...' : 'Update Event' }}
           </button>
         </div>
       </form>
+    </div>
     </div>
   </div>
 </template>
@@ -280,12 +323,15 @@
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
+import AdminHeader from '../../../components/AdminHeader.vue'
+import AdminQuickNav from '../../../components/AdminQuickNav.vue'
 
 const router = useRouter();
 const route = useRoute();
 const processing = ref(false);
 const loading = ref(true);
 const cities = ref([]);
+const photographers = ref([]);
 const errors = ref({});
 
 const form = ref({
@@ -296,7 +342,10 @@ const form = ref({
   event_date: '',
   duration_hours: null,
   city_id: '',
+  venue_name: '',
+  venue_address: '',
   location: '',
+  address: '',
   max_attendees: null,
   ticket_price: 0,
   requirements: '',
@@ -340,7 +389,10 @@ const fetchEvent = async () => {
       event_date: formatDateForInput(event.event_date),
       duration_hours: event.duration_hours || null,
       city_id: event.city_id || '',
+      venue_name: event.venue_name || '',
+      venue_address: event.venue_address || '',
       location: event.location || '',
+      address: event.address || '',
       max_attendees: event.max_attendees || null,
       ticket_price: event.ticket_price || 0,
       requirements: event.requirements || '',
@@ -366,10 +418,61 @@ const fetchEvent = async () => {
 
 const fetchCities = async () => {
   try {
-    const response = await axios.get('/api/v1/cities');
-    cities.value = response.data.data || response.data;
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      console.warn('No auth token found in localStorage');
+      return;
+    }
+    
+    const response = await axios.get('/api/v1/admin/cities?minimal=1', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    });
+    
+    console.log('Cities API Response:', response.data);
+    
+    if (response.data.status === 'success' && Array.isArray(response.data.data)) {
+      cities.value = response.data.data;
+      console.log(`Loaded ${cities.value.length} cities`);
+    } else {
+      console.warn('Unexpected response structure:', response.data);
+      cities.value = [];
+    }
   } catch (error) {
     console.error('Error fetching cities:', error);
+    cities.value = [];
+  }
+};
+
+const fetchPhotographers = async () => {
+  try {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      console.warn('No auth token found in localStorage');
+      return;
+    }
+    
+    const response = await axios.get('/api/v1/admin/photographers?status=active&minimal=1', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    });
+    
+    console.log('Photographers API Response:', response.data);
+    
+    if (response.data.status === 'success' && Array.isArray(response.data.data)) {
+      photographers.value = response.data.data;
+      console.log(`Loaded ${photographers.value.length} photographers`);
+    } else {
+      console.warn('Unexpected response structure:', response.data);
+      photographers.value = [];
+    }
+  } catch (error) {
+    console.error('Error fetching photographers:', error);
+    photographers.value = [];
   }
 };
 
@@ -406,8 +509,14 @@ const submitForm = async () => {
   }
 };
 
+const saveDraft = async () => {
+  form.value.status = 'draft';
+  await submitForm();
+};
+
 onMounted(() => {
   fetchCities();
+  fetchPhotographers();
   fetchEvent();
 });
 </script>

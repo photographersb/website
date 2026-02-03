@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Competition;
 use App\Models\CompetitionSubmission;
 use App\Models\CompetitionVote;
+use App\Http\Traits\ApiResponse;
 use App\Services\WinnerCalculationService;
 use App\Services\CertificateService;
 use App\Services\PrizeDistributionService;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 
 class CompetitionController extends Controller
 {
+    use ApiResponse;
     /**
      * Get competition stats (cached for 15 minutes)
      */
@@ -21,74 +23,110 @@ class CompetitionController extends Controller
         return Cache::remember('competition_stats', 900, function () {
             $stats = [
                 'active_competitions' => Competition::where('status', 'active')->count(),
-                'total_prize_pool' => Competition::where('status', '!=', 'cancelled')->sum('total_prize_pool'),
-                'total_submissions' => Competition::sum('total_submissions'),
-                'total_participants' => \App\Models\CompetitionSubmission::distinct('photographer_id')->count(),
+                'total_prize_pool' => Competition::whereIn('status', ['published', 'active'])->sum('total_prize_pool'),
+                'total_submissions' => Competition::whereIn('status', ['published', 'active'])->sum('total_submissions'),
+                'total_participants' => \App\Models\CompetitionSubmission::whereIn('status', ['published', 'active'])->distinct('photographer_id')->count(),
             ];
 
-            return response()->json([
-                'status' => 'success',
-                'data' => $stats,
-            ]);
+            return $this->success($stats, 'Competition stats retrieved successfully');
         });
     }
 
     /**
-     * Get all competitions with filters
+     * Get all competitions with filters, sorting, and pagination
+     * Public dashboard: shows published competitions only
+     * Include featured competitions first
      */
     public function index(Request $request)
     {
-        $query = Competition::where('is_public', true)
-            ->with(['admin', 'organizer']);
+        $perPage = $request->get('per_page', 12);
+        $page = $request->get('page', 1);
+        
+        $cacheKey = 'competitions:list:' . md5(json_encode($request->all()));
+        
+        return Cache::remember($cacheKey, 1800, function () use ($request, $perPage, $page) {
+            $query = Competition::query();
+            
+            // Show published and active competitions to public
+            $query->whereIn('status', ['published', 'active']);
 
-        // Filter by status
-        if ($request->has('status') && $request->status != '') {
-            $query->where('status', $request->status);
-        } else {
-            // Default: show active and judging competitions
-            $query->whereIn('status', ['active', 'judging', 'completed']);
-        }
+            // Filter by category
+            if ($request->has('category') && $request->category != '') {
+                $query->where('theme', 'like', '%' . $request->category . '%');
+            }
 
-        // Filter by paid/free
-        if ($request->has('is_paid') && $request->is_paid !== '') {
-            $query->where('is_paid_competition', $request->is_paid);
-        }
+            // Filter by theme/keyword search
+            if ($request->has('search') && $request->search != '') {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                      ->orWhere('theme', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%");
+                });
+            }
 
-        // Filter by theme
-        if ($request->has('theme') && $request->theme != '') {
-            $query->where('theme', 'like', '%' . $request->theme . '%');
-        }
+            // Filter by paid/free
+            if ($request->has('is_paid') && $request->is_paid !== '') {
+                $query->where('is_paid_competition', filter_var($request->is_paid, FILTER_VALIDATE_BOOLEAN));
+            }
 
-        // Sorting
-        $sort = $request->get('sort', 'deadline');
-        switch ($sort) {
-            case 'prize':
-                $query->orderBy('total_prize_pool', 'desc');
-                break;
-            case 'submissions':
-                $query->orderBy('total_submissions', 'desc');
-                break;
-            case 'newest':
-                $query->orderBy('created_at', 'desc');
-                break;
-            case 'deadline':
-            default:
-                $query->orderBy('submission_deadline', 'asc');
-                break;
-        }
+            // Eager load relationships with counts to prevent N+1
+            $query->with([
+                'admin:id,name,email',
+                'organizer.user:id,name',
+                'category:id,name,slug',
+            ])
+            ->withCount(['submissions', 'votes', 'prizes']);
 
-        $competitions = $query->paginate(20);
+            // Featured scope ordering
+            $featuredScope = $request->get('featured_scope', 'global');
+            $now = now();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $competitions->items(),
-            'meta' => [
-                'total' => $competitions->total(),
-                'per_page' => $competitions->perPage(),
-                'current_page' => $competitions->currentPage(),
-                'last_page' => $competitions->lastPage(),
-            ],
-        ]);
+            if ($featuredScope === 'area' && $request->filled('city_id')) {
+                $cityId = $request->city_id;
+                $query->orderByRaw(
+                    "CASE WHEN is_featured = 1 AND (featured_until IS NULL OR featured_until >= ?) AND EXISTS (SELECT 1 FROM photographers p WHERE p.id = competitions.organizer_id AND p.city_id = ?) THEN 2 WHEN is_featured = 1 AND (featured_until IS NULL OR featured_until >= ?) THEN 1 ELSE 0 END DESC",
+                    [$now, $cityId, $now]
+                );
+            } elseif ($featuredScope === 'category' && $request->filled('category')) {
+                $category = $request->category;
+                $query->orderByRaw(
+                    "CASE WHEN is_featured = 1 AND (featured_until IS NULL OR featured_until >= ?) AND theme LIKE ? THEN 2 WHEN is_featured = 1 AND (featured_until IS NULL OR featured_until >= ?) THEN 1 ELSE 0 END DESC",
+                    [$now, "%{$category}%", $now]
+                );
+            } else {
+                $query->orderByRaw(
+                    "CASE WHEN is_featured = 1 AND (featured_until IS NULL OR featured_until >= ?) THEN 1 ELSE 0 END DESC",
+                    [$now]
+                );
+            }
+
+            // Sorting: featured first, then by newest
+            $sort = $request->get('sort', 'featured-newest');
+            switch ($sort) {
+                case 'deadline':
+                    $query->orderBy('submission_deadline', 'asc');
+                    break;
+                case 'prize':
+                    $query->orderBy('total_prize_pool', 'desc');
+                    break;
+                case 'submissions':
+                    $query->orderBy('total_submissions', 'desc');
+                    break;
+                case 'newest':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                case 'featured-newest':
+                default:
+                    // Featured scope applied, then newest
+                    $query->orderBy('created_at', 'desc');
+                    break;
+            }
+
+            $competitions = $query->paginate($perPage, ['*'], 'page', $page);
+
+            return $this->paginated($competitions, 'Competitions retrieved successfully');
+        });
     }
 
     /**
@@ -96,26 +134,38 @@ class CompetitionController extends Controller
      */
     public function show(Competition $competition)
     {
-        // Eager load relationships to avoid N+1 queries
-        $competition->load([
+        // Check if competition is published or active (public only)
+        if (!in_array($competition->status, ['published', 'active'])) {
+            return $this->notFound('This competition is not available');
+        }
+
+        $cacheKey = "competition:{$competition->id}:details";
+        
+        $competition = Cache::remember($cacheKey, 3600, function () use ($competition) {
+            // Eager load relationships to avoid N+1 queries
+            return $competition->load([
             'admin',
-            'organizer',
+            'organizer.user',
             'prizes' => function ($q) {
                 $q->orderBy('rank');
             },
             'sponsors',
+            'mentors' => function ($q) {
+                $q->where('mentors.is_active', true);
+            },
+            'judgeProfiles' => function ($q) {
+                $q->where('judges.is_active', true);
+            },
             'submissions' => function ($q) {
                 $q->where('status', 'approved')
-                  ->with(['photographer'])
+                  ->with('photographer:id,name')
                   ->orderBy('vote_count', 'desc')
                   ->limit(10);
             },
-        ]);
+            ]);
+        });
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $competition,
-        ]);
+        return $this->success($competition, 'Competition details retrieved successfully');
     }
 
     /**
@@ -125,10 +175,7 @@ class CompetitionController extends Controller
     {
         // Check if competition is accepting submissions
         if (now() > $competition->submission_deadline) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Submission deadline has passed',
-            ], 422);
+            return $this->error('Submission deadline has passed', 422);
         }
 
         $validated = $request->validate([
@@ -148,10 +195,7 @@ class CompetitionController extends Controller
             ->count();
 
         if ($submissionCount >= $competition->max_submissions_per_user) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'You have reached the maximum number of submissions',
-            ], 422);
+            return $this->error('You have reached the maximum number of submissions', 422);
         }
 
         $submission = CompetitionSubmission::create([
@@ -161,11 +205,7 @@ class CompetitionController extends Controller
             'status' => 'pending_review',
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Photo submitted successfully',
-            'data' => $submission,
-        ], 201);
+        return $this->created($submission, 'Photo submitted successfully');
     }
 
     /**
@@ -177,10 +217,7 @@ class CompetitionController extends Controller
 
         // Check if voting is active
         if (now() < $competition->voting_start_at || now() > $competition->voting_end_at) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Voting is not currently active',
-            ], 422);
+            return $this->error('Voting is not currently active', 422);
         }
 
         // Check daily vote limit
@@ -190,10 +227,7 @@ class CompetitionController extends Controller
             ->count();
 
         if ($voteCountToday >= 50) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'You have reached your daily voting limit',
-            ], 422);
+            return $this->error('You have reached your daily voting limit', 422);
         }
 
         // Check if already voted on this submission
@@ -202,10 +236,7 @@ class CompetitionController extends Controller
             ->first();
 
         if ($existingVote) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'You have already voted on this submission',
-            ], 422);
+            return $this->error('You have already voted on this submission', 422);
         }
 
         // Record vote
@@ -222,11 +253,7 @@ class CompetitionController extends Controller
         // Update submission vote count
         $submission->increment('vote_count');
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Vote recorded',
-            'data' => $vote,
-        ], 201);
+        return $this->created($vote, 'Vote recorded');
     }
 
     /**
@@ -234,20 +261,16 @@ class CompetitionController extends Controller
      */
     public function leaderboard(Competition $competition)
     {
+        // Enforce pagination limits to prevent DoS
+        $perPage = min(request()->get('per_page', 50), 100);
+        
         $submissions = CompetitionSubmission::where('competition_id', $competition->id)
             ->where('status', 'approved')
             ->with(['photographer', 'votes'])
             ->orderBy('vote_count', 'desc')
-            ->paginate(50);
+            ->paginate($perPage);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $submissions->items(),
-            'meta' => [
-                'total' => $submissions->total(),
-                'per_page' => $submissions->perPage(),
-            ],
-        ]);
+        return $this->paginated($submissions, 'Leaderboard retrieved successfully');
     }
     
     /**
@@ -267,20 +290,13 @@ class CompetitionController extends Controller
         $result = $winnerService->calculateWinners($competition, $config);
         
         if (!$result['success']) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $result['message']
-            ], 400);
+            return $this->error($result['message'], 400);
         }
         
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Winner calculation preview',
-            'data' => [
-                'winners' => $result['winners'],
-                'config' => $result['config']
-            ]
-        ]);
+        return $this->success([
+            'winners' => $result['winners'],
+            'config' => $result['config']
+        ], 'Winner calculation preview');
     }
     
     /**
@@ -301,22 +317,15 @@ class CompetitionController extends Controller
         $result = $winnerService->announceWinners($competition, $config);
         
         if (!$result['success']) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $result['message']
-            ], 400);
+            return $this->error($result['message'], 400);
         }
         
         // TODO: Send winner notifications via email
         
-        return response()->json([
-            'status' => 'success',
-            'message' => $result['message'],
-            'data' => [
-                'winners' => $result['winners'],
-                'config' => $result['config']
-            ]
-        ]);
+        return $this->success([
+            'winners' => $result['winners'],
+            'config' => $result['config']
+        ], $result['message']);
     }
     
     /**
@@ -326,10 +335,7 @@ class CompetitionController extends Controller
     {
         $result = $winnerService->getWinners($competition);
         
-        return response()->json([
-            'status' => 'success',
-            'data' => $result
-        ]);
+        return $this->success($result, 'Winners retrieved successfully');
     }
     
     /**
@@ -340,10 +346,7 @@ class CompetitionController extends Controller
         $limit = $request->input('limit', 20);
         $leaderboard = $winnerService->getLeaderboard($competition, $limit);
         
-        return response()->json([
-            'status' => 'success',
-            'data' => $leaderboard
-        ]);
+        return $this->success($leaderboard, 'Leaderboard retrieved successfully');
     }
 
     // Certificate Generation Methods
@@ -360,19 +363,14 @@ class CompetitionController extends Controller
         $submission = CompetitionSubmission::find($request->submission_id);
 
         if ($submission->competition_id !== $competition->id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Submission does not belong to this competition'
-            ], 400);
+            return $this->error('Submission does not belong to this competition', 400);
         }
 
         $result = $certificateService->generateCertificate($submission);
 
-        return response()->json([
-            'status' => $result['success'] ? 'success' : 'error',
-            'message' => $result['message'],
-            'data' => $result
-        ], $result['success'] ? 200 : 400);
+        return $result['success'] 
+            ? $this->success($result, $result['message']) 
+            : $this->error($result['message'], 400);
     }
 
     /**
@@ -382,11 +380,9 @@ class CompetitionController extends Controller
     {
         $result = $certificateService->generateAllCertificates($competition);
 
-        return response()->json([
-            'status' => $result['success'] ? 'success' : 'error',
-            'message' => $result['message'],
-            'data' => $result
-        ], $result['success'] ? 200 : 400);
+        return $result['success'] 
+            ? $this->success($result, $result['message']) 
+            : $this->error($result['message'], 400);
     }
 
     /**
@@ -397,10 +393,7 @@ class CompetitionController extends Controller
         $result = $certificateService->downloadCertificate($certificateId);
 
         if (is_array($result) && !$result['success']) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $result['message']
-            ], 404);
+            return $this->notFound($result['message']);
         }
 
         return $result; // Binary file response
@@ -416,27 +409,21 @@ class CompetitionController extends Controller
             ->first();
 
         if (!$submission) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Certificate not found'
-            ], 404);
+            return $this->notFound('Certificate not found');
         }
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'certificate_id' => $submission->certificate_id,
-                'certificate_url' => $submission->certificate_url,
-                'generated_at' => $submission->certificate_generated_at,
-                'photographer_name' => $submission->photographer->name,
-                'competition_name' => $submission->competition->title,
-                'photo_title' => $submission->title,
-                'award_type' => $submission->award_type,
-                'rank' => $submission->rank,
-                'final_score' => $submission->final_score,
-                'download_url' => url('/api/v1/certificates/' . $certificateId . '/download')
-            ]
-        ]);
+        return $this->success([
+            'certificate_id' => $submission->certificate_id,
+            'certificate_url' => $submission->certificate_url,
+            'generated_at' => $submission->certificate_generated_at,
+            'photographer_name' => $submission->photographer->name,
+            'competition_name' => $submission->competition->title,
+            'photo_title' => $submission->title,
+            'award_type' => $submission->award_type,
+            'rank' => $submission->rank,
+            'final_score' => $submission->final_score,
+            'download_url' => url('/api/v1/certificates/' . $certificateId . '/download')
+        ], 'Certificate details retrieved successfully');
     }
 
     // Prize Distribution Methods
@@ -456,10 +443,7 @@ class CompetitionController extends Controller
         $submission = CompetitionSubmission::find($request->submission_id);
 
         if ($submission->competition_id !== $competition->id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Submission does not belong to this competition'
-            ], 400);
+            return $this->error('Submission does not belong to this competition', 400);
         }
 
         $result = $prizeService->setPrize($submission, [
@@ -468,11 +452,9 @@ class CompetitionController extends Controller
             'notes' => $request->notes
         ]);
 
-        return response()->json([
-            'status' => $result['success'] ? 'success' : 'error',
-            'message' => $result['message'],
-            'data' => $result['data'] ?? null
-        ], $result['success'] ? 200 : 400);
+        return $result['success'] 
+            ? $this->success($result['data'] ?? null, $result['message']) 
+            : $this->error($result['message'], 400);
     }
 
     /**
@@ -489,11 +471,9 @@ class CompetitionController extends Controller
 
         $result = $prizeService->setAllPrizes($competition, $request->prizes);
 
-        return response()->json([
-            'status' => $result['success'] ? 'success' : 'error',
-            'message' => $result['message'],
-            'data' => $result['data'] ?? null
-        ], $result['success'] ? 200 : 400);
+        return $result['success'] 
+            ? $this->success($result['data'] ?? null, $result['message']) 
+            : $this->error($result['message'], 400);
     }
 
     /**
@@ -511,10 +491,7 @@ class CompetitionController extends Controller
         $submission = CompetitionSubmission::find($request->submission_id);
 
         if ($submission->competition_id !== $competition->id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Submission does not belong to this competition'
-            ], 400);
+            return $this->error('Submission does not belong to this competition', 400);
         }
 
         $result = $prizeService->updatePrizeStatus($submission, $request->status, [
@@ -522,11 +499,9 @@ class CompetitionController extends Controller
             'notes' => $request->notes
         ]);
 
-        return response()->json([
-            'status' => $result['success'] ? 'success' : 'error',
-            'message' => $result['message'],
-            'data' => $result['data'] ?? null
-        ], $result['success'] ? 200 : 400);
+        return $result['success'] 
+            ? $this->success($result['data'] ?? null, $result['message']) 
+            : $this->error($result['message'], 400);
     }
 
     /**
@@ -536,10 +511,7 @@ class CompetitionController extends Controller
     {
         $result = $prizeService->getPrizeReport($competition);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $result['data']
-        ]);
+        return $this->success($result['data'], 'Prize report retrieved successfully');
     }
 
     /**
@@ -549,11 +521,10 @@ class CompetitionController extends Controller
     {
         $result = $prizeService->getPendingPrizes();
 
-        return response()->json([
-            'status' => 'success',
+        return $this->success([
             'data' => $result['data'],
             'total' => $result['total']
-        ]);
+        ], 'Pending prizes retrieved successfully');
     }
 
     /**
@@ -563,9 +534,6 @@ class CompetitionController extends Controller
     {
         $result = $prizeService->getGlobalStatistics();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $result['data']
-        ]);
+        return $this->success($result['data'], 'Global prize statistics retrieved successfully');
     }
 }

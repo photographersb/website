@@ -13,7 +13,8 @@
             <button
               v-if="unreadCount > 0"
               @click="markAllAsRead"
-              class="ml-auto px-4 py-2 text-burgundy hover:text-burgundy-dark transition-colors text-sm font-medium"
+              class="ml-auto px-4 py-2 btn-text transition-colors text-sm font-medium"
+              style="color: var(--admin-brand-primary);"
             >
               Mark all as read
             </button>
@@ -26,7 +27,7 @@
               :class="[
                 'px-4 py-2 rounded-lg transition-colors text-sm font-medium',
                 filter === 'all'
-                  ? 'bg-burgundy text-white'
+                  ? 'btn-primary'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               ]"
             >
@@ -37,7 +38,7 @@
               :class="[
                 'px-4 py-2 rounded-lg transition-colors text-sm font-medium',
                 filter === 'unread'
-                  ? 'bg-burgundy text-white'
+                  ? 'btn-primary'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               ]"
             >
@@ -48,7 +49,7 @@
               :class="[
                 'px-4 py-2 rounded-lg transition-colors text-sm font-medium',
                 filter === 'read'
-                  ? 'bg-burgundy text-white'
+                  ? 'btn-primary'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               ]"
             >
@@ -59,7 +60,7 @@
 
         <!-- Loading State -->
         <div v-if="loading" class="py-12 text-center">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-burgundy mx-auto"></div>
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style="border-bottom-color: var(--admin-brand-primary);\"></div>
           <p class="text-gray-600 mt-4">Loading notifications...</p>
         </div>
 
@@ -109,7 +110,7 @@
 
                   <!-- Unread Badge -->
                   <div v-if="!notification.read_at" class="flex-shrink-0">
-                    <span class="w-3 h-3 bg-burgundy rounded-full block"></span>
+                    <span class="w-3 h-3 rounded-full block" style="background-color: var(--admin-brand-primary);"></span>
                   </div>
                 </div>
 
@@ -117,7 +118,8 @@
                 <div class="mt-3" v-if="getNotificationAction(notification)">
                   <router-link
                     :to="getNotificationAction(notification)"
-                    class="inline-flex items-center text-burgundy hover:text-burgundy-dark text-sm font-medium"
+                    class="inline-flex items-center btn-text text-sm font-medium"
+                    style="color: var(--admin-brand-primary);"
                   >
                     View Details
                     <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

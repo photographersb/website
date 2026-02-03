@@ -29,7 +29,7 @@
                                 <p class="text-sm text-gray-500">{{ category.hashtags_count || 0 }} hashtags</p>
                             </div>
                         </div>
-                        <span :class="[category.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800', 'px-2 py-1 text-xs font-semibold rounded-full']">
+                        <span :class="category.is_active ? 'status-active' : 'status-inactive'">
                             {{ category.is_active ? 'Active' : 'Inactive' }}
                         </span>
                     </div>
@@ -39,7 +39,7 @@
                     <div class="flex justify-between items-center">
                         <span class="text-xs text-gray-500">Order: {{ category.display_order }}</span>
                         <div>
-                            <button @click="editCategory(category)" class="text-blue-600 hover:text-blue-900 text-sm mr-3">Edit</button>
+                            <button @click="editCategory(category)" class="text-burgundy hover:text-burgundy-dark text-sm mr-3">Edit</button>
                             <button @click="deleteCategory(category.id)" class="text-red-600 hover:text-red-900 text-sm">Delete</button>
                         </div>
                     </div>

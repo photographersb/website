@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Photographer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Competition;
 use App\Models\Photographer;
 use App\Models\CompetitionSubmission;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 
 class PhotographerCompetitionController extends Controller
 {
+    use ApiResponse;
     /**
      * Check if user is a verified photographer
      */
@@ -32,7 +34,7 @@ class PhotographerCompetitionController extends Controller
         $photographer = $this->checkVerifiedPhotographer();
 
         $query = CompetitionSubmission::where('photographer_id', $photographer->id)
-            ->with(['competition.category', 'category'])
+            ->with(['competition.categories', 'category'])
             ->select('competition_id')
             ->distinct();
 
@@ -86,7 +88,7 @@ class PhotographerCompetitionController extends Controller
     {
         $photographer = $this->checkVerifiedPhotographer();
 
-        $competition = Competition::with(['category'])
+        $competition = Competition::with(['categories'])
             ->findOrFail($id);
 
         // Get photographer's submissions for this competition

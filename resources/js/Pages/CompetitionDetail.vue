@@ -35,33 +35,33 @@
           <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-3 sm:mb-4 leading-tight drop-shadow-2xl">
             {{ competition.title }}
           </h1>
-          <p v-if="competition.theme" class="text-lg sm:text-xl md:text-2xl text-red-200 font-semibold mb-4 drop-shadow-lg">
+          <p v-if="competition.theme" class="text-lg sm:text-xl md:text-2xl text-red-200 font-semibold mb-8 drop-shadow-lg">
             📷 {{ competition.theme }}
           </p>
         </div>
       </div>
 
       <div class="container mx-auto px-4 -mt-16 sm:-mt-20 relative z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           <!-- Main Content -->
-          <div class="lg:col-span-2 space-y-6">
+          <div class="lg:col-span-2 space-y-8">
             <!-- Stats Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div class="bg-gradient-to-br from-burgundy to-red-800 rounded-2xl shadow-xl p-5 text-center transform hover:scale-105 transition-transform">
-                <div class="text-3xl font-black text-white mb-2">৳{{ formatNumber(competition.total_prize_pool) }}</div>
-                <div class="text-sm text-white/90 font-medium">Prize Pool</div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+              <div class="bg-gradient-to-br from-burgundy via-red-700 to-red-800 rounded-2xl shadow-xl p-6 md:p-8 text-center transform hover:scale-105 transition-transform">
+                <div class="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-2">{{ formatNumber(Math.floor(competition.total_prize_pool)) }}</div>
+                <div class="text-xs md:text-sm text-white/90 font-medium">Prize Pool</div>
               </div>
-              <div class="bg-white rounded-2xl shadow-xl p-5 text-center transform hover:scale-105 transition-transform">
-                <div class="text-3xl font-black text-gray-900 mb-2">{{ competition.total_submissions }}</div>
-                <div class="text-sm text-gray-600 font-medium">Submissions</div>
+              <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 text-center transform hover:scale-105 transition-transform">
+                <div class="text-2xl md:text-3xl lg:text-3xl font-black text-gray-900 mb-2">{{ competition.total_submissions }}</div>
+                <div class="text-xs md:text-sm text-gray-600 font-medium">Submissions</div>
               </div>
-              <div class="bg-white rounded-2xl shadow-xl p-5 text-center transform hover:scale-105 transition-transform">
-                <div class="text-3xl font-black text-purple-600 mb-2">{{ competition.total_votes }}</div>
-                <div class="text-sm text-gray-600 font-medium">Votes</div>
+              <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 text-center transform hover:scale-105 transition-transform">
+                <div class="text-2xl md:text-3xl lg:text-3xl font-black text-purple-600 mb-2">{{ competition.total_votes }}</div>
+                <div class="text-xs md:text-sm text-gray-600 font-medium">Votes</div>
               </div>
-              <div class="bg-white rounded-2xl shadow-xl p-5 text-center transform hover:scale-105 transition-transform">
-                <div class="text-3xl font-black text-blue-600 mb-2">{{ competition.number_of_winners }}</div>
-                <div class="text-sm text-gray-600 font-medium">Winners</div>
+              <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 text-center transform hover:scale-105 transition-transform">
+                <div class="text-2xl md:text-3xl lg:text-3xl font-black text-blue-600 mb-2">{{ competition.number_of_winners }}</div>
+                <div class="text-xs md:text-sm text-gray-600 font-medium">Winners</div>
               </div>
             </div>
 
@@ -130,6 +130,130 @@
               </div>
             </div>
 
+            <!-- Judges Section -->
+            <div v-if="competition.judgeProfiles && competition.judgeProfiles.length > 0" class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+              <h2 class="text-2xl md:text-3xl font-bold mb-6 text-gray-900 flex items-center gap-3">
+                <span class="w-1.5 h-8 bg-burgundy rounded-full"></span>
+                Our Judges
+              </h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div v-for="judge in competition.judgeProfiles" :key="judge.id" 
+                     class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 hover:shadow-lg transition-shadow border border-gray-200">
+                  <div class="flex flex-col items-center text-center">
+                    <!-- Judge Avatar -->
+                    <img v-if="judge.profile_photo_url" 
+                         :src="judge.profile_photo_url" 
+                         :alt="judge.name" 
+                         class="w-20 h-20 rounded-full object-cover mb-4 border-4 border-burgundy" />
+                    <div v-else 
+                         class="w-20 h-20 rounded-full bg-gradient-to-br from-burgundy to-red-700 flex items-center justify-center text-white text-2xl font-bold mb-4 border-4 border-burgundy">
+                      {{ judge.name.charAt(0) }}
+                    </div>
+                    
+                    <!-- Judge Info -->
+                    <h3 class="text-lg font-bold text-gray-900 mb-1">{{ judge.name }}</h3>
+                    <p v-if="judge.expertise" class="text-sm text-red-600 font-medium mb-3">{{ judge.expertise }}</p>
+                    <p class="text-xs text-gray-600 leading-relaxed">
+                      {{ judge.bio || 'Professional photographer and expert judge' }}
+                    </p>
+                    
+                    <!-- Judge Badge -->
+                    <div class="mt-4 inline-block bg-burgundy text-white px-3 py-1 rounded-full text-xs font-semibold">
+                      ⚖️ Chief Judge
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Rules & Eligibility Section -->
+            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+              <button @click="showRules = !showRules" class="w-full flex items-center justify-between mb-6 hover:opacity-80 transition-opacity">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-3">
+                  <span class="w-1.5 h-8 bg-burgundy rounded-full"></span>
+                  Rules & Eligibility
+                </h2>
+                <svg :class="['w-6 h-6 text-burgundy transition-transform', showRules ? 'rotate-180' : '']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+              </button>
+              <div v-if="showRules" class="prose prose-sm max-w-none text-gray-700 leading-relaxed animate-in">
+                <p v-if="competition.rules" class="whitespace-pre-line">{{ competition.rules }}</p>
+                <p v-else class="text-gray-500 italic">No specific rules provided for this competition. Please check with the organizer for details.</p>
+                <div v-if="competition.terms_and_conditions" class="mt-6 pt-6 border-t">
+                  <h3 class="text-lg font-bold text-gray-900 mb-3">Terms & Conditions</h3>
+                  <p class="whitespace-pre-line">{{ competition.terms_and_conditions }}</p>
+                </div>
+              </div>
+              <div v-else class="text-center py-4">
+                <p class="text-sm text-gray-600">Click to view competition rules and eligibility criteria</p>
+              </div>
+            </div>
+
+            <!-- Sponsors Section -->
+            <div v-if="competition.sponsors && competition.sponsors.length > 0" class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+              <h2 class="text-2xl md:text-3xl font-bold mb-6 text-gray-900 flex items-center gap-3">
+                <span class="w-1.5 h-8 bg-burgundy rounded-full"></span>
+                Our Sponsors
+              </h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div v-for="sponsor in competition.sponsors" :key="sponsor.id" 
+                     class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 hover:shadow-lg transition-shadow border border-gray-200 flex items-center gap-4">
+                  <img v-if="sponsor.logo_url" 
+                       :src="sponsor.logo_url" 
+                       :alt="sponsor.name" 
+                       class="w-20 h-20 object-contain" />
+                  <div v-else 
+                       class="w-20 h-20 rounded-lg bg-gray-300 flex items-center justify-center text-gray-600 font-bold text-sm">
+                    {{ sponsor.name.substring(0, 2).toUpperCase() }}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <h3 class="text-lg font-bold text-gray-900 mb-1 truncate">{{ sponsor.name }}</h3>
+                    <p v-if="sponsor.website" class="text-sm text-burgundy hover:underline truncate">
+                      <a :href="sponsor.website" target="_blank" rel="noopener">Visit Website</a>
+                    </p>
+                    <p v-if="sponsor.description" class="text-xs text-gray-600 mt-2 line-clamp-2">{{ sponsor.description }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mentors Section -->
+            <div v-if="competition.mentors && competition.mentors.length > 0" class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+              <h2 class="text-2xl md:text-3xl font-bold mb-6 text-gray-900 flex items-center gap-3">
+                <span class="w-1.5 h-8 bg-burgundy rounded-full"></span>
+                Our Mentors
+              </h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div v-for="mentor in competition.mentors" :key="mentor.id" 
+                     class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 hover:shadow-lg transition-shadow border border-gray-200">
+                  <div class="flex flex-col items-center text-center">
+                    <!-- Mentor Avatar -->
+                    <img v-if="mentor.profile_photo_url" 
+                         :src="mentor.profile_photo_url" 
+                         :alt="mentor.name" 
+                         class="w-20 h-20 rounded-full object-cover mb-4 border-4 border-blue-500" />
+                    <div v-else 
+                         class="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-2xl font-bold mb-4 border-4 border-blue-500">
+                      {{ mentor.name.charAt(0) }}
+                    </div>
+                    
+                    <!-- Mentor Info -->
+                    <h3 class="text-lg font-bold text-gray-900 mb-1">{{ mentor.name }}</h3>
+                    <p v-if="mentor.expertise" class="text-sm text-blue-600 font-medium mb-3">{{ mentor.expertise }}</p>
+                    <p class="text-xs text-gray-600 leading-relaxed">
+                      {{ mentor.bio || 'Experienced mentor and guide' }}
+                    </p>
+                    
+                    <!-- Mentor Badge -->
+                    <div class="mt-4 inline-block bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                      👨‍🏫 Mentor
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Submissions / Leaderboard -->
             <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
               <div class="flex items-center justify-between mb-6">
@@ -175,7 +299,7 @@
           </div>
 
           <!-- Sidebar -->
-          <div class="lg:col-span-1 space-y-5">
+          <div class="lg:col-span-1 space-y-8">
             <!-- Action Card -->
             <div class="bg-white rounded-2xl shadow-xl p-6 lg:sticky lg:top-6">
               <div class="space-y-5">
@@ -261,7 +385,7 @@
             </div>
 
             <!-- Share Card -->
-            <div class="bg-white rounded-lg shadow-lg p-4 sm:p-5 md:p-6">
+            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
               <h3 class="font-semibold mb-3 text-sm sm:text-base">Share Competition</h3>
               <div class="flex flex-wrap gap-2">
                 <button @click="shareOnFacebook" class="flex-1 min-w-[100px] bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base">
@@ -299,7 +423,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import axios from 'axios';
+import axios from '../bootstrap';
 
 const route = useRoute();
 const router = useRouter();
@@ -308,6 +432,7 @@ const competition = ref(null);
 const topSubmissions = ref([]);
 const loading = ref(true);
 const isAuthenticated = ref(false);
+const showRules = ref(false);
 
 const isVotingActive = computed(() => {
   if (!competition.value) return false;

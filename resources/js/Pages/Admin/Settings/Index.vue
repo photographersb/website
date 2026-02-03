@@ -1,11 +1,18 @@
 <template>
-  <div class="admin-settings">
-    <div class="page-header">
-      <h1 class="page-title">⚙️ System Settings</h1>
-      <p class="page-subtitle">Configure platform settings and preferences</p>
-    </div>
+  <div class="min-h-screen bg-gray-50">
+    <!-- Admin Header with Back Button & Notifications -->
+    <AdminHeader 
+      title="⚙️ System Settings" 
+      subtitle="Configure platform settings and preferences"
+    />
 
-    <div class="settings-layout">
+    <!-- Main Content -->
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      
+      <!-- Quick Navigation -->
+      <AdminQuickNav />
+
+      <div class="settings-layout">
       <div class="settings-nav">
         <button 
           v-for="tab in tabs" 
@@ -28,7 +35,7 @@
               v-model="settings.platform_name" 
               type="text" 
               class="form-input" 
-              placeholder="Photographar"
+              placeholder="Photographer SB"
             />
           </div>
 
@@ -122,7 +129,7 @@
               v-model="settings.mail_from_name" 
               type="text" 
               class="form-input" 
-              placeholder="Photographar"
+              placeholder="Photographer SB"
             />
           </div>
 
@@ -257,11 +264,14 @@
     <div v-if="showSuccess" class="success-toast">
       ✅ Settings saved successfully!
     </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import AdminHeader from '../../../components/AdminHeader.vue'
+import AdminQuickNav from '../../../components/AdminQuickNav.vue'
 
 const activeTab = ref('general')
 const showSuccess = ref(false)
@@ -323,7 +333,7 @@ onMounted(() => {
 .settings-nav { background: white; border-radius: 1rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); height: fit-content; position: sticky; top: 2rem; }
 .nav-item { width: 100%; text-align: left; padding: 0.75rem 1rem; background: none; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 500; color: #6b7280; margin-bottom: 0.5rem; transition: all 0.2s; }
 .nav-item:hover { background: #f3f4f6; }
-.nav-item.active { background: #6c0b1a; color: white; }
+.nav-item.active { background: var(--admin-brand-primary); color: white; }
 .settings-content { background: white; border-radius: 1rem; padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); min-height: 500px; }
 .settings-section h2 { margin-bottom: 2rem; color: #1f2937; font-size: 1.5rem; font-weight: 700; }
 .settings-section h3 { margin: 1.5rem 0 1rem; color: #374151; font-size: 1.125rem; font-weight: 600; }
@@ -331,9 +341,9 @@ onMounted(() => {
 .setting-group { margin-bottom: 1.5rem; }
 .setting-group label { display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500; font-size: 0.875rem; }
 .form-input { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.875rem; transition: border-color 0.2s; }
-.form-input:focus { outline: none; border-color: #6c0b1a; box-shadow: 0 0 0 3px rgba(108, 11, 26, 0.1); }
-.btn-save { background: #6c0b1a; color: white; padding: 0.75rem 2rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; margin-top: 1rem; transition: all 0.2s; }
-.btn-save:hover { background: #4a070f; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(108, 11, 26, 0.2); }
+.form-input:focus { outline: none; border-color: var(--admin-brand-primary); box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.12); }
+.btn-save { background: var(--admin-brand-primary); color: white; padding: 0.75rem 2rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; margin-top: 1rem; transition: all 0.2s; }
+.btn-save:hover { background: var(--admin-brand-primary-dark); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(139, 21, 56, 0.2); }
 .success-toast { position: fixed; bottom: 2rem; right: 2rem; background: #10b981; color: white; padding: 1rem 2rem; border-radius: 0.5rem; box-shadow: 0 10px 15px rgba(0,0,0,0.1); font-weight: 600; animation: slideIn 0.3s ease-out; }
 @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 .text-sm { font-size: 0.875rem; }

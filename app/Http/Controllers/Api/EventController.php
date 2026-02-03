@@ -3,230 +3,289 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Event;
-use App\Models\EventRsvp;
+use App\Models\EventRegistration;
+use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
+    use ApiResponse;
     /**
-     * Get events statistics (cached for 10 minutes)
+     * Get all published events with pagination
      */
-    public function stats()
+    public function index(Request $request): JsonResponse
     {
-        return Cache::remember('events_stats', 600, function () {
-            $totalEvents = Event::where('status', 'published')->count();
-            $upcomingEvents = Event::where('status', 'published')
-                ->where('event_date', '>=', now())
-                ->count();
-            $totalCities = Event::where('status', 'published')
-                ->distinct('city_id')
-                ->count('city_id');
-            $totalRsvps = EventRsvp::where('rsvp_status', 'going')->count();
+        // Enforce pagination limits to prevent DoS
+        $perPage = min($request->get('per_page', 15), 100);
+        $page = $request->get('page', 1);
 
-            return response()->json([
-                'status' => 'success',
-                'data' => [
-                    'total_events' => $totalEvents,
-                    'upcoming_events' => $upcomingEvents,
-                    'total_cities' => $totalCities,
-                    'total_rsvps' => $totalRsvps,
-                ],
-            ]);
-        });
-    }
+        $query = Event::published()
+            ->with(['category', 'city', 'organizer']);
 
-    /**
-     * Get all events with filters
-     */
-    public function index(Request $request)
-    {
-        $query = Event::where('status', 'published')
-            ->with(['organizer.user', 'city']);
+        // Filter by category
+        if ($request->has('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
 
         // Filter by city
-        if ($request->has('city')) {
-            $query->whereHas('city', function ($q) {
-                $q->where('slug', request('city'));
+        if ($request->has('city_id')) {
+            $query->where('city_id', $request->city_id);
+        }
+
+        // Filter by type
+        if ($request->has('type')) {
+            $query->where('event_type', $request->type);
+        }
+
+        // Search
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
-        // Filter by event type
-        if ($request->has('event_type')) {
-            $query->where('event_type', $request->event_type);
+        // Featured scope ordering
+        $featuredScope = $request->get('featured_scope', 'global');
+        $now = now();
+
+        if ($featuredScope === 'area' && $request->filled('city_id')) {
+            $cityId = $request->city_id;
+            $query->orderByRaw(
+                "CASE WHEN is_featured = 1 AND (featured_until IS NULL OR featured_until >= ?) AND city_id = ? THEN 2 WHEN is_featured = 1 AND (featured_until IS NULL OR featured_until >= ?) THEN 1 ELSE 0 END DESC",
+                [$now, $cityId, $now]
+            );
+        } elseif ($featuredScope === 'category' && $request->filled('category_id')) {
+            $categoryId = $request->category_id;
+            $query->orderByRaw(
+                "CASE WHEN is_featured = 1 AND (featured_until IS NULL OR featured_until >= ?) AND category_id = ? THEN 2 WHEN is_featured = 1 AND (featured_until IS NULL OR featured_until >= ?) THEN 1 ELSE 0 END DESC",
+                [$now, $categoryId, $now]
+            );
+        } else {
+            $query->orderByRaw(
+                "CASE WHEN is_featured = 1 AND (featured_until IS NULL OR featured_until >= ?) THEN 1 ELSE 0 END DESC",
+                [$now]
+            );
         }
 
-        // Filter by date range
-        if ($request->has('from_date')) {
-            $query->where('event_date', '>=', $request->from_date);
+        // Filter upcoming vs past
+        if ($request->input('filter') === 'upcoming') {
+            $query->upcoming();
+        } elseif ($request->input('filter') === 'past') {
+            $query->past();
         }
 
-        if ($request->has('to_date')) {
-            $query->where('event_date', '<=', $request->to_date);
+        $query->orderBy('event_date', 'asc');
+
+        $events = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $this->paginated($events, 'Events retrieved successfully');
+    }
+
+    /**
+     * Get featured events
+     */
+    public function featured(Request $request): JsonResponse
+    {
+        $query = Event::published()
+            ->featured()
+            ->with(['category', 'city', 'organizer'])
+            ->orderBy('event_date', 'asc')
+            ->take(6);
+
+        $events = $query->get();
+
+        return $this->success($events, 'Featured events retrieved successfully');
+    }
+
+    /**
+     * Get event by slug
+     */
+    public function show($slug): JsonResponse
+    {
+        $relations = [
+            'category',
+            'city',
+            'organizer',
+        ];
+
+        if (Schema::hasTable('event_rsvps')) {
+            $relations['rsvps'] = function ($q) {
+                $q->where('rsvp_status', 'going')->orWhere('rsvp_status', 'maybe');
+            };
         }
 
-        // Sort
-        $sortField = 'event_date';
-        $sortDirection = 'asc';
+        if (Schema::hasTable('event_tickets')) {
+            $relations[] = 'tickets';
+        }
 
-        if ($request->has('sort')) {
-            switch ($request->sort) {
-                case 'date_desc':
-                    $sortDirection = 'desc';
-                    break;
-                case 'featured':
-                    $sortField = 'is_featured';
-                    $sortDirection = 'desc';
-                    break;
+        $event = Event::with($relations)
+        ->bySlug($slug)
+        ->firstOrFail();
+
+        // Check if published (or admin can view drafts)
+        if (!$event->isPublished() && !Auth::check()) {
+            abort(404);
+        }
+
+        if (!$event->isPublished() && Auth::check() && Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized to view this event');
+        }
+
+        $userRegistration = null;
+        if (Auth::check() && Schema::hasTable('event_rsvps')) {
+            $userRegistration = $event->getUserRegistration(Auth::id());
+        }
+
+        return $this->success([
+            'event' => $event,
+            'user_registration' => $userRegistration,
+            'schema' => $this->generateEventSchema($event),
+        ], 'Event retrieved successfully');
+    }
+
+    /**
+     * RSVP to a free event
+     */
+    public function rsvp(Request $request, Event $event): JsonResponse
+    {
+        if (!Auth::check()) {
+            return $this->unauthorized('Unauthorized');
+        }
+
+        // Check if event is free
+        if ($event->is_paid) {
+            return $this->error('Please purchase tickets for this paid event', 400);
+        }
+
+        // Check booking window
+        if (!$event->isBookingOpen()) {
+            return $this->error('Booking window for this event has closed', 400);
+        }
+
+        // Get or create registration
+        $existing = $event->getUserRegistration(Auth::id());
+        
+        if ($existing) {
+            // Toggle RSVP status
+            if ($existing->rsvp_status === 'going') {
+                $existing->update([
+                    'rsvp_status' => 'not_going',
+                    'responded_at' => now(),
+                ]);
+                $message = 'RSVP cancelled';
+            } else {
+                $existing->update([
+                    'rsvp_status' => 'going',
+                    'responded_at' => now(),
+                ]);
+                $message = 'RSVP updated to going';
             }
+            $registration = $existing->fresh();
+        } else {
+            // Check capacity for new registration
+            if ($event->capacity && !$event->hasCapacityFor(1)) {
+                return $this->error('Not enough seats available', 400);
+            }
+
+            // Create new registration
+            $registration = $event->registrations()->create([
+                'user_id' => Auth::id(),
+                'rsvp_status' => 'going',
+                'responded_at' => now(),
+            ]);
+            $message = 'RSVP successful';
         }
 
-        $query->orderBy($sortField, $sortDirection);
-
-        if ($sortField !== 'is_featured') {
-            $query->orderBy('is_featured', 'desc');
-        }
-
-        $events = $query->paginate(12);
-
-        return response()->json([
-            'status' => 'success',
-            'data' => $events->items(),
-            'meta' => [
-                'total' => $events->total(),
-                'per_page' => $events->perPage(),
-                'current_page' => $events->currentPage(),
-                'last_page' => $events->lastPage(),
-            ],
-        ]);
+        return $this->success($registration->load('event'), $message);
     }
 
     /**
-     * Get single event
+     * Get user's event registrations
      */
-    public function show($slug)
+    public function myEvents(Request $request): JsonResponse
     {
-        $event = Event::where('slug', $slug)->first();
-
-        if (!$event) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Event not found',
-            ], 404);
+        if (!Auth::check()) {
+            return $this->unauthorized('Unauthorized');
         }
 
-        if ($event->status !== 'published' && auth()->user()?->id !== $event->organizer->user_id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Event not found',
-            ], 404);
-        }
+        $registrations = EventRegistration::with('event', 'ticket')
+            ->where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->paginate($request->input('per_page', 10));
 
-        $event->load(['organizer.user', 'city']);
-        $event->increment('view_count');
-
-        return response()->json([
-            'status' => 'success',
-            'data' => $event,
-        ]);
+        return $this->paginated($registrations, 'User events retrieved successfully');
     }
 
     /**
-     * Check user's RSVP status for an event
+     * Generate Event schema.org JSON-LD
      */
-    public function rsvpStatus($eventId)
+    private function generateEventSchema(Event $event): array
     {
-        // Check if user is authenticated
-        if (!auth()->check()) {
-            return response()->json([
-                'status' => 'success',
-                'data' => [
-                    'is_rsvped' => false,
+        $offers = [];
+        if (Schema::hasTable('event_tickets')) {
+            $offers = $event->tickets->map(function ($ticket) use ($event) {
+                return [
+                    '@type' => 'Offer',
+                    'url' => route('events.show', $event->slug),
+                    'price' => $ticket->price,
+                    'priceCurrency' => 'BDT',
+                    'availability' => $ticket->getAvailableQuantity() > 0
+                        ? 'https://schema.org/InStock'
+                        : 'https://schema.org/OutOfStock',
+                    'validFrom' => $ticket->sales_start_datetime->toIso8601String(),
+                ];
+            })->toArray();
+        }
+
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'Event',
+            'name' => $event->title,
+            'description' => $event->description,
+            'image' => $event->hero_image_url ?? $event->banner_image,
+            'startDate' => optional($event->event_date)->toIso8601String(),
+            'endDate' => optional($event->event_end_date)->toIso8601String(),
+            'eventStatus' => 'https://schema.org/EventScheduled',
+            'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendanceMode',
+            'location' => [
+                '@type' => 'Place',
+                'name' => $event->location ?? $event->venue ?? $event->location_text,
+                'address' => [
+                    '@type' => 'PostalAddress',
+                    'addressLocality' => $event->city?->name ?? '',
+                    'addressCountry' => 'BD',
                 ],
-            ]);
-        }
-
-        $rsvp = EventRsvp::where('event_id', $eventId)
-            ->where('user_id', auth()->id())
-            ->where('rsvp_status', 'going')
-            ->first();
-
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'is_rsvped' => $rsvp !== null,
             ],
-        ]);
+            'organizer' => [
+                '@type' => 'Organization',
+                'name' => $event->organizer?->name ?? 'Event Organizer',
+            ],
+            'offers' => $offers,
+        ];
     }
 
     /**
-     * RSVP to event
+     * Get event statistics
      */
-    public function rsvp(Request $request, $eventId)
+    public function stats(): JsonResponse
     {
-        // Support both numeric ID and slug
-        $event = is_numeric($eventId)
-            ? Event::findOrFail($eventId)
-            : Event::where('slug', $eventId)->firstOrFail();
+        $stats = [
+            'total_events' => Event::where('status', 'published')->count(),
+            'upcoming_events' => Event::where('status', 'published')
+                ->where('event_date', '>=', now())
+                ->count(),
+            'total_cities' => Event::where('status', 'published')
+                ->distinct('city_id')
+                ->whereNotNull('city_id')
+                ->count('city_id'),
+            'total_rsvps' => Event::where('status', 'published')->sum('rsvp_count'),
+        ];
 
-        $validated = $request->validate([
-            'rsvp_status' => 'required|in:going,maybe,not_going',
-        ]);
-
-        // Check capacity
-        if ($event->max_attendees && $event->rsvp_count >= $event->max_attendees) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Event is full',
-            ], 422);
-        }
-
-        try {
-            $rsvp = DB::transaction(function () use ($event, $validated) {
-                $rsvp = EventRsvp::updateOrCreate(
-                    [
-                        'event_id' => $event->id,
-                        'user_id' => auth()->id(),
-                    ],
-                    [
-                        'rsvp_status' => $validated['rsvp_status'],
-                        'responded_at' => now(),
-                    ]
-                );
-
-                // Update event RSVP count
-                $event->rsvp_count = EventRsvp::where('event_id', $event->id)
-                    ->where('rsvp_status', 'going')
-                    ->count();
-                $event->save();
-
-                return $rsvp;
-            });
-
-            Log::info('RSVP updated successfully', [
-                'event_id' => $event->id,
-                'user_id' => auth()->id(),
-                'rsvp_status' => $validated['rsvp_status'],
-            ]);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'RSVP updated',
-                'data' => $rsvp,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Failed to update RSVP', [
-                'event_id' => $event->id,
-                'user_id' => auth()->id(),
-                'error' => $e->getMessage(),
-            ]);
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to update RSVP. Please try again.',
-            ], 500);
-        }
+        return $this->success($stats, 'Event stats retrieved successfully');
     }
 }

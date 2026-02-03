@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Review;
+use App\Http\Traits\ApiResponse;
+use App\Services\NotificationService;
+use App\Services\PhotographerNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ReviewController extends Controller
 {
+    use ApiResponse;
     /**
      * Create review for booking
      */
@@ -37,18 +41,12 @@ class ReviewController extends Controller
 
             // Verify user is the reviewer
             if ($booking->client_id !== auth()->id()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Unauthorized',
-                ], 403);
+                return $this->unauthorized('Unauthorized');
             }
 
             // Check if booking is completed
             if ($booking->status !== 'completed') {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Can only review completed bookings',
-                ], 422);
+                return $this->validationError(['booking_id' => ['Can only review completed bookings']], 'Can only review completed bookings');
             }
 
             $isVerifiedPurchase = true;
@@ -63,6 +61,35 @@ class ReviewController extends Controller
                 'status' => 'pending',
             ]);
 
+            // Send new review notification
+            $review->load(['photographer', 'reviewer']);
+            
+            // Notify photographer
+            try {
+                PhotographerNotificationService::notifyNewReview($review);
+            } catch (\Exception $notificationError) {
+                Log::warning('Failed to send photographer notification', [
+                    'review_id' => $review->id,
+                    'error' => $notificationError->getMessage(),
+                ]);
+            }
+
+            // Track review achievement
+            \App\Services\AchievementService::trackReviewReceived(
+                $validated['photographer_id'],
+                $validated['rating']
+            );
+
+            // Send system notification
+            try {
+                NotificationService::newReview($review);
+            } catch (\Exception $notificationError) {
+                Log::warning('Failed to send new review notification', [
+                    'review_id' => $review->id,
+                    'error' => $notificationError->getMessage(),
+                ]);
+            }
+
             Log::info('Review created successfully', [
                 'review_id' => $review->id,
                 'photographer_id' => $validated['photographer_id'],
@@ -70,11 +97,7 @@ class ReviewController extends Controller
                 'is_verified' => $isVerifiedPurchase,
             ]);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Review created successfully',
-                'data' => $review,
-            ], 201);
+            return $this->created($review, 'Review created successfully');
         } catch (\Exception $e) {
             Log::error('Failed to create review', [
                 'error' => $e->getMessage(),
@@ -82,10 +105,7 @@ class ReviewController extends Controller
                 'reviewer_id' => auth()->id(),
             ]);
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to submit review. Please try again.',
-            ], 500);
+            return $this->error('Failed to submit review. Please try again.', 500);
         }
     }
 
@@ -102,14 +122,7 @@ class ReviewController extends Controller
             ->orderBy('published_at', 'desc')
             ->paginate(20);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $reviews->items(),
-            'meta' => [
-                'total' => $reviews->total(),
-                'per_page' => $reviews->perPage(),
-            ],
-        ]);
+        return $this->paginated($reviews, 'Reviews retrieved successfully');
     }
 
     /**
@@ -119,10 +132,7 @@ class ReviewController extends Controller
     {
         // Check admin access
         if (!auth()->check() || !in_array(auth()->user()->role, ['admin', 'super_admin'])) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized. Admin access required.'
-            ], 403);
+            return $this->unauthorized('Unauthorized. Admin access required.');
         }
 
         $query = Review::with(['reviewer', 'photographer.user', 'booking']);
@@ -145,9 +155,6 @@ class ReviewController extends Controller
 
         $reviews = $query->orderBy('created_at', 'desc')->get();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $reviews,
-        ]);
+        return $this->success($reviews, 'Reviews retrieved successfully');
     }
 }

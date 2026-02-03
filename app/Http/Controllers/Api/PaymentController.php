@@ -3,14 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Payment;
-use App\Models\Transaction;
+use App\Http\Traits\ApiResponse;
 use App\Models\Booking;
+use App\Models\Transaction;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
+    use ApiResponse;
+
     public function __construct(private PaymentService $paymentService)
     {
     }
@@ -26,35 +29,29 @@ class PaymentController extends Controller
             'amount' => 'required|numeric|gt:0',
         ]);
 
-        $booking = Booking::find($validated['booking_id']);
+        $booking = Booking::findOrFail($validated['booking_id']);
 
-        // Check authorization
-        if ($booking->client_id !== auth()->id()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ], 403);
+        if ($booking->client_id !== Auth::id()) {
+            return $this->unauthorized('Unauthorized');
         }
 
-        // Check if booking is pending payment
         if ($booking->status !== 'pending_payment') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Booking is not pending payment',
-            ], 422);
+            return $this->validationError(['booking' => 'Booking is not pending payment'], 'Booking is not pending payment');
         }
 
-        $paymentMethod = $validated['payment_method'];
-
-        // Route to appropriate payment gateway
-        $response = match ($paymentMethod) {
-            'card' => $this->processSSLCommerz($booking, $validated['amount']),
-            'bkash' => $this->processBKash($booking, $validated['amount']),
-            'nagad' => $this->processNagad($booking, $validated['amount']),
-            'bank_transfer' => $this->initiateBankTransfer($booking, $validated['amount']),
+        $method = match ($validated['payment_method']) {
+            'card' => 'sslcommerz',
+            'bkash' => 'bkash',
+            'nagad' => 'nagad',
+            'bank_transfer' => 'bank',
         };
 
-        return response()->json($response);
+        try {
+            $response = $this->paymentService->initiatePayment($booking, $method, $validated['amount']);
+            return $this->success($response, 'Payment initiated successfully');
+        } catch (\Exception $e) {
+            return $this->error('Failed to initiate payment: ' . $e->getMessage(), 500);
+        }
     }
 
     /**
@@ -65,26 +62,9 @@ class PaymentController extends Controller
         $transactionId = $request->get('tran_id') ?? $request->get('transaction_id');
 
         try {
-            $result = $this->paymentService->handleCallback($transactionId, 'success', $request->all());
+            $this->paymentService->handleCallback($transactionId, 'completed', $request->all());
 
-            // Redirect to frontend success page
             return redirect(env('FRONTEND_URL', 'http://localhost:5173') . '/payment/success?transaction=' . $transactionId);
-        } catch (\Exception $e) {
-            return redirect(env('FRONTEND_URL', 'http://localhost:5173') . '/payment/error?message=' . urlencode($e->getMessage()));
-        }
-    }
-
-    /**
-     * Payment failure callback
-     */
-    public function failCallback(Request $request)
-    {
-        $transactionId = $request->get('tran_id') ?? $request->get('transaction_id');
-
-        try {
-            $this->paymentService->handleCallback($transactionId, 'failed', $request->all());
-
-            return redirect(env('FRONTEND_URL', 'http://localhost:5173') . '/payment/failed?transaction=' . $transactionId);
         } catch (\Exception $e) {
             return redirect(env('FRONTEND_URL', 'http://localhost:5173') . '/payment/error?message=' . urlencode($e->getMessage()));
         }
@@ -109,24 +89,18 @@ class PaymentController extends Controller
     /**
      * Get transaction details
      */
-    public function getTransaction($transactionId)
+    public function getTransaction(string $transactionId)
     {
         $transaction = Transaction::with(['booking.photographer.user', 'user'])
             ->where('reference_id', $transactionId)
+            ->orWhere('transaction_id', $transactionId)
             ->firstOrFail();
 
-        // Check authorization
-        if ($transaction->user_id !== auth()->id() && $transaction->booking->photographer->user_id !== auth()->id()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ], 403);
+        if ($transaction->user_id !== Auth::id() && $transaction->booking?->photographer?->user_id !== Auth::id()) {
+            return $this->unauthorized('Unauthorized');
         }
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $transaction,
-        ]);
+        return $this->success($transaction, 'Transaction retrieved successfully');
     }
 
     /**
@@ -135,14 +109,12 @@ class PaymentController extends Controller
     public function myTransactions(Request $request)
     {
         $query = Transaction::with(['booking.photographer.user'])
-            ->where('user_id', auth()->id());
+            ->where('user_id', Auth::id());
 
-        // Filter by status
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
 
-        // Filter by payment method
         if ($request->has('payment_method')) {
             $query->where('payment_method', $request->payment_method);
         }
@@ -150,10 +122,47 @@ class PaymentController extends Controller
         $transactions = $query->orderBy('created_at', 'desc')
             ->paginate($request->get('per_page', 15));
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $transactions,
-        ]);
+        return $this->paginated($transactions, 'Transactions retrieved successfully');
     }
 
+    /**
+     * Process refund
+     */
+    public function refund(Request $request, string $transactionId)
+    {
+        if (!Auth::check()) {
+            return $this->unauthorized('Unauthorized');
+        }
+
+        $validated = $request->validate([
+            'reason' => 'required|string|max:500',
+            'refund_amount' => 'nullable|numeric|gt:0',
+        ]);
+
+        $transaction = Transaction::where('reference_id', $transactionId)
+            ->orWhere('transaction_id', $transactionId)
+            ->firstOrFail();
+
+        if ($transaction->user_id !== Auth::id() && !in_array(Auth::user()->role, ['admin', 'super_admin'])) {
+            return $this->unauthorized('Unauthorized');
+        }
+
+        $refundAmount = $validated['refund_amount'] ?? $transaction->amount;
+
+        if ($refundAmount > $transaction->amount) {
+            return $this->validationError(['refund_amount' => 'Refund amount cannot exceed transaction amount'], 'Refund amount cannot exceed transaction amount');
+        }
+
+        try {
+            $refundResult = $this->paymentService->processRefund($transaction, $refundAmount, $validated['reason']);
+
+            return $this->success([
+                'transaction_id' => $transaction->id,
+                'refund_amount' => $refundAmount,
+                'refund_status' => $refundResult['status'] ?? 'completed',
+            ], 'Refund initiated successfully');
+        } catch (\Exception $e) {
+            return $this->validationError(['refund' => $e->getMessage()], $e->getMessage());
+        }
+    }
 }

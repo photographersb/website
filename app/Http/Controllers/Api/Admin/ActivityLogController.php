@@ -39,9 +39,12 @@ class ActivityLogController extends Controller
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        // Search in description
+        // Search in description and action
         if ($request->has('search')) {
-            $query->where('description', 'like', '%' . $request->search . '%');
+            $query->where(function($q) use ($request) {
+                $q->where('description', 'like', '%' . $request->search . '%')
+                  ->orWhere('action', 'like', '%' . $request->search . '%');
+            });
         }
 
         // Sort by latest first
