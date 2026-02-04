@@ -2,29 +2,29 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AdminSitemapCheckResult extends Model
 {
+    use HasFactory;
+
     protected $table = 'admin_sitemap_check_results';
 
     protected $fillable = [
         'check_id',
+        'module',
         'route_name',
         'url',
         'method',
-        'module',
         'status_code',
         'response_time_ms',
         'result_status',
         'error_summary',
-        'error_details',
-        'has_blank_body'
     ];
 
     protected $casts = [
-        'has_blank_body' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime'
     ];

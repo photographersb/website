@@ -10,13 +10,11 @@ class BookingStatusLog extends Model
     public $timestamps = false; // only created_at, no updated_at
 
     protected $fillable = [
-        'booking_id',
+        'booking_request_id',
         'old_status',
         'new_status',
         'changed_by_user_id',
-        'reason',
-        'notes',
-        'ip_address',
+        'note',
         'created_at'
     ];
 
@@ -24,9 +22,9 @@ class BookingStatusLog extends Model
         'created_at' => 'datetime'
     ];
 
-    public function booking(): BelongsTo
+    public function bookingRequest(): BelongsTo
     {
-        return $this->belongsTo(Booking::class);
+        return $this->belongsTo(BookingRequest::class);
     }
 
     public function changedByUser(): BelongsTo

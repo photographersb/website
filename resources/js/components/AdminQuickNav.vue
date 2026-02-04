@@ -158,6 +158,38 @@
         </svg>
         <span class="text-xs font-medium text-primary-700">Notifications</span>
       </router-link>
+
+      <!-- Error Center -->
+      <router-link to="/admin/error-center" class="quick-nav-btn bg-primary-50 hover:bg-primary-100 border-primary-200">
+        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 5v1M12 3a9 9 0 110 18 9 9 0 010-18z" />
+        </svg>
+        <span class="text-xs font-medium text-primary-700">Errors</span>
+      </router-link>
+
+      <!-- Audit Logs -->
+      <router-link to="/admin/audit-logs" class="quick-nav-btn bg-primary-50 hover:bg-primary-100 border-primary-200">
+        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <span class="text-xs font-medium text-primary-700">Audit</span>
+      </router-link>
+
+      <!-- Share Frames -->
+      <router-link to="/admin/share-frames" class="quick-nav-btn bg-primary-50 hover:bg-primary-100 border-primary-200">
+        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0l7.172 7.172m-7.172-7.172a2 2 0 012.828 0L20 16" />
+        </svg>
+        <span class="text-xs font-medium text-primary-700">Frames</span>
+      </router-link>
+
+      <!-- Hashtags -->
+      <router-link to="/admin/hashtags" class="quick-nav-btn bg-primary-50 hover:bg-primary-100 border-primary-200">
+        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+        </svg>
+        <span class="text-xs font-medium text-primary-700">Hashtags</span>
+      </router-link>
       </div>
     </div>
   </div>

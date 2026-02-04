@@ -772,7 +772,7 @@ class AdminController extends Controller
 
         // Check if requesting for simple dropdown (minimal data) - for event forms
         if ($request->get('minimal') === 'true' || $request->get('minimal') === '1') {
-            $photographers = $query->select('id', 'user_id', 'business_name')
+            $photographers = $query->select('id', 'user_id', 'slug')
                 ->with('user:id,name,email')
                 ->orderBy('id', 'desc')
                 ->get();
@@ -917,6 +917,45 @@ class AdminController extends Controller
         $this->auditLog("Featured photographer #{$id}");
 
         return $this->success($photographer->fresh(), 'Photographer featured status updated');
+    }
+
+    /**
+     * Get mentors list (for event forms)
+     */
+    public function getMentors(Request $request)
+    {
+        $this->checkAdminAccess();
+
+        $query = Mentor::query();
+
+        // Filter by active status
+        if ($request->has('status') && $request->status === 'active') {
+            $query->where('is_active', true);
+        }
+
+        // Check if requesting for simple dropdown (minimal data) - for event forms
+        if ($request->get('minimal') === 'true' || $request->get('minimal') === '1') {
+            $mentors = $query->select('id', 'name', 'email')
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get();
+            return $this->success($mentors, 'Mentors retrieved (minimal)');
+        }
+
+        // Full list with pagination
+        $perPage = $request->input('per_page', 20);
+        $mentors = $query->orderBy('name')->paginate($perPage);
+
+        return $this->success([
+            'mentors' => $mentors->items(),
+        ], 'Mentors retrieved successfully', 200, [
+            'meta' => [
+                'total' => $mentors->total(),
+                'per_page' => $mentors->perPage(),
+                'current_page' => $mentors->currentPage(),
+                'last_page' => $mentors->lastPage(),
+            ]
+        ]);
     }
 
     /**

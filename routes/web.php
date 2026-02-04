@@ -37,17 +37,146 @@ Route::prefix('api/photographers')->group(function () {
     Route::get('/search', [\App\Http\Controllers\PublicPhotographerController::class, 'search'])->name('photographer.search.api');
 });
 
+// Admin Access Gate - Shows landing page or redirects to dashboard
+Route::get('/admin', [\App\Http\Controllers\Admin\AdminAccessController::class, 'index'])
+    ->name('admin.gate')
+    ->middleware('throttle:30,1');
+
 // Admin Routes are handled by Vue Router + API endpoints
 // See routes/api.php for admin API endpoints (/api/v1/admin/*)
 
 // Admin Sitemap (Web-based UI)
-Route::prefix('admin')->group(function () {
-    Route::get('/sitemap', [\App\Http\Controllers\Admin\AdminSitemapController::class, 'index'])->name('admin.sitemap');
-    Route::post('/sitemap/test', [\App\Http\Controllers\Admin\AdminSitemapController::class, 'startTest'])->name('admin.sitemap.test');
-    Route::get('/sitemap/checks/{check}', [\App\Http\Controllers\Admin\AdminSitemapController::class, 'viewCheck'])->name('admin.sitemap.check');
-    Route::get('/sitemap/checks/{check}/stats', [\App\Http\Controllers\Admin\AdminSitemapController::class, 'checkStats'])->name('admin.sitemap.stats');
-    Route::get('/sitemap/checks/{check}/export', [\App\Http\Controllers\Admin\AdminSitemapController::class, 'exportCsv'])->name('admin.sitemap.export');
-    Route::delete('/sitemap/checks/{check}', [\App\Http\Controllers\Admin\AdminSitemapController::class, 'deleteCheck'])->name('admin.sitemap.delete');
+Route::prefix('admin')->middleware('auth')->group(function () {
+    Route::get('/system-health/sitemap', [\App\Http\Controllers\Admin\AdminSitemapController::class, 'index'])->name('admin.sitemap.index');
+    Route::post('/system-health/sitemap/run-test', [\App\Http\Controllers\Admin\AdminSitemapController::class, 'runTest'])->name('admin.sitemap.run-test');
+    Route::get('/system-health/sitemap/checks', [\App\Http\Controllers\Admin\AdminSitemapController::class, 'getChecks'])->name('admin.sitemap.checks');
+    Route::get('/system-health/sitemap/checks/{check}', [\App\Http\Controllers\Admin\AdminSitemapController::class, 'show'])->name('admin.sitemap.show');
+    Route::get('/system-health/sitemap/checks/{check}/export', [\App\Http\Controllers\Admin\AdminSitemapController::class, 'export'])->name('admin.sitemap.export');
+    Route::delete('/system-health/sitemap/checks/{check}', [\App\Http\Controllers\Admin\AdminSitemapController::class, 'destroy'])->name('admin.sitemap.destroy');
+    
+    // Dev Tools (Super Admin Only, Non-Production Only)
+    Route::prefix('dev')->name('admin.dev.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\DevToolsController::class, 'index'])->name('index');
+        Route::post('/clear-cache', [\App\Http\Controllers\Admin\DevToolsController::class, 'clearCache'])->name('clear-cache');
+        Route::post('/clear-view-cache', [\App\Http\Controllers\Admin\DevToolsController::class, 'clearViewCache'])->name('clear-view-cache');
+        Route::post('/clear-config-cache', [\App\Http\Controllers\Admin\DevToolsController::class, 'clearConfigCache'])->name('clear-config-cache');
+        Route::post('/clear-route-cache', [\App\Http\Controllers\Admin\DevToolsController::class, 'clearRouteCache'])->name('clear-route-cache');
+        Route::post('/assets-info', [\App\Http\Controllers\Admin\DevToolsController::class, 'assetsInfo'])->name('assets-info');
+    });
+
+    // Share Frame Template Management (Admin Only)
+    Route::prefix('competitions/{competition}/share-frame-template')->name('admin.competitions.share-frame-template.')->group(function () {
+        Route::get('/edit', [\App\Http\Controllers\Admin\CompetitionShareFrameTemplateController::class, 'edit'])->name('edit');
+        Route::put('/', [\App\Http\Controllers\Admin\CompetitionShareFrameTemplateController::class, 'update'])->name('update');
+        Route::post('/preview', [\App\Http\Controllers\Admin\CompetitionShareFrameTemplateController::class, 'preview'])->name('preview');
+        Route::delete('/', [\App\Http\Controllers\Admin\CompetitionShareFrameTemplateController::class, 'destroy'])->name('destroy');
+    });
+
+    // Certificate Management (Admin Only)
+    Route::prefix('certificates')->name('admin.certificates.')->group(function () {
+        Route::resource('templates', \App\Http\Controllers\Admin\CertificateTemplateController::class);
+        Route::get('/', [\App\Http\Controllers\Admin\CertificateController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\CertificateController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\CertificateController::class, 'store'])->name('store');
+        Route::get('/{certificate}', [\App\Http\Controllers\Admin\CertificateController::class, 'show'])->name('show');
+        Route::post('/auto-issue', [\App\Http\Controllers\Admin\CertificateController::class, 'autoIssueForEvent'])->name('auto-issue');
+        Route::post('/{certificate}/generate', [\App\Http\Controllers\Admin\CertificateController::class, 'generate'])->name('generate');
+        Route::post('/{certificate}/download', [\App\Http\Controllers\Admin\CertificateController::class, 'download'])->name('download');
+        Route::post('/{certificate}/revoke', [\App\Http\Controllers\Admin\CertificateController::class, 'revoke'])->name('revoke');
+        Route::post('/{certificate}/reissue', [\App\Http\Controllers\Admin\CertificateController::class, 'reissue'])->name('reissue');
+    });
+
+    // Event Management (Web-based CRUD UI)
+    Route::prefix('events')->name('admin.events.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\EventController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\EventController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\EventController::class, 'store'])->name('store');
+        Route::get('/{event}', [\App\Http\Controllers\Admin\EventController::class, 'show'])->name('show');
+        Route::get('/{event}/edit', [\App\Http\Controllers\Admin\EventController::class, 'edit'])->name('edit');
+        Route::put('/{event}', [\App\Http\Controllers\Admin\EventController::class, 'update'])->name('update');
+        Route::delete('/{event}', [\App\Http\Controllers\Admin\EventController::class, 'destroy'])->name('destroy');
+    });
+
+    // Event Certificates
+    Route::get('/events/{event}/certificates', [\App\Http\Controllers\Admin\CertificateController::class, 'byEvent'])
+        ->name('admin.events.certificates');
+    Route::post('/events/{event}/certificates/regenerate-bulk', [\App\Http\Controllers\Admin\CertificateController::class, 'regenerateBulk'])
+        ->name('admin.events.certificates.regenerate-bulk');
+});
+
+// SEO Landing Pages: Categories & Locations
+Route::get('/categories', [\App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
+Route::get('/categories/{slug}', [\App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
+
+Route::get('/locations', [\App\Http\Controllers\LocationController::class, 'index'])->name('locations.index');
+Route::get('/locations/{slug}', [\App\Http\Controllers\LocationController::class, 'show'])->name('locations.show');
+
+// Share Frame Routes (Public)
+Route::prefix('competitions/{competition}/submissions/{submission}/share-frame')->name('competitions.submissions.share-frame.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\SubmissionShareFrameController::class, 'show'])->name('show');
+    Route::post('/generate', [\App\Http\Controllers\SubmissionShareFrameController::class, 'generate'])->name('generate');
+    Route::post('/regenerate', [\App\Http\Controllers\SubmissionShareFrameController::class, 'regenerate'])->name('regenerate');
+    Route::get('/download/{format}', [\App\Http\Controllers\SubmissionShareFrameController::class, 'download'])->name('download');
+});
+
+// Short URL Vote Redirect
+Route::get('/vote/{shortUrl}', [\App\Http\Controllers\SubmissionShareFrameController::class, 'voteRedirect'])->name('vote.redirect');
+
+// Certificate Verification (Public)
+Route::get('/certificate/verify/{certificateCode}', [\App\Http\Controllers\CertificateVerificationController::class, 'verify'])->name('certificate.verify');
+Route::get('/certificate/{certificateCode}/qr', [\App\Http\Controllers\CertificateVerificationController::class, 'downloadQR'])->name('certificate.qr');
+
+// Booking Marketplace Routes
+Route::middleware('auth')->group(function () {
+    // Client - Request booking from photographer
+    Route::get('/@{photographerUsername}/book', [\App\Http\Controllers\BookingRequestController::class, 'create'])->name('booking.create');
+    Route::post('/bookings', [\App\Http\Controllers\BookingRequestController::class, 'store'])->name('booking.store');
+    
+    // Booking Details & Actions
+    Route::get('/bookings/{booking}', [\App\Http\Controllers\BookingRequestController::class, 'show'])->name('booking.show');
+    Route::post('/bookings/{booking}/accept', [\App\Http\Controllers\BookingRequestController::class, 'accept'])->name('booking.accept');
+    Route::post('/bookings/{booking}/decline', [\App\Http\Controllers\BookingRequestController::class, 'decline'])->name('booking.decline');
+    Route::post('/bookings/{booking}/cancel', [\App\Http\Controllers\BookingRequestController::class, 'cancel'])->name('booking.cancel');
+    Route::post('/bookings/{booking}/complete', [\App\Http\Controllers\BookingRequestController::class, 'complete'])->name('booking.complete');
+    
+    // Booking Lists (Client & Photographer)
+    Route::get('/my-bookings/client', [\App\Http\Controllers\BookingRequestController::class, 'clientBookings'])->name('booking.client.list');
+    Route::get('/my-bookings/photographer', [\App\Http\Controllers\BookingRequestController::class, 'photographerBookings'])->name('booking.photographer.list');
+    
+    // Messaging
+    Route::post('/bookings/{booking}/messages', [\App\Http\Controllers\BookingMessageController::class, 'store'])->name('booking.message.store');
+    Route::delete('/messages/{message}', [\App\Http\Controllers\BookingMessageController::class, 'delete'])->name('booking.message.delete');
+    Route::post('/bookings/{booking}/messages/read', [\App\Http\Controllers\BookingMessageController::class, 'markAsRead'])->name('booking.messages.read');
+});
+
+// Admin Booking Management Routes
+Route::middleware(['auth', 'super_admin'])->prefix('admin/bookings')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\BookingController::class, 'index'])->name('admin.booking.index');
+    Route::get('/{booking}', [\App\Http\Controllers\Admin\BookingController::class, 'show'])->name('admin.booking.show');
+    Route::post('/{booking}/cancel', [\App\Http\Controllers\Admin\BookingController::class, 'cancel'])->name('admin.booking.cancel');
+    Route::post('/{booking}/dispute', [\App\Http\Controllers\Admin\BookingController::class, 'dispute'])->name('admin.booking.dispute');
+    Route::get('/statistics/get', [\App\Http\Controllers\Admin\BookingController::class, 'statistics'])->name('admin.booking.statistics');
+});
+
+
+
+// Photographer Verification Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/verification', [\App\Http\Controllers\VerificationController::class, 'index'])->name('verification.index');
+    Route::get('/verification/create', [\App\Http\Controllers\VerificationController::class, 'create'])->name('verification.create');
+    Route::post('/verification', [\App\Http\Controllers\VerificationController::class, 'store'])->name('verification.store');
+    Route::get('/verification/{verificationRequest}', [\App\Http\Controllers\VerificationController::class, 'show'])->name('verification.show');
+    Route::get('/verification/{verificationRequest}/download/{type}', [\App\Http\Controllers\VerificationController::class, 'downloadDocument'])->name('verification.download');
+});
+
+// Admin Verification Routes
+Route::middleware(['auth'])->prefix('admin/verifications')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\VerificationController::class, 'index'])->name('admin.verifications.index');
+    Route::get('/{verificationRequest}', [\App\Http\Controllers\Admin\VerificationController::class, 'show'])->name('admin.verifications.show');
+    Route::post('/{verificationRequest}/approve', [\App\Http\Controllers\Admin\VerificationController::class, 'approve'])->name('admin.verifications.approve');
+    Route::post('/{verificationRequest}/reject', [\App\Http\Controllers\Admin\VerificationController::class, 'reject'])->name('admin.verifications.reject');
+    Route::get('/{verificationRequest}/download/{type}', [\App\Http\Controllers\Admin\VerificationController::class, 'downloadDocument'])->name('admin.verifications.download');
+    Route::get('/statistics/get', [\App\Http\Controllers\Admin\VerificationController::class, 'statistics'])->name('admin.verifications.statistics');
 });
 // Test Error Routes (for Error Center testing)
 Route::get('/test-error', function () {
@@ -74,3 +203,5 @@ Route::get('/{any?}', function () {
 })->where('any', '.*');
 
 require __DIR__.'/auth.php';
+
+

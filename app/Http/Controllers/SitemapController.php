@@ -65,11 +65,13 @@ class SitemapController extends Controller
             ->get();
 
         $urls = $photographers->map(function ($photographer) {
+            // Use @username format for SEO-friendly URLs
+            $username = $photographer->user->username ?? $photographer->slug;
             return [
-                'loc' => url("/photographer/{$photographer->slug}"),
+                'loc' => url("/@{$username}"),
                 'lastmod' => $photographer->updated_at->toAtomString(),
                 'changefreq' => 'weekly',
-                'priority' => '0.8',
+                'priority' => '0.9', // High priority for photographer profiles
             ];
         })->toArray();
 
@@ -116,13 +118,23 @@ class SitemapController extends Controller
     {
         $cities = City::select('slug')->get();
 
-        $urls = $cities->map(function ($city) {
-            return [
-                'loc' => url('/photographers/by-location') . '?city=' . $city->slug,
+        $urls = [];
+        
+        // Add locations hub page
+        $urls[] = [
+            'loc' => url('/locations'),
+            'changefreq' => 'weekly',
+            'priority' => '0.9',
+        ];
+
+        // Add individual location pages
+        foreach ($cities as $city) {
+            $urls[] = [
+                'loc' => url("/locations/{$city->slug}"),
                 'changefreq' => 'weekly',
                 'priority' => '0.9', // High priority for local SEO
             ];
-        })->toArray();
+        }
 
         return $this->generateXML($urls);
     }
@@ -133,9 +145,17 @@ class SitemapController extends Controller
 
         $urls = [];
         
+        // Add categories hub page
+        $urls[] = [
+            'loc' => url('/categories'),
+            'changefreq' => 'weekly',
+            'priority' => '0.9',
+        ];
+
+        // Add individual category pages
         foreach ($categories as $category) {
             $urls[] = [
-                'loc' => url('/photographers/by-category') . '?category=' . $category->slug,
+                'loc' => url("/categories/{$category->slug}"),
                 'changefreq' => 'weekly',
                 'priority' => '0.9',
             ];

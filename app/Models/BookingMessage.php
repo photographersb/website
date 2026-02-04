@@ -8,42 +8,29 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class BookingMessage extends Model
 {
     protected $fillable = [
-        'booking_id',
-        'sender_id',
-        'sender_type',
+        'booking_request_id',
+        'sender_user_id',
         'message',
-        'attachments',
+        'attachment_path',
         'is_read',
-        'read_at',
-        'is_system_message'
     ];
 
     protected $casts = [
-        'attachments' => 'array',
         'is_read' => 'boolean',
-        'is_system_message' => 'boolean',
-        'read_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime'
     ];
 
-    public function booking(): BelongsTo
+    public function bookingRequest(): BelongsTo
     {
-        return $this->belongsTo(Booking::class);
+        return $this->belongsTo(BookingRequest::class);
     }
 
     public function sender(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'sender_id');
+        return $this->belongsTo(User::class, 'sender_user_id');
     }
 
     public function markAsRead(): void
     {
-        if (!$this->is_read) {
-            $this->update([
-                'is_read' => true,
-                'read_at' => now()
-            ]);
-        }
+        $this->update(['is_read' => true]);
     }
 }

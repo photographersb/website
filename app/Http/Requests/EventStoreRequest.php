@@ -59,6 +59,8 @@ class EventStoreRequest extends FormRequest
 
             // Organizer & Settings
             'organizer_id' => [Rule::requiredIf(!$isDraft), 'nullable', 'exists:photographers,id'],
+            'mentor_ids' => 'nullable|array',
+            'mentor_ids.*' => 'integer|exists:mentors,id',
             'status' => 'required|in:draft,published,cancelled',
             'is_featured' => 'boolean',
             'featured_until' => 'nullable|date|after:now',

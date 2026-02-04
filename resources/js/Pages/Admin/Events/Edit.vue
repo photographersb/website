@@ -234,7 +234,7 @@
               >
                 <option value="">Select photographer</option>
                 <option v-for="photographer in photographers" :key="photographer.id" :value="photographer.id">
-                  {{ photographer.user?.name || photographer.business_name || `Photographer #${photographer.id}` }}
+                  {{ photographer.user?.name || `Photographer #${photographer.id}` }}
                 </option>
               </select>
               <router-link to="/admin/photographers" class="mt-1 inline-block text-sm text-burgundy hover:text-burgundy-dark">

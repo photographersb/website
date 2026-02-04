@@ -193,15 +193,15 @@
           </div>
 
           <!-- Grid View -->
-          <div v-else-if="viewMode === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+          <div v-else-if="viewMode === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6">
             <router-link
               v-for="photographer in displayedPhotographers"
               :key="photographer.id"
               :to="`/photographer/${photographer.slug}`"
-              class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all border border-gray-100"
+              class="bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all border border-gray-100"
             >
               <!-- Image -->
-              <div class="relative h-48 bg-gradient-to-br from-gray-200 to-gray-300 overflow-hidden">
+              <div class="relative h-56 sm:h-48 bg-gradient-to-br from-gray-200 to-gray-300 overflow-hidden">
                 <img
                   v-if="photographer.profile_photo"
                   :src="photographer.profile_photo"
@@ -211,37 +211,37 @@
                 <div v-else class="w-full h-full flex items-center justify-center text-4xl">
                   📸
                 </div>
-                <div class="absolute top-3 right-3 bg-white rounded-full p-2 shadow-lg">
-                  <svg class="w-5 h-5 text-primary-700" fill="currentColor" viewBox="0 0 20 20">
+                <div class="absolute top-2 sm:top-3 right-2 sm:right-3 bg-white rounded-full p-1.5 sm:p-2 shadow-lg">
+                  <svg class="w-4 h-4 sm:w-5 sm:h-5 text-primary-700" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.3A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z" />
                   </svg>
                 </div>
               </div>
 
               <!-- Info -->
-              <div class="p-4 sm:p-5">
-                <h3 class="text-lg font-bold text-gray-900 mb-1">{{ photographer.name }}</h3>
+              <div class="p-3 sm:p-4 md:p-5">
+                <h3 class="text-base sm:text-lg font-bold text-gray-900 mb-1 truncate">{{ photographer.name }}</h3>
                 <router-link
-                  v-if="getCitySlug(photographer)"
-                  :to="`/photographers/by-location?city=${getCitySlug(photographer)}`"
-                  class="text-sm text-primary-700 font-semibold mb-3 inline-flex"
+                  v-if="photographer.city_slug"
+                  :to="`/photographers/by-location?city=${photographer.city_slug}`"
+                  class="text-xs sm:text-sm text-primary-700 font-semibold mb-2 sm:mb-3 inline-flex"
                 >
-                  {{ photographer.city }}
+                  {{ photographer.city_name }}
                 </router-link>
-                <p v-else class="text-sm text-primary-700 font-semibold mb-3">{{ photographer.city }}</p>
+                <p v-else class="text-xs sm:text-sm text-primary-700 font-semibold mb-2 sm:mb-3">{{ photographer.city_name }}</p>
                 
                 <!-- Rating -->
-                <div class="flex items-center gap-2 mb-3">
+                <div class="flex items-center gap-1 sm:gap-2 mb-2 sm:mb-3">
                   <div class="flex gap-0.5">
-                    <span v-for="i in 5" :key="i" class="text-yellow-400">
+                    <span v-for="i in 5" :key="i" class="text-yellow-400 text-sm sm:text-base">
                       {{ i <= Math.floor(photographer.rating || 0) ? '⭐' : '☆' }}
                     </span>
                   </div>
-                  <span class="text-sm text-gray-600 font-medium">({{ photographer.reviews_count || 0 }})</span>
+                  <span class="text-xs sm:text-sm text-gray-600 font-medium">({{ photographer.reviews_count || 0 }})</span>
                 </div>
 
                 <!-- Categories -->
-                <div class="flex flex-wrap gap-2 mb-4">
+                <div class="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
                   <router-link
                     v-for="category in photographer.categories?.slice(0, 2)"
                     :key="category"
@@ -256,7 +256,7 @@
                 </div>
 
                 <!-- CTA -->
-                <button class="w-full px-4 py-3 bg-gradient-to-r from-primary-700 to-primary-800 text-white rounded-lg hover:from-primary-800 hover:to-primary-900 transition-all font-semibold text-sm">
+                <button class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-r from-primary-700 to-primary-800 text-white rounded-lg hover:from-primary-800 hover:to-primary-900 transition-all font-semibold text-xs sm:text-sm">
                   View Profile
                 </button>
               </div>
@@ -264,44 +264,44 @@
           </div>
 
           <!-- List View -->
-          <div v-else class="space-y-4">
+          <div v-else class="space-y-3 sm:space-y-4">
             <router-link
               v-for="photographer in displayedPhotographers"
               :key="photographer.id"
               :to="`/photographer/${photographer.slug}`"
-              class="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100 hover:shadow-xl hover:border-primary-300 transition-all flex flex-col sm:flex-row gap-4 sm:gap-6 hover:-translate-y-1"
+              class="bg-white rounded-xl sm:rounded-2xl shadow-lg p-3 sm:p-4 md:p-6 border border-gray-100 hover:shadow-xl hover:border-primary-300 transition-all flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 hover:-translate-y-1"
             >
               <!-- Photo -->
-              <div class="w-full sm:w-32 h-40 sm:h-32 rounded-xl bg-gradient-to-br from-gray-200 to-gray-300 flex-shrink-0 overflow-hidden">
+              <div class="w-full sm:w-24 md:w-32 h-48 sm:h-24 md:h-32 rounded-lg sm:rounded-xl bg-gradient-to-br from-gray-200 to-gray-300 flex-shrink-0 overflow-hidden">
                 <img
                   v-if="photographer.profile_photo"
                   :src="photographer.profile_photo"
                   :alt="photographer.name"
                   class="w-full h-full object-cover"
                 />
-                <div v-else class="w-full h-full flex items-center justify-center text-4xl">
+                <div v-else class="w-full h-full flex items-center justify-center text-3xl sm:text-4xl">
                   📸
                 </div>
               </div>
 
               <!-- Details -->
-              <div class="flex-1">
-                <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ photographer.name }}</h3>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-2 truncate">{{ photographer.name }}</h3>
                 <router-link
-                  v-if="getCitySlug(photographer)"
-                  :to="`/photographers/by-location?city=${getCitySlug(photographer)}`"
-                  class="text-primary-700 font-semibold mb-2 flex items-center gap-2 hover:text-primary-800"
+                  v-if="photographer.city_slug"
+                  :to="`/photographers/by-location?city=${photographer.city_slug}`"
+                  class="text-sm sm:text-base text-primary-700 font-semibold mb-2 flex items-center gap-1 sm:gap-2 hover:text-primary-800"
                 >
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
                   </svg>
-                  {{ photographer.city }}
+                  {{ photographer.city_name }}
                 </router-link>
-                <p v-else class="text-primary-700 font-semibold mb-2 flex items-center gap-2">
+                <p v-else class="text-sm sm:text-base text-primary-700 font-semibold mb-2 flex items-center gap-1 sm:gap-2">
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
                   </svg>
-                  {{ photographer.city }}
+                  {{ photographer.city_name }}
                 </p>
 
                 <!-- Rating & Categories -->
@@ -544,8 +544,51 @@ const fetchPhotographers = async () => {
       params.city = selectedCity.value
     }
     
-    const response = await api.get('/v1/photographers', { params })
-    photographers.value = response.data.data || response.data || []
+    const response = await api.get('/api/v1/photographers', { params })
+    console.log('Raw API Response:', response.data)
+    
+    // Handle different response structures
+    let data = []
+    
+    // First check if it's a success response with .data property
+    if (response.data?.data && Array.isArray(response.data.data)) {
+      data = response.data.data
+      console.log('Using response.data.data (success response structure)')
+    } 
+    // Check if the entire response is an array
+    else if (Array.isArray(response.data)) {
+      data = response.data
+      console.log('Using response.data directly as array')
+    } 
+    // Check if it's an object with photographers
+    else if (response.data && typeof response.data === 'object') {
+      data = Object.values(response.data).filter(item => 
+        item && typeof item === 'object' && (item.id || item.user_id)
+      )
+      console.log('Extracted data from object values:', data.length)
+    }
+    
+    console.log('Extracted data before transform:', data.length, data)
+    console.log('API Response for city:', selectedCity.value || 'all', 'Count:', data.length)
+    
+    // Transform photographer data to ensure consistent structure
+    photographers.value = data.map(p => ({
+      ...p,
+      // Ensure city is accessible in multiple ways
+      city_name: p.city?.name || p.city || 'Unknown',
+      city_slug: p.city?.slug || slugify(p.city?.name || p.city || ''),
+      // Ensure categories array exists and is properly formatted
+      categories: Array.isArray(p.categories) 
+        ? p.categories.map(cat => cat.name || cat)
+        : [],
+      // Add convenient accessors
+      rating: p.average_rating || 0,
+      reviews_count: p.rating_count || 0,
+      name: p.user?.name || 'Unknown',
+      profile_photo: p.profile_picture || null
+    }))
+    
+    console.log('Photographers after transform:', photographers.value.length)
   } catch (error) {
     console.error('Failed to fetch photographers:', error)
     photographers.value = []
@@ -567,9 +610,14 @@ watch(selectedCity, (newCity) => {
 
 onMounted(async () => {
   const initialCity = route.query.city
+  console.log('OnMounted - Initial city from URL:', initialCity)
+  
   if (typeof initialCity === 'string') {
     selectedCity.value = initialCity
+    console.log('OnMounted - Set selectedCity to:', selectedCity.value)
   }
+  
+  // Always fetch, whether city is set or not
   await fetchPhotographers()
 })
 </script>

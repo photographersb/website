@@ -19,29 +19,30 @@ class AdminErrorLog extends Model
         'status_code',
         'user_id',
         'ip',
+        'user_agent',
         'message',
         'exception_class',
         'file',
         'line',
         'trace',
+        'signature_hash',
+        'occurrences',
+        'first_seen_at',
+        'last_seen_at',
         'is_resolved',
         'resolved_by_user_id',
         'resolved_at',
         'is_muted',
-        'error_signature',
-        'occurrence_count',
-        'last_occurrence_at',
-        'notes',
     ];
 
     protected $casts = [
         'is_resolved' => 'boolean',
         'is_muted' => 'boolean',
-        'trace' => 'array',
+        'first_seen_at' => 'datetime',
+        'last_seen_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'resolved_at' => 'datetime',
-        'last_occurrence_at' => 'datetime',
     ];
 
     protected $appends = ['severity_badge', 'status_label'];
@@ -75,15 +76,15 @@ class AdminErrorLog extends Model
         );
 
         // Check if similar error exists and increment count
-        $existing = self::where('error_signature', $signature)
+        $existing = self::where('signature_hash', $signature)
             ->where('is_muted', false)
             ->latest()
             ->first();
 
         if ($existing && $existing->created_at->diffInMinutes(now()) < 5) {
             // Similar error within 5 minutes - increment count
-            $existing->increment('occurrence_count');
-            $existing->update(['last_occurrence_at' => now()]);
+            $existing->increment('occurrences');
+            $existing->update(['last_seen_at' => now()]);
             return $existing;
         }
 
@@ -97,21 +98,24 @@ class AdminErrorLog extends Model
             'status_code' => $statusCode,
             'user_id' => $userId ?? auth()->id(),
             'ip' => $ip ?? request()->ip(),
+            'user_agent' => request()->userAgent(),
             'message' => $exception->getMessage(),
             'exception_class' => $exception::class,
             'file' => $exception->getFile(),
             'line' => $exception->getLine(),
-            'trace' => collect($exception->getTrace())
+            'trace' => json_encode(collect($exception->getTrace())
                 ->map(fn ($line) => [
                     'function' => $line['function'] ?? null,
                     'class' => $line['class'] ?? null,
                     'file' => $line['file'] ?? null,
                     'line' => $line['line'] ?? null,
                 ])
-                ->toArray(),
-            'error_signature' => $signature,
-            'occurrence_count' => 1,
-            'last_occurrence_at' => now(),
+                ->take(20) // Limit trace depth
+                ->toArray()),
+            'signature_hash' => $signature,
+            'occurrences' => 1,
+            'first_seen_at' => now(),
+            'last_seen_at' => now(),
         ]);
     }
 
@@ -189,6 +193,11 @@ class AdminErrorLog extends Model
             'email' => 'admin@system.local'
         ]);
     }
+    
+    public function notes()
+    {
+        return $this->hasMany(AdminErrorLogNote::class, 'error_log_id');
+    }
 
     /**
      * Scopes
@@ -231,13 +240,12 @@ class AdminErrorLog extends Model
             ->orWhere('exception_class', 'like', "%{$term}%");
     }
 
-    /**
-     * Mark as resolved
-     */
-    public function markResolved(User $user, ?string $notes = null): void
+    /**): void
     {
         $this->update([
             'is_resolved' => true,
+            'resolved_by_user_id' => $user->id,
+            'resolved_at' => now()true,
             'resolved_by_user_id' => $user->id,
             'resolved_at' => now(),
             'notes' => $notes,

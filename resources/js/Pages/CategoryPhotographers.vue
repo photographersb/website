@@ -236,15 +236,15 @@
           </div>
 
           <!-- Grid View -->
-          <div v-else-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div v-else-if="viewMode === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6">
             <router-link
               v-for="photographer in displayedPhotographers"
               :key="photographer.id"
               :to="`/photographer/${photographer.slug}`"
-              class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all border border-gray-100"
+              class="bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all border border-gray-100"
             >
               <!-- Image -->
-              <div class="relative h-48 bg-gradient-to-br from-gray-200 to-gray-300 overflow-hidden">
+              <div class="relative h-56 sm:h-48 bg-gradient-to-br from-gray-200 to-gray-300 overflow-hidden">
                 <img
                   v-if="photographer.profile_photo"
                   :src="photographer.profile_photo"
@@ -254,40 +254,40 @@
                 <div v-else class="w-full h-full flex items-center justify-center text-4xl">
                   📸
                 </div>
-                <div class="absolute top-3 right-3 bg-white rounded-full p-2 shadow-lg">
-                  <svg v-if="photographer.verified" class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <div class="absolute top-2 sm:top-3 right-2 sm:right-3 bg-white rounded-full p-1.5 sm:p-2 shadow-lg">
+                  <svg v-if="photographer.verified" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 3.062v6.757a1 1 0 01-.940 1.017 48.412 48.412 0 01-7.125 0 1 1 0 01-.94-1.017v-6.757a3.066 3.066 0 012.812-3.062zM9 12a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
                   </svg>
                 </div>
               </div>
 
               <!-- Info -->
-              <div class="p-4 sm:p-5">
-                <h3 class="text-lg font-bold text-gray-900 mb-1">{{ photographer.name }}</h3>
+              <div class="p-3 sm:p-4 md:p-5">
+                <h3 class="text-base sm:text-lg font-bold text-gray-900 mb-1 truncate">{{ photographer.name }}</h3>
                 <router-link
-                  v-if="getCitySlug(photographer)"
-                  :to="`/photographers/by-location?city=${getCitySlug(photographer)}`"
+                  v-if="photographer.city_slug"
+                  :to="`/photographers/by-location?city=${photographer.city_slug}`"
                   class="inline-flex items-center px-2 py-1 bg-primary-100 text-primary-700 text-xs font-bold rounded-full mb-2 hover:bg-primary-200"
                 >
-                  {{ photographer.city }}
+                  {{ photographer.city_name }}
                 </router-link>
                 <span v-else class="inline-flex items-center px-2 py-1 bg-primary-100 text-primary-700 text-xs font-bold rounded-full mb-2">
-                  {{ photographer.city }}
+                  {{ photographer.city_name }}
                 </span>
-                <p class="text-sm text-gray-600 mb-3">from ₹{{ photographer.min_price || 1000 }}/event</p>
+                <p class="text-sm text-gray-600 mb-2 sm:mb-3">from ₹{{ photographer.min_price || 1000 }}/event</p>
                 
                 <!-- Rating -->
-                <div class="flex items-center gap-2 mb-3">
+                <div class="flex items-center gap-1 sm:gap-2 mb-2 sm:mb-3">
                   <div class="flex gap-0.5">
-                    <span v-for="i in 5" :key="i" class="text-yellow-400">
+                    <span v-for="i in 5" :key="i" class="text-yellow-400 text-sm sm:text-base">
                       {{ i <= Math.floor(photographer.rating || 0) ? '⭐' : '☆' }}
                     </span>
                   </div>
-                  <span class="text-sm text-gray-600 font-medium">({{ photographer.reviews_count || 0 }})</span>
+                  <span class="text-xs sm:text-sm text-gray-600 font-medium">({{ photographer.reviews_count || 0 }})</span>
                 </div>
 
                 <!-- CTA -->
-                <button class="w-full px-4 py-3 bg-gradient-to-r from-primary-700 to-primary-800 text-white rounded-lg hover:from-primary-800 hover:to-primary-900 transition-all font-semibold text-sm">
+                <button class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-r from-primary-700 to-primary-800 text-white rounded-lg hover:from-primary-800 hover:to-primary-900 transition-all font-semibold text-xs sm:text-sm">
                   View Profile
                 </button>
               </div>
@@ -295,56 +295,56 @@
           </div>
 
           <!-- List View -->
-          <div v-else class="space-y-4">
+          <div v-else class="space-y-3 sm:space-y-4">
             <router-link
               v-for="photographer in displayedPhotographers"
               :key="photographer.id"
               :to="`/photographer/${photographer.slug}`"
-              class="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100 hover:shadow-xl hover:border-primary-300 transition-all flex flex-col sm:flex-row gap-4 sm:gap-6 hover:-translate-y-1"
+              class="bg-white rounded-xl sm:rounded-2xl shadow-lg p-3 sm:p-4 md:p-6 border border-gray-100 hover:shadow-xl hover:border-primary-300 transition-all flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 hover:-translate-y-1"
             >
               <!-- Photo -->
-              <div class="w-full sm:w-32 h-40 sm:h-32 rounded-xl bg-gradient-to-br from-gray-200 to-gray-300 flex-shrink-0 overflow-hidden relative">
+              <div class="w-full sm:w-24 md:w-32 h-48 sm:h-24 md:h-32 rounded-lg sm:rounded-xl bg-gradient-to-br from-gray-200 to-gray-300 flex-shrink-0 overflow-hidden relative">
                 <img
                   v-if="photographer.profile_photo"
                   :src="photographer.profile_photo"
                   :alt="photographer.name"
                   class="w-full h-full object-cover"
                 />
-                <div v-else class="w-full h-full flex items-center justify-center text-4xl">
+                <div v-else class="w-full h-full flex items-center justify-center text-3xl sm:text-4xl">
                   📸
                 </div>
-                <div v-if="photographer.verified" class="absolute top-1 right-1 bg-green-500 rounded-full p-1 shadow-lg">
-                  <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <div v-if="photographer.verified" class="absolute top-1 sm:top-1 right-1 sm:right-1 bg-green-500 rounded-full p-1 shadow-lg">
+                  <svg class="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                   </svg>
                 </div>
               </div>
 
               <!-- Details -->
-              <div class="flex-1">
+              <div class="flex-1 min-w-0">
                 <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
-                  <div>
-                    <h3 class="text-2xl font-bold text-gray-900">{{ photographer.name }}</h3>
+                  <div class="min-w-0">
+                    <h3 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 truncate">{{ photographer.name }}</h3>
                     <router-link
-                      v-if="getCitySlug(photographer)"
-                      :to="`/photographers/by-location?city=${getCitySlug(photographer)}`"
-                      class="inline-flex items-center gap-2 px-3 py-1 bg-primary-100 text-primary-700 text-xs font-bold rounded-full hover:bg-primary-200"
+                      v-if="photographer.city_slug"
+                      :to="`/photographers/by-location?city=${photographer.city_slug}`"
+                      class="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 bg-primary-100 text-primary-700 text-xs font-bold rounded-full hover:bg-primary-200"
                     >
-                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
                       </svg>
-                      {{ photographer.city }}
+                      {{ photographer.city_name }}
                     </router-link>
-                    <p v-else class="inline-flex items-center gap-2 px-3 py-1 bg-primary-100 text-primary-700 text-xs font-bold rounded-full">
-                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <p v-else class="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 bg-primary-100 text-primary-700 text-xs font-bold rounded-full">
+                      <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
                       </svg>
-                      {{ photographer.city }}
+                      {{ photographer.city_name }}
                     </p>
                   </div>
-                  <div class="text-right">
-                    <p class="text-sm text-gray-500">Starting from</p>
-                    <p class="text-2xl font-bold text-primary-700">₹{{ photographer.min_price || 1000 }}</p>
+                  <div class="text-left sm:text-right flex-shrink-0">
+                    <p class="text-xs sm:text-sm text-gray-500">Starting from</p>
+                    <p class="text-xl sm:text-2xl font-bold text-primary-700">₹{{ photographer.min_price || 1000 }}</p>
                   </div>
                 </div>
 
@@ -637,7 +637,26 @@ const fetchPhotographers = async () => {
         category: selectedCategory.value
       }
     })
-    photographers.value = response.data.data || response.data || []
+    
+    // Handle nested data structure from API
+    const data = response.data?.data || response.data || []
+    console.log('API Response for category:', selectedCategory.value, 'Count:', data.length)
+    
+    // Transform photographer data to ensure consistent structure
+    photographers.value = data.map(p => ({
+      ...p,
+      // Ensure city is accessible as both object and string
+      city_name: p.city?.name || p.city || 'Unknown',
+      city_slug: p.city?.slug || slugify(p.city?.name || p.city || ''),
+      // Ensure categories array exists
+      categories: Array.isArray(p.categories) ? p.categories : [],
+      // Add convenient accessors
+      min_price: p.starting_price || p.min_price || 1000,
+      rating: p.average_rating || 0,
+      reviews_count: p.rating_count || 0,
+      name: p.user?.name || 'Unknown',
+      profile_photo: p.profile_picture || null
+    }))
   } catch (error) {
     console.error('Failed to fetch photographers:', error)
     photographers.value = []

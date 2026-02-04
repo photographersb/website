@@ -59,6 +59,8 @@ class EventUpdateRequest extends FormRequest
 
             // Organizer & Settings
             'organizer_id' => 'sometimes|exists:photographers,id',
+            'mentor_ids' => 'nullable|array',
+            'mentor_ids.*' => 'integer|exists:mentors,id',
             'status' => 'sometimes|in:draft,published,cancelled,completed',
             'is_featured' => 'boolean',
             'featured_until' => 'nullable|date|after:now',

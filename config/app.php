@@ -25,6 +25,8 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    'build_version' => env('APP_BUILD_VERSION', now()->format('Y-m-d_H:i:s')),
+
     'api_prefix' => 'api/v1',
 
     'api_rate_limit' => [

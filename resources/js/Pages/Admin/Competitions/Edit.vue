@@ -854,7 +854,8 @@ For questions or concerns regarding the competition, please contact our support 
             status: comp.status || 'draft',
             is_featured: !!comp.is_featured,
             sponsor_ids: (comp.sponsorRecords || []).map(s => s.id),
-            judge_ids: (comp.judges || []).map(j => j.user_id || j.id),
+            // Use judge_profile_id for validation against judges table
+            judge_ids: (comp.judges || []).map(j => j.judge_profile_id).filter(id => id != null),
           };
         } else {
           console.error('Invalid response structure:', response.data);
@@ -953,16 +954,17 @@ For questions or concerns regarding the competition, please contact our support 
         const seenUserIds = new Set();
 
         judgeProfiles.forEach(profile => {
-          if (!profile.user_id) return;
-          if (seenUserIds.has(profile.user_id)) return;
+          if (!profile.id) return;
+          if (seenUserIds.has(profile.id)) return;
           options.push({
-            id: profile.user_id,
+            id: profile.id, // Use judge profile ID for validation
+            user_id: profile.user_id, // Store user_id for reference
             name: profile.name || profile.user?.name,
             email: profile.email || profile.user?.email,
             source: 'profile',
             profile_id: profile.id,
           });
-          seenUserIds.add(profile.user_id);
+          seenUserIds.add(profile.id);
         });
 
         judgeUsers.forEach(user => {

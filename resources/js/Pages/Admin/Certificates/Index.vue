@@ -1,21 +1,25 @@
 <template>
-  <div class="space-y-6">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-900">Certificate Management</h1>
-        <p class="text-gray-600 mt-1">Manage competition certificates and awards</p>
+  <div class="min-h-screen bg-gray-50">
+    <!-- Admin Header -->
+    <AdminHeader 
+      title="🎓 Certificate Management" 
+      subtitle="Manage competition certificates and awards"
+    />
+
+    <!-- Main Content -->
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <!-- Header with Action Button -->
+      <div class="flex items-center justify-end">
+        <router-link 
+          to="/admin/certificates/manual-issuance"
+          class="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition font-medium flex items-center gap-2"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Issue Certificate Manually
+        </router-link>
       </div>
-      <router-link 
-        to="/admin/certificates/manual-issuance"
-        class="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition font-medium flex items-center gap-2"
-      >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-        </svg>
-        Issue Certificate Manually
-      </router-link>
-    </div>
 
     <!-- Tabs -->
     <div class="flex gap-4 border-b border-gray-200">
@@ -194,12 +198,14 @@
     >
       {{ toastMessage }}
     </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import api from '../../../api';
+import AdminHeader from '../../../components/AdminHeader.vue';
 
 const activeTab = ref('all');
 const searchQuery = ref('');

@@ -109,17 +109,32 @@ class AdminEventApiController extends Controller
         $validated['slug'] = $slug;
 
         try {
+            DB::beginTransaction();
+            
+            // Extract mentor_ids if provided
+            $mentorIds = $validated['mentor_ids'] ?? [];
+            unset($validated['mentor_ids']); // Remove from validated data
+            
             $event = Event::create($validated);
+            
+            // Sync mentors if provided
+            if (!empty($mentorIds)) {
+                $event->mentors()->sync($mentorIds);
+            }
+            
+            DB::commit();
 
             Log::info('Event created successfully', [
                 'event_id' => $event->id,
                 'title' => $event->title,
-                'organizer_id' => $validated['organizer_id'],
+                'organizer_id' => $validated['organizer_id'] ?? null,
+                'mentors_count' => count($mentorIds),
                 'admin_id' => auth()->id(),
             ]);
 
-            return $this->created($event->load(['organizer.user', 'city']), 'Event created successfully');
+            return $this->created($event->load(['organizer.user', 'city', 'mentors']), 'Event created successfully');
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Failed to create event', [
                 'error' => $e->getMessage(),
                 'title' => $validated['title'] ?? null,
@@ -157,17 +172,33 @@ class AdminEventApiController extends Controller
         }
 
         try {
+            DB::beginTransaction();
+            
+            // Extract mentor_ids if provided
+            $mentorIds = $validated['mentor_ids'] ?? null;
+            unset($validated['mentor_ids']); // Remove from validated data
+            
             $event->update($validated);
+            
+            // Sync mentors if provided (null means don't touch, empty array means clear all)
+            if ($mentorIds !== null) {
+                $event->mentors()->sync($mentorIds);
+            }
+            
+            DB::commit();
 
             Log::info('Event updated successfully', [
                 'event_id' => $event->id,
                 'title' => $event->title,
+                'mentors_updated' => $mentorIds !== null,
                 'admin_id' => auth()->id(),
             ]);
+            
             // Clear events stats cache
             Cache::forget('events_stats');
-            return $this->success($event->load(['organizer.user', 'city']), 'Event updated successfully');
+            return $this->success($event->load(['organizer.user', 'city', 'mentors']), 'Event updated successfully');
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Failed to update event', [
                 'event_id' => $event->id,
                 'error' => $e->getMessage(),

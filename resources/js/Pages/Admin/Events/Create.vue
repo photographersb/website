@@ -299,7 +299,7 @@
               >
                 <option value="">Select photographer</option>
                 <option v-for="photographer in photographers" :key="photographer.id" :value="photographer.id">
-                  {{ photographer.user?.name || photographer.business_name || `Photographer #${photographer.id}` }}
+                  {{ photographer.user?.name || `Photographer #${photographer.id}` }}
                 </option>
               </select>
               <router-link to="/admin/photographers" class="mt-1 inline-block text-sm text-burgundy hover:text-burgundy-dark">
@@ -308,6 +308,27 @@
               <p class="mt-1 text-sm text-gray-500">Select the photographer organizing this event</p>
               <p v-if="photographers.length === 0" class="mt-1 text-sm text-warning-700">⚠️ No verified photographers available. Please add photographers from Admin → Photographers first.</p>
               <p v-if="errors.organizer_id" class="mt-1 text-sm text-red-600">{{ errors.organizer_id[0] }}</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Mentors</label>
+              <div class="space-y-2">
+                <div v-for="mentor in mentors" :key="mentor.id" class="flex items-center">
+                  <input
+                    :id="`mentor-${mentor.id}`"
+                    v-model="form.mentor_ids"
+                    type="checkbox"
+                    :value="mentor.id"
+                    class="h-4 w-4 text-burgundy focus:ring-burgundy border-gray-300 rounded"
+                  />
+                  <label :for="`mentor-${mentor.id}`" class="ml-2 block text-sm text-gray-900">
+                    {{ mentor.name }} <span class="text-gray-500">({{ mentor.email }})</span>
+                  </label>
+                </div>
+              </div>
+              <p v-if="mentors.length === 0" class="mt-1 text-sm text-warning-700">ℹ️ No active mentors available. Mentors can be assigned to events for guidance and support.</p>
+              <p class="mt-1 text-sm text-gray-500">Select one or more mentors for this event (optional)</p>
+              <p v-if="errors.mentor_ids" class="mt-1 text-sm text-red-600">{{ errors.mentor_ids[0] }}</p>
             </div>
           </div>
         </div>
@@ -463,12 +484,14 @@ const form = ref({
   ticket_price: 0,
   requirements: '',
   organizer_id: '',
+  mentor_ids: [],
   status: 'published',
   is_featured: false,
   featured_until: '',
 });
 
 const photographers = ref([]);
+const mentors = ref([]);
 const showToast = ref(false);
 const toastMessage = ref('');
 const toastType = ref('success');
@@ -549,6 +572,35 @@ const fetchPhotographers = async () => {
   }
 };
 
+const fetchMentors = async () => {
+  try {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      console.warn('No auth token found in localStorage');
+      return;
+    }
+    
+    const response = await axios.get('/api/v1/admin/mentors?status=active&minimal=1', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    });
+    
+    console.log('Mentors API Response:', response.data);
+    
+    if (response.data.status === 'success' && Array.isArray(response.data.data)) {
+      mentors.value = response.data.data;
+      console.log(`Loaded ${mentors.value.length} mentors`);
+    } else {
+      mentors.value = [];
+    }
+  } catch (error) {
+    console.error('Error fetching mentors:', error);
+    mentors.value = [];
+  }
+};
+
 const submitForm = async () => {
   processing.value = true;
   errors.value = {};
@@ -581,6 +633,7 @@ const submitForm = async () => {
         router.push('/admin/events');
       }, 1500);
     }
+  fetchMentors();
   } catch (error) {
     console.error('Error creating event:', error);
     

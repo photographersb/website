@@ -2,8 +2,11 @@
 
 namespace App\Exceptions;
 
-use App\Models\AdminErrorLog;
+use App\Services\ErrorLogService;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -34,46 +37,82 @@ class Handler extends ExceptionHandler
      */
     public function report(Throwable $exception)
     {
-        // Record critical errors to admin error logs
         // Skip certain exceptions to avoid noise
-        if ($this->shouldNotReport($exception)) {
+        if (!$this->shouldReportToErrorCenter($exception)) {
             return parent::report($exception);
         }
 
         try {
-            AdminErrorLog::recordError($exception);
-        } catch (\Exception $e) {
-            // Silently fail if error logging fails
-            logger('Error logging failed: ' . $e->getMessage());
+            $errorLogService = app(ErrorLogService::class);
+            $errorLogService->logException(
+                exception: $exception,
+                url: request()->fullUrl(),
+                routeName: request()->route()?->getName(),
+                method: request()->method(),
+                statusCode: $this->getStatusCode($exception),
+                userId: auth()->id(),
+                ip: request()->ip()
+            );
+        } catch (Throwable $e) {
+            // Silently fail if error logging fails to prevent infinite loops
+            logger()->error('Error Center logging failed', [
+                'error' => $e->getMessage(),
+                'original_exception' => $exception->getMessage(),
+            ]);
         }
 
         parent::report($exception);
     }
 
     /**
-     * Determine if exception should be reported to error logs
+     * Get HTTP status code from exception
      */
-    protected function shouldNotReport(Throwable $exception): bool
+    protected function getStatusCode(Throwable $exception): ?int
     {
-        // Skip 404s in production
-        if (app()->environment('production') && method_exists($exception, 'getStatusCode')) {
-            if ($exception->getStatusCode() === 404) {
-                return true;
+        if (method_exists($exception, 'getStatusCode')) {
+            return $exception->getStatusCode();
+        }
+
+        if ($exception instanceof HttpException) {
+            return $exception->getStatusCode();
+        }
+
+        return null;
+    }
+
+    /**
+     * Determine if exception should be reported to Error Center
+     */
+    protected function shouldReportToErrorCenter(Throwable $exception): bool
+    {
+        // Skip 404s (unless in development)
+        if ($exception instanceof NotFoundHttpException && !app()->environment('local')) {
+            return false;
+        }
+
+        // Skip validation exceptions (user input errors)
+        if ($exception instanceof ValidationException) {
+            return false;
+        }
+
+        // Skip expected HTTP exceptions (400, 401, 403, 429)
+        if ($exception instanceof HttpException) {
+            $code = $exception->getStatusCode();
+            if (in_array($code, [400, 401, 403, 404, 429])) {
+                return false;
             }
         }
 
-        // Skip validation exceptions
-        if ($exception instanceof \Illuminate\Validation\ValidationException) {
-            return true;
+        // Skip authentication/authorization exceptions (expected behavior)
+        if ($exception instanceof \Illuminate\Auth\AuthenticationException) {
+            return false;
         }
 
-        // Skip HTTP exceptions that are expected
-        if ($exception instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
-            if (in_array($exception->getStatusCode(), [400, 401, 403])) {
-                return true;
-            }
+        if ($exception instanceof \Illuminate\Auth\Access\AuthorizationException) {
+            return false;
         }
 
-        return false;
+        // Report everything else
+        return true;
     }
 }

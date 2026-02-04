@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use App\Traits\HasSeoMeta;
@@ -114,6 +115,16 @@ class Competition extends Model
     public function prizes(): HasMany
     {
         return $this->hasMany(CompetitionPrize::class);
+    }
+
+    public function shareFrameTemplates(): HasMany
+    {
+        return $this->hasMany(CompetitionShareFrameTemplate::class);
+    }
+
+    public function activeShareFrameTemplate(): HasOne
+    {
+        return $this->hasOne(CompetitionShareFrameTemplate::class)->where('is_active', true);
     }
 
     public function categories(): HasMany

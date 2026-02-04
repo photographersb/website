@@ -4,196 +4,218 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AdminSitemapCheck;
-use App\Services\AdminSitemapService;
+use App\Models\AdminSitemapCheckResult;
+use App\Services\AdminSitemapTestService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
 
 class AdminSitemapController extends Controller
 {
-    protected AdminSitemapService $service;
+    private AdminSitemapTestService $testService;
 
-    public function __construct(AdminSitemapService $service)
+    public function __construct(AdminSitemapTestService $testService)
     {
-        $this->service = $service;
-        // Remove middleware from constructor - will be applied in routes
+        $this->testService = $testService;
+        $this->middleware('auth');
+        $this->middleware('admin');
     }
 
     /**
-     * Display admin sitemap - Visual Navigation Map
+     * Show sitemap dashboard
      */
-    public function index(Request $request)
+    public function index()
     {
-        $links = $this->service->getSitemapLinks();
+        $recentChecks = AdminSitemapCheck::with('runByUser', 'results')
+            ->latest()
+            ->limit(5)
+            ->get();
 
-        // Group by module
-        $groupedLinks = collect($links)->groupBy('module')->toArray();
+        $latestCheck = AdminSitemapCheck::with('results')
+            ->latest()
+            ->first();
+
+        $stats = [];
+        if ($latestCheck) {
+            $stats = [
+                'total_routes' => $latestCheck->total_links,
+                'passed' => $latestCheck->passed,
+                'failed' => $latestCheck->failed,
+                'skipped' => $latestCheck->skipped,
+                'success_rate' => round($latestCheck->getSuccessRate(), 1),
+                'last_scan_at' => $latestCheck->isComplete() ? $latestCheck->finished_at : null,
+                'duration' => $latestCheck->getDurationSeconds(),
+            ];
+        }
+
+        $adminRoutes = $this->testService->getAdminRoutes();
 
         return view('admin.sitemap.index', [
-            'links' => $links,
-            'groupedLinks' => $groupedLinks,
-            'totalLinks' => count($links),
+            'stats' => $stats,
+            'latestCheck' => $latestCheck,
+            'recentChecks' => $recentChecks,
+            'adminRoutes' => $adminRoutes,
         ]);
     }
 
     /**
-     * Start link test
+     * Run sitemap test
      */
-    public function startTest(Request $request)
+    public function runTest(Request $request)
     {
         try {
-            // Get authenticated user or create a system user
-            $user = auth()->user() ?? \App\Models\User::first();
-            
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No user available to run test. Please create a user first.'
-                ], 403);
-            }
-            
-            $check = $this->service->runLinkTests($user);
+            $user = Auth::user();
+            $check = $this->testService->startCheck($user->id);
+            $this->testService->runAllTests($check, $user);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Link test completed',
                 'check_id' => $check->id,
-                'results' => [
-                    'total' => $check->total_links,
-                    'passed' => $check->passed_links,
-                    'failed' => $check->failed_links,
-                    'skipped' => $check->skipped_links,
-                    'duration' => $check->getDurationSeconds(),
-                ]
+                'message' => 'Sitemap test completed successfully',
             ]);
+
         } catch (\Exception $e) {
+            \Log::error('AdminSitemap test error: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Error running test: ' . $e->getMessage()
+                'message' => 'Error running sitemap test: ' . $e->getMessage(),
             ], 500);
         }
     }
 
     /**
-     * View specific check results
+     * Get all checks
      */
-    public function viewCheck(AdminSitemapCheck $check, Request $request)
+    public function getChecks(Request $request)
     {
-        $module = $request->query('module');
-        $status = $request->query('status');
-        $statusCode = $request->query('status_code');
-        $search = $request->query('search');
+        $checks = AdminSitemapCheck::with('runByUser')
+            ->latest()
+            ->paginate(20);
 
-        $results = $this->service->getCheckResults($check, $module, $status, $statusCode, $search);
+        return response()->json([
+            'data' => $checks->items(),
+            'pagination' => [
+                'current_page' => $checks->currentPage(),
+                'per_page' => $checks->perPage(),
+                'total' => $checks->total(),
+                'last_page' => $checks->lastPage(),
+            ],
+        ]);
+    }
 
-        // Get unique modules and statuses for filters
-        $modules = $check->results()->distinct()->pluck('module')->sort()->toArray();
-        $statuses = $check->results()->distinct()->pluck('result_status')->sort()->toArray();
-        $statusCodes = $check->results()
-            ->whereNotNull('status_code')
+    /**
+     * Show single check details
+     */
+    public function show(AdminSitemapCheck $check)
+    {
+        $check->load('runByUser', 'results');
+
+        $moduleFilter = request('module');
+        $statusFilter = request('status');
+        $searchQuery = request('search');
+        $sortBy = request('sort_by', 'module');
+
+        $results = $check->results();
+
+        if ($moduleFilter) {
+            $results = $results->where('module', $moduleFilter);
+        }
+
+        if ($statusFilter) {
+            $results = $results->where('result_status', $statusFilter);
+        }
+
+        if ($searchQuery) {
+            $results = $results->where('url', 'like', "%{$searchQuery}%")
+                ->orWhere('route_name', 'like', "%{$searchQuery}%");
+        }
+
+        $results = match($sortBy) {
+            'response_time_asc' => $results->orderBy('response_time_ms', 'asc'),
+            'response_time_desc' => $results->orderBy('response_time_ms', 'desc'),
+            'status_code' => $results->orderBy('status_code', 'desc'),
+            'module' => $results->orderBy('module', 'asc'),
+            default => $results->orderBy('module', 'asc'),
+        };
+
+        $results = $results->paginate(25);
+
+        $modules = AdminSitemapCheckResult::where('check_id', $check->id)
             ->distinct()
-            ->pluck('status_code')
-            ->sort()
-            ->toArray();
+            ->pluck('module')
+            ->sort();
 
-        return view('admin.sitemap.check-results', [
+        $failedResults = $check->results()
+            ->where('result_status', 'failed')
+            ->limit(10)
+            ->get();
+
+        return view('admin.sitemap.show', [
             'check' => $check,
             'results' => $results,
             'modules' => $modules,
-            'statuses' => $statuses,
-            'statusCodes' => $statusCodes,
-            'currentFilters' => [
-                'module' => $module,
-                'status' => $status,
-                'status_code' => $statusCode,
-                'search' => $search,
-            ]
-        ]);
-    }
-
-    /**
-     * View check statistics
-     */
-    public function checkStats(AdminSitemapCheck $check)
-    {
-        $results = $check->results()
-            ->select('module', 'result_status')
-            ->get()
-            ->groupBy('module')
-            ->map(function ($group) {
-                return [
-                    'passed' => $group->where('result_status', 'passed')->count(),
-                    'failed' => $group->where('result_status', 'failed')->count(),
-                    'skipped' => $group->where('result_status', 'skipped')->count(),
-                    'total' => $group->count(),
-                ];
-            });
-
-        return response()->json([
-            'check' => [
-                'id' => $check->id,
-                'started_at' => $check->started_at,
-                'finished_at' => $check->finished_at,
-                'duration_seconds' => $check->getDurationSeconds(),
-                'passed_percentage' => $check->getPassedPercentage(),
-                'totals' => [
-                    'total' => $check->total_links,
-                    'passed' => $check->passed_links,
-                    'failed' => $check->failed_links,
-                    'skipped' => $check->skipped_links,
-                ]
+            'failedResults' => $failedResults,
+            'filters' => [
+                'module' => $moduleFilter,
+                'status' => $statusFilter,
+                'search' => $searchQuery,
+                'sort_by' => $sortBy,
             ],
-            'by_module' => $results
         ]);
     }
 
     /**
-     * Export results as CSV
+     * Export check results as CSV
      */
-    public function exportCsv(AdminSitemapCheck $check)
+    public function export(AdminSitemapCheck $check)
     {
-        $results = $check->results()->orderBy('module')->orderBy('url')->get();
+        if (Auth::user()->role !== 'super_admin') {
+            abort(403);
+        }
 
-        $csvContent = "Module,Link Name,URL,Status,Status Code,Response Time (ms),Error Summary\n";
+        $results = $check->results()
+            ->orderBy('module')
+            ->orderBy('route_name')
+            ->get();
+
+        $csv = "Module,Route Name,URL,Method,Status Code,Response Time (ms),Result Status,Error Summary\n";
 
         foreach ($results as $result) {
-            $statusCode = $result->status_code ?? 'N/A';
             $errorSummary = str_replace('"', '""', $result->error_summary ?? '');
-
-            $csvContent .= sprintf(
-                "%s,%s,%s,%s,%s,%d,\"%s\"\n",
+            $csv .= sprintf(
+                "\"%s\",\"%s\",\"%s\",\"%s\",%s,%d,\"%s\",\"%s\"\n",
                 $result->module,
-                str_replace(',', ' ', $this->getLinkName($result->url)),
+                $result->route_name,
                 $result->url,
-                $result->result_status,
-                $statusCode,
+                $result->method,
+                $result->status_code ?? 'null',
                 $result->response_time_ms,
+                $result->result_status,
                 $errorSummary
             );
         }
 
-        return response($csvContent)
-            ->header('Content-Type', 'text/csv')
-            ->header('Content-Disposition', 'attachment; filename=sitemap-check-' . $check->id . '.csv');
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => "attachment; filename=\"sitemap-check-{$check->id}.csv\"",
+        ]);
     }
 
     /**
      * Delete a check
      */
-    public function deleteCheck(AdminSitemapCheck $check)
+    public function destroy(AdminSitemapCheck $check)
     {
+        if (Auth::id() !== $check->run_by_user_id && Auth::user()->role !== 'super_admin') {
+            abort(403);
+        }
+
         $check->results()->delete();
         $check->delete();
 
-        return back()->with('success', 'Sitemap check deleted successfully');
-    }
-
-    /**
-     * Get link name from URL
-     */
-    private function getLinkName(string $url): string
-    {
-        $name = str_replace('admin/', '', $url);
-        $name = str_replace(['/', '_', '-'], ' ', $name);
-        return ucwords($name);
+        return response()->json([
+            'success' => true,
+            'message' => 'Check deleted successfully',
+        ]);
     }
 }

@@ -21,6 +21,7 @@
   "dependencies": {
     "@vitejs/plugin-vue": "^6.0.3",
     "chart.js": "^4.5.1",
+    "html2canvas": "^1.4.1",
     "terser": "^5.46.0",
     "vue-router": "^4.2.5"
   }

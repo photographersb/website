@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
@@ -37,6 +38,8 @@ class CompetitionSubmission extends Model
         'ranking',
         'is_winner',
         'winner_position',
+        'short_url',
+        'share_token',
     ];
 
     protected $casts = [
@@ -79,6 +82,11 @@ class CompetitionSubmission extends Model
     public function scores(): HasMany
     {
         return $this->hasMany(CompetitionScore::class, 'submission_id');
+    }
+
+    public function shareFrame(): HasOne
+    {
+        return $this->hasOne(SubmissionShareFrame::class, 'competition_submission_id');
     }
     
     public function incrementViewCount()

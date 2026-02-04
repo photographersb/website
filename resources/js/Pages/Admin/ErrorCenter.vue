@@ -1,12 +1,15 @@
 <template>
-  <div class="space-y-6">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-900">Error Center</h1>
-        <p class="text-gray-600 mt-1">Monitor, track, and manage system errors in real-time</p>
-      </div>
-      <div class="flex gap-3">
+  <div class="min-h-screen bg-gray-50">
+    <!-- Admin Header -->
+    <AdminHeader 
+      title="🚨 Error Center" 
+      subtitle="Monitor, track, and manage system errors in real-time"
+    />
+
+    <!-- Main Content -->
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-end gap-3">
         <button
           @click="refreshData"
           class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -20,7 +23,6 @@
           <i class="fas fa-download"></i> Export CSV
         </button>
       </div>
-    </div>
 
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -422,8 +424,7 @@
 
 <script>
 import { ref, onMounted, computed } from 'vue';
-
-export default {
+import AdminHeader from '../../components/AdminHeader.vue';
   name: 'ErrorCenter',
   setup() {
     const errors = ref([]);
@@ -687,6 +688,7 @@ export default {
       exportErrors,
       refreshData,
       watchPagination,
+      AdminHeader,
     };
   },
   watch: {

@@ -629,6 +629,9 @@ Route::prefix('v1')->group(function () {
             Route::put('/categories/{id}', [CategoryController::class, 'update']);
             Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
             
+            // Mentor Management (for event forms)
+            Route::get('/mentors', [AdminController::class, 'getMentors']);
+            
             // Photographer Management
             Route::get('/photographers', [AdminController::class, 'getPhotographers']);
             Route::post('/photographers', [AdminController::class, 'storePhotographer']);

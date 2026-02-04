@@ -2,43 +2,42 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AdminSitemapCheck extends Model
 {
+    use HasFactory;
+
     protected $table = 'admin_sitemap_checks';
 
     protected $fillable = [
-        'started_by_user_id',
+        'run_by_user_id',
         'started_at',
         'finished_at',
         'total_links',
-        'passed_links',
-        'failed_links',
-        'skipped_links',
-        'status',
-        'error_summary'
+        'passed',
+        'failed',
+        'skipped',
     ];
 
     protected $casts = [
         'started_at' => 'datetime',
         'finished_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime'
     ];
 
     /**
-     * Get the user who started the check
+     * User who ran this check
      */
-    public function user(): BelongsTo
+    public function runByUser(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'started_by_user_id');
+        return $this->belongsTo(User::class, 'run_by_user_id');
     }
 
     /**
-     * Get all check results
+     * Results for this check
      */
     public function results(): HasMany
     {
@@ -46,47 +45,56 @@ class AdminSitemapCheck extends Model
     }
 
     /**
-     * Get duration in seconds
+     * Get passed results
      */
-    public function getDurationSeconds(): ?float
+    public function passedResults()
     {
-        if (!$this->finished_at) {
-            return null;
-        }
-
-        return $this->finished_at->diffInMilliseconds($this->started_at) / 1000;
+        return $this->results()->where('result_status', 'passed');
     }
 
     /**
-     * Get summary percentage passed
+     * Get failed results
      */
-    public function getPassedPercentage(): int
+    public function failedResults()
+    {
+        return $this->results()->where('result_status', 'failed');
+    }
+
+    /**
+     * Get skipped results
+     */
+    public function skippedResults()
+    {
+        return $this->results()->where('result_status', 'skipped');
+    }
+
+    /**
+     * Calculate duration in seconds
+     */
+    public function getDurationSeconds(): ?int
+    {
+        if ($this->finished_at && $this->started_at) {
+            return $this->finished_at->diffInSeconds($this->started_at);
+        }
+        return null;
+    }
+
+    /**
+     * Get success rate percentage
+     */
+    public function getSuccessRate(): float
     {
         if ($this->total_links === 0) {
             return 0;
         }
-
-        return (int) (($this->passed_links / $this->total_links) * 100);
+        return ($this->passed / $this->total_links) * 100;
     }
 
     /**
-     * Mark check as completed
+     * Check if scan is complete
      */
-    public function markCompleted(): void
+    public function isComplete(): bool
     {
-        $this->finished_at = now();
-        $this->status = 'completed';
-        $this->save();
-    }
-
-    /**
-     * Mark check as failed
-     */
-    public function markFailed(string $error): void
-    {
-        $this->finished_at = now();
-        $this->status = 'failed';
-        $this->error_summary = $error;
-        $this->save();
+        return $this->finished_at !== null;
     }
 }

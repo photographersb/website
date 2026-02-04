@@ -1,136 +1,218 @@
-@extends('layouts.admin')
+@extends('admin.layout')
 
-@section('title', 'Admin Sitemap')
+@section('title', 'Admin Sitemap & Link Tester')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="container mx-auto px-6 py-8">
     <!-- Header -->
-    <div class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-900 mb-2">📍 Admin Sitemap</h1>
-        <p class="text-gray-600 text-lg">Complete navigation map of all admin pages and features</p>
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Admin Sitemap & Link Tester</h1>
+            <p class="text-gray-600 mt-2">Monitor all admin routes and test them for broken links</p>
+        </div>
+        <button onclick="runSitemapTest()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold">
+            <i class="fas fa-play mr-2"></i>Run Link Test
+        </button>
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-            <p class="text-gray-600 text-sm font-semibold uppercase">Total Sections</p>
-            <p class="text-3xl font-bold text-blue-600">{{ count($groupedLinks) }}</p>
-        </div>
-        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
-            <p class="text-gray-600 text-sm font-semibold uppercase">Total Pages</p>
-            <p class="text-3xl font-bold text-green-600">{{ $totalLinks }}</p>
-        </div>
-        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
-            <p class="text-gray-600 text-sm font-semibold uppercase">Quick Access</p>
-            <p class="text-3xl font-bold text-purple-600">✓</p>
-        </div>
-        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-burgundy-600">
-            <p class="text-gray-600 text-sm font-semibold uppercase">Organized</p>
-            <p class="text-3xl font-bold text-burgundy-600">✓</p>
-        </div>
-    </div>
-
-    <!-- Navigation Tree -->
-    <div class="bg-white rounded-lg shadow-lg">
-        <div class="px-6 py-4 bg-gray-50 border-b">
-            <h2 class="text-xl font-bold text-gray-900">📂 Admin Navigation Structure</h2>
-            <p class="text-sm text-gray-600 mt-1">Click any section to expand and view available pages</p>
-        </div>
-
-        <div class="divide-y divide-gray-200">
-            @foreach($groupedLinks as $module => $moduleLinks)
-                <div class="hover:bg-gray-50 transition-colors">
-                    <!-- Module Header -->
-                    <div class="px-6 py-4 cursor-pointer flex items-center justify-between" onclick="toggleModule('{{ $module }}')">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl">{{ getModuleIcon($module) }}</span>
-                            <div>
-                                <h3 class="font-bold text-gray-900 text-lg">{{ $module }}</h3>
-                                <p class="text-sm text-gray-500">{{ count($moduleLinks) }} pages available</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
-                                {{ count($moduleLinks) }}
-                            </span>
-                            <svg id="icon-{{ $module }}" class="w-5 h-5 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </div>
+    @if($latestCheck)
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm font-medium">Total Routes</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-2">{{ $stats['total_routes'] ?? 0 }}</p>
                     </div>
-
-                    <!-- Module Links -->
-                    <div id="content-{{ $module }}" class="hidden bg-gray-50">
-                        <div class="px-6 py-4">
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                @foreach($moduleLinks as $link)
-                                    <a href="{{ $link['url'] }}" 
-                                       class="block p-4 bg-white border border-gray-200 rounded-lg hover:border-burgundy-500 hover:shadow-md transition-all group">
-                                        <div class="flex items-start gap-3">
-                                            <span class="text-burgundy-600 mt-1">🔗</span>
-                                            <div class="flex-1 min-w-0">
-                                                <h4 class="font-semibold text-gray-900 group-hover:text-burgundy-600 transition-colors truncate">
-                                                    {{ $link['link_name'] }}
-                                                </h4>
-                                                <p class="text-xs text-gray-500 font-mono mt-1 truncate">{{ $link['url'] }}</p>
-                                                @if($link['route_name'])
-                                                    <p class="text-xs text-gray-400 mt-1 truncate">Route: {{ $link['route_name'] }}</p>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </a>
-                                @endforeach
-                            </div>
-                        </div>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-sitemap text-blue-600 text-xl"></i>
                     </div>
                 </div>
-            @endforeach
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm font-medium">Passed</p>
+                        <p class="text-3xl font-bold text-green-600 mt-2">{{ $stats['passed'] ?? 0 }}</p>
+                        <p class="text-sm text-gray-500 mt-1">{{ $stats['success_rate'] ?? 0 }}% success</p>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <i class="fas fa-check text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm font-medium">Failed</p>
+                        <p class="text-3xl font-bold text-red-600 mt-2">{{ $stats['failed'] ?? 0 }}</p>
+                    </div>
+                    <div class="bg-red-100 p-3 rounded-full">
+                        <i class="fas fa-times text-red-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm font-medium">Skipped</p>
+                        <p class="text-3xl font-bold text-yellow-600 mt-2">{{ $stats['skipped'] ?? 0 }}</p>
+                    </div>
+                    <div class="bg-yellow-100 p-3 rounded-full">
+                        <i class="fas fa-minus text-yellow-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Last Scan Info -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+            <p class="text-sm text-gray-700">
+                <strong>Last scan:</strong> 
+                @if($stats['last_scan_at'])
+                    {{ $stats['last_scan_at']->diffForHumans() }}
+                    @if($stats['duration'])
+                        (took {{ $stats['duration'] }}s)
+                    @endif
+                @else
+                    No scans performed yet
+                @endif
+            </p>
+        </div>
+    @else
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8 text-center">
+            <i class="fas fa-info-circle text-yellow-600 text-2xl mb-3"></i>
+            <p class="text-gray-700">No sitemap tests have been run yet. Click "Run Link Test" to get started.</p>
+        </div>
+    @endif
+
+    <!-- Recent Checks -->
+    @if($recentChecks->count() > 0)
+        <div class="bg-white rounded-lg shadow mb-8">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Recent Scans</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Date</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Run By</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Routes Tested</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Results</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        @foreach($recentChecks as $check)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 text-sm text-gray-900">
+                                    {{ $check->created_at->format('M d, Y H:i') }}
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-900">
+                                    {{ $check->runByUser->name ?? 'Unknown' }}
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-900 font-medium">
+                                    {{ $check->total_links }}
+                                </td>
+                                <td class="px-6 py-4 text-sm">
+                                    <div class="flex gap-3">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            ✓ {{ $check->passed }}
+                                        </span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            ✗ {{ $check->failed }}
+                                        </span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                            ⊘ {{ $check->skipped }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm">
+                                    @if($check->isComplete())
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            Completed
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                            In Progress
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 text-sm">
+                                    <a href="{{ route('admin.sitemap.show', $check) }}" class="text-blue-600 hover:text-blue-900 font-medium">
+                                        View Details
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
+
+    <!-- Admin Routes Overview -->
+    <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Admin Routes to Test ({{ count($adminRoutes) }})</h2>
+        </div>
+        <div class="p-6">
+            @if(count($adminRoutes) > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach($adminRoutes as $route)
+                        <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="font-semibold text-gray-900">{{ $route['route_name'] }}</h3>
+                                <span class="text-xs bg-gray-200 text-gray-800 px-2 py-1 rounded">
+                                    {{ $route['module'] }}
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2 break-all">{{ $route['uri'] }}</p>
+                            <p class="text-xs text-gray-500">{{ $route['controller'] }}</p>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p class="text-gray-600 text-center py-8">No admin routes found</p>
+            @endif
         </div>
     </div>
 </div>
 
-@php
-function getModuleIcon($module) {
-    $icons = [
-        'Dashboard' => '📊',
-        'Users' => '👥',
-        'Roles' => '🔐',
-        'Photographers' => '📸',
-        'Bookings' => '📅',
-        'Events' => '🎉',
-        'Competitions' => '🏆',
-        'Sponsors' => '🤝',
-        'Mentors' => '👨‍🏫',
-        'Judges' => '⚖️',
-        'Notices' => '📢',
-        'SEO' => '🔍',
-        'Settings' => '⚙️',
-        'System Health' => '💚',
-        'Error Logs' => '📋',
-    ];
-    return $icons[$module] ?? '📁';
-}
-@endphp
-
 <script>
-function toggleModule(module) {
-    const content = document.getElementById('content-' + module);
-    const icon = document.getElementById('icon-' + module);
-    
-    if (content.classList.contains('hidden')) {
-        content.classList.remove('hidden');
-        icon.style.transform = 'rotate(180deg)';
-    } else {
-        content.classList.add('hidden');
-        icon.style.transform = 'rotate(0deg)';
-    }
-}
+function runSitemapTest() {
+    const btn = event.target.closest('button');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Running...';
 
-// Expand first module by default
-document.addEventListener('DOMContentLoaded', function() {
-    @if(count($groupedLinks) > 0)
-        toggleModule('{{ array_key_first($groupedLinks) }}');
-    @endif
-});
+    fetch('{{ route("admin.sitemap.run-test") }}', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '{{ route("admin.sitemap.show", "") }}/' + data.check_id;
+        } else {
+            alert('Error: ' + data.message);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-play mr-2"></i>Run Link Test';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error running sitemap test');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-play mr-2"></i>Run Link Test';
+    });
+}
 </script>
 @endsection

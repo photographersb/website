@@ -1,257 +1,297 @@
 <template>
-  <div class="space-y-6">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-900">Share Frame Generator</h1>
-        <p class="text-gray-600 mt-1">Create branded frames for social media sharing</p>
-      </div>
-    </div>
+  <div class="min-h-screen bg-gray-50">
+    <!-- Admin Header -->
+    <AdminHeader 
+      title="🎨 Share Frame Generator" 
+      subtitle="Create branded frames for social media sharing"
+    />
 
-    <!-- Main Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Configuration Panel -->
-      <div class="lg:col-span-1 space-y-4">
-        <div class="bg-white rounded-lg shadow p-6 space-y-4">
-          <!-- Frame Type Selection -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-900 mb-2">Frame Type</label>
-            <select
-              v-model="config.frameType"
-              @change="updatePreview"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            >
-              <option value="certificate">Certificate</option>
-              <option value="winner">Winner Badge</option>
-              <option value="finalist">Finalist Badge</option>
-              <option value="achievement">Achievement</option>
-            </select>
-          </div>
+    <!-- Main Content -->
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <!-- Preview Panel (Top - Full Width) -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+        <div class="bg-gradient-to-r from-orange-50 to-amber-50 px-6 py-4 border-b border-orange-100">
+          <h3 class="text-xl font-bold text-gray-900">📸 Live Preview</h3>
+          <p class="text-sm text-gray-600 mt-1">Your frame will appear below</p>
+        </div>
+        <div class="p-8 flex justify-center items-center bg-gradient-to-b from-gray-50 to-gray-100 min-h-96" :style="previewContainerStyle">
+          <!-- Frame Preview -->
+          <div
+            v-if="previewData"
+            data-frame-canvas
+            class="relative shadow-2xl rounded-xl overflow-hidden border-8 border-white"
+            :style="getFrameDimensions"
+          >
+            <!-- Background -->
+            <div
+              class="absolute inset-0"
+              :style="getBackgroundStyle"
+            ></div>
 
-          <!-- Title -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-900 mb-2">Title Text</label>
-            <input
-              v-model="config.title"
-              @input="updatePreview"
-              type="text"
-              placeholder="e.g., Certificate of Excellence"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            />
-          </div>
+            <!-- Content -->
+            <div class="relative w-full h-full flex flex-col items-center justify-center px-6 py-8 text-center overflow-hidden">
+              <!-- Logo Area -->
+              <div v-if="config.includeLogo" class="mb-4 flex-shrink-0">
+                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg">
+                  <svg class="w-8 h-8 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
+                  </svg>
+                </div>
+              </div>
 
-          <!-- Subtitle -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-900 mb-2">Subtitle</label>
-            <input
-              v-model="config.subtitle"
-              @input="updatePreview"
-              type="text"
-              placeholder="e.g., Photography Excellence Awards 2026"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            />
-          </div>
+              <!-- Title -->
+              <h2 class="font-bold leading-tight line-clamp-3" :style="{...getTitleStyle, fontSize: 'clamp(1.5rem, 8vw, 2.5rem)'}">
+                {{ config.title || 'Frame Title' }}
+              </h2>
 
-          <!-- Format Selection -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-900 mb-2">Format</label>
-            <div class="space-y-2">
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input
-                  v-model="config.format"
-                  value="instagram-story"
-                  @change="updatePreview"
-                  type="radio"
-                  class="w-4 h-4 text-orange-500"
-                />
-                <span class="text-sm">Instagram Story (1080×1920)</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input
-                  v-model="config.format"
-                  value="instagram-post"
-                  @change="updatePreview"
-                  type="radio"
-                  class="w-4 h-4 text-orange-500"
-                />
-                <span class="text-sm">Instagram Post (1080×1080)</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input
-                  v-model="config.format"
-                  value="facebook"
-                  @change="updatePreview"
-                  type="radio"
-                  class="w-4 h-4 text-orange-500"
-                />
-                <span class="text-sm">Facebook (1200×628)</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input
-                  v-model="config.format"
-                  value="twitter"
-                  @change="updatePreview"
-                  type="radio"
-                  class="w-4 h-4 text-orange-500"
-                />
-                <span class="text-sm">X/Twitter (1200×675)</span>
-              </label>
+              <!-- Subtitle -->
+              <p v-if="config.subtitle" class="mt-2 leading-snug line-clamp-4" :style="{...getSubtitleStyle, fontSize: 'clamp(0.875rem, 5vw, 1.125rem)'}">
+                {{ config.subtitle }}
+              </p>
+
+              <!-- Badge/Icon -->
+              <div v-if="config.frameType !== 'achievement'" class="my-3 flex-shrink-0">
+                <svg class="w-16 h-16" :style="getIconStyle" fill="currentColor" viewBox="0 0 24 24">
+                  <path v-if="config.frameType === 'certificate'" d="M20 6h-2.15l1.46-1.46c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0L16.59 6H7.41L5.1 2.13c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L5.15 6H3c-1.66 0-3 1.34-3 3v11c0 1.66 1.34 3 3 3h17c1.66 0 3-1.34 3-3V9c0-1.66-1.34-3-3-3zm0 14H3V9h17v11z"/>
+                  <path v-else-if="config.frameType === 'winner'" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                  <path v-else d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </div>
+
+              <!-- QR Code Area -->
+              <div v-if="config.includeQr" class="mt-4 flex-shrink-0">
+                <div class="w-16 h-16 bg-white rounded p-1 shadow-lg">
+                  <div class="w-full h-full bg-gray-200 rounded flex items-center justify-center text-xs text-gray-600 font-mono">QR</div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Color Scheme -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-900 mb-2">Color Scheme</label>
-            <select
-              v-model="config.colorScheme"
-              @change="updatePreview"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            >
-              <option value="burgundy">Burgundy (Brand)</option>
-              <option value="gold">Gold Premium</option>
-              <option value="blue">Blue Professional</option>
-              <option value="green">Green Modern</option>
-              <option value="purple">Purple Elegant</option>
-            </select>
+          <!-- Loading State -->
+          <div v-else class="flex flex-col items-center justify-center py-20 text-gray-500">
+            <svg class="w-16 h-16 mb-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M7.172 7.172A4 4 0 0112.828 12m5.656-5.656a4 4 0 010 5.656M7.172 7.172a4 4 0 015.656 0"/>
+            </svg>
+            <p class="text-lg font-medium">Generating preview...</p>
           </div>
+        </div>
 
-          <!-- Background Style -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-900 mb-2">Background</label>
-            <select
-              v-model="config.backgroundStyle"
-              @change="updatePreview"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            >
-              <option value="solid">Solid Color</option>
-              <option value="gradient">Gradient</option>
-              <option value="pattern">Pattern</option>
-            </select>
-          </div>
-
-          <!-- Include QR Code -->
-          <div class="flex items-center gap-2">
-            <input
-              id="include_qr"
-              v-model="config.includeQr"
-              @change="updatePreview"
-              type="checkbox"
-              class="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-2 focus:ring-orange-500"
-            />
-            <label for="include_qr" class="text-sm text-gray-700">Include QR Code</label>
-          </div>
-
-          <!-- Include Logo -->
-          <div class="flex items-center gap-2">
-            <input
-              id="include_logo"
-              v-model="config.includeLogo"
-              @change="updatePreview"
-              type="checkbox"
-              class="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-2 focus:ring-orange-500"
-            />
-            <label for="include_logo" class="text-sm text-gray-700">Include Logo</label>
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="pt-4 space-y-2">
-            <button
-              @click="generateFrame"
-              :disabled="isGenerating"
-              class="w-full px-4 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition"
-            >
-              {{ isGenerating ? 'Generating...' : 'Generate Frame' }}
-            </button>
-            <button
-              @click="downloadFrame"
-              :disabled="!frameGenerated"
-              class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition"
-            >
-              Download PNG
-            </button>
-            <button
-              @click="downloadJPEG"
-              :disabled="!frameGenerated"
-              class="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition"
-            >
-              Download JPEG
-            </button>
+        <!-- Format Info -->
+        <div class="px-6 py-3 bg-gray-50 border-t border-gray-200">
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span class="text-gray-600"><strong>Format:</strong> {{ getFormatLabel }} ({{ getFormatDimensions }}px)</span>
+            </div>
+            <div>
+              <span class="text-gray-600"><strong>Color:</strong> {{ getColorSchemeLabel }}</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Preview Panel -->
-      <div class="lg:col-span-2">
-        <div class="bg-white rounded-lg shadow p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Preview</h3>
-          
-          <div class="flex justify-center items-center bg-gray-100 rounded-lg overflow-hidden" :style="previewContainerStyle">
-            <!-- Frame Preview -->
-            <div
-              v-if="previewData"
-              class="relative"
-              :style="getFrameDimensions"
-            >
-              <!-- Background -->
-              <div
-                class="absolute inset-0"
-                :style="getBackgroundStyle"
-              ></div>
+      <!-- Configuration Panel (Bottom) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Configuration (2 columns) -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-xl shadow-lg p-8">
+            <h3 class="text-lg font-bold text-gray-900 mb-6 pb-4 border-b-2 border-orange-200">⚙️ Frame Configuration</h3>
+            
+            <!-- Configuration Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <!-- Left Column: Steps 1-3 -->
+              <div class="space-y-5">
+                <!-- Step 1: Frame Type Selection -->
+                <div class="group">
+                  <label class="block text-sm font-semibold text-gray-900 mb-2 flex items-center gap-3">
+                    <span class="w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 text-white flex items-center justify-center text-xs font-bold shadow-md group-hover:scale-110 transition">1</span>
+                    <span>Frame Type</span>
+                  </label>
+                  <select
+                    v-model="config.frameType"
+                    @change="updatePreview"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white hover:border-orange-300 transition"
+                  >
+                    <option value="certificate">🎓 Certificate</option>
+                    <option value="winner">🏆 Winner Badge</option>
+                    <option value="finalist">⭐ Finalist Badge</option>
+                    <option value="achievement">✨ Achievement</option>
+                  </select>
+                </div>
 
-              <!-- Content -->
-              <div class="relative h-full flex flex-col items-center justify-center p-8 text-center">
-                <!-- Logo Area -->
-                <div v-if="config.includeLogo" class="mb-6">
-                  <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg">
-                    <svg class="w-10 h-10 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
-                    </svg>
+                <!-- Step 2: Title -->
+                <div class="group">
+                  <label class="block text-sm font-semibold text-gray-900 mb-2 flex items-center gap-3">
+                    <span class="w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 text-white flex items-center justify-center text-xs font-bold shadow-md group-hover:scale-110 transition">2</span>
+                    <span>Title Text</span>
+                  </label>
+                  <input
+                    v-model="config.title"
+                    @input="updatePreview"
+                    type="text"
+                    placeholder="e.g., Certificate of Excellence"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent hover:border-orange-300 transition"
+                  />
+                </div>
+
+                <!-- Step 3: Subtitle -->
+                <div class="group">
+                  <label class="block text-sm font-semibold text-gray-900 mb-2 flex items-center gap-3">
+                    <span class="w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 text-white flex items-center justify-center text-xs font-bold shadow-md group-hover:scale-110 transition">3</span>
+                    <span>Subtitle</span>
+                  </label>
+                  <input
+                    v-model="config.subtitle"
+                    @input="updatePreview"
+                    type="text"
+                    placeholder="e.g., Photography Excellence Awards 2026"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent hover:border-orange-300 transition"
+                  />
+                </div>
+              </div>
+
+              <!-- Right Column: Steps 4-5 -->
+              <div class="space-y-5">
+                <!-- Step 4: Format Selection -->
+                <div class="group">
+                  <label class="block text-sm font-semibold text-gray-900 mb-2 flex items-center gap-3">
+                    <span class="w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 text-white flex items-center justify-center text-xs font-bold shadow-md group-hover:scale-110 transition">4</span>
+                    <span>Format</span>
+                  </label>
+                  <select
+                    v-model="config.format"
+                    @change="updatePreview"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white hover:border-orange-300 transition"
+                  >
+                    <option value="instagram-story">📱 Instagram Story (1080×1920)</option>
+                    <option value="instagram-post">📷 Instagram Post (1080×1080)</option>
+                    <option value="facebook">👍 Facebook (1200×628)</option>
+                    <option value="twitter">𝕏 X/Twitter (1200×675)</option>
+                  </select>
+                </div>
+
+                <!-- Step 5: Color Scheme with Visual Buttons -->
+                <div class="group">
+                  <label class="block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-3">
+                    <span class="w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 text-white flex items-center justify-center text-xs font-bold shadow-md group-hover:scale-110 transition">5</span>
+                    <span>Color Scheme</span>
+                  </label>
+                  <div class="grid grid-cols-5 gap-2">
+                    <button
+                      v-for="scheme in Object.keys(colorSchemes)"
+                      :key="scheme"
+                      @click="config.colorScheme = scheme; updatePreview()"
+                      class="p-3 rounded-lg border-2 transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                      :class="config.colorScheme === scheme ? 'ring-2 ring-offset-2 ring-orange-500 border-orange-500 shadow-lg' : 'border-gray-300 hover:border-orange-300'"
+                      :title="scheme.charAt(0).toUpperCase() + scheme.slice(1)"
+                    >
+                      <div class="flex gap-1 h-8">
+                        <div class="flex-1 rounded" :style="{ backgroundColor: colorSchemes[scheme].primary }"></div>
+                        <div class="flex-1 rounded" :style="{ backgroundColor: colorSchemes[scheme].secondary }"></div>
+                      </div>
+                    </button>
                   </div>
                 </div>
 
-                <!-- Title -->
-                <h2 class="text-4xl font-bold mb-3" :style="getTitleStyle">
-                  {{ config.title || 'Frame Title' }}
-                </h2>
-
-                <!-- Subtitle -->
-                <p v-if="config.subtitle" class="text-lg mb-6" :style="getSubtitleStyle">
-                  {{ config.subtitle }}
-                </p>
-
-                <!-- Badge/Icon -->
-                <div v-if="config.frameType !== 'achievement'" class="my-4">
-                  <svg class="w-24 h-24" :style="getIconStyle" fill="currentColor" viewBox="0 0 24 24">
-                    <path v-if="config.frameType === 'certificate'" d="M20 6h-2.15l1.46-1.46c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0L16.59 6H7.41L5.1 2.13c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L5.15 6H3c-1.66 0-3 1.34-3 3v11c0 1.66 1.34 3 3 3h17c1.66 0 3-1.34 3-3V9c0-1.66-1.34-3-3-3zm0 14H3V9h17v11z"/>
-                    <path v-else-if="config.frameType === 'winner'" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
-                    <path v-else d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                  </svg>
-                </div>
-
-                <!-- QR Code Area -->
-                <div v-if="config.includeQr" class="mt-6">
-                  <div class="w-20 h-20 bg-white rounded p-1 shadow-lg">
-                    <div class="w-full h-full bg-gray-200 rounded flex items-center justify-center text-xs text-gray-600">
-                      QR Code
-                    </div>
-                  </div>
+                <!-- Background Style -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-900 mb-2">Background Style</label>
+                  <select
+                    v-model="config.backgroundStyle"
+                    @change="updatePreview"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white hover:border-orange-300 transition"
+                  >
+                    <option value="gradient">🎨 Gradient</option>
+                    <option value="solid">⬛ Solid Color</option>
+                    <option value="pattern">🔲 Pattern</option>
+                  </select>
                 </div>
               </div>
             </div>
 
-            <!-- Loading State -->
-            <div v-else class="flex flex-col items-center justify-center py-12 text-gray-500">
-              <svg class="w-12 h-12 mb-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M7.172 7.172A4 4 0 0112.828 12m5.656-5.656a4 4 0 010 5.656M7.172 7.172a4 4 0 015.656 0"/>
-              </svg>
-              <p>Frame preview will appear here</p>
+            <!-- Additional Options -->
+            <div class="mt-8 pt-6 border-t border-gray-100 space-y-3">
+              <h4 class="text-sm font-semibold text-gray-900 mb-3">✨ Additional Options</h4>
+              <label class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 px-3 py-2 rounded transition">
+                <input
+                  v-model="config.includeQr"
+                  @change="updatePreview"
+                  type="checkbox"
+                  class="w-4 h-4 text-orange-500 rounded focus:ring-2 focus:ring-orange-500"
+                />
+                <span class="text-sm font-medium text-gray-700">📱 Include QR Code</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 px-3 py-2 rounded transition">
+                <input
+                  v-model="config.includeLogo"
+                  @change="updatePreview"
+                  type="checkbox"
+                  class="w-4 h-4 text-orange-500 rounded focus:ring-2 focus:ring-orange-500"
+                />
+                <span class="text-sm font-medium text-gray-700">🏢 Include Logo</span>
+              </label>
             </div>
           </div>
+        </div>
 
-          <!-- Format Info -->
-          <div class="mt-4 text-xs text-gray-600 space-y-1">
-            <p><strong>Current Format:</strong> {{ getFormatLabel }} ({{ getFormatDimensions }}px)</p>
-            <p><strong>Color Scheme:</strong> {{ getColorSchemeLabel }}</p>
+        <!-- Action Panel (Sidebar) -->
+        <div class="lg:col-span-1">
+          <div class="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl shadow-lg p-6 border border-orange-100">
+            <h3 class="text-lg font-bold text-gray-900 mb-4 pb-3 border-b-2 border-orange-200">🚀 Actions</h3>
+            
+            <div class="space-y-3">
+              <!-- Generate Button -->
+              <button
+                @click="generateFrame"
+                :disabled="isGenerating"
+                class="w-full px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 active:scale-95"
+              >
+                <span v-if="!isGenerating">✨ Generate Frame</span>
+                <span v-else class="flex items-center justify-center gap-2">
+                  <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M7.172 7.172A4 4 0 0112.828 12m5.656-5.656a4 4 0 010 5.656M7.172 7.172a4 4 0 015.656 0"/>
+                  </svg>
+                  Generating...
+                </span>
+              </button>
+
+              <!-- Download Options -->
+              <div class="space-y-2 pt-2">
+                <p class="text-xs font-semibold text-gray-600 uppercase">Download As:</p>
+                <button
+                  @click="downloadFrame"
+                  :disabled="!frameGenerated"
+                  class="w-full px-4 py-2 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition"
+                >
+                  📥 PNG
+                </button>
+                <button
+                  @click="downloadJPEG"
+                  :disabled="!frameGenerated"
+                  class="w-full px-4 py-2 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition"
+                >
+                  📥 JPEG
+                </button>
+              </div>
+
+              <!-- Status Info -->
+              <div class="mt-6 pt-6 border-t border-orange-200 bg-white rounded-lg p-4">
+                <div class="space-y-2 text-sm">
+                  <div class="flex items-center justify-between">
+                    <span class="text-gray-600">Frame:</span>
+                    <span class="font-semibold text-gray-900">{{ config.frameType }}</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-gray-600">Format:</span>
+                    <span class="font-semibold text-gray-900 text-right">{{ getFormatLabel }}</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-gray-600">Status:</span>
+                    <span v-if="frameGenerated" class="text-green-600 font-semibold">✓ Ready</span>
+                    <span v-else class="text-gray-500 font-semibold">Pending</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -261,7 +301,7 @@
     <div 
       v-if="toastMessage"
       :class="[
-        'fixed bottom-4 right-4 px-6 py-3 rounded-lg text-white transition z-50',
+        'fixed bottom-4 right-4 px-6 py-3 rounded-lg text-white transition z-50 shadow-lg',
         toastType === 'success' ? 'bg-green-600' : 'bg-red-600'
       ]"
     >
@@ -272,6 +312,8 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import html2canvas from 'html2canvas';
+import AdminHeader from '../../components/AdminHeader.vue';
 
 const config = ref({
   frameType: 'certificate',

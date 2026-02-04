@@ -162,4 +162,180 @@ class SeoService
 
         return '<script type="application/ld+json">' . "\n" . json_encode($seoMeta->schema_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n" . '</script>';
     }
+
+    /**
+     * Generate SEO metadata for Event
+     */
+    public function generateEventSeo($event): object
+    {
+        $metaTitle = "{$event->title} | Photography Event | Photographer SB";
+        $metaDescription = substr(strip_tags($event->description), 0, 155) . "...";
+        $eventUrl = url("/events/{$event->slug}");
+        
+        $ogImage = $event->banner_url ?? $event->image_url ?? asset('images/og-events.jpg');
+        
+        $schema = $this->generateEventSchema($event);
+
+        return (object) [
+            'meta_title' => $metaTitle,
+            'meta_description' => $metaDescription,
+            'canonical_url' => $eventUrl,
+            'og_title' => $event->title,
+            'og_description' => $metaDescription,
+            'og_image' => $ogImage,
+            'og_url' => $eventUrl,
+            'og_type' => 'event',
+            'robots_index' => true,
+            'robots_follow' => true,
+            'schema_json' => $schema,
+        ];
+    }
+
+    /**
+     * Generate Event schema
+     */
+    protected function generateEventSchema($event): array
+    {
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Event',
+            'name' => $event->title,
+            'description' => strip_tags($event->description),
+            'url' => url("/events/{$event->slug}"),
+            'eventStatus' => 'https://schema.org/EventScheduled',
+        ];
+
+        if ($event->start_date) {
+            $schema['startDate'] = $event->start_date->toIso8601String();
+        }
+
+        if ($event->end_date) {
+            $schema['endDate'] = $event->end_date->toIso8601String();
+        }
+
+        if ($event->location) {
+            $schema['location'] = [
+                '@type' => 'Place',
+                'name' => $event->location,
+            ];
+        }
+
+        if ($event->banner_url ?? $event->image_url) {
+            $schema['image'] = $event->banner_url ?? $event->image_url;
+        }
+
+        if ($event->organizer_name) {
+            $schema['organizer'] = [
+                '@type' => 'Organization',
+                'name' => $event->organizer_name,
+            ];
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Generate SEO metadata for Competition
+     */
+    public function generateCompetitionSeo($competition): object
+    {
+        $metaTitle = "{$competition->title} | Photography Competition | Photographer SB";
+        $metaDescription = substr(strip_tags($competition->description), 0, 155) . "...";
+        $competitionUrl = url("/competitions/{$competition->slug}");
+        
+        $ogImage = $competition->cover_image ?? $competition->banner_url ?? asset('images/og-competitions.jpg');
+        
+        $schema = $this->generateCompetitionSchema($competition);
+
+        return (object) [
+            'meta_title' => $metaTitle,
+            'meta_description' => $metaDescription,
+            'canonical_url' => $competitionUrl,
+            'og_title' => $competition->title,
+            'og_description' => $metaDescription,
+            'og_image' => $ogImage,
+            'og_url' => $competitionUrl,
+            'og_type' => 'article',
+            'robots_index' => true,
+            'robots_follow' => true,
+            'schema_json' => $schema,
+        ];
+    }
+
+    /**
+     * Generate Competition schema (CreativeWork)
+     */
+    protected function generateCompetitionSchema($competition): array
+    {
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'CreativeWork',
+            'name' => $competition->title,
+            'description' => strip_tags($competition->description),
+            'url' => url("/competitions/{$competition->slug}"),
+        ];
+
+        if ($competition->start_date) {
+            $schema['datePublished'] = $competition->start_date->toIso8601String();
+        }
+
+        if ($competition->end_date) {
+            $schema['expires'] = $competition->end_date->toIso8601String();
+        }
+
+        if ($competition->cover_image ?? $competition->banner_url) {
+            $schema['image'] = $competition->cover_image ?? $competition->banner_url;
+        }
+
+        if ($competition->prizes) {
+            $schema['award'] = $competition->prizes;
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Generate homepage SEO
+     */
+    public function generateHomepageSeo(): object
+    {
+        return (object) [
+            'meta_title' => 'Photographer SB - Find & Hire Professional Photographers in Bangladesh',
+            'meta_description' => 'Bangladesh\'s largest photography marketplace. Browse 1000+ verified photographers. Book wedding, event, portrait, commercial photographers. Secure payments, verified reviews.',
+            'canonical_url' => url('/'),
+            'og_title' => 'Photographer SB - Professional Photography Services Bangladesh',
+            'og_description' => 'Connect with verified photographers across Bangladesh. Compare portfolios, read reviews, book instantly.',
+            'og_image' => asset('images/og-home.jpg'),
+            'og_url' => url('/'),
+            'og_type' => 'website',
+            'robots_index' => true,
+            'robots_follow' => true,
+            'schema_json' => $this->getOrganizationSchema(),
+        ];
+    }
+
+    /**
+     * Generate Organization schema for homepage
+     */
+    protected function getOrganizationSchema(): array
+    {
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'Organization',
+            'name' => 'Photographer SB',
+            'description' => 'Bangladesh\'s premier photography marketplace connecting photographers with clients',
+            'url' => url('/'),
+            'logo' => asset('images/logo.png'),
+            'sameAs' => [
+                'https://www.facebook.com/thephotographersbd',
+                'https://www.instagram.com/thephotographersbd',
+            ],
+            'contactPoint' => [
+                '@type' => 'ContactPoint',
+                'contactType' => 'customer service',
+                'telephone' => '+880-1767300900',
+                'availableLanguage' => ['Bengali', 'English'],
+            ],
+        ];
+    }
 }

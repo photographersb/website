@@ -4,6 +4,89 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   PHOTOGRAPHER SB DESIGN SYSTEM
+   Global Design Tokens & CSS Variables
+   ============================================ */
+
+:root {
+  /* Primary Brand Colors */
+  --sb-primary: #8B1538;
+  --sb-primary-hover: #6F112D;
+  --sb-primary-soft: #FDF2F5;
+  --sb-primary-light: #F9CFD9;
+  --sb-primary-dark: #530D22;
+  
+  /* Text Colors */
+  --sb-text: #1F2937;
+  --sb-text-light: #6B7280;
+  --sb-text-muted: #9CA3AF;
+  --sb-text-inverse: #FFFFFF;
+  
+  /* Background Colors */
+  --sb-bg: #F9FAFB;
+  --sb-bg-white: #FFFFFF;
+  --sb-card-bg: #FFFFFF;
+  --sb-card-hover: #F3F4F6;
+  
+  /* Border Colors */
+  --sb-border: #E5E7EB;
+  --sb-border-light: #F3F4F6;
+  --sb-border-focus: var(--sb-primary);
+  
+  /* Status Colors */
+  --sb-success: #10B981;
+  --sb-success-bg: #D1FAE5;
+  --sb-warning: #F59E0B;
+  --sb-warning-bg: #FEF3C7;
+  --sb-danger: #EF4444;
+  --sb-danger-bg: #FEE2E2;
+  --sb-info: #3B82F6;
+  --sb-info-bg: #DBEAFE;
+  
+  /* Spacing Scale */
+  --sb-space-xs: 0.25rem;    /* 4px */
+  --sb-space-sm: 0.5rem;     /* 8px */
+  --sb-space-md: 1rem;       /* 16px */
+  --sb-space-lg: 1.5rem;     /* 24px */
+  --sb-space-xl: 2rem;       /* 32px */
+  --sb-space-2xl: 3rem;      /* 48px */
+  
+  /* Border Radius */
+  --sb-radius-sm: 0.375rem;  /* 6px */
+  --sb-radius-md: 0.5rem;    /* 8px */
+  --sb-radius-lg: 0.75rem;   /* 12px */
+  --sb-radius-xl: 1rem;      /* 16px */
+  --sb-radius-full: 9999px;
+  
+  /* Shadows */
+  --sb-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --sb-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --sb-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --sb-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --sb-shadow-brand: 0 10px 30px -5px rgba(139, 21, 56, 0.3);
+  
+  /* Typography */
+  --sb-font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --sb-font-display: 'Space Grotesk', 'DM Sans', sans-serif;
+  
+  /* Transitions */
+  --sb-transition: all 0.2s ease-in-out;
+  --sb-transition-fast: all 0.15s ease-in-out;
+  --sb-transition-slow: all 0.3s ease-in-out;
+}
+
+/* Dark Mode Variables (Optional) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sb-bg: #111827;
+    --sb-card-bg: #1F2937;
+    --sb-text: #F9FAFB;
+    --sb-text-light: #D1D5DB;
+    --sb-border: #374151;
+  }
+}
+
 /* Lazy Loading Styles */
 img.lazy-loading {
   filter: blur(5px);

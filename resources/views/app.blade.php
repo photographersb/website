@@ -49,6 +49,13 @@
     <!-- Dynamic SEO Meta Tags (Page-specific) -->
     @yield('meta')
     
+    @if(config('app.env') !== 'production' && config('app.debug') === true)
+    <!-- Anti-caching meta tags (DEV MODE ONLY) -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    @endif
+    
     <!-- Preconnect for Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -117,6 +124,12 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
+    <!-- DEBUG-VIEW: app.blade.php loaded -->
+    {!! \App\Support\DevInfo::renderRouteMarker() !!}
+    
     <div id="app"></div>
+    
+    <!-- Dev Debug Badge -->
+    {!! \App\Support\DevInfo::renderDebugBadge() !!}
 </body>
 </html>
