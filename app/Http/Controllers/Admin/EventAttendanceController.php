@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\EventAttendanceLog;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Services\CertificateAutoIssueService;
 
 class EventAttendanceController extends Controller
 {
@@ -104,6 +105,11 @@ class EventAttendanceController extends Controller
             'user_id' => $registration->user_id,
             'scanned_at' => now(),
         ]);
+
+        // Auto-issue certificate if event has certificates enabled
+        if ($event->certificates_enabled) {
+            CertificateAutoIssueService::issueForAttendee($attendance);
+        }
 
         return response()->json([
             'success' => true,
