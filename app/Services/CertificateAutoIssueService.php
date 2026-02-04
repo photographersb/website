@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Certificate;
 use App\Models\Event;
-use App\Models\EventAttendanceLog;
+use App\Models\EventRegistration;
 use App\Models\CertificateTemplate;
 use Illuminate\Support\Str;
 
@@ -21,16 +21,17 @@ class CertificateAutoIssueService
         }
 
         // Get certificate template
-        $template = $event->certificateTemplate ?: CertificateTemplate::where('type', 'event')->where('is_default', true)->first();
+        $template = $event->certificateTemplate ?: CertificateTemplate::where('type', 'participation')->where('is_default', true)->first();
         
         if (!$template) {
             return ['success' => false, 'message' => 'No certificate template found'];
         }
 
         // Get all attended registrations without certificates
-        $attendances = EventAttendanceLog::where('event_id', $event->id)
-            ->with(['registration', 'user'])
-            ->whereDoesntHave('registration.user.certificates', function ($q) use ($event) {
+        $attendedRegistrations = EventRegistration::where('event_id', $event->id)
+            ->whereNotNull('attended_at')
+            ->with('user')
+            ->whereDoesntHave('user.certificates', function ($q) use ($event) {
                 $q->where('event_id', $event->id);
             })
             ->get();
@@ -38,29 +39,29 @@ class CertificateAutoIssueService
         $issued = 0;
         $errors = [];
 
-        foreach ($attendances as $attendance) {
+        foreach ($attendedRegistrations as $registration) {
             try {
                 $certificate = Certificate::create([
+                    'certificate_code' => self::generateCertificateCode($event->id),
                     'template_id' => $template->id,
                     'event_id' => $event->id,
-                    'issued_to_user_id' => $attendance->user_id,
-                    'certificate_code' => self::generateCertificateCode($event->id),
-                    'issued_at' => now(),
-                    'title' => "Certificate of Attendance - {$event->title}",
-                    'description' => "This is to certify that {$attendance->user->name} successfully attended {$event->title} held on {$event->start_datetime->format('M d, Y')}.",
-                    'issued_by' => $event->organizer?->name ?? 'Photographer SB',
-                    'status' => 'active',
+                    'issued_to_user_id' => $registration->user_id,
+                    'issued_to_name' => $registration->user->name,
+                    'issued_to_email' => $registration->user->email,
+                    'issue_date' => now(),
+                    'status' => 'issued',
+                    'created_by_user_id' => 1, // System
                 ]);
 
                 $issued++;
             } catch (\Exception $e) {
                 $errors[] = [
-                    'user_id' => $attendance->user_id,
+                    'user_id' => $registration->user_id,
                     'error' => $e->getMessage(),
                 ];
                 \Log::error('Certificate auto-issue failed', [
                     'event_id' => $event->id,
-                    'user_id' => $attendance->user_id,
+                    'user_id' => $registration->user_id,
                     'error' => $e->getMessage(),
                 ]);
             }
@@ -69,17 +70,29 @@ class CertificateAutoIssueService
         return [
             'success' => true,
             'issued' => $issued,
-            'total_attendees' => $attendances->count(),
+            'total_attendees' => $attendedRegistrations->count(),
             'errors' => $errors,
         ];
     }
 
     /**
-     * Auto-issue certificate for single attendee
+     * Auto-issue certificate for single attendee (EventRegistration)
      */
-    public static function issueForAttendee(EventAttendanceLog $attendance)
+    public static function issueForAttendee($registration)
     {
-        $event = $attendance->event;
+        // Support both EventRegistration model and stdClass for testing
+        if (is_object($registration) && !($registration instanceof EventRegistration)) {
+            // Convert stdClass to compatible object for testing
+            $event = $registration->event;
+            $userId = $registration->user_id;
+            $userName = $registration->user->name ?? 'Unknown';
+            $userEmail = $registration->user->email ?? null;
+        } else {
+            $event = $registration->event;
+            $userId = $registration->user_id;
+            $userName = $registration->user->name;
+            $userEmail = $registration->user->email;
+        }
 
         // Check if event has certificates enabled
         if (!$event->certificates_enabled) {
@@ -88,7 +101,7 @@ class CertificateAutoIssueService
 
         // Check if already issued
         $existing = Certificate::where('event_id', $event->id)
-            ->where('issued_to_user_id', $attendance->user_id)
+            ->where('issued_to_user_id', $userId)
             ->first();
 
         if ($existing) {
@@ -96,7 +109,7 @@ class CertificateAutoIssueService
         }
 
         // Get template
-        $template = $event->certificateTemplate ?: CertificateTemplate::where('type', 'event')->where('is_default', true)->first();
+        $template = $event->certificateTemplate ?: CertificateTemplate::where('type', 'participation')->where('is_default', true)->first();
         
         if (!$template) {
             return ['success' => false, 'message' => 'No certificate template found'];
@@ -104,25 +117,26 @@ class CertificateAutoIssueService
 
         try {
             $certificate = Certificate::create([
+                'certificate_code' => self::generateCertificateCode($event->id),
                 'template_id' => $template->id,
                 'event_id' => $event->id,
-                'issued_to_user_id' => $attendance->user_id,
-                'certificate_code' => self::generateCertificateCode($event->id),
-                'issued_at' => now(),
-                'title' => "Certificate of Attendance - {$event->title}",
-                'description' => "This is to certify that {$attendance->user->name} successfully attended {$event->title} held on {$event->start_datetime->format('M d, Y')}.",
-                'issued_by' => $event->organizer?->name ?? 'Photographer SB',
-                'status' => 'active',
+                'issued_to_user_id' => $userId,
+                'issued_to_name' => $userName,
+                'issued_to_email' => $userEmail,
+                'issue_date' => now(),
+                'status' => 'issued',
+                'created_by_user_id' => 1, // System
             ]);
 
             return ['success' => true, 'certificate' => $certificate];
         } catch (\Exception $e) {
             \Log::error('Certificate auto-issue failed for attendee', [
-                'attendance_id' => $attendance->id,
+                'event_id' => $event->id,
+                'user_id' => $userId,
                 'error' => $e->getMessage(),
             ]);
 
-            return ['success' => false, 'message' => $e->getMessage()];
+            return ['success' => false, 'error' => $e->getMessage()];
         }
     }
 

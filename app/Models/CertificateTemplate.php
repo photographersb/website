@@ -9,19 +9,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class CertificateTemplate extends Model
 {
     protected $fillable = [
-        'name',
+        'title',
         'description',
-        'background_image_path',
-        'primary_color',
-        'font_family',
-        'settings',
-        'is_active',
-        'created_by_user_id',
+        'type',
+        'width',
+        'height',
+        'background_color',
+        'accent_color',
+        'text_color',
+        'title_font',
+        'is_default',
+        'template_content',
     ];
 
     protected $casts = [
-        'settings' => 'array',
-        'is_active' => 'boolean',
+        'width' => 'decimal:2',
+        'height' => 'decimal:2',
+        'is_default' => 'boolean',
     ];
 
     public function createdBy(): BelongsTo
