@@ -97,6 +97,14 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::delete('/{event}', [\App\Http\Controllers\Admin\EventController::class, 'destroy'])->name('destroy');
     });
 
+    // Event Attendance QR Scanning
+    Route::prefix('events/{event}/attendance')->name('admin.events.attendance.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\EventAttendanceController::class, 'index'])->name('index');
+        Route::post('/scan', [\App\Http\Controllers\Admin\EventAttendanceController::class, 'scan'])->name('scan');
+        Route::get('/report', [\App\Http\Controllers\Admin\EventAttendanceController::class, 'report'])->name('report');
+        Route::post('/export', [\App\Http\Controllers\Admin\EventAttendanceController::class, 'export'])->name('export');
+    });
+
     // Event Certificates
     Route::get('/events/{event}/certificates', [\App\Http\Controllers\Admin\CertificateController::class, 'byEvent'])
         ->name('admin.events.certificates');
@@ -110,6 +118,25 @@ Route::get('/categories/{slug}', [\App\Http\Controllers\CategoryController::clas
 
 Route::get('/locations', [\App\Http\Controllers\LocationController::class, 'index'])->name('locations.index');
 Route::get('/locations/{slug}', [\App\Http\Controllers\LocationController::class, 'show'])->name('locations.show');
+
+// Public Event Routes
+Route::prefix('events')->name('events.')->group(function () {
+    Route::get('/{event:slug}', [\App\Http\Controllers\EventController::class, 'show'])->name('show');
+    Route::post('/{event}/register', [\App\Http\Controllers\EventController::class, 'register'])->name('register')->middleware('auth');
+});
+
+// Event Registration & Payment Routes (Authenticated)
+Route::middleware('auth')->prefix('registrations')->name('registrations.')->group(function () {
+    Route::get('/{registration}/payment', [\App\Http\Controllers\EventController::class, 'payment'])->name('payment');
+    Route::post('/{registration}/payment/callback', [\App\Http\Controllers\EventController::class, 'paymentCallback'])->name('payment.callback');
+    Route::get('/{registration}/confirmation', [\App\Http\Controllers\EventController::class, 'confirmation'])->name('confirmation');
+    Route::get('/{registration}/ticket', [\App\Http\Controllers\EventController::class, 'downloadTicket'])->name('ticket');
+});
+
+// Event Payment Routes (Public - for webhook callbacks)
+Route::post('/events/payment/webhook/stripe', [\App\Http\Controllers\EventPaymentController::class, 'stripeWebhook'])->name('events.payment.webhook.stripe');
+Route::post('/events/payment/webhook/sslcommerz', [\App\Http\Controllers\EventPaymentController::class, 'sslcommerzWebhook'])->name('events.payment.webhook.sslcommerz');
+
 
 // Share Frame Routes (Public)
 Route::prefix('competitions/{competition}/submissions/{submission}/share-frame')->name('competitions.submissions.share-frame.')->group(function () {
