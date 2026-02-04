@@ -79,36 +79,36 @@ class AdminCompetitionApiController extends Controller
         $sortDirection = $request->get('sort_direction', 'desc');
         $query->orderBy($sortField, $sortDirection);
 
+        // Create a clone for stats calculation BEFORE pagination
+        $statsQuery = clone $query;
+        
+        // Get IDs from the filtered query (same filters as the list)
+        $filteredIds = (clone $statsQuery)->pluck('id');
+
+        // Paginate after getting stats base IDs
         $competitions = $query->paginate($request->get('per_page', 20));
 
-        $statsScope = $request->get('stats_scope', 'all');
-        $baseStatsQuery = $statsScope === 'dashboard'
-            ? Competition::published()
-            : Competition::query();
-
-        $baseIds = $baseStatsQuery->pluck('id');
-
-        // Calculate stats using shared scopes
+        // Calculate stats using the SAME filtered query
         $stats = [
-            'total' => (clone $baseStatsQuery)->count(),
-            'active' => Competition::active()->count(),
-            'upcoming' => Competition::upcoming()->count(),
-            'completed' => Competition::completed()->count(),
-            'draft' => Competition::where('status', 'draft')->count(),
-            'archived' => Competition::where('status', 'archived')->count(),
-            'featured' => (clone $baseStatsQuery)->where('is_featured', true)->count(),
+            'total' => $filteredIds->count(),
+            'active' => Competition::whereIn('id', $filteredIds)->active()->count(),
+            'upcoming' => Competition::whereIn('id', $filteredIds)->upcoming()->count(),
+            'completed' => Competition::whereIn('id', $filteredIds)->completed()->count(),
+            'draft' => Competition::whereIn('id', $filteredIds)->where('status', 'draft')->count(),
+            'archived' => Competition::whereIn('id', $filteredIds)->where('status', 'archived')->count(),
+            'featured' => Competition::whereIn('id', $filteredIds)->where('is_featured', true)->count(),
             'totalSubmissions' => DB::table('competition_submissions')
-                ->whereIn('competition_id', $baseIds)
+                ->whereIn('competition_id', $filteredIds)
                 ->count(),
             'totalParticipants' => DB::table('competition_submissions')
-                ->whereIn('competition_id', $baseIds)
+                ->whereIn('competition_id', $filteredIds)
                 ->distinct('photographer_id')
                 ->count('photographer_id'),
             'totalPrizePool' => DB::table('competition_prizes')
-                ->whereIn('competition_id', $baseIds)
+                ->whereIn('competition_id', $filteredIds)
                 ->sum('cash_amount'),
             'pendingSubmissions' => DB::table('competition_submissions')
-                ->whereIn('competition_id', $baseIds)
+                ->whereIn('competition_id', $filteredIds)
                 ->where('status', 'pending')
                 ->count(),
         ];
