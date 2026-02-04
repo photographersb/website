@@ -7,6 +7,7 @@ use App\Models\EventRegistration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use App\Services\QRCodeService;
 
 class EventController extends Controller
 {
@@ -115,6 +116,13 @@ class EventController extends Controller
 
         // For free events, auto-confirm
         if ($event->event_type === 'free') {
+            // Generate QR code immediately
+            try {
+                QRCodeService::generateForEventRegistration($registration);
+            } catch (\Exception $e) {
+                \Log::error('QR generation failed', ['registration_id' => $registration->id]);
+            }
+
             return redirect()->route('registrations.confirmation', $registration)
                 ->with('success', 'Successfully registered! Your registration code is: ' . $registrationCode);
         }
@@ -165,6 +173,13 @@ class EventController extends Controller
 
         // Mark as paid
         $registration->update(['payment_status' => 'paid']);
+
+        // Generate QR code for ticket
+        try {
+            QRCodeService::generateForEventRegistration($registration);
+        } catch (\Exception $e) {
+            \Log::error('QR generation failed', ['registration_id' => $registration->id]);
+        }
 
         return redirect()->route('registrations.confirmation', $registration)
             ->with('success', 'Payment successful! Your ticket QR code is ready.');

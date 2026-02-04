@@ -39,6 +39,29 @@ class EventAttendanceController extends Controller
     }
 
     /**
+     * Display mobile QR scanner
+     */
+    public function mobile(Event $event)
+    {
+        $this->authorize('update', $event);
+
+        $stats = [
+            'total_registered' => $event->registrations()->count(),
+            'attended_count' => EventAttendanceLog::where('event_id', $event->id)->count(),
+            'attendance_rate' => 0,
+        ];
+
+        if ($stats['total_registered'] > 0) {
+            $stats['attendance_rate'] = round(($stats['attended_count'] / $stats['total_registered']) * 100, 1);
+        }
+
+        return view('admin.events.attendance.mobile', [
+            'event' => $event,
+            'stats' => $stats,
+        ]);
+    }
+
+    /**
      * Process QR code scan
      */
     public function scan(Request $request, Event $event)

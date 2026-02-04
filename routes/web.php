@@ -100,6 +100,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     // Event Attendance QR Scanning
     Route::prefix('events/{event}/attendance')->name('admin.events.attendance.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\EventAttendanceController::class, 'index'])->name('index');
+        Route::get('/mobile', [\App\Http\Controllers\Admin\EventAttendanceController::class, 'mobile'])->name('mobile');
         Route::post('/scan', [\App\Http\Controllers\Admin\EventAttendanceController::class, 'scan'])->name('scan');
         Route::get('/report', [\App\Http\Controllers\Admin\EventAttendanceController::class, 'report'])->name('report');
         Route::post('/export', [\App\Http\Controllers\Admin\EventAttendanceController::class, 'export'])->name('export');

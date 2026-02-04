@@ -63,16 +63,24 @@
                 </div>
 
                 <!-- QR Code -->
-                @if($registration->ticket_qr_path)
+                @php
+                    $qrUrl = null;
+                    if ($registration->ticket_qr_path) {
+                        $qrUrl = asset('storage/' . $registration->ticket_qr_path);
+                    }
+                @endphp
+                
+                @if($qrUrl)
                 <div class="bg-gray-50 rounded-lg p-8 mb-8 text-center">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Your Ticket QR Code</h3>
-                    <img src="{{ asset('storage/' . $registration->ticket_qr_path) }}" alt="Ticket QR Code" 
-                        class="w-48 h-48 mx-auto mb-4">
+                    <img src="{{ $qrUrl }}" alt="Ticket QR Code" 
+                        class="w-48 h-48 mx-auto mb-4 border-2 border-blue-200 p-2 bg-white rounded">
                     <p class="text-gray-600 text-sm">Show this QR code at the event for check-in</p>
                 </div>
                 @else
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8 text-center">
-                    <p class="text-blue-700">Your QR code will be generated shortly</p>
+                    <p class="text-blue-700">Your QR code is being generated...</p>
+                    <p class="text-blue-600 text-sm mt-2">Refresh this page in a few moments</p>
                 </div>
                 @endif
 

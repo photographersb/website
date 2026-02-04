@@ -80,4 +80,68 @@ class QRCodeService
     {
         return config('app.url') . $this->getVoteUrl($submission);
     }
+
+    /**
+     * Generate QR code for event registration ticket
+     */
+    public static function generateForEventRegistration($registration): string
+    {
+        // Create QR code data with registration code
+        $qrData = $registration->registration_code;
+
+        // Generate QR code
+        $qrCode = QrCode::size(300)->generate($qrData);
+
+        // Save to storage
+        $filename = 'qr-codes/registrations/' . $registration->event_id . '/' . $registration->registration_code . '.png';
+        
+        // Store the QR code
+        Storage::disk('public')->put($filename, $qrCode);
+
+        // Update registration record
+        $registration->update([
+            'ticket_qr_path' => $filename,
+        ]);
+
+        return $filename;
+    }
+
+    /**
+     * Get QR code URL for event registration
+     */
+    public static function getEventRegistrationQRUrl($registration): string
+    {
+        if (!$registration->ticket_qr_path) {
+            self::generateForEventRegistration($registration);
+        }
+
+        return asset('storage/' . $registration->ticket_qr_path);
+    }
+
+    /**
+     * Generate bulk QR codes for event registrations
+     */
+    public static function generateBulkForEventRegistrations($eventId)
+    {
+        $registrations = \App\Models\EventRegistration::where('event_id', $eventId)
+            ->whereNull('ticket_qr_path')
+            ->limit(100)
+            ->get();
+
+        $generated = 0;
+
+        foreach ($registrations as $registration) {
+            try {
+                self::generateForEventRegistration($registration);
+                $generated++;
+            } catch (\Exception $e) {
+                \Log::error('Event QR Generation Error', [
+                    'registration_id' => $registration->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $generated;
+    }
 }
