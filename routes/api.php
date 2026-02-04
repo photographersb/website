@@ -120,8 +120,10 @@ Route::prefix('v1')->group(function () {
 
     // Public events
     Route::get('/events/stats', [EventController::class, 'stats']);
-    Route::get('/events', [EventController::class, 'index']);
-    Route::get('/events/{slug}', [EventController::class, 'show']);
+    Route::get('/events', [\App\Http\Controllers\Api\EventApiController::class, 'index']);
+    Route::get('/events/featured', [\App\Http\Controllers\Api\EventApiController::class, 'featured']);
+    Route::get('/events/cities', [\App\Http\Controllers\Api\EventApiController::class, 'cities']);
+    Route::get('/events/{slug}', [\App\Http\Controllers\Api\EventApiController::class, 'show']);
 
     // Public competitions
     Route::get('/competitions', [CompetitionController::class, 'index']);

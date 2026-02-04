@@ -121,9 +121,14 @@ Route::get('/locations/{slug}', [\App\Http\Controllers\LocationController::class
 
 // Public Event Routes
 Route::prefix('events')->name('events.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\EventListingController::class, 'index'])->name('index');
+    Route::get('/featured', [\App\Http\Controllers\EventListingController::class, 'featured'])->name('featured');
     Route::get('/{event:slug}', [\App\Http\Controllers\EventController::class, 'show'])->name('show');
     Route::post('/{event}/register', [\App\Http\Controllers\EventController::class, 'register'])->name('register')->middleware('auth');
 });
+
+// User Registration Dashboard (Authenticated)
+Route::middleware('auth')->get('/my-registrations', [\App\Http\Controllers\EventListingController::class, 'myRegistrations'])->name('events.my-registrations');
 
 // Event Registration & Payment Routes (Authenticated)
 Route::middleware('auth')->prefix('registrations')->name('registrations.')->group(function () {
