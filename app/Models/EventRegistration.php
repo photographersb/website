@@ -52,6 +52,11 @@ class EventRegistration extends Model
         return $this->hasOne(EventPayment::class);
     }
 
+    public function attendanceLogs()
+    {
+        return $this->hasMany(AttendanceLog::class);
+    }
+
     // Scopes
     public function scopeConfirmed($query)
     {

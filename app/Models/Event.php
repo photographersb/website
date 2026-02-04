@@ -119,9 +119,25 @@ class Event extends Model
         return $this->hasMany(EventRsvp::class);
     }
 
+    public function mentors()
+    {
+        return $this->belongsToMany(Mentor::class, 'event_mentors', 'event_id', 'mentor_id')
+                    ->withTimestamps();
+    }
+
     public function payments()
     {
         return $this->hasManyThrough(EventPayment::class, EventRsvp::class);
+    }
+
+    public function attendanceLogs()
+    {
+        return $this->hasMany(AttendanceLog::class);
+    }
+
+    public function certificateTemplate()
+    {
+        return $this->belongsTo(CertificateTemplate::class, 'certificate_template_id');
     }
 
     // Scopes

@@ -80,4 +80,87 @@ class EventPolicy
     {
         return in_array($user->role, ['admin', 'super_admin']);
     }
+
+    /**
+     * Determine if user can perform check-in (attendance scanning)
+     */
+    public function checkIn(User $user, Event $event): bool
+    {
+        // Admin can always check-in
+        if ($this->isAdmin($user)) {
+            return true;
+        }
+
+        // Event organizer can check-in their own events
+        return $this->isOrganizer($user, $event);
+    }
+
+    /**
+     * Determine if user can manage event registrations
+     */
+    public function manageRegistrations(User $user, Event $event): bool
+    {
+        // Admin can manage all registrations
+        if ($this->isAdmin($user)) {
+            return true;
+        }
+
+        // Organizer can manage own event registrations
+        return $this->isOrganizer($user, $event);
+    }
+
+    /**
+     * Determine if user can view attendance logs
+     */
+    public function viewAttendanceLogs(User $user, Event $event): bool
+    {
+        // Admin can view all logs
+        if ($this->isAdmin($user)) {
+            return true;
+        }
+
+        // Organizer can view own event logs
+        return $this->isOrganizer($user, $event);
+    }
+
+    /**
+     * Determine if user can export attendance data
+     */
+    public function exportAttendance(User $user, Event $event): bool
+    {
+        // Same authorization as viewing attendance logs
+        return $this->viewAttendanceLogs($user, $event);
+    }
+
+    /**
+     * Determine if user can register for the event
+     */
+    public function register(User $user, Event $event): bool
+    {
+        // Must be published and booking must be open
+        if ($event->status !== 'published' || !$event->isBookingOpen()) {
+            return false;
+        }
+
+        // Must have capacity
+        if (!$event->hasCapacityFor()) {
+            return false;
+        }
+
+        // Cannot register twice
+        if ($event->getUserRegistration($user->id)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if user can cancel their registration
+     */
+    public function cancelRegistration(User $user, $registration): bool
+    {
+        // User can only cancel their own registration
+        return $user->id === $registration->user_id;
+    }
 }
