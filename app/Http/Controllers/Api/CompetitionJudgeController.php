@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class CompetitionJudgeController extends Controller
 {
+    use ApiResponse;
     /**
      * Assign judge to competition (Admin only)
      */
@@ -95,6 +96,10 @@ class CompetitionJudgeController extends Controller
         // Get all approved submissions with existing scores
         $submissions = CompetitionSubmission::with([
             'photographer.photographer',
+            'files' => function ($query) {
+                $query->select(['id', 'submission_id', 'exif_json', 'sort_order'])
+                    ->orderBy('sort_order');
+            },
             'scores' => function ($query) use ($judgeId) {
                 $query->where('judge_id', $judgeId);
             }

@@ -1,18 +1,36 @@
 <template>
   <transition name="fade">
-    <div v-if="modelValue" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-      <div class="absolute inset-0 bg-black/50" @click="close"></div>
+    <div
+      v-if="modelValue"
+      class="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+    >
+      <div
+        class="absolute inset-0 bg-black/50"
+        @click="close"
+      />
       <transition name="slide-up">
         <div class="relative w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden">
           <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-            <h3 class="text-lg font-bold text-gray-900">{{ title }}</h3>
+            <h3 class="text-lg font-bold text-gray-900">
+              {{ title }}
+            </h3>
             <button
               class="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
-              @click="close"
               aria-label="Close filters"
+              @click="close"
             >
-              <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              <svg
+                class="w-5 h-5 text-gray-700"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>

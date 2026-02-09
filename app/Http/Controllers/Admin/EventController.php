@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
-use App\Models\City;
+use App\Models\Location;
 use App\Models\Category;
 use App\Models\Mentor;
 use App\Models\CertificateTemplate;
@@ -53,7 +53,10 @@ class EventController extends Controller
     public function create()
     {
         return view('admin.events.create', [
-            'cities' => City::orderBy('name')->get(),
+            'cities' => Location::where('is_active', true)
+                ->whereIn('type', ['district', 'upazila'])
+                ->orderBy('name')
+                ->get(),
             'categories' => Category::orderBy('name')->get(),
             'mentors' => Mentor::orderBy('name')->get(),
             'certificateTemplates' => CertificateTemplate::orderBy('name')->get(),
@@ -70,7 +73,7 @@ class EventController extends Controller
             'description' => 'required|string',
             'category_id' => 'nullable|exists:categories,id',
             'organizer_id' => 'nullable|exists:photographers,id',
-            'city_id' => 'required|exists:cities,id',
+            'city_id' => 'required|exists:locations,id',
             'venue_name' => 'required|string|max:255',
             'venue_address' => 'required|string|max:255',
             'latitude' => 'nullable|numeric|min:-90|max:90',
@@ -140,7 +143,10 @@ class EventController extends Controller
 
         return view('admin.events.edit', [
             'event' => $event,
-            'cities' => City::orderBy('name')->get(),
+            'cities' => Location::where('is_active', true)
+                ->whereIn('type', ['district', 'upazila'])
+                ->orderBy('name')
+                ->get(),
             'categories' => Category::orderBy('name')->get(),
             'mentors' => Mentor::orderBy('name')->get(),
             'certificateTemplates' => CertificateTemplate::orderBy('name')->get(),
@@ -157,7 +163,7 @@ class EventController extends Controller
             'description' => 'required|string',
             'category_id' => 'nullable|exists:categories,id',
             'organizer_id' => 'nullable|exists:photographers,id',
-            'city_id' => 'required|exists:cities,id',
+            'city_id' => 'required|exists:locations,id',
             'venue_name' => 'required|string|max:255',
             'venue_address' => 'required|string|max:255',
             'latitude' => 'nullable|numeric|min:-90|max:90',

@@ -13,6 +13,22 @@ use Illuminate\Support\Facades\Log;
 class ReviewController extends Controller
 {
     use ApiResponse;
+
+    /**
+     * Get featured testimonials (public endpoint)
+     */
+    public function featured(Request $request)
+    {
+        $reviews = Review::where('status', 'published')
+            ->where('rating', '>=', 4)
+            ->with(['reviewer:id,name'])
+            ->orderBy('created_at', 'desc')
+            ->limit(6)
+            ->get();
+
+        return $this->success($reviews, 'Featured testimonials retrieved successfully');
+    }
+
     /**
      * Create review for booking
      */

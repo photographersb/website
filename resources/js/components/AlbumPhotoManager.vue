@@ -3,54 +3,88 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
       <div>
-        <h2 class="text-2xl font-bold">{{ album.name }}</h2>
-        <p class="text-gray-600">{{ album.photo_count || 0 }} photos</p>
+        <h2 class="text-2xl font-bold">
+          {{ album.name }}
+        </h2>
+        <p class="text-gray-600">
+          {{ album.photo_count || 0 }} photos
+        </p>
       </div>
       <div class="flex gap-2">
         <button
-          @click="showPexelsSearch = true"
+          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          @click="$refs.fileInput.click()"
+        >
+          📤 Upload Photos
+        </button>
+        <input
+          ref="fileInput"
+          type="file"
+          multiple
+          accept="image/*"
+          class="hidden"
+          @change="handleFileUpload"
+        >
+        <button
           class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+          @click="showPexelsSearch = true"
         >
           🔍 Add from Pexels
         </button>
         <button
-          @click="$emit('close')"
           class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+          @click="$emit('close')"
         >
           Close
         </button>
       </div>
+      <p class="upload-hint mt-2">Images: 2400x1600 px recommended.</p>
     </div>
 
     <!-- Photo Grid -->
-    <div v-if="photos.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
-      <div v-for="photo in photos" :key="photo.id" class="relative group">
+    <div
+      v-if="photos.length > 0"
+      class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6"
+    >
+      <div
+        v-for="photo in photos"
+        :key="photo.id"
+        class="relative group"
+      >
         <img
           :src="photo.thumbnail_url"
           :alt="photo.title || 'Photo'"
           class="w-full h-48 object-cover rounded-lg"
-        />
+        >
         <div
           class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2"
         >
           <button
-            @click="deletePhoto(photo.id)"
             class="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+            @click="deletePhoto(photo.id)"
           >
             Delete
           </button>
         </div>
-        <div v-if="photo.title" class="mt-1 text-sm font-medium truncate">
+        <div
+          v-if="photo.title"
+          class="mt-1 text-sm font-medium truncate"
+        >
           {{ photo.title }}
         </div>
       </div>
     </div>
 
-    <div v-else class="text-center py-12 text-gray-500">
-      <p class="mb-4">No photos in this album yet</p>
+    <div
+      v-else
+      class="text-center py-12 text-gray-500"
+    >
+      <p class="mb-4">
+        No photos in this album yet
+      </p>
       <button
-        @click="showPexelsSearch = true"
         class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+        @click="showPexelsSearch = true"
       >
         🔍 Add Photos from Pexels
       </button>
@@ -65,19 +99,21 @@
       <div class="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         <!-- Search Header -->
         <div class="p-6 border-b">
-          <h3 class="text-2xl font-bold mb-4">Search Pexels Photos</h3>
+          <h3 class="text-2xl font-bold mb-4">
+            Search Pexels Photos
+          </h3>
           <div class="flex gap-2">
             <input
               v-model="pexelsQuery"
-              @keyup.enter="searchPexels"
               type="text"
               placeholder="Search for wedding, portrait, landscape..."
               class="flex-1 border rounded px-4 py-2 focus:ring-2 focus:ring-purple-600"
-            />
+              @keyup.enter="searchPexels"
+            >
             <button
-              @click="searchPexels"
               :disabled="searching || !pexelsQuery"
               class="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
+              @click="searchPexels"
             >
               {{ searching ? 'Searching...' : 'Search' }}
             </button>
@@ -86,8 +122,8 @@
             <button
               v-for="tag in quickTags"
               :key="tag"
-              @click="quickSearch(tag)"
               class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded"
+              @click="quickSearch(tag)"
             >
               {{ tag }}
             </button>
@@ -96,12 +132,20 @@
 
         <!-- Results Grid -->
         <div class="flex-1 overflow-y-auto p-6">
-          <div v-if="searching" class="text-center py-12">
-            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-            <p class="mt-4 text-gray-600">Searching Pexels...</p>
+          <div
+            v-if="searching"
+            class="text-center py-12"
+          >
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600" />
+            <p class="mt-4 text-gray-600">
+              Searching Pexels...
+            </p>
           </div>
 
-          <div v-else-if="pexelsResults.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div
+            v-else-if="pexelsResults.length > 0"
+            class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+          >
             <div
               v-for="photo in pexelsResults"
               :key="photo.id"
@@ -112,7 +156,7 @@
                 :src="photo.thumbnail_url"
                 :alt="'Photo by ' + photo.photographer"
                 class="w-full h-48 object-cover rounded-lg"
-              />
+              >
               <div
                 v-if="isPhotoSelected(photo)"
                 class="absolute inset-0 bg-purple-600/30 rounded-lg flex items-center justify-center"
@@ -127,32 +171,41 @@
             </div>
           </div>
 
-          <div v-else-if="pexelsQuery" class="text-center py-12 text-gray-500">
+          <div
+            v-else-if="pexelsQuery"
+            class="text-center py-12 text-gray-500"
+          >
             No results found. Try different keywords.
           </div>
 
-          <div v-else class="text-center py-12 text-gray-500">
+          <div
+            v-else
+            class="text-center py-12 text-gray-500"
+          >
             Enter a search term to find photos
           </div>
         </div>
 
         <!-- Footer with Selection -->
-        <div v-if="selectedPhotos.length > 0" class="p-6 border-t bg-gray-50">
+        <div
+          v-if="selectedPhotos.length > 0"
+          class="p-6 border-t bg-gray-50"
+        >
           <div class="flex justify-between items-center">
             <div>
               <span class="font-medium">{{ selectedPhotos.length }} photo(s) selected</span>
             </div>
             <div class="flex gap-2">
               <button
-                @click="selectedPhotos = []"
                 class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
+                @click="selectedPhotos = []"
               >
                 Clear Selection
               </button>
               <button
-                @click="addSelectedPhotos"
                 :disabled="adding"
                 class="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
+                @click="addSelectedPhotos"
               >
                 {{ adding ? 'Adding...' : 'Add to Album' }}
               </button>
@@ -160,7 +213,10 @@
           </div>
         </div>
 
-        <div v-else class="p-6 border-t bg-gray-50 text-center text-gray-600">
+        <div
+          v-else
+          class="p-6 border-t bg-gray-50 text-center text-gray-600"
+        >
           Click on photos to select them, then add to your album
         </div>
       </div>
@@ -171,6 +227,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import api from '../api';
+import { validateUploadFile } from '../utils/imageValidation';
 
 const props = defineProps({
   album: {
@@ -282,6 +339,56 @@ const deletePhoto = async (photoId) => {
   } catch (error) {
     console.error('Error deleting photo:', error);
     alert('Failed to delete photo');
+  }
+};
+
+const handleFileUpload = async (event) => {
+  const files = Array.from(event.target.files || []);
+  if (files.length === 0) return;
+
+  const valid = [];
+  for (const file of files) {
+    const validation = await validateUploadFile(file, {
+      label: 'Photo',
+      maxBytes: 10 * 1024 * 1024,
+      allowedTypes: ['image/jpeg', 'image/png'],
+      imageWidth: 2400,
+      imageHeight: 1600
+    });
+
+    if (!validation.ok) {
+      alert(validation.message);
+      continue;
+    }
+
+    valid.push(file);
+  }
+
+  if (valid.length === 0) {
+    event.target.value = '';
+    return;
+  }
+
+  adding.value = true;
+  try {
+    const formData = new FormData();
+    valid.forEach((file) => formData.append('photos[]', file));
+
+    await api.post(`/photographer/albums/${props.album.id}/photos/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    alert(`${valid.length} photo(s) uploaded successfully!`);
+    event.target.value = ''; // Reset file input
+    await fetchPhotos();
+    emit('updated');
+  } catch (error) {
+    console.error('Error uploading photos:', error);
+    alert(error.response?.data?.message || 'Failed to upload photos');
+  } finally {
+    adding.value = false;
   }
 };
 </script>

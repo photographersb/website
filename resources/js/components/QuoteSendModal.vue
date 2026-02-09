@@ -1,31 +1,67 @@
 <template>
   <div class="quote-send-modal">
-    <div class="modal-overlay" @click="$emit('close')"></div>
+    <div
+      class="modal-overlay"
+      @click="$emit('close')"
+    />
     <div class="modal-content">
       <div class="modal-header">
-        <h2 class="text-2xl font-bold text-gray-800">Send Custom Quote</h2>
-        <button @click="$emit('close')" class="close-btn">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        <h2 class="text-2xl font-bold text-gray-800">
+          Send Custom Quote
+        </h2>
+        <button
+          class="close-btn"
+          @click="$emit('close')"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
 
-      <form @submit.prevent="submitQuote" class="modal-body">
+      <form
+        class="modal-body"
+        @submit.prevent="submitQuote"
+      >
         <!-- Client Info -->
         <div class="client-info-card">
-          <h3 class="font-semibold text-lg mb-2">Client: {{ inquiry.user?.name || 'Unknown' }}</h3>
-          <p class="text-sm text-gray-600">{{ inquiry.event_type }} • {{ inquiry.event_date }}</p>
-          <p class="text-sm text-gray-600 mt-1">{{ inquiry.message }}</p>
+          <h3 class="font-semibold text-lg mb-2">
+            Client: {{ inquiry.user?.name || 'Unknown' }}
+          </h3>
+          <p class="text-sm text-gray-600">
+            {{ inquiry.event_type }} • {{ inquiry.event_date }}
+          </p>
+          <p class="text-sm text-gray-600 mt-1">
+            {{ inquiry.message }}
+          </p>
         </div>
 
         <!-- Package Selection (Optional) -->
         <div class="form-group">
           <label>Select Package (Optional)</label>
-          <select v-model="form.package_id" class="form-control">
-            <option :value="null">Custom Quote (No Package)</option>
-            <option v-for="pkg in packages" :key="pkg.id" :value="pkg.id">
-              {{ pkg.name }} - ৳{{ Number(pkg.price).toLocaleString() }}
+          <select
+            v-model="form.package_id"
+            class="form-control"
+          >
+            <option :value="null">
+              Custom Quote (No Package)
+            </option>
+            <option
+              v-for="pkg in packages"
+              :key="pkg.id"
+              :value="pkg.id"
+            >
+              {{ pkg.name }} - ৳{{ formatNumber(pkg.price) }}
             </option>
           </select>
         </div>
@@ -34,16 +70,16 @@
         <div class="form-group">
           <label>Quote Amount (৳) <span class="text-red-500">*</span></label>
           <input 
-            type="number" 
             v-model="form.amount" 
+            type="number" 
             class="form-control"
             placeholder="Enter amount in BDT"
             min="100"
             max="1000000"
             required
-          />
+          >
           <p class="text-sm text-gray-500 mt-1">
-            Client will pay 30% advance: ৳{{ advanceAmount.toLocaleString() }}
+            Client will pay 30% advance: ৳{{ formatNumber(advanceAmount) }}
           </p>
         </div>
 
@@ -58,34 +94,58 @@
             minlength="20"
             maxlength="2000"
             required
-          ></textarea>
-          <p class="text-sm text-gray-500 mt-1">{{ form.description.length }}/2000 characters</p>
+          />
+          <p class="text-sm text-gray-500 mt-1">
+            {{ form.description.length }}/2000 characters
+          </p>
         </div>
 
         <!-- Deliverables -->
         <div class="form-group">
           <label>Deliverables</label>
-          <div v-for="(deliverable, index) in form.deliverables" :key="index" class="flex gap-2 mb-2">
+          <div
+            v-for="(deliverable, index) in form.deliverables"
+            :key="index"
+            class="flex gap-2 mb-2"
+          >
             <input 
-              type="text" 
               v-model="deliverable.item" 
+              type="text" 
               class="form-control flex-1"
               placeholder="e.g., High-res edited photos"
-            />
+            >
             <input 
-              type="number" 
               v-model="deliverable.quantity" 
+              type="number" 
               class="form-control w-20"
               placeholder="Qty"
               min="1"
-            />
-            <button type="button" @click="removeDeliverable(index)" class="btn-danger">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            >
+            <button
+              type="button"
+              class="btn-danger"
+              @click="removeDeliverable(index)"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
-          <button type="button" @click="addDeliverable" class="btn-secondary mt-2">
+          <button
+            type="button"
+            class="btn-secondary mt-2"
+            @click="addDeliverable"
+          >
             + Add Deliverable
           </button>
         </div>
@@ -93,11 +153,23 @@
         <!-- Validity -->
         <div class="form-group">
           <label>Quote Valid For (Days) <span class="text-red-500">*</span></label>
-          <select v-model="form.validity_days" class="form-control" required>
-            <option :value="3">3 Days</option>
-            <option :value="7">1 Week</option>
-            <option :value="14">2 Weeks</option>
-            <option :value="30">1 Month</option>
+          <select
+            v-model="form.validity_days"
+            class="form-control"
+            required
+          >
+            <option :value="3">
+              3 Days
+            </option>
+            <option :value="7">
+              1 Week
+            </option>
+            <option :value="14">
+              2 Weeks
+            </option>
+            <option :value="30">
+              1 Month
+            </option>
           </select>
           <p class="text-sm text-gray-500 mt-1">
             Expires on: {{ expiryDate }}
@@ -113,20 +185,31 @@
             rows="3"
             placeholder="Add any special terms, cancellation policy, etc."
             maxlength="5000"
-          ></textarea>
+          />
         </div>
 
         <!-- Error Message -->
-        <div v-if="error" class="alert alert-error">
+        <div
+          v-if="error"
+          class="alert alert-error"
+        >
           {{ error }}
         </div>
 
         <!-- Submit Button -->
         <div class="flex gap-3 mt-6">
-          <button type="button" @click="$emit('close')" class="btn-secondary flex-1">
+          <button
+            type="button"
+            class="btn-secondary flex-1"
+            @click="$emit('close')"
+          >
             Cancel
           </button>
-          <button type="submit" :disabled="loading" class="btn-primary flex-1">
+          <button
+            type="submit"
+            :disabled="loading"
+            class="btn-primary flex-1"
+          >
             <span v-if="loading">Sending...</span>
             <span v-else>Send Quote</span>
           </button>
@@ -138,6 +221,7 @@
 
 <script>
 import { ref, computed } from 'vue';
+import { formatDate as formatDateValue, formatNumber } from '../utils/formatters';
 
 export default {
   name: 'QuoteSendModal',
@@ -174,7 +258,7 @@ export default {
     const expiryDate = computed(() => {
       const date = new Date();
       date.setDate(date.getDate() + parseInt(form.value.validity_days));
-      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+      return formatDateValue(date);
     });
 
     const addDeliverable = () => {
@@ -230,6 +314,7 @@ export default {
       addDeliverable,
       removeDeliverable,
       submitQuote,
+      formatNumber,
     };
   },
 };

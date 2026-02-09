@@ -34,4 +34,6 @@ class StoreVerificationRequest extends FormRequest
                 'phone.required' => 'Phone number is required',
                 'document_front_path.mimes' => 'Document must be JPG, PNG, or PDF',
                 'document_front_path.max' => 'Document must not exceed 10MB'
+            ];
+        }
 }

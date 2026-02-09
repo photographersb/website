@@ -3,23 +3,26 @@
     <label class="block text-sm font-medium mb-2">
       {{ label }}
     </label>
-    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-burgundy transition">
+    <div class="upload-drop p-6 text-center">
       <input
         ref="fileInput"
         type="file"
         :accept="accept"
         :multiple="multiple"
-        @change="handleFileSelect"
         class="hidden"
-      />
+        @change="handleFileSelect"
+      >
       
       <!-- Preview -->
-      <div v-if="preview" class="mb-4">
+      <div
+        v-if="preview"
+        class="mb-4"
+      >
         <img
           :src="preview"
           alt="Preview"
           class="max-h-48 mx-auto rounded"
-        />
+        >
       </div>
 
       <!-- Upload Area -->
@@ -42,29 +45,37 @@
         </p>
         <button
           type="button"
-          @click="$refs.fileInput.click()"
           class="mt-4 px-4 py-2 bg-burgundy text-white rounded hover:bg-[#6F112D]"
+          @click="$refs.fileInput.click()"
         >
           Choose {{ multiple ? 'Files' : 'File' }}
         </button>
-        <p class="mt-2 text-xs text-gray-500">
-          {{ hint }}
+        <p class="mt-2 upload-hint">
+          {{ hint }}<span v-if="dimensions"> · {{ dimensions }}</span>
         </p>
       </div>
 
       <!-- Progress -->
-      <div v-if="uploading" class="mt-4">
+      <div
+        v-if="uploading"
+        class="mt-4"
+      >
         <div class="w-full bg-gray-200 rounded-full h-2">
           <div
             class="bg-burgundy h-2 rounded-full transition-all"
             :style="{ width: `${uploadProgress}%` }"
-          ></div>
+          />
         </div>
-        <p class="text-sm text-gray-600 mt-2">Uploading... {{ uploadProgress }}%</p>
+        <p class="text-sm text-gray-600 mt-2">
+          Uploading... {{ uploadProgress }}%
+        </p>
       </div>
 
       <!-- Error -->
-      <div v-if="error" class="mt-4 p-3 bg-red-100 text-red-700 rounded text-sm">
+      <div
+        v-if="error"
+        class="mt-4 p-3 bg-red-100 text-red-700 rounded text-sm"
+      >
         {{ error }}
       </div>
     </div>
@@ -73,6 +84,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import { validateUploadFile } from '../utils/imageValidation';
 
 const props = defineProps({
   label: {
@@ -87,6 +99,10 @@ const props = defineProps({
     type: String,
     default: 'PNG, JPG up to 5MB',
   },
+  dimensions: {
+    type: String,
+    default: '',
+  },
   accept: {
     type: String,
     default: 'image/*',
@@ -99,6 +115,14 @@ const props = defineProps({
     type: Number,
     default: 5 * 1024 * 1024, // 5MB
   },
+  expectedWidth: {
+    type: Number,
+    default: null,
+  },
+  expectedHeight: {
+    type: Number,
+    default: null,
+  },
 });
 
 const emit = defineEmits(['upload', 'error']);
@@ -109,16 +133,27 @@ const uploading = ref(false);
 const uploadProgress = ref(0);
 const error = ref('');
 
-const handleFileSelect = (event) => {
+const handleFileSelect = async (event) => {
   const files = event.target.files;
   if (!files || files.length === 0) return;
 
   error.value = '';
-  
-  // Validate file size
-  for (let file of files) {
-    if (file.size > props.maxSize) {
-      error.value = `File ${file.name} exceeds maximum size of ${props.maxSize / (1024 * 1024)}MB`;
+
+  for (const file of files) {
+    const allowedTypes = props.accept
+      ? props.accept.split(',').map((type) => type.trim()).filter(Boolean)
+      : null;
+
+    const validation = await validateUploadFile(file, {
+      label: 'Image',
+      maxBytes: props.maxSize,
+      allowedTypes,
+      imageWidth: props.expectedWidth,
+      imageHeight: props.expectedHeight,
+    });
+
+    if (!validation.ok) {
+      error.value = validation.message;
       return;
     }
   }

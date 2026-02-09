@@ -4,8 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Photographer;
 use App\Models\Category;
-use App\Models\City;
+use App\Models\Location;
 use App\Models\EventRsvp;
+use App\Models\PhotographerStats;
+use App\Models\Inquiry;
+use App\Models\CompetitionSubmission;
+use App\Models\SubmissionShareFrame;
 use App\Rules\SocialMediaUrl;
 use App\Http\Requests\StorePhotographerRequest;
 use App\Http\Traits\ApiResponse;
@@ -14,6 +18,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class PhotographerController extends Controller
 {
@@ -29,11 +34,32 @@ class PhotographerController extends Controller
         $page = $request->get('page', 1);
 
         $query = Photographer::where('is_verified', true)
-            ->with(['user', 'city', 'trustScore', 'categories', 'photos']);
+            ->with(['user:id,name', 'city:id,name,slug', 'trustScore', 'categories:id,name,slug,icon'])
+            ->select('photographers.*');
+
+        // Search by name, username, location, or category
+        if ($request->has('q') && strlen($request->q) >= 2) {
+            $searchTerm = $request->q;
+            $query->where(function ($q) use ($searchTerm) {
+                // Search in photographer name/username
+                $q->whereHas('user', function ($subQ) use ($searchTerm) {
+                    $subQ->where('name', 'LIKE', "%{$searchTerm}%")
+                         ->orWhere('username', 'LIKE', "%{$searchTerm}%");
+                })
+                // Search in city name
+                ->orWhereHas('city', function ($subQ) use ($searchTerm) {
+                    $subQ->where('name', 'LIKE', "%{$searchTerm}%");
+                })
+                // Search in category name
+                ->orWhereHas('categories', function ($subQ) use ($searchTerm) {
+                    $subQ->where('name', 'LIKE', "%{$searchTerm}%");
+                });
+            });
+        }
 
         // Filter by city
         if ($request->has('city')) {
-            $city = City::where('slug', $request->city)->first();
+            $city = Location::where('slug', $request->city)->first();
             if ($city) {
                 $query->where('city_id', $city->id);
             }
@@ -182,6 +208,7 @@ class PhotographerController extends Controller
         }
 
         $photographerData = $photographer->toArray();
+        unset($photographerData['specializations']);
         $photographerData['competition_wins'] = $competitionWins;
         $photographerData['events_joined'] = Schema::hasTable('event_rsvps')
             ? EventRsvp::where('user_id', $photographer->user_id)
@@ -209,7 +236,23 @@ class PhotographerController extends Controller
     }
 
     /**
-     * Search photographers
+     * Get photographer profile by username
+     */
+    public function showByUsername($username)
+    {
+        // Find user by username
+        $user = \App\Models\User::where('username', $username)->first();
+        
+        if (!$user || !$user->isPhotographer()) {
+            return $this->error('Photographer not found', 404);
+        }
+
+        // Get the photographer and call show with the ID
+        return $this->show($user->photographer->id);
+    }
+
+    /**
+     * Search photographers with intelligent matching
      */
     public function search(Request $request)
     {
@@ -220,11 +263,32 @@ class PhotographerController extends Controller
         }
 
         $photographers = Photographer::where('is_verified', true)
+            ->with(['city:id,name,slug', 'categories:id,name,slug,icon'])
             ->whereHas('user', function ($q) use ($query) {
-                $q->where('name', 'LIKE', "%{$query}%")
-                  ->orWhere('email', 'LIKE', "%{$query}%");
+                // Prioritize exact matches, then word boundaries, then contains
+                $q->where(function($subQ) use ($query) {
+                    // Exact match (highest priority)
+                    $subQ->where('name', '=', $query)
+                         ->orWhere('username', '=', $query);
+                })
+                ->orWhere(function($subQ) use ($query) {
+                    // Starts with (second priority)
+                    $subQ->where('name', 'LIKE', "{$query}%")
+                         ->orWhere('username', 'LIKE', "{$query}%");
+                })
+                ->orWhere(function($subQ) use ($query) {
+                    // Contains with word boundary (third priority)
+                    $subQ->where('name', 'LIKE', "% {$query}%")
+                         ->orWhere('name', 'LIKE', "%{$query} %")
+                         ->orWhere('username', 'LIKE', "% {$query}%");
+                })
+                ->orWhere(function($subQ) use ($query) {
+                    // Contains anywhere (lowest priority)
+                    $subQ->where('name', 'LIKE', "%{$query}%")
+                         ->orWhere('username', 'LIKE', "%{$query}%");
+                });
             })
-            ->select('id', 'user_id', 'slug', 'average_rating', 'is_featured')
+            ->select('id', 'user_id', 'city_id', 'slug', 'profile_picture', 'average_rating', 'is_featured')
             ->limit(10)
             ->get();
 
@@ -281,10 +345,18 @@ class PhotographerController extends Controller
     {
         $user = $request->user();
         $photographer = $user->photographer;
+        $userId = $user->id;
 
         if (!$photographer) {
             return $this->notFound('Photographer profile not found');
         }
+
+        $profileStats = PhotographerStats::firstOrCreate(
+            ['photographer_id' => $photographer->id],
+            ['profile_views' => 0, 'profile_views_this_month' => 0, 'profile_share_clicks' => 0, 'profile_share_visits' => 0, 'total_points' => 0, 'level' => 1]
+        );
+
+        $this->ensureShareCode($photographer);
 
         // Get dashboard statistics
         $stats = [
@@ -294,6 +366,12 @@ class PhotographerController extends Controller
             'total_revenue' => $photographer->transactions()
                 ->where('status', 'completed')
                 ->sum('net_amount') ?? 0,
+            'profile_views' => $profileStats->profile_views ?? 0,
+            'profile_clicks' => Inquiry::where('photographer_id', $photographer->id)->count(),
+            'vote_count' => CompetitionSubmission::where('photographer_id', $userId)->sum('vote_count'),
+            'share_count' => SubmissionShareFrame::whereHas('submission', function ($q) use ($userId) {
+                $q->where('photographer_id', $userId);
+            })->sum('generation_count'),
         ];
 
         // Get recent bookings
@@ -324,7 +402,10 @@ class PhotographerController extends Controller
             ->get();
 
         // Get competition submissions
-        $competitionSubmissions = \App\Models\CompetitionSubmission::where('photographer_id', $photographer->id)
+        $competitionSubmissions = \App\Models\CompetitionSubmission::where(function ($q) use ($userId) {
+            $q->where('photographer_id', $userId)
+                ->orWhere('user_id', $userId);
+            })
             ->with(['competition:id,title,slug,status,submission_deadline,voting_end_at'])
             ->orderBy('created_at', 'desc')
             ->limit(10)
@@ -352,6 +433,74 @@ class PhotographerController extends Controller
     }
 
     /**
+     * Track profile share actions from the photographer dashboard
+     */
+    public function logProfileShare(Request $request)
+    {
+        $photographer = $request->user()->photographer;
+
+        if (!$photographer) {
+            return $this->notFound('Photographer profile not found');
+        }
+
+        $validated = $request->validate([
+            'action' => 'required|string|in:copy,open,whatsapp,facebook,messenger,telegram',
+        ]);
+
+        $this->ensureShareCode($photographer);
+
+        $stats = PhotographerStats::firstOrCreate(
+            ['photographer_id' => $photographer->id],
+            ['profile_views' => 0, 'profile_views_this_month' => 0, 'profile_share_clicks' => 0, 'profile_share_visits' => 0, 'total_points' => 0, 'level' => 1]
+        );
+
+        $stats->increment('profile_share_clicks');
+
+        return $this->success([
+            'share_code' => $photographer->share_code,
+            'profile_share_clicks' => $stats->profile_share_clicks,
+        ], 'Profile share tracked successfully');
+    }
+
+    /**
+     * Track visits that came from shared profile links
+     */
+    public function trackProfileShareVisit(Request $request)
+    {
+        $validated = $request->validate([
+            'ref' => 'required|string|max:32',
+        ]);
+
+        $photographer = Photographer::where('share_code', $validated['ref'])->first();
+        if (!$photographer) {
+            return $this->success([], 'Share code not found');
+        }
+
+        $stats = PhotographerStats::firstOrCreate(
+            ['photographer_id' => $photographer->id],
+            ['profile_views' => 0, 'profile_views_this_month' => 0, 'profile_share_clicks' => 0, 'profile_share_visits' => 0, 'total_points' => 0, 'level' => 1]
+        );
+
+        $stats->increment('profile_share_visits');
+
+        return $this->success([], 'Profile share visit tracked successfully');
+    }
+
+    private function ensureShareCode(Photographer $photographer): void
+    {
+        if ($photographer->share_code) {
+            return;
+        }
+
+        do {
+            $shareCode = Str::lower(Str::random(10));
+        } while (Photographer::where('share_code', $shareCode)->exists());
+
+        $photographer->share_code = $shareCode;
+        $photographer->save();
+    }
+
+    /**
      * Update photographer profile information
      */
     public function updateProfile(StorePhotographerRequest $request)
@@ -370,6 +519,21 @@ class PhotographerController extends Controller
         }
 
         try {
+            // Handle username update (stored in users table)
+            if (isset($validated['username']) && $validated['username'] !== $user->username) {
+                // Check if username is available
+                $existingUser = \App\Models\User::where('username', $validated['username'])
+                    ->where('id', '!=', $user->id)
+                    ->first();
+                
+                if ($existingUser) {
+                    return $this->validationError(['username' => ['This username is already taken']], 'Username unavailable');
+                }
+                
+                $user->update(['username' => $validated['username']]);
+            }
+            unset($validated['username']);
+            
             // Extract category_ids before updating photographer
             $categoryIds = $validated['category_ids'] ?? null;
             unset($validated['category_ids']);
@@ -528,19 +692,26 @@ class PhotographerController extends Controller
     public function getMySubmissions(Request $request)
     {
         $photographer = $request->user()->photographer;
+        $userId = $request->user()->id;
 
         if (!$photographer) {
             return $this->notFound('Photographer profile not found');
         }
 
-        $submissions = \App\Models\CompetitionSubmission::where('photographer_id', $photographer->id)
+        $perPage = (int) $request->get('per_page', 15);
+        $perPage = max(1, min($perPage, 1000));
+
+        $submissions = \App\Models\CompetitionSubmission::where(function ($q) use ($userId) {
+                $q->where('photographer_id', $userId)
+                    ->orWhere('user_id', $userId);
+            })
             ->with([
                 'competition:id,title,slug,status,submission_deadline,voting_start_at,voting_end_at,judging_end_at',
                 'votes'
             ])
             ->withCount('votes')
             ->orderBy('created_at', 'desc')
-            ->paginate(15);
+            ->paginate($perPage);
 
         return $this->paginated($submissions, 'Competition submissions retrieved successfully');
     }

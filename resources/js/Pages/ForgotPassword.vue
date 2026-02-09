@@ -3,13 +3,17 @@
     <!-- Hero Section -->
     <section class="relative overflow-hidden bg-gradient-to-br from-burgundy via-[#8E0E3F] to-[#6F112D] text-white">
       <div class="absolute inset-0 overflow-hidden">
-        <div class="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-        <div class="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+        <div class="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
       </div>
 
       <div class="container mx-auto px-4 py-12 md:py-16 relative z-10 text-center">
-        <h1 class="text-3xl md:text-5xl font-bold mb-2 tracking-tight">Reset Your Password</h1>
-        <p class="text-base md:text-lg text-gray-100">We'll help you get back into your account</p>
+        <h1 class="text-3xl md:text-5xl font-bold mb-2 tracking-tight">
+          Reset Your Password
+        </h1>
+        <p class="text-base md:text-lg text-gray-100">
+          We'll help you get back into your account
+        </p>
       </div>
     </section>
 
@@ -18,10 +22,17 @@
       <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-100">
         <!-- Step 1: Enter Email -->
         <div v-if="step === 1">
-          <h2 class="text-2xl font-bold mb-2">Enter Your Email</h2>
-          <p class="text-gray-600 mb-6 text-sm">We'll send you a link to reset your password</p>
+          <h2 class="text-2xl font-bold mb-2">
+            Enter Your Email
+          </h2>
+          <p class="text-gray-600 mb-6 text-sm">
+            We'll send you a link to reset your password
+          </p>
 
-          <form @submit.prevent="sendResetLink" class="space-y-4">
+          <form
+            class="space-y-4"
+            @submit.prevent="sendResetLink"
+          >
             <div>
               <label class="block text-sm font-medium mb-1">Email Address</label>
               <input
@@ -30,7 +41,7 @@
                 required
                 class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-burgundy focus:border-transparent"
                 placeholder="your@email.com"
-              />
+              >
             </div>
 
             <button
@@ -41,9 +52,17 @@
               {{ loading ? 'Sending...' : 'Send Reset Link' }}
             </button>
 
-            <p v-if="error" class="text-red-600 text-sm">{{ error }}</p>
+            <p
+              v-if="error"
+              class="text-red-600 text-sm"
+            >
+              {{ error }}
+            </p>
 
-            <router-link to="/auth" class="block text-center text-burgundy hover:text-[#6F112D] font-medium text-sm transition-colors">
+            <router-link
+              to="/auth"
+              class="block text-center text-burgundy hover:text-[#6F112D] font-medium text-sm transition-colors"
+            >
               Back to Login
             </router-link>
           </form>
@@ -51,10 +70,17 @@
 
         <!-- Step 2: Reset Password -->
         <div v-else-if="step === 2">
-          <h2 class="text-2xl font-bold mb-2">Create New Password</h2>
-          <p class="text-gray-600 mb-6 text-sm">Enter a strong password for your account</p>
+          <h2 class="text-2xl font-bold mb-2">
+            Create New Password
+          </h2>
+          <p class="text-gray-600 mb-6 text-sm">
+            Enter a strong password for your account
+          </p>
 
-          <form @submit.prevent="resetPassword" class="space-y-4">
+          <form
+            class="space-y-4"
+            @submit.prevent="resetPassword"
+          >
             <div>
               <label class="block text-sm font-medium mb-1">New Password</label>
               <input
@@ -64,8 +90,10 @@
                 minlength="8"
                 class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-burgundy focus:border-transparent"
                 placeholder="••••••••"
-              />
-              <p class="text-gray-500 text-xs mt-1">Minimum 8 characters</p>
+              >
+              <p class="text-gray-500 text-xs mt-1">
+                Minimum 8 characters
+              </p>
             </div>
 
             <div>
@@ -76,7 +104,7 @@
                 required
                 class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-burgundy focus:border-transparent"
                 placeholder="••••••••"
-              />
+              >
             </div>
 
             <button
@@ -87,26 +115,54 @@
               {{ loading ? 'Resetting...' : 'Reset Password' }}
             </button>
 
-            <p v-if="error" class="text-red-600 text-sm">{{ error }}</p>
+            <p
+              v-if="error"
+              class="text-red-600 text-sm"
+            >
+              {{ error }}
+            </p>
 
-            <router-link to="/auth" class="block text-center text-burgundy hover:text-[#6F112D] font-medium text-sm transition-colors">
+            <router-link
+              to="/auth"
+              class="block text-center text-burgundy hover:text-[#6F112D] font-medium text-sm transition-colors"
+            >
               Back to Login
             </router-link>
           </form>
         </div>
 
         <!-- Step 3: Success -->
-        <div v-else-if="step === 3" class="text-center">
+        <div
+          v-else-if="step === 3"
+          class="text-center"
+        >
           <div class="mb-4">
-            <svg class="w-16 h-16 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            <svg
+              class="w-16 h-16 mx-auto text-green-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              />
             </svg>
           </div>
 
-          <h2 class="text-2xl font-bold mb-2">Password Reset Successfully!</h2>
-          <p class="text-gray-600 mb-6">Your password has been reset. You can now login with your new password.</p>
+          <h2 class="text-2xl font-bold mb-2">
+            Password Reset Successfully!
+          </h2>
+          <p class="text-gray-600 mb-6">
+            Your password has been reset. You can now login with your new password.
+          </p>
 
-          <router-link to="/auth" class="inline-block bg-burgundy text-white px-6 py-3 rounded-lg hover:bg-[#6F112D] transition-colors font-semibold">
+          <router-link
+            to="/auth"
+            class="inline-block bg-burgundy text-white px-6 py-3 rounded-lg hover:bg-[#6F112D] transition-colors font-semibold"
+          >
             Go to Login
           </router-link>
         </div>

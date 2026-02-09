@@ -23,6 +23,9 @@ class SuperAdminSeeder extends Seeder
             $superAdmin->update([
                 'role' => 'super_admin',
                 'email_verified_at' => now(),
+                'approval_status' => 'approved',
+                'approved_at' => now(),
+                'approved_by' => null, // Super admin doesn't need approver
                 'is_suspended' => false,
                 'suspension_reason' => null,
                 'suspended_at' => null,
@@ -39,6 +42,9 @@ class SuperAdminSeeder extends Seeder
                 'role' => 'super_admin',
                 'email_verified_at' => now(),
                 'phone_verified_at' => now(),
+                'approval_status' => 'approved',
+                'approved_at' => now(),
+                'approved_by' => null, // Super admin doesn't need approver
                 'avatar_url' => null,
                 'bio' => 'Principal Architect & System Administrator - Somogro Bangladesh',
                 'is_suspended' => false,

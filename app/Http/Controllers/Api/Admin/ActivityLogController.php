@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ActivityLogController extends Controller
 {
@@ -14,6 +15,11 @@ class ActivityLogController extends Controller
     public function index(Request $request)
     {
         $query = ActivityLog::with('user');
+
+        $role = Auth::check() ? Auth::user()->role : null;
+        if ($role !== 'super_admin') {
+            $query->where('user_id', Auth::id());
+        }
 
         // Filter by user
         if ($request->has('user_id')) {

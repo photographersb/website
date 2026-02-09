@@ -1,0 +1,1214 @@
+[
+    {
+        "method":  "POST",
+        "uri":  "api/v1/auth/forgot-password",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AuthController@forgotPassword"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/auth/link-social-account",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\SocialAuthController@linkAccount"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/auth/linked-accounts",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\SocialAuthController@getLinkedAccounts"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/auth/login",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AuthController@login"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/auth/logout",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AuthController@logout"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/auth/me",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AuthController@me"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/auth/register",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AuthController@register"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/auth/resend-phone-otp",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AuthController@resendPhoneOtp"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/auth/resend-verification",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AuthController@resendVerification"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/auth/reset-password",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AuthController@resetPassword"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/auth/send-phone-otp",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AuthController@sendPhoneOtp"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/auth/unlink-social-account",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\SocialAuthController@unlinkAccount"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/auth/verify-email",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AuthController@verifyEmail"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/auth/verify-phone-otp",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AuthController@verifyPhoneOtp"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/auth/{provider}/callback",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\SocialAuthController@handleProviderCallback"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/auth/{provider}/redirect",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\SocialAuthController@redirectToProvider"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/bookings",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\BookingController@myBookings"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/bookings/inquiry",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\BookingController@createInquiry"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/bookings/{booking}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\BookingController@getBooking"
+    },
+    {
+        "method":  "PATCH",
+        "uri":  "api/v1/bookings/{booking}/cancel",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\BookingController@cancelBooking"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/bookings/{booking}/invoice/download",
+        "name":  "bookings.invoice.download",
+        "action":  "App\\Http\\Controllers\\Api\\BookingController@downloadInvoice"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/bookings/{booking}/invoice/email",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\BookingController@emailInvoice"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/bookings/{booking}/invoice/generate",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\BookingController@generateInvoice"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/bookings/{booking}/messages",
+        "name":  "booking.messages.index",
+        "action":  "App\\Http\\Controllers\\Api\\BookingMessageController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/bookings/{booking}/messages",
+        "name":  "booking.messages.store",
+        "action":  "App\\Http\\Controllers\\Api\\BookingMessageController@store"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/bookings/{booking}/messages/mark-all-read",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\BookingMessageController@markAllAsRead"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/bookings/{booking}/messages/{message}",
+        "name":  "booking.messages.show",
+        "action":  "App\\Http\\Controllers\\Api\\BookingMessageController@show"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/bookings/{booking}/messages/{message}",
+        "name":  "booking.messages.destroy",
+        "action":  "App\\Http\\Controllers\\Api\\BookingMessageController@destroy"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/bookings/{booking}/messages/{message}/read",
+        "name":  "booking.messages.read",
+        "action":  "App\\Http\\Controllers\\Api\\BookingMessageController@markAsRead"
+    },
+    {
+        "method":  "PATCH",
+        "uri":  "api/v1/bookings/{booking}/status",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\BookingController@updateStatus"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/categories",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CategoryController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/categories/{category}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionCategoryController@show"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/categories/{category}/leaderboard",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionCategoryController@leaderboard"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/certificates/{certificate_id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@getCertificateDetails"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/certificates/{certificate_id}/download",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@downloadCertificate"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/cities",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CityController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/competition-submissions/{submission}/vote",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@vote"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions/stats",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@stats"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions/{competition}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@show"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions/{competition}/categories",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionCategoryController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions/{competition}/full-leaderboard",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@getLeaderboard"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions/{competition}/judge/progress",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionJudgeController@getScoringProgress"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions/{competition}/judge/submissions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionJudgeController@getAssignedSubmissions"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions/{competition}/leaderboard",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@leaderboard"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions/{competition}/my-submissions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@mySubmissions"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions/{competition}/my-votes",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionVoteController@myVotes"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions/{competition}/sponsors",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSponsorController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions/{competition}/submissions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/competitions/{competition}/submissions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions/{competition}/submissions/{submission}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/competitions/{competition}/submissions/{submission}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/competitions/{competition}/submissions/{submission}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@destroy"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/competitions/{competition}/submissions/{submission}/score",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionJudgeController@submitScore"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/competitions/{competition}/submissions/{submission}/vote",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionVoteController@vote"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/competitions/{competition}/submissions/{submission}/vote",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionVoteController@unvote"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions/{competition}/submissions/{submission}/vote-status",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionVoteController@checkVote"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/competitions/{competition}/submit",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@submit"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions/{competition}/voting/stats",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionVoteController@stats"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions/{competition}/winners",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@getWinners"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/competitions/{competition}/winners-by-category",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionCategoryController@winnersByCategory"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/contact",
+        "name":  null,
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/events",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\EventApiController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/events/cities",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\EventApiController@cities"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/events/featured",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\EventApiController@featured"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/events/stats",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\EventController@stats"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/events/{event}/rsvp",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\EventController@rsvp"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/events/{slug}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\EventApiController@show"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/featured-photographers/analytics/{featured}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerAnalyticsController@show"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/featured-photographers/analytics/{featured}/export",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerAnalyticsController@export"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/featured-photographers/analytics/{featured}/record-booking",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerAnalyticsController@recordBooking"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/featured-photographers/analytics/{featured}/record-inquiry",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerAnalyticsController@recordInquiry"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/featured-photographers/analytics/{featured}/record-portfolio-click",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerAnalyticsController@recordPortfolioClick"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/featured-photographers/analytics/{featured}/record-profile-click",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerAnalyticsController@recordProfileClick"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/featured-photographers/analytics/{featured}/record-view",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerAnalyticsController@recordView"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/featured-photographers/payments/bkash-callback",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerPaymentController@bkashCallback"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/featured-photographers/payments/featured/{featured}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerPaymentController@forFeaturedPhotographer"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/featured-photographers/payments/initiate",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerPaymentController@initiate"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/featured-photographers/payments/statistics",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerPaymentController@statistics"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/featured-photographers/payments/stripe-webhook",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerPaymentController@stripeWebhook"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/featured-photographers/payments/{payment}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerPaymentController@show"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/featured-photographers/upgrade/options/{featured}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerUpgradeController@getUpgradeOptions"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/featured-photographers/upgrade/{featured}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerUpgradeController@initiateUpgrade"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/featured-photographers/upgrade/{featured}/history",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerUpgradeController@getHistory"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/featured-photographers/upgrade/{upgrade}/confirm",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerUpgradeController@confirmUpgrade"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/hashtags",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\HashtagController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/hashtags/featured",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\HashtagController@featured"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/health",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\HealthController@check"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/judge/assignments",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionJudgeController@getMyAssignments"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/judge/competitions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Judge\\JudgeDashboardController@myCompetitions"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/judge/competitions/{competition}/submissions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Judge\\JudgeDashboardController@competitionSubmissions"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/judge/competitions/{competition}/submissions/{submission}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Judge\\JudgeDashboardController@getSubmission"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/judge/competitions/{competition}/submissions/{submission}/score",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Judge\\JudgeDashboardController@submitScore"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/judge/dashboard",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Judge\\JudgeDashboardController@dashboard"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/judge/scoring-history",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Judge\\JudgeDashboardController@scoringHistory"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/judges",
+        "name":  null,
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/judges/{judge}",
+        "name":  null,
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/locations",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\LocationApiController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/mentors",
+        "name":  null,
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/mentors/{mentor}",
+        "name":  null,
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/my-activity",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ActivityLogController@myActivity"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/notices/my-notices",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\NoticeController@getMyNotices"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/notices/{id}/read",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\NoticeController@markAsRead"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/notification-channels",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\NotificationPreferenceController@channels"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/notification-preferences",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\NotificationPreferenceController@index"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/notification-preferences",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\NotificationPreferenceController@update"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/notification-preferences/reset",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\NotificationPreferenceController@reset"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/notifications",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\NotificationController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/notifications/create-admin",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\NotificationTestController@createAdminNotification"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/notifications/create-test",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\NotificationTestController@createTestNotification"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/notifications/mark-all-read",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\NotificationController@markAllAsRead"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/notifications/unread-count",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\NotificationController@unreadCount"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/notifications/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\NotificationController@destroy"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/notifications/{id}/read",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\NotificationController@markAsRead"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/payments/initiate",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PaymentController@initiatePayment"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/payments/transactions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PaymentController@myTransactions"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/payments/transactions/{transactionId}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PaymentController@getTransaction"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/payments/{transactionId}/refund",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PaymentController@refund"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photo-categories",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\PhotoCategoryController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/achievements",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerController@getAchievements"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/albums",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AlbumController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/photographer/albums",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AlbumController@store"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/photographer/albums/{albumId}/photos",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotoController@store"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/photographer/albums/{albumId}/photos/upload",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotoController@upload"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/albums/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AlbumController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/photographer/albums/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AlbumController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/photographer/albums/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AlbumController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/awards",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerAwardController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/photographer/awards",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerAwardController@store"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/photographer/awards/reorder",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerAwardController@reorder"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/photographer/awards/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerAwardController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/photographer/awards/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerAwardController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/competitions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Photographer\\PhotographerCompetitionController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/photographer/competitions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Photographer\\PhotographerCompetitionController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/competitions/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Photographer\\PhotographerCompetitionController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/photographer/competitions/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Photographer\\PhotographerCompetitionController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/photographer/competitions/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Photographer\\PhotographerCompetitionController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/dashboard",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerController@dashboard"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/event-rsvps",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerController@getMyEventRsvps"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/events",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Photographer\\PhotographerEventController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/photographer/events",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Photographer\\PhotographerEventController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/events/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Photographer\\PhotographerEventController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/photographer/events/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Photographer\\PhotographerEventController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/photographer/events/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Photographer\\PhotographerEventController@destroy"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/photographer/events/{id}/cancel",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Photographer\\PhotographerEventController@cancel"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/notifications",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerController@getNotifications"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/photographer/notifications/mark-all-read",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerController@markAllNotificationsAsRead"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/notifications/unread-count",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerController@getUnreadNotificationCount"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/photographer/notifications/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerController@deleteNotification"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/photographer/notifications/{id}/read",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerController@markNotificationAsRead"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/onboarding/checklist",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerOnboardingController@getChecklist"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/photographer/onboarding/checklist/update-step",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerOnboardingController@updateStep"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/onboarding/progress",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerOnboardingController@getProgress"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/packages",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PackageController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/photographer/packages",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PackageController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/packages/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PackageController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/photographer/packages/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PackageController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/photographer/packages/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PackageController@destroy"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/photographer/packages/{id}/images",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PackageController@uploadImages"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/photos/search-pexels",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotoController@searchPexels"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/photographer/photos/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotoController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/photographer/photos/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotoController@destroy"
+    },
+    {
+        "method":  "PATCH",
+        "uri":  "api/v1/photographer/profile",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerController@updateProfile"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/photographer/profile/avatar",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerController@updateAvatar"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/settings",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerSettingsController@getSettings"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/photographer/settings/availability",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerSettingsController@updateAvailability"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/photographer/settings/profile",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerSettingsController@updateProfile"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/photographer/settings/social",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerSettingsController@updateSocial"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/photographer/settings/tips",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerSettingsController@updateTips"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographer/submissions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerController@getMySubmissions"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographers",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographers/@{username}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerController@showByUsername"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographers/search",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerController@search"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/photographers/tips/{tipId}/confirm",
+        "name":  "api.photographer.tip.confirm",
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerTipController@confirmTip"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographers/{photographerId}/awards",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerAwardController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographers/{photographerId}/tips",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerTipController@getPhotographerTips"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographers/{photographerId}/tips/info",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerTipController@getTipInfo"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/photographers/{photographerId}/tips/initiate",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerTipController@initiateTip"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographers/{photographerSlugOrId}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerController@show"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/photographers/{photographer_id}/reviews",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\ReviewController@getPhotographerReviews"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/platform/stats",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PlatformStatsController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/reviews",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\ReviewController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/reviews",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\ReviewController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/reviews/featured",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\ReviewController@featured"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/site-links",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Admin\\SiteLinkController@publicIndex"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/sitemap.xml",
+        "name":  "sitemap.index",
+        "action":  "App\\Http\\Controllers\\Api\\SitemapController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/sitemap/categories.xml",
+        "name":  "api.sitemap.categories",
+        "action":  "App\\Http\\Controllers\\Api\\SitemapController@categories"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/sitemap/cities.xml",
+        "name":  "api.sitemap.cities",
+        "action":  "App\\Http\\Controllers\\Api\\SitemapController@cities"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/sitemap/competitions.xml",
+        "name":  "api.sitemap.competitions",
+        "action":  "App\\Http\\Controllers\\Api\\SitemapController@competitions"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/sitemap/photographers.xml",
+        "name":  "api.sitemap.photographers",
+        "action":  "App\\Http\\Controllers\\Api\\SitemapController@photographers"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/sitemap/static.xml",
+        "name":  "api.sitemap.static",
+        "action":  "App\\Http\\Controllers\\Api\\SitemapController@static"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/sponsor-inquiry",
+        "name":  null,
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/sponsors",
+        "name":  null,
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/sponsors/{sponsor}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSponsorController@show"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/verifications/pending",
+        "name":  "verifications.pending",
+        "action":  "App\\Http\\Controllers\\Api\\VerificationController@getPendingRequests"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/verifications/renew",
+        "name":  "verifications.renew",
+        "action":  "App\\Http\\Controllers\\Api\\VerificationController@renewVerification"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/verifications/status/{photographer}",
+        "name":  "verifications.status",
+        "action":  "App\\Http\\Controllers\\Api\\VerificationController@getStatus"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/verifications/submit",
+        "name":  "verifications.submit",
+        "action":  "App\\Http\\Controllers\\Api\\VerificationController@submitRequest"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/verifications/{photographer}/history",
+        "name":  "verifications.history",
+        "action":  "App\\Http\\Controllers\\Api\\VerificationController@getPhotographerHistory"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/verifications/{photographer}/verifications/{verification}/revoke",
+        "name":  "verifications.revoke",
+        "action":  "App\\Http\\Controllers\\Api\\VerificationController@revokeVerification"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/verifications/{verificationRequest}/approve",
+        "name":  "verifications.approve",
+        "action":  "App\\Http\\Controllers\\Api\\VerificationController@approveRequest"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/verifications/{verificationRequest}/reject",
+        "name":  "verifications.reject",
+        "action":  "App\\Http\\Controllers\\Api\\VerificationController@rejectRequest"
+    }
+]

@@ -1,16 +1,28 @@
 <template>
   <div class="min-h-screen bg-gray-100 py-8">
+    <Toast
+      v-if="toastVisible"
+      :message="toastMessage"
+      :type="toastType"
+      @close="closeToast"
+    />
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Judge Scoring Dashboard</h1>
-        <p class="text-gray-600">{{ competition?.title }}</p>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+          Judge Scoring Dashboard
+        </h1>
+        <p class="text-gray-600">
+          {{ competition?.title }}
+        </p>
       </div>
 
       <!-- Progress Card -->
       <div class="bg-white rounded-lg shadow-md p-6 mb-8">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-gray-900">Your Progress</h2>
+          <h2 class="text-xl font-bold text-gray-900">
+            Your Progress
+          </h2>
           <span class="text-3xl font-bold text-red-600">{{ progress.progress_percentage }}%</span>
         </div>
         
@@ -19,21 +31,33 @@
           <div 
             class="bg-red-600 h-4 rounded-full transition-all duration-500"
             :style="{ width: progress.progress_percentage + '%' }"
-          ></div>
+          />
         </div>
         
         <div class="grid grid-cols-3 gap-4 text-center">
           <div>
-            <p class="text-2xl font-bold text-gray-900">{{ progress.total }}</p>
-            <p class="text-sm text-gray-600">Total Submissions</p>
+            <p class="text-2xl font-bold text-gray-900">
+              {{ progress.total }}
+            </p>
+            <p class="text-sm text-gray-600">
+              Total Submissions
+            </p>
           </div>
           <div>
-            <p class="text-2xl font-bold text-green-600">{{ progress.scored }}</p>
-            <p class="text-sm text-gray-600">Scored</p>
+            <p class="text-2xl font-bold text-green-600">
+              {{ progress.scored }}
+            </p>
+            <p class="text-sm text-gray-600">
+              Scored
+            </p>
           </div>
           <div>
-            <p class="text-2xl font-bold text-yellow-600">{{ progress.pending }}</p>
-            <p class="text-sm text-gray-600">Pending</p>
+            <p class="text-2xl font-bold text-yellow-600">
+              {{ progress.pending }}
+            </p>
+            <p class="text-sm text-gray-600">
+              Pending
+            </p>
           </div>
         </div>
       </div>
@@ -42,29 +66,29 @@
       <div class="bg-white rounded-lg shadow-md p-4 mb-6">
         <div class="flex gap-4">
           <button 
-            @click="filter = 'all'"
             :class="[
               'px-4 py-2 rounded-lg font-medium transition-colors',
               filter === 'all' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             ]"
+            @click="filter = 'all'"
           >
             All ({{ submissions.length }})
           </button>
           <button 
-            @click="filter = 'pending'"
             :class="[
               'px-4 py-2 rounded-lg font-medium transition-colors',
               filter === 'pending' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             ]"
+            @click="filter = 'pending'"
           >
             Pending ({{ pendingCount }})
           </button>
           <button 
-            @click="filter = 'scored'"
             :class="[
               'px-4 py-2 rounded-lg font-medium transition-colors',
               filter === 'scored' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             ]"
+            @click="filter = 'scored'"
           >
             Scored ({{ scoredCount }})
           </button>
@@ -72,13 +96,21 @@
       </div>
 
       <!-- Loading -->
-      <div v-if="loading" class="text-center py-12">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
-        <p class="mt-4 text-gray-600">Loading submissions...</p>
+      <div
+        v-if="loading"
+        class="text-center py-12"
+      >
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-red-600" />
+        <p class="mt-4 text-gray-600">
+          Loading submissions...
+        </p>
       </div>
 
       <!-- Submissions Grid -->
-      <div v-else-if="filteredSubmissions.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        v-else-if="filteredSubmissions.length > 0"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
         <div 
           v-for="submission in filteredSubmissions" 
           :key="submission.id"
@@ -91,13 +123,15 @@
               :src="submission.thumbnail_url || submission.image_url" 
               :alt="submission.title"
               class="w-full h-full object-cover"
-            />
+            >
           </div>
 
           <!-- Info -->
           <div class="p-4">
             <div class="flex items-start justify-between mb-2">
-              <h3 class="font-bold text-gray-900 flex-1 line-clamp-1">{{ submission.title }}</h3>
+              <h3 class="font-bold text-gray-900 flex-1 line-clamp-1">
+                {{ submission.title }}
+              </h3>
               <span 
                 v-if="submission.is_scored"
                 class="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs font-bold rounded"
@@ -111,10 +145,15 @@
                 Pending
               </span>
             </div>
-            <p class="text-sm text-gray-600 mb-2">by {{ submission.photographer?.name }}</p>
+            <p class="text-sm text-gray-600 mb-2">
+              by {{ submission.photographer?.name }}
+            </p>
             
             <!-- Current Score (if scored) -->
-            <div v-if="submission.is_scored && submission.my_score" class="mt-3 pt-3 border-t">
+            <div
+              v-if="submission.is_scored && submission.my_score"
+              class="mt-3 pt-3 border-t"
+            >
               <div class="flex items-center justify-between text-sm">
                 <span class="text-gray-600">Your Score:</span>
                 <span class="text-xl font-bold text-red-600">{{ submission.my_score.total_score }}/50</span>
@@ -135,24 +174,59 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else class="text-center py-12 bg-white rounded-lg shadow">
-        <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      <div
+        v-else
+        class="text-center py-12 bg-white rounded-lg shadow"
+      >
+        <svg
+          class="mx-auto h-16 w-16 text-gray-400 mb-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
         </svg>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">No submissions found</h3>
-        <p class="text-gray-600">There are no submissions matching your filter.</p>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">
+          No submissions found
+        </h3>
+        <p class="text-gray-600">
+          There are no submissions matching your filter.
+        </p>
       </div>
     </div>
 
     <!-- Scoring Modal -->
-    <div v-if="showScoringModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+    <div
+      v-if="showScoringModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+    >
       <div class="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
         <!-- Modal Header -->
         <div class="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between z-10">
-          <h2 class="text-2xl font-bold text-gray-900">Score Submission</h2>
-          <button @click="closeScoringModal" class="text-gray-400 hover:text-gray-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          <h2 class="text-2xl font-bold text-gray-900">
+            Score Submission
+          </h2>
+          <button
+            class="text-gray-400 hover:text-gray-600"
+            @click="closeScoringModal"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -166,16 +240,31 @@
                 :src="selectedSubmission?.image_url" 
                 :alt="selectedSubmission?.title"
                 class="w-full rounded-lg mb-4"
-              />
-              <h3 class="text-xl font-bold text-gray-900 mb-2">{{ selectedSubmission?.title }}</h3>
-              <p class="text-gray-600 mb-4">by {{ selectedSubmission?.photographer?.name }}</p>
-              <p v-if="selectedSubmission?.description" class="text-gray-700 mb-4">{{ selectedSubmission.description }}</p>
+              >
+              <h3 class="text-xl font-bold text-gray-900 mb-2">
+                {{ selectedSubmission?.title }}
+              </h3>
+              <p class="text-gray-600 mb-4">
+                by {{ selectedSubmission?.photographer?.name }}
+              </p>
+              <p
+                v-if="selectedSubmission?.description"
+                class="text-gray-700 mb-4"
+              >
+                {{ selectedSubmission.description }}
+              </p>
               
               <!-- Metadata -->
               <div class="space-y-2 text-sm text-gray-600">
-                <p v-if="selectedSubmission?.location"><strong>Location:</strong> {{ selectedSubmission.location }}</p>
-                <p v-if="selectedSubmission?.camera_make"><strong>Camera:</strong> {{ selectedSubmission.camera_make }} {{ selectedSubmission.camera_model }}</p>
-                <p v-if="selectedSubmission?.camera_settings"><strong>Settings:</strong> {{ selectedSubmission.camera_settings }}</p>
+                <p v-if="selectedSubmission?.location">
+                  <strong>Location:</strong> {{ selectedSubmission.location }}
+                </p>
+                <p v-if="selectedSubmission?.camera_make">
+                  <strong>Camera:</strong> {{ selectedSubmission.camera_make }} {{ selectedSubmission.camera_model }}
+                </p>
+                <p v-if="cameraSettingsText">
+                  <strong>Settings:</strong> {{ cameraSettingsText }}
+                </p>
               </div>
             </div>
 
@@ -197,8 +286,10 @@
                       max="10" 
                       step="0.5"
                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    />
-                    <p class="text-xs text-gray-600 mt-1">Rule of thirds, balance, framing</p>
+                    >
+                    <p class="text-xs text-gray-600 mt-1">
+                      Rule of thirds, balance, framing
+                    </p>
                   </div>
 
                   <!-- Technical Quality -->
@@ -214,8 +305,10 @@
                       max="10" 
                       step="0.5"
                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    />
-                    <p class="text-xs text-gray-600 mt-1">Focus, exposure, lighting, post-processing</p>
+                    >
+                    <p class="text-xs text-gray-600 mt-1">
+                      Focus, exposure, lighting, post-processing
+                    </p>
                   </div>
 
                   <!-- Creativity -->
@@ -231,8 +324,10 @@
                       max="10" 
                       step="0.5"
                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    />
-                    <p class="text-xs text-gray-600 mt-1">Originality, unique perspective, innovation</p>
+                    >
+                    <p class="text-xs text-gray-600 mt-1">
+                      Originality, unique perspective, innovation
+                    </p>
                   </div>
 
                   <!-- Story/Message -->
@@ -248,8 +343,10 @@
                       max="10" 
                       step="0.5"
                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    />
-                    <p class="text-xs text-gray-600 mt-1">Narrative, emotion, context</p>
+                    >
+                    <p class="text-xs text-gray-600 mt-1">
+                      Narrative, emotion, context
+                    </p>
                   </div>
 
                   <!-- Impact -->
@@ -265,8 +362,10 @@
                       max="10" 
                       step="0.5"
                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    />
-                    <p class="text-xs text-gray-600 mt-1">Visual impact, memorability, wow factor</p>
+                    >
+                    <p class="text-xs text-gray-600 mt-1">
+                      Visual impact, memorability, wow factor
+                    </p>
                   </div>
                 </div>
 
@@ -286,7 +385,7 @@
                     rows="3"
                     placeholder="Provide constructive feedback..."
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  ></textarea>
+                  />
                 </div>
 
                 <!-- Strengths -->
@@ -297,7 +396,7 @@
                     rows="2"
                     placeholder="What worked well..."
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  ></textarea>
+                  />
                 </div>
 
                 <!-- Areas for Improvement -->
@@ -308,15 +407,15 @@
                     rows="2"
                     placeholder="What could be improved..."
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  ></textarea>
+                  />
                 </div>
 
                 <!-- Actions -->
                 <div class="mt-6 flex gap-3">
                   <button 
                     type="button"
-                    @click="closeScoringModal"
                     class="flex-1 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium"
+                    @click="closeScoringModal"
                   >
                     Cancel
                   </button>
@@ -341,14 +440,19 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import api from '../api';
+import Toast from '../components/ui/Toast.vue';
+import { useApiError } from '../composables/useApiError';
 
 const route = useRoute();
+const { toastMessage, toastType, toastVisible, showToast, handleApiError, closeToast } = useApiError();
 
 const competition = ref(null);
 const submissions = ref([]);
 const progress = ref({ total: 0, scored: 0, pending: 0, progress_percentage: 0 });
 const loading = ref(true);
 const filter = ref('all');
+const competitionId = computed(() => route.params.competitionId);
+const hasAutoOpened = ref(false);
 
 const showScoringModal = ref(false);
 const selectedSubmission = ref(null);
@@ -365,6 +469,59 @@ const scoreForm = ref({
   improvements: ''
 });
 
+function formatCameraSettings(value, exifValue = null) {
+  const resolved = value ?? exifValue;
+
+  if (!resolved) {
+    return null;
+  }
+
+  if (typeof resolved === 'string') {
+    try {
+      const parsed = JSON.parse(resolved);
+      if (parsed && typeof parsed === 'object') {
+        return formatCameraSettings(parsed);
+      }
+    } catch (error) {
+      return resolved;
+    }
+
+    return resolved;
+  }
+
+  if (Array.isArray(resolved)) {
+    return resolved.filter(Boolean).join(', ');
+  }
+
+  if (typeof resolved === 'object') {
+    if (resolved.raw) {
+      return resolved.raw;
+    }
+
+    const exifFields = [
+      resolved.iso,
+      resolved.ISO,
+      resolved.aperture,
+      resolved.Aperture,
+      resolved.fNumber,
+      resolved.shutter_speed,
+      resolved.ShutterSpeed,
+      resolved.exposure_time,
+      resolved.ExposureTime,
+      resolved.focal_length,
+      resolved.FocalLength,
+    ].filter(Boolean);
+
+    if (exifFields.length > 0) {
+      return exifFields.join(', ');
+    }
+
+    return Object.values(resolved).filter(Boolean).join(', ');
+  }
+
+  return String(resolved);
+}
+
 const totalScore = computed(() => {
   return (
     scoreForm.value.composition_score +
@@ -373,6 +530,12 @@ const totalScore = computed(() => {
     scoreForm.value.story_score +
     scoreForm.value.impact_score
   ).toFixed(1);
+});
+
+const cameraSettingsText = computed(() => {
+  const submission = selectedSubmission.value;
+  const exif = submission?.files?.[0]?.exif_json;
+  return formatCameraSettings(submission?.camera_settings, exif);
 });
 
 const filteredSubmissions = computed(() => {
@@ -395,33 +558,50 @@ onMounted(async () => {
 
 const fetchCompetition = async () => {
   try {
-    const { data } = await api.get(`/competitions/${route.params.slug}`);
+    const { data } = await api.get(`/competitions/${competitionId.value}`);
     competition.value = data.data;
   } catch (error) {
-    console.error('Error fetching competition:', error);
+      handleApiError(error, 'Error fetching competition');
   }
 };
 
 const fetchProgress = async () => {
   try {
-    const { data } = await api.get(`/competitions/${competition.value.id}/judge/progress`);
+    const { data } = await api.get(`/competitions/${competitionId.value}/judge/progress`);
     progress.value = data.data;
   } catch (error) {
-    console.error('Error fetching progress:', error);
+      handleApiError(error, 'Error fetching progress');
   }
 };
 
 const fetchSubmissions = async () => {
   loading.value = true;
   try {
-    const { data } = await api.get(`/competitions/${competition.value.id}/judge/submissions`);
+    const { data } = await api.get(`/competitions/${competitionId.value}/judge/submissions`);
     submissions.value = data.data;
+    openSubmissionFromRoute();
   } catch (error) {
-    console.error('Error fetching submissions:', error);
-    alert(error.response?.data?.message || 'Failed to load submissions');
+     handleApiError(error, 'Failed to load submissions');
   } finally {
     loading.value = false;
   }
+};
+
+const openSubmissionFromRoute = () => {
+  if (hasAutoOpened.value || !route.params.submissionId) {
+    return;
+  }
+
+  const submissionId = String(route.params.submissionId);
+  const match = submissions.value.find((submission) => String(submission.id) === submissionId);
+
+  if (match) {
+    openScoringModal(match);
+  } else {
+    showToast('Submission not found or not assigned to you.', 'error');
+  }
+
+  hasAutoOpened.value = true;
 };
 
 const openScoringModal = (submission) => {
@@ -455,6 +635,7 @@ const openScoringModal = (submission) => {
   showScoringModal.value = true;
 };
 
+
 const closeScoringModal = () => {
   showScoringModal.value = false;
   selectedSubmission.value = null;
@@ -464,17 +645,16 @@ const submitScore = async () => {
   submitting.value = true;
   try {
     await api.post(
-      `/competitions/${competition.value.id}/submissions/${selectedSubmission.value.id}/score`,
+      `/competitions/${competitionId.value}/submissions/${selectedSubmission.value.id}/score`,
       scoreForm.value
     );
     
-    alert('Score submitted successfully!');
+    showToast('Score submitted successfully!', 'success');
     closeScoringModal();
     await fetchProgress();
     await fetchSubmissions();
   } catch (error) {
-    console.error('Error submitting score:', error);
-    alert(error.response?.data?.message || 'Failed to submit score');
+     handleApiError(error, 'Failed to submit score');
   } finally {
     submitting.value = false;
   }

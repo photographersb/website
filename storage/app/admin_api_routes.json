@@ -1,0 +1,1298 @@
+[
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/activity-logs",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ActivityLogController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/activity-logs/export",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ActivityLogController@export"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/activity-logs/model/{modelType}/{modelId}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ActivityLogController@modelActivity"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/activity-logs/statistics",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ActivityLogController@statistics"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/analytics",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@analytics"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/approval-stats",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\UserApprovalController@stats"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/audit-logs",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@auditLogs"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/bookings",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminBookingController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/bookings/stats",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminBookingController@stats"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/bookings/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminBookingController@show"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/bookings/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminBookingController@destroy"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/bookings/{id}/status",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminBookingController@updateStatus"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/categories",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CategoryController@adminIndex"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/categories",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CategoryController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/categories/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CategoryController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/categories/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CategoryController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/categories/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CategoryController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/certificate-templates",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\CertificateTemplateController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/certificate-templates",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\CertificateTemplateController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/certificate-templates/type/{type}/default",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\CertificateTemplateController@getDefault"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/certificate-templates/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\CertificateTemplateController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/certificate-templates/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\CertificateTemplateController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/certificate-templates/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\CertificateTemplateController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/cities",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CityController@adminIndex"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/cities",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CityController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/cities/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CityController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/cities/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CityController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/cities/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CityController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/competition-sponsors/global-statistics",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSponsorController@globalStatistics"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/competition-sponsors/{sponsor}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSponsorController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/competition-sponsors/{sponsor}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSponsorController@destroy"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competition-sponsors/{sponsor}/toggle-active",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSponsorController@toggleActive"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/competitions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminCompetitionApiController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminCompetitionApiController@store"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/announce-winners",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@announceWinners"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/calculate-winners",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@calculateWinners"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/categories",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionCategoryController@store"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/categories/bulk",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionCategoryController@bulkCreate"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/competitions/{competition}/categories/statistics",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionCategoryController@statistics"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/competitions/{competition}/categories/{category}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionCategoryController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/competitions/{competition}/categories/{category}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionCategoryController@destroy"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/categories/{category}/toggle-active",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionCategoryController@toggleActive"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/generate-certificate",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@generateSingleCertificate"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/generate-certificates",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@generateAllCertificates"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/judges",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionJudgeController@assignJudge"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/competitions/{competition}/judges",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionJudgeController@getJudges"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/competitions/{competition}/judges/{judge}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionJudgeController@removeJudge"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/competitions/{competition}/leaderboard",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Admin\\CompetitionController@getLeaderboard"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/competitions/{competition}/prize-report",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@getPrizeReport"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/competitions/{competition}/scoring/stats",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionJudgeController@getScoringStats"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/set-all-prizes",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@setAllPrizes"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/set-prize",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@setPrize"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/sponsors",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSponsorController@store"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/sponsors/bulk",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSponsorController@bulkCreate"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/sponsors/reorder",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSponsorController@reorder"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/competitions/{competition}/sponsors/statistics",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSponsorController@statistics"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/competitions/{competition}/submissions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@adminIndex"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/competitions/{competition}/submissions/stats",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@stats"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/submissions/{submission}/approve",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@approve"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/submissions/{submission}/disqualify",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@disqualify"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/submissions/{submission}/reject",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@reject"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/competitions/{competition}/update-prize-status",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@updatePrizeStatus"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/competitions/{competition}/winners",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Admin\\CompetitionController@getWinners"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/competitions/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminCompetitionApiController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/competitions/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminCompetitionApiController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/competitions/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminCompetitionApiController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/contact-messages",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/contact-messages",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/contact-messages/stats",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@stats"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/contact-messages/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/contact-messages/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@update"
+    },
+    {
+        "method":  "PATCH",
+        "uri":  "api/v1/admin/contact-messages/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@updateStatus"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/contact-messages/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@destroy"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/contact-messages/{id}/archive",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@archive"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/contact-messages/{id}/respond",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ContactMessageController@markAsResponded"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/dashboard",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@dashboard"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/error-logs",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ErrorCenterController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/error-logs/clear-resolved",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ErrorCenterController@clearResolved"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/error-logs/export",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ErrorCenterController@export"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/error-logs/statistics",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ErrorCenterController@statistics"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/error-logs/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ErrorCenterController@show"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/error-logs/{id}/mute",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ErrorCenterController@mute"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/error-logs/{id}/resolve",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ErrorCenterController@markResolved"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/error-logs/{id}/unmute",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ErrorCenterController@unmute"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/error-logs/{id}/unresolve",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ErrorCenterController@markUnresolved"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/errors",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ErrorController@index"
+    },
+    {
+        "method":  "PATCH",
+        "uri":  "api/v1/admin/errors/{error}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ErrorController@updateStatus"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/events",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminEventApiController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/events",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminEventApiController@store"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/events/bulk-update-status",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminEventApiController@bulkUpdateStatus"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/events/{event}/check-in",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\EventCheckInController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/events/{event}/check-in/export",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\EventCheckInController@exportCheckInReport"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/events/{event}/check-in/manual",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\EventCheckInController@manualCheckIn"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/events/{event}/check-in/qr/{qrToken}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\EventCheckInController@getByQrToken"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/events/{event}/check-in/registrations",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\EventCheckInController@getRegistrations"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/events/{event}/check-in/scan",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\EventCheckInController@scan"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/events/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminEventApiController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/events/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminEventApiController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/events/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminEventApiController@destroy"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/events/{id}/toggle-featured",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminEventApiController@toggleFeatured"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/featured-photographers",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\FeaturedPhotographerController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/featured-photographers",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\FeaturedPhotographerController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/featured-photographers/payments/statistics",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerPaymentController@adminIndex"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/featured-photographers/upgrades",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerUpgradeController@adminIndex"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/featured-photographers/upgrades/{upgrade}/verify-cash",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\FeaturedPhotographerUpgradeController@verifyCashPayment"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/featured-photographers/{featuredPhotographer}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\FeaturedPhotographerController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/featured-photographers/{featuredPhotographer}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\FeaturedPhotographerController@destroy"
+    },
+    {
+        "method":  "PATCH",
+        "uri":  "api/v1/admin/featured-photographers/{featuredPhotographer}/toggle",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\FeaturedPhotographerController@toggle"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/hashtags",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\HashtagController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/hashtags",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\HashtagController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/hashtags/featured",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\HashtagController@featured"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/hashtags/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\HashtagController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/hashtags/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\HashtagController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/hashtags/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\HashtagController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/health",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\HealthController@admin"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/judges",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\JudgeController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/judges",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\JudgeController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/judges/{judge}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\JudgeController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/judges/{judge}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\JudgeController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/judges/{judge}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\JudgeController@destroy"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/judges/{judge}/assign-competitions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\JudgeController@assignCompetitions"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/judges/{judge}/toggle-status",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\JudgeController@toggleStatus"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/mentors",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@getMentors"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/mentors",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\MentorController@store"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/mentors/reorder",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\MentorController@updateOrder"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/mentors/{mentor}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\MentorController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/mentors/{mentor}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\MentorController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/mentors/{mentor}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\MentorController@destroy"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/mentors/{mentor}/toggle-status",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\MentorController@toggleStatus"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/notices",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\NoticeController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/notices",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\NoticeController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/notices/roles/available",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\NoticeController@getRoles"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/notices/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\NoticeController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/notices/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\NoticeController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/notices/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\NoticeController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/notifications",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\NotificationController@index"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/notifications/delete-read",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\NotificationController@deleteRead"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/notifications/mark-all-read",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\NotificationController@markAllAsRead"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/notifications/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\NotificationController@destroy"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/notifications/{id}/mark-read",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\NotificationController@markAsRead"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/pending-users",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\UserApprovalController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/photo-categories",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\PhotoCategoryController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/photo-categories/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\PhotoCategoryController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/photo-categories/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\PhotoCategoryController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/photo-categories/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\PhotoCategoryController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/photographers",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@getPhotographers"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/photographers",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@storePhotographer"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/photographers/onboarding/pending",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerOnboardingController@getPendingOnboardings"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/photographers/search",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\FeaturedPhotographerController@searchPhotographers"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/photographers/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@showPhotographer"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/photographers/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@updatePhotographer"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/photographers/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@deletePhotographer"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/photographers/{id}/feature",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@featurePhotographer"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/photographers/{id}/verify",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@verifyPhotographer"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/photographers/{photographer}/onboarding/reset",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PhotographerOnboardingController@resetChecklist"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/platform-sponsors",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SponsorController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/platform-sponsors",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SponsorController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/platform-sponsors/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SponsorController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/platform-sponsors/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SponsorController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/platform-sponsors/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SponsorController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/prizes/pending",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@getPendingPrizes"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/prizes/statistics",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionController@getGlobalPrizeStats"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/registrations/{registration}/check-in/undo",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\EventCheckInController@undoCheckIn"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/reviews",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminReviewController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/reviews/bulk-update",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminReviewController@bulkUpdateStatus"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/reviews/stats",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminReviewController@stats"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/reviews/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminReviewController@destroy"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/reviews/{id}/report",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminReviewController@markAsReported"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/reviews/{id}/status",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminReviewController@updateStatus"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/seo",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SeoMetaController@show"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/seo",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SeoMetaController@store"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/seo",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SeoMetaController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/seo/all",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SeoMetaController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/seo/generate",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SeoMetaController@generate"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/seo/preview",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SeoMetaController@preview"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/settings",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminSettingsController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/settings/bulk",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminSettingsController@bulkUpdate"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/settings/category/{category}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminSettingsController@getCategory"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/settings/reset",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminSettingsController@reset"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/settings/{key}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminSettingsController@update"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/share-frames",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ShareFrameController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/share-frames",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ShareFrameController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/share-frames/{shareFrame}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ShareFrameController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/share-frames/{shareFrame}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ShareFrameController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/share-frames/{shareFrame}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\ShareFrameController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/sponsors",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SponsorManagementController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/sponsors",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SponsorManagementController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/sponsors/{sponsor}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SponsorManagementController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/sponsors/{sponsor}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SponsorManagementController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/sponsors/{sponsor}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SponsorManagementController@destroy"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/sponsors/{sponsor}/toggle-status",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SponsorManagementController@toggleStatus"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/submissions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@allSubmissions"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/submissions/stats",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\CompetitionSubmissionController@allStats"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/system-health",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@systemHealth"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/transactions",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminTransactionController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/transactions/export",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminTransactionController@export"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/transactions/stats",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminTransactionController@stats"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/transactions/{id}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminTransactionController@show"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/transactions/{id}/refund",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminTransactionController@refund"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/transactions/{id}/status",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\AdminTransactionController@updateStatus"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/upload-logo",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\SponsorController@uploadLogo"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/users",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@users"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/users",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@storeUser"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/users/bulk-approve",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\UserApprovalController@bulkApprove"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/users/{id}/approve",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\UserApprovalController@approve"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/users/{id}/reject",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\Admin\\UserApprovalController@reject"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/users/{user}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@showUser"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "api/v1/admin/users/{user}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@updateUser"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "api/v1/admin/users/{user}",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@deleteUser"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/users/{user}/promote-to-judge",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@promoteToJudge"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/users/{user}/promote-to-mentor",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@promoteToMentor"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/users/{user}/suspend",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@suspendUser"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/users/{user}/unsuspend",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@unsuspendUser"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "api/v1/admin/verifications",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@getVerifications"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/verifications/{verification}/approve",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@approveVerification"
+    },
+    {
+        "method":  "POST",
+        "uri":  "api/v1/admin/verifications/{verification}/reject",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\AdminController@rejectVerification"
+    }
+]

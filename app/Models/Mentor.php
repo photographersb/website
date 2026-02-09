@@ -34,6 +34,22 @@ class Mentor extends Model
         'sort_order' => 'integer',
     ];
 
+    protected $appends = ['profile_image_url'];
+
+    public function getProfileImageUrlAttribute(): ?string
+    {
+        $value = $this->profile_image;
+        if (!$value) {
+            return null;
+        }
+
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, '/storage/')) {
+            return $value;
+        }
+
+        return '/storage/' . ltrim($value, '/');
+    }
+
     protected static function boot()
     {
         parent::boot();

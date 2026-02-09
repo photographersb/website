@@ -10,12 +10,22 @@ class EventPayment extends Model
     use HasFactory;
 
     protected $fillable = [
+        'event_id',
+        'registration_id',
+        'user_id',
         'event_registration_id',
         'gateway',
         'transaction_id',
+        'method',
+        'sender_number',
+        'trx_id',
         'amount',
         'currency',
         'status',
+        'screenshot_path',
+        'admin_note',
+        'verified_by_user_id',
+        'verified_at',
         'paid_at',
         'raw_response',
     ];
@@ -23,6 +33,7 @@ class EventPayment extends Model
     protected $casts = [
         'amount' => 'decimal:2',
         'paid_at' => 'datetime',
+        'verified_at' => 'datetime',
         'raw_response' => 'json',
     ];
 
@@ -33,7 +44,17 @@ class EventPayment extends Model
 
     public function event()
     {
-        return $this->registration->event();
+        return $this->belongsTo(Event::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function verifier()
+    {
+        return $this->belongsTo(User::class, 'verified_by_user_id');
     }
 
     // Scopes

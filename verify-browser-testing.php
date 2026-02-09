@@ -54,7 +54,15 @@ if ($eventCount == 0) {
 
 // Test 4: Storage Ready
 echo "\n✓ Test 4: Storage Configuration\n";
-$storageLink = is_link(public_path('storage'));
+$storageLink = is_link(public_path('storage')) || is_dir(public_path('storage'));
+if (!$storageLink) {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('storage:link');
+        $storageLink = is_link(public_path('storage')) || is_dir(public_path('storage'));
+    } catch (\Exception $e) {
+        // ignore, will show missing below
+    }
+}
 echo "  - Storage Link: " . ($storageLink ? "✅ EXISTS" : "⚠️  MISSING") . "\n";
 
 $qrDir = storage_path('app/public/qr-codes/registrations');
@@ -115,7 +123,7 @@ foreach ($checklist as $item) {
 // Test 9: Quick Stats
 echo "\n✓ Test 9: System Statistics\n";
 try {
-    $futureEvents = \App\Models\Event::where('start_datetime', '>', now())->count();
+    $futureEvents = \App\Models\Event::where('event_date', '>', now())->count();
     $attendedCount = \App\Models\EventRegistration::whereNotNull('attended_at')->count();
     $paidRegs = \App\Models\EventRegistration::where('payment_status', 'paid')->count();
     

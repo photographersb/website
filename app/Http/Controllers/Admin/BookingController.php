@@ -66,9 +66,9 @@ class BookingController extends Controller
                         'name' => $b->photographer->full_name ?? $b->photographer->name,
                         'username' => $b->photographer->username,
                     ],
-                    'event_date' => $b->event_date?->format('d M Y'),
+                    'event_date' => $b->event_date?->format('d-m-Y'),
                     'budget' => $b->budget_min && $b->budget_max ? "৳{$b->budget_min} - ৳{$b->budget_max}" : 'N/A',
-                    'created_at' => $b->created_at->format('d M Y H:i'),
+                    'created_at' => $b->created_at->format('d-m-Y H:i'),
                 ];
             }),
             'filters' => $request->only(['status', 'from_date', 'to_date', 'search']),
@@ -105,7 +105,7 @@ class BookingController extends Controller
                 'id' => $booking->id,
                 'code' => $booking->booking_code,
                 'status' => $booking->status,
-                'event_date' => $booking->event_date?->format('Y-m-d'),
+                'event_date' => $booking->event_date?->format('d-m-Y'),
                 'event_time' => $booking->event_time?->format('H:i'),
                 'duration_hours' => $booking->duration_hours,
                 'venue_address' => $booking->venue_address,
@@ -131,11 +131,11 @@ class BookingController extends Controller
                     'profile_image' => $booking->photographer->profile_image_url,
                 ],
                 'timestamps' => [
-                    'created_at' => $booking->created_at?->format('d M Y H:i'),
-                    'accepted_at' => $booking->accepted_at?->format('d M Y H:i'),
-                    'declined_at' => $booking->declined_at?->format('d M Y H:i'),
-                    'cancelled_at' => $booking->cancelled_at?->format('d M Y H:i'),
-                    'completed_at' => $booking->completed_at?->format('d M Y H:i'),
+                    'created_at' => $booking->created_at?->format('d-m-Y H:i'),
+                    'accepted_at' => $booking->accepted_at?->format('d-m-Y H:i'),
+                    'declined_at' => $booking->declined_at?->format('d-m-Y H:i'),
+                    'cancelled_at' => $booking->cancelled_at?->format('d-m-Y H:i'),
+                    'completed_at' => $booking->completed_at?->format('d-m-Y H:i'),
                 ],
                 'messages' => $booking->messages->map(function ($msg) {
                     return [
@@ -146,7 +146,7 @@ class BookingController extends Controller
                         ],
                         'message' => $msg->message,
                         'attachment_path' => $msg->attachment_path,
-                        'created_at' => $msg->created_at->format('d M Y H:i'),
+                        'created_at' => $msg->created_at->format('d-m-Y H:i'),
                     ];
                 }),
                 'status_logs' => $booking->statusLogs->map(function ($log) {
@@ -155,7 +155,7 @@ class BookingController extends Controller
                         'new_status' => $log->new_status,
                         'changed_by' => $log->changedByUser->full_name ?? $log->changedByUser->name,
                         'note' => $log->note,
-                        'created_at' => $log->created_at->format('d M Y H:i'),
+                        'created_at' => $log->created_at->format('d-m-Y H:i'),
                     ];
                 }),
             ],

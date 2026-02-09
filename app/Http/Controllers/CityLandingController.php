@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\City;
+use App\Models\Location;
 use App\Models\Category;
 use App\Models\Photographer;
 use Illuminate\Http\Request;
@@ -11,7 +11,7 @@ class CityLandingController extends Controller
 {
     public function showCity($citySlug)
     {
-        $city = City::where('slug', $citySlug)->firstOrFail();
+        $city = Location::where('slug', $citySlug)->firstOrFail();
         
         $photographers = Photographer::with(['user', 'categories'])
             ->where('city_id', $city->id)
@@ -58,7 +58,7 @@ class CityLandingController extends Controller
             'total_photographers' => Photographer::whereHas('categories', function($q) use ($category) {
                 $q->where('categories.id', $category->id);
             })->where('is_verified', true)->count(),
-            'cities' => City::withCount(['photographers' => function($q) use ($category) {
+            'cities' => Location::withCount(['photographers' => function($q) use ($category) {
                 $q->whereHas('categories', function($q2) use ($category) {
                     $q2->where('categories.id', $category->id);
                 })->where('is_verified', true);
@@ -82,7 +82,7 @@ class CityLandingController extends Controller
 
     public function showCityCategory($citySlug, $categorySlug)
     {
-        $city = City::where('slug', $citySlug)->firstOrFail();
+        $city = Location::where('slug', $citySlug)->firstOrFail();
         $category = Category::where('slug', $categorySlug)->firstOrFail();
         
         $photographers = Photographer::with(['user', 'categories'])

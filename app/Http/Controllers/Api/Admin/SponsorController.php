@@ -22,6 +22,8 @@ class SponsorController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'logo' => 'nullable|string',
+            'logo_credit_name' => 'nullable|string|max:255',
+            'logo_credit_url' => 'nullable|url|max:255',
             'website' => 'nullable|url',
             'description' => 'nullable|string',
             'status' => 'required|in:active,inactive',
@@ -62,6 +64,8 @@ class SponsorController extends Controller
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'logo' => 'nullable|string',
+            'logo_credit_name' => 'nullable|string|max:255',
+            'logo_credit_url' => 'nullable|url|max:255',
             'website' => 'nullable|url',
             'description' => 'nullable|string',
             'status' => 'sometimes|required|in:active,inactive',

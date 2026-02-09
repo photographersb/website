@@ -44,8 +44,12 @@ class CategoryController extends Controller
         $category = Category::where('slug', $slug)->firstOrFail();
         
         $photographers = Photographer::with('user')
-            ->whereJsonContains('specializations', $category->name)
-            ->orWhere('category_id', $category->id)
+            ->where(function ($query) use ($category) {
+                $query->whereJsonContains('specializations', $category->name)
+                    ->orWhereHas('categories', function ($categoryQuery) use ($category) {
+                        $categoryQuery->where('categories.id', $category->id);
+                    });
+            })
             ->where('is_verified', true)
             ->paginate(24);
 

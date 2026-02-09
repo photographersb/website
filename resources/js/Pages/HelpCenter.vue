@@ -1,7 +1,24 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-12">
-    <div class="container mx-auto px-4 max-w-4xl">
-      <h1 class="text-4xl font-bold mb-8">Help Center</h1>
+  <div class="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <section class="relative overflow-hidden bg-gradient-to-br from-burgundy via-[#8E0E3F] to-[#6F112D] text-white">
+      <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+      </div>
+      <div class="container mx-auto px-4 py-12 md:py-16 relative z-10 text-center">
+        <p class="text-xs uppercase tracking-[0.35em] text-white/70">
+          Support
+        </p>
+        <h1 class="text-3xl md:text-5xl font-bold mt-4 tracking-tight">
+          Help Center
+        </h1>
+        <p class="text-base md:text-lg text-white/85 max-w-3xl mx-auto mt-4">
+          Find answers fast or contact our support team.
+        </p>
+      </div>
+    </section>
+
+    <div class="container mx-auto px-4 max-w-4xl -mt-10 relative z-10 pb-12">
 
       <!-- Search Box -->
       <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
@@ -11,75 +28,164 @@
             type="text"
             placeholder="Search for help..."
             class="w-full border rounded-lg px-4 py-3 pl-12 focus:outline-none focus:ring-2 focus:ring-burgundy"
-          />
-          <svg class="w-5 h-5 text-gray-400 absolute left-4 top-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          >
+          <svg
+            class="w-5 h-5 text-gray-400 absolute left-4 top-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
           </svg>
         </div>
       </div>
 
       <!-- FAQ Categories -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer" @click="activeCategory = 'general'">
+        <div
+          class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
+          @click="activeCategory = 'general'"
+        >
           <div class="flex items-center gap-3 mb-3">
             <div class="w-12 h-12 bg-burgundy-50 rounded-lg flex items-center justify-center">
-              <svg class="w-6 h-6 text-burgundy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                class="w-6 h-6 text-burgundy"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
-            <h3 class="text-lg font-bold">General Questions</h3>
+            <h3 class="text-lg font-bold">
+              General Questions
+            </h3>
           </div>
-          <p class="text-sm text-gray-600">Common questions about using Photographer SB</p>
+          <p class="text-sm text-gray-600">
+            Common questions about using Photographer SB
+          </p>
         </div>
 
-        <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer" @click="activeCategory = 'booking'">
+        <div
+          class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
+          @click="activeCategory = 'booking'"
+        >
           <div class="flex items-center gap-3 mb-3">
             <div class="w-12 h-12 bg-burgundy-50 rounded-lg flex items-center justify-center">
-              <svg class="w-6 h-6 text-burgundy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <svg
+                class="w-6 h-6 text-burgundy"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
               </svg>
             </div>
-            <h3 class="text-lg font-bold">Booking & Payments</h3>
+            <h3 class="text-lg font-bold">
+              Booking & Payments
+            </h3>
           </div>
-          <p class="text-sm text-gray-600">Learn about booking process and payments</p>
+          <p class="text-sm text-gray-600">
+            Learn about booking process and payments
+          </p>
         </div>
 
-        <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer" @click="activeCategory = 'photographer'">
+        <div
+          class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
+          @click="activeCategory = 'photographer'"
+        >
           <div class="flex items-center gap-3 mb-3">
             <div class="w-12 h-12 bg-burgundy-50 rounded-lg flex items-center justify-center">
-              <svg class="w-6 h-6 text-burgundy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              <svg
+                class="w-6 h-6 text-burgundy"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                />
               </svg>
             </div>
-            <h3 class="text-lg font-bold">For Photographers</h3>
+            <h3 class="text-lg font-bold">
+              For Photographers
+            </h3>
           </div>
-          <p class="text-sm text-gray-600">Information for photographers on the platform</p>
+          <p class="text-sm text-gray-600">
+            Information for photographers on the platform
+          </p>
         </div>
 
-        <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer" @click="activeCategory = 'account'">
+        <div
+          class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
+          @click="activeCategory = 'account'"
+        >
           <div class="flex items-center gap-3 mb-3">
             <div class="w-12 h-12 bg-burgundy-50 rounded-lg flex items-center justify-center">
-              <svg class="w-6 h-6 text-burgundy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              <svg
+                class="w-6 h-6 text-burgundy"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
               </svg>
             </div>
-            <h3 class="text-lg font-bold">Account & Profile</h3>
+            <h3 class="text-lg font-bold">
+              Account & Profile
+            </h3>
           </div>
-          <p class="text-sm text-gray-600">Manage your account and profile settings</p>
+          <p class="text-sm text-gray-600">
+            Manage your account and profile settings
+          </p>
         </div>
       </div>
 
       <!-- FAQ Accordion -->
       <div class="bg-white rounded-lg shadow-lg p-8">
-        <h2 class="text-2xl font-bold mb-6">Frequently Asked Questions</h2>
+        <h2 class="text-2xl font-bold mb-6">
+          Frequently Asked Questions
+        </h2>
 
         <div class="space-y-4">
           <!-- General FAQs -->
-          <div v-for="(faq, index) in filteredFAQs" :key="index" class="border-b pb-4">
+          <div
+            v-for="(faq, index) in filteredFAQs"
+            :key="index"
+            class="border-b pb-4"
+          >
             <button
-              @click="toggleFAQ(index)"
               class="w-full text-left flex justify-between items-center py-2 hover:text-burgundy transition-colors"
+              @click="toggleFAQ(index)"
             >
               <span class="font-medium">{{ faq.question }}</span>
               <svg
@@ -89,10 +195,18 @@
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </button>
-            <div v-show="openFAQ === index" class="mt-2 text-gray-600 text-sm">
+            <div
+              v-show="openFAQ === index"
+              class="mt-2 text-gray-600 text-sm"
+            >
               {{ faq.answer }}
             </div>
           </div>
@@ -101,8 +215,12 @@
 
       <!-- Still Need Help -->
       <div class="mt-8 bg-burgundy text-white rounded-lg shadow-lg p-8 text-center">
-        <h3 class="text-2xl font-bold mb-4">Still Need Help?</h3>
-        <p class="mb-6 opacity-90">Our support team is here to assist you with any questions or concerns.</p>
+        <h3 class="text-2xl font-bold mb-4">
+          Still Need Help?
+        </h3>
+        <p class="mb-6 opacity-90">
+          Our support team is here to assist you with any questions or concerns.
+        </p>
         <router-link
           to="/contact"
           class="inline-block bg-white text-burgundy px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors"

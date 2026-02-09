@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen">
     <!-- Admin Header with Back Button & Notifications -->
     <AdminHeader 
       title="📋 Booking Management" 
@@ -8,274 +8,453 @@
 
     <!-- Main Content -->
     <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      
       <!-- Quick Navigation -->
       <AdminQuickNav />
 
-      <!-- Export Button -->
-      <div class="flex justify-end">
-        <button @click="exportBookings" class="btn-export-main">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          Export Data
-        </button>
+      <section class="page-hero">
+        <div class="hero-copy">
+          <p class="hero-kicker">BOOKING FLOW</p>
+          <h1 class="hero-title">Bookings, revenue, and status in sync.</h1>
+          <p class="hero-subtitle">
+            Monitor confirmations, progress, and revenue without friction.
+          </p>
+          <div class="hero-actions">
+            <button
+              class="btn-admin-primary"
+              @click="exportBookings"
+            >
+              Export Data
+            </button>
+            <button
+              class="btn-admin-secondary"
+              @click="fetchBookings"
+            >
+              Refresh List
+            </button>
+          </div>
+        </div>
+        <div class="hero-status">
+          <div class="status-card">
+            <span class="status-label">Total Bookings</span>
+            <span class="status-value">{{ stats.total || 0 }}</span>
+          </div>
+          <div class="status-card">
+            <span class="status-label">Pending</span>
+            <span class="status-value">{{ stats.pending || 0 }}</span>
+          </div>
+          <div class="status-card">
+            <span class="status-label">Revenue</span>
+            <span class="status-value">৳{{ formatNumber(stats.revenue || 0) }}</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="page-topbar">
+        <div class="status-chip">
+          Confirmed: {{ stats.confirmed || 0 }}
+        </div>
       </div>
 
       <!-- Stats Grid -->
       <div class="stats-grid">
-      <div class="stat-card stat-blue">
-        <div class="stat-icon">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
+        <div class="stat-card stat-blue">
+          <div class="stat-icon">
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Total Bookings</span>
+            <span class="stat-value">{{ stats.total }}</span>
+          </div>
         </div>
-        <div class="stat-content">
-          <span class="stat-label">Total Bookings</span>
-          <span class="stat-value">{{ stats.total }}</span>
+
+        <div class="stat-card stat-yellow">
+          <div class="stat-icon">
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Pending</span>
+            <span class="stat-value">{{ stats.pending }}</span>
+          </div>
+        </div>
+
+        <div class="stat-card stat-green">
+          <div class="stat-icon">
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Confirmed</span>
+            <span class="stat-value">{{ stats.confirmed }}</span>
+          </div>
+        </div>
+
+        <div class="stat-card stat-purple">
+          <div class="stat-icon">
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Total Revenue</span>
+            <span class="stat-value">৳{{ formatNumber(stats.revenue) }}</span>
+          </div>
         </div>
       </div>
 
-      <div class="stat-card stat-yellow">
-        <div class="stat-icon">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <div class="stat-content">
-          <span class="stat-label">Pending</span>
-          <span class="stat-value">{{ stats.pending }}</span>
-        </div>
-      </div>
+      <!-- Filters & Search -->
+      <div class="content-card">
+        <div class="filters-bar">
+          <div class="search-box">
+            <svg
+              class="search-icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <input 
+              v-model="filters.search" 
+              type="text"
+              placeholder="Search by client or photographer name..." 
+              class="search-input" 
+              @input="debounceSearch"
+            >
+          </div>
 
-      <div class="stat-card stat-green">
-        <div class="stat-icon">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <div class="stat-content">
-          <span class="stat-label">Confirmed</span>
-          <span class="stat-value">{{ stats.confirmed }}</span>
-        </div>
-      </div>
+          <select
+            v-model="filters.status"
+            class="filter-select"
+            @change="fetchBookings"
+          >
+            <option value="">
+              All Status
+            </option>
+            <option value="pending">
+              Pending
+            </option>
+            <option value="confirmed">
+              Confirmed
+            </option>
+            <option value="in_progress">
+              In Progress
+            </option>
+            <option value="completed">
+              Completed
+            </option>
+            <option value="cancelled">
+              Cancelled
+            </option>
+          </select>
 
-      <div class="stat-card stat-purple">
-        <div class="stat-icon">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <div class="stat-content">
-          <span class="stat-label">Total Revenue</span>
-          <span class="stat-value">৳{{ formatNumber(stats.revenue) }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Filters & Search -->
-    <div class="content-card">
-      <div class="filters-bar">
-        <div class="search-box">
-          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input 
-            v-model="filters.search" 
-            @input="debounceSearch"
-            type="text" 
-            placeholder="Search by client or photographer name..." 
-            class="search-input"
-          />
+          <input
+            v-model="filters.date"
+            type="date"
+            class="filter-input"
+            @change="fetchBookings"
+          >
         </div>
 
-        <select v-model="filters.status" @change="fetchBookings" class="filter-select">
-          <option value="">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="confirmed">Confirmed</option>
-          <option value="in_progress">In Progress</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
+        <!-- Loading State -->
+        <div
+          v-if="loading"
+          class="loading-state"
+        >
+          <div class="spinner" />
+          <p>Loading bookings...</p>
+        </div>
 
-        <input v-model="filters.date" @change="fetchBookings" type="date" class="filter-input" />
-      </div>
-
-      <!-- Loading State -->
-      <div v-if="loading" class="loading-state">
-        <div class="spinner"></div>
-        <p>Loading bookings...</p>
-      </div>
-
-      <!-- Bookings Table -->
-      <div v-else-if="bookings.length > 0" class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Booking ID</th>
-              <th>Client</th>
-              <th>Photographer</th>
-              <th>Event Type</th>
-              <th>Event Date</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="booking in bookings" :key="booking.id" class="booking-row">
-              <td>
-                <span class="booking-id">#{{ booking.id }}</span>
-              </td>
-              <td>
-                <div class="user-cell">
-                  <div class="user-avatar">{{ booking.client?.name?.charAt(0).toUpperCase() || 'C' }}</div>
-                  <div>
-                    <div class="user-name">{{ booking.client?.name || 'N/A' }}</div>
-                    <div class="user-email">{{ booking.client?.email || 'N/A' }}</div>
+        <!-- Bookings Table -->
+        <div
+          v-else-if="bookings.length > 0"
+          class="table-container"
+        >
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Booking ID</th>
+                <th>Client</th>
+                <th>Photographer</th>
+                <th>Event Type</th>
+                <th>Event Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="booking in bookings"
+                :key="booking.id"
+                class="booking-row"
+              >
+                <td>
+                  <span class="booking-id">#{{ booking.id }}</span>
+                </td>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar">
+                      {{ booking.client?.name?.charAt(0).toUpperCase() || 'C' }}
+                    </div>
+                    <div>
+                      <div class="user-name">
+                        {{ booking.client?.name || 'N/A' }}
+                      </div>
+                      <div class="user-email">
+                        {{ booking.client?.email || 'N/A' }}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td>
-                <div class="user-cell">
-                  <div class="user-avatar photographer-avatar">{{ booking.photographer?.user?.name?.charAt(0).toUpperCase() || 'P' }}</div>
-                  <div>
-                    <div class="user-name">{{ booking.photographer?.user?.name || 'N/A' }}</div>
-                    <div class="user-email">{{ booking.photographer?.business_name || 'N/A' }}</div>
+                </td>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar photographer-avatar">
+                      {{ booking.photographer?.user?.name?.charAt(0).toUpperCase() || 'P' }}
+                    </div>
+                    <div>
+                      <div class="user-name">
+                        {{ booking.photographer?.user?.name || 'N/A' }}
+                      </div>
+                      <div class="user-email">
+                        {{ booking.photographer?.business_name || 'N/A' }}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td>
-                <span class="event-type">{{ booking.event_type || 'General' }}</span>
-              </td>
-              <td>
-                <span class="date-text">{{ formatDate(booking.event_date) }}</span>
-              </td>
-              <td>
-                <span class="amount-text">৳{{ formatNumber(booking.total_amount) }}</span>
-              </td>
-              <td>
-                <span :class="`badge badge-${getStatusColor(booking.status)}`">
-                  {{ capitalizeFirst(booking.status) }}
-                </span>
-              </td>
-              <td>
-                <div class="action-buttons">
-                  <button @click="viewBooking(booking)" class="btn-action" title="View Details">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Empty State -->
-      <div v-else class="empty-state">
-        <div class="empty-icon">📋</div>
-        <p class="empty-title">No bookings found</p>
-        <p class="empty-subtitle">Bookings will appear here as they are created</p>
-      </div>
-
-      <!-- Pagination -->
-      <div v-if="bookings.length > 0" class="pagination">
-        <div class="pagination-info">
-          Showing {{ bookings.length }} bookings
-        </div>
-      </div>
-    </div>
-
-    <!-- View Modal -->
-    <div v-if="showViewModal" class="modal-overlay" @click.self="showViewModal = false">
-      <div class="modal modal-large">
-        <div class="modal-header">
-          <h3>Booking Details #{{ selectedBooking?.id }}</h3>
-          <button @click="showViewModal = false" class="modal-close">×</button>
-        </div>
-        <div class="modal-body" v-if="selectedBooking">
-          <div class="detail-sections">
-            <div class="detail-section">
-              <h4>Client Information</h4>
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <span class="detail-label">Name:</span>
-                  <span class="detail-value">{{ selectedBooking.client?.name }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Email:</span>
-                  <span class="detail-value">{{ selectedBooking.client?.email }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Phone:</span>
-                  <span class="detail-value">{{ selectedBooking.client?.phone || 'N/A' }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="detail-section">
-              <h4>Photographer Information</h4>
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <span class="detail-label">Name:</span>
-                  <span class="detail-value">{{ selectedBooking.photographer?.user?.name }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Business:</span>
-                  <span class="detail-value">{{ selectedBooking.photographer?.business_name }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Email:</span>
-                  <span class="detail-value">{{ selectedBooking.photographer?.user?.email }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="detail-section">
-              <h4>Booking Details</h4>
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <span class="detail-label">Event Type:</span>
-                  <span class="detail-value">{{ selectedBooking.event_type }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Event Date:</span>
-                  <span class="detail-value">{{ formatDate(selectedBooking.event_date) }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Location:</span>
-                  <span class="detail-value">{{ selectedBooking.location || 'N/A' }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Total Amount:</span>
-                  <span class="detail-value">৳{{ formatNumber(selectedBooking.total_amount) }}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Status:</span>
-                  <span :class="`badge badge-${getStatusColor(selectedBooking.status)}`">
-                    {{ capitalizeFirst(selectedBooking.status) }}
+                </td>
+                <td>
+                  <span class="event-type">{{ booking.event_type || 'General' }}</span>
+                </td>
+                <td>
+                  <span class="date-text">{{ formatDate(booking.event_date) }}</span>
+                </td>
+                <td>
+                  <span class="amount-text">৳{{ formatNumber(booking.total_amount) }}</span>
+                </td>
+                <td>
+                  <span :class="`badge badge-${getStatusColor(booking.status)}`">
+                    {{ capitalizeFirst(booking.status) }}
                   </span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Created:</span>
-                  <span class="detail-value">{{ formatDate(selectedBooking.created_at) }}</span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button
+                      class="btn-action"
+                      title="View Details"
+                      @click="viewBooking(booking)"
+                    >
+                      <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State -->
+        <div
+          v-else
+          class="empty-state"
+        >
+          <div class="empty-icon">
+            📋
+          </div>
+          <p class="empty-title">
+            No bookings found
+          </p>
+          <p class="empty-subtitle">
+            Bookings will appear here as they are created
+          </p>
+        </div>
+
+        <!-- Pagination -->
+        <div
+          v-if="bookings.length > 0"
+          class="pagination"
+        >
+          <div class="pagination-info">
+            Showing {{ bookings.length }} bookings
+          </div>
+        </div>
+      </div>
+
+      <!-- View Modal -->
+      <div
+        v-if="showViewModal"
+        class="modal-overlay"
+        @click.self="showViewModal = false"
+      >
+        <div class="modal modal-large">
+          <div class="modal-header">
+            <h3>Booking Details #{{ selectedBooking?.id }}</h3>
+            <button
+              class="modal-close"
+              @click="showViewModal = false"
+            >
+              ×
+            </button>
+          </div>
+          <div
+            v-if="selectedBooking"
+            class="modal-body"
+          >
+            <div class="detail-sections">
+              <div class="detail-section">
+                <h4>Client Information</h4>
+                <div class="detail-grid">
+                  <div class="detail-item">
+                    <span class="detail-label">Name:</span>
+                    <span class="detail-value">{{ selectedBooking.client?.name }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">{{ selectedBooking.client?.email }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Phone:</span>
+                    <span class="detail-value">{{ selectedBooking.client?.phone || 'N/A' }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div v-if="selectedBooking.notes" class="detail-section">
-              <h4>Notes</h4>
-              <p class="detail-notes">{{ selectedBooking.notes }}</p>
+              <div class="detail-section">
+                <h4>Photographer Information</h4>
+                <div class="detail-grid">
+                  <div class="detail-item">
+                    <span class="detail-label">Name:</span>
+                    <span class="detail-value">{{ selectedBooking.photographer?.user?.name }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Business:</span>
+                    <span class="detail-value">{{ selectedBooking.photographer?.business_name }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">{{ selectedBooking.photographer?.user?.email }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detail-section">
+                <h4>Booking Details</h4>
+                <div class="detail-grid">
+                  <div class="detail-item">
+                    <span class="detail-label">Event Type:</span>
+                    <span class="detail-value">{{ selectedBooking.event_type }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Event Date:</span>
+                    <span class="detail-value">{{ formatDate(selectedBooking.event_date) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Location:</span>
+                    <span class="detail-value">{{ selectedBooking.location || 'N/A' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Total Amount:</span>
+                    <span class="detail-value">৳{{ formatNumber(selectedBooking.total_amount) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Status:</span>
+                    <span :class="`badge badge-${getStatusColor(selectedBooking.status)}`">
+                      {{ capitalizeFirst(selectedBooking.status) }}
+                    </span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Created:</span>
+                    <span class="detail-value">{{ formatDate(selectedBooking.created_at) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                v-if="selectedBooking.notes"
+                class="detail-section"
+              >
+                <h4>Notes</h4>
+                <p class="detail-notes">
+                  {{ selectedBooking.notes }}
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- Toast -->
-    <div v-if="showToast" class="toast">{{ toastMessage }}</div>
+      <!-- Toast -->
+      <div
+        v-if="showToast"
+        class="toast"
+      >
+        {{ toastMessage }}
+      </div>
     </div>
   </div>
 </template>
@@ -284,6 +463,7 @@
 import { ref, computed, onMounted } from 'vue'
 import AdminHeader from '../../../components/AdminHeader.vue'
 import AdminQuickNav from '../../../components/AdminQuickNav.vue'
+import api from '../../../api'
 
 const bookings = ref([])
 const loading = ref(false)
@@ -322,27 +502,19 @@ const debounceSearch = () => {
 const fetchBookings = async () => {
   loading.value = true
   try {
-    const token = localStorage.getItem('auth_token')
-    const params = new URLSearchParams()
-    
-    if (filters.value.search) params.append('search', filters.value.search)
-    if (filters.value.status) params.append('status', filters.value.status)
-    if (filters.value.date) params.append('event_date', filters.value.date)
-    
-    const response = await fetch(`/api/v1/admin/bookings?${params}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
+    const params = {}
+    if (filters.value.search) params.search = filters.value.search
+    if (filters.value.status) params.status = filters.value.status
+    if (filters.value.date) params.event_date = filters.value.date
+
+    const { data } = await api.get('/admin/bookings', { params })
+    if (data.status === 'success') {
+      bookings.value = data.data?.data || []
+      if (data.data?.stats) {
+        stats.value = data.data.stats
       }
-    })
-    
-    const data = await response.json()
-    if (response.ok) {
-      bookings.value = data.data || []
-      // Update stats from backend response
-      if (data.stats) {
-        stats.value = data.stats
-      }
+    } else {
+      showToastMessage(data.message || 'Error loading bookings')
     }
   } catch (error) {
     console.error('Error fetching bookings:', error)
@@ -404,6 +576,19 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.page-hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 1.5rem; padding: 1.75rem 2rem; border-radius: 1.5rem; border: 1px solid rgba(142, 14, 63, 0.2); background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(247, 239, 233, 0.82)), linear-gradient(90deg, rgba(142, 14, 63, 0.06), transparent 45%, rgba(109, 72, 56, 0.08)); box-shadow: 0 25px 55px rgba(24, 12, 8, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6); backdrop-filter: blur(6px); }
+.hero-copy { display: flex; flex-direction: column; gap: 0.85rem; }
+.hero-kicker { font-size: 0.7rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--admin-text-secondary); font-weight: 700; }
+.hero-title { font-size: 2rem; line-height: 1.1; color: var(--admin-text-primary); text-shadow: 0 2px 14px rgba(142, 14, 63, 0.18); }
+.hero-subtitle { color: var(--admin-text-secondary); max-width: 480px; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.hero-status { display: grid; gap: 0.8rem; }
+.status-card { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(142, 14, 63, 0.2); border-radius: 1rem; padding: 1rem 1.25rem; box-shadow: 0 16px 35px rgba(22, 12, 8, 0.08); display: flex; flex-direction: column; gap: 0.35rem; }
+.status-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--admin-text-secondary); }
+.status-value { font-size: 1.1rem; font-weight: 700; color: var(--admin-text-primary); }
+.page-topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1.25rem; background: rgba(255, 255, 255, 0.88); border: 1px solid rgba(140, 108, 95, 0.2); border-radius: 1.1rem; box-shadow: 0 18px 35px rgba(18, 9, 6, 0.08); backdrop-filter: blur(8px); }
+.status-chip { background: rgba(142, 14, 63, 0.12); color: var(--admin-text-primary); padding: 0.4rem 0.8rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+@media (max-width: 1024px) { .page-hero { grid-template-columns: 1fr; } }
 .admin-bookings { padding: 2rem; min-height: 100vh; background: var(--admin-bg-page); }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
 .page-title { font-size: 2rem; font-weight: 700; color: #1f2937; margin: 0; }

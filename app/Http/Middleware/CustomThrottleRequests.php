@@ -2,10 +2,9 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
-use Illuminate\Http\Request;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Routing\Middleware\ThrottleRequests;
-use Symfony\Component\HttpFoundation\Response;
+use App\Services\ThrottleEventLogger;
 
 class CustomThrottleRequests extends ThrottleRequests
 {
@@ -16,11 +15,20 @@ class CustomThrottleRequests extends ThrottleRequests
      * @param  string  $key
      * @param  int  $maxAttempts
      * @param  callable|null  $responseCallback
-     * @return \Symfony\Component\HttpFoundation\Response
+    * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function buildException($request, $key, $maxAttempts, $responseCallback = null)
     {
         $retryAfter = $this->getTimeUntilNextRetry($key);
+
+        try {
+            $logger = app(ThrottleEventLogger::class);
+            $logger->log($request, $retryAfter);
+        } catch (\Throwable $e) {
+            logger()->error('Throttle logging failed', [
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         $headers = $this->getHeaders(
             $maxAttempts,
@@ -28,10 +36,12 @@ class CustomThrottleRequests extends ThrottleRequests
             $retryAfter
         );
 
-        return response()->json([
+        $response = response()->json([
             'status' => 'error',
             'message' => 'Too many requests. Please slow down and try again later.',
             'retry_after' => $retryAfter . ' seconds',
         ], 429, $headers);
+
+        return new HttpResponseException($response);
     }
 }

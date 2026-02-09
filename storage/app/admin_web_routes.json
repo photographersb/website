@@ -1,0 +1,500 @@
+[
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin",
+        "name":  "admin.gate",
+        "action":  "App\\Http\\Controllers\\Admin\\AdminAccessController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/activity-logs",
+        "name":  "admin.activity-logs",
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/analytics",
+        "name":  "admin.analytics",
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/bookings",
+        "name":  "admin.booking.index",
+        "action":  "App\\Http\\Controllers\\Admin\\BookingController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/bookings/statistics/get",
+        "name":  "admin.booking.statistics",
+        "action":  "App\\Http\\Controllers\\Admin\\BookingController@statistics"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/bookings/{booking}",
+        "name":  "admin.booking.show",
+        "action":  "App\\Http\\Controllers\\Admin\\BookingController@show"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/bookings/{booking}/cancel",
+        "name":  "admin.booking.cancel",
+        "action":  "App\\Http\\Controllers\\Admin\\BookingController@cancel"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/bookings/{booking}/dispute",
+        "name":  "admin.booking.dispute",
+        "action":  "App\\Http\\Controllers\\Admin\\BookingController@dispute"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/certificates",
+        "name":  "admin.certificates.index",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/certificates",
+        "name":  "admin.certificates.store",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateController@store"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/certificates/auto-issue",
+        "name":  "admin.certificates.auto-issue",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateController@autoIssueForEvent"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/certificates/create",
+        "name":  "admin.certificates.create",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateController@create"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/certificates/templates",
+        "name":  "admin.certificates.templates.index",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateTemplateController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/certificates/templates",
+        "name":  "admin.certificates.templates.store",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateTemplateController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/certificates/templates/create",
+        "name":  "admin.certificates.templates.create",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateTemplateController@create"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/certificates/templates/{template}",
+        "name":  "admin.certificates.templates.show",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateTemplateController@show"
+    },
+    {
+        "method":  "PUT|PATCH",
+        "uri":  "admin/certificates/templates/{template}",
+        "name":  "admin.certificates.templates.update",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateTemplateController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "admin/certificates/templates/{template}",
+        "name":  "admin.certificates.templates.destroy",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateTemplateController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/certificates/templates/{template}/edit",
+        "name":  "admin.certificates.templates.edit",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateTemplateController@edit"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/certificates/{certificate}",
+        "name":  "admin.certificates.show",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateController@show"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/certificates/{certificate}/download",
+        "name":  "admin.certificates.download",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateController@download"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/certificates/{certificate}/generate",
+        "name":  "admin.certificates.generate",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateController@generate"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/certificates/{certificate}/reissue",
+        "name":  "admin.certificates.reissue",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateController@reissue"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/certificates/{certificate}/revoke",
+        "name":  "admin.certificates.revoke",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateController@revoke"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "admin/competitions/{competition}/share-frame-template",
+        "name":  "admin.competitions.share-frame-template.update",
+        "action":  "App\\Http\\Controllers\\Admin\\CompetitionShareFrameTemplateController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "admin/competitions/{competition}/share-frame-template",
+        "name":  "admin.competitions.share-frame-template.destroy",
+        "action":  "App\\Http\\Controllers\\Admin\\CompetitionShareFrameTemplateController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/competitions/{competition}/share-frame-template/edit",
+        "name":  "admin.competitions.share-frame-template.edit",
+        "action":  "App\\Http\\Controllers\\Admin\\CompetitionShareFrameTemplateController@edit"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/competitions/{competition}/share-frame-template/preview",
+        "name":  "admin.competitions.share-frame-template.preview",
+        "action":  "App\\Http\\Controllers\\Admin\\CompetitionShareFrameTemplateController@preview"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/dashboard",
+        "name":  "admin.dashboard",
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/dev",
+        "name":  "admin.dev.index",
+        "action":  "App\\Http\\Controllers\\Admin\\DevToolsController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/dev/assets-info",
+        "name":  "admin.dev.assets-info",
+        "action":  "App\\Http\\Controllers\\Admin\\DevToolsController@assetsInfo"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/dev/clear-cache",
+        "name":  "admin.dev.clear-cache",
+        "action":  "App\\Http\\Controllers\\Admin\\DevToolsController@clearCache"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/dev/clear-config-cache",
+        "name":  "admin.dev.clear-config-cache",
+        "action":  "App\\Http\\Controllers\\Admin\\DevToolsController@clearConfigCache"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/dev/clear-route-cache",
+        "name":  "admin.dev.clear-route-cache",
+        "action":  "App\\Http\\Controllers\\Admin\\DevToolsController@clearRouteCache"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/dev/clear-view-cache",
+        "name":  "admin.dev.clear-view-cache",
+        "action":  "App\\Http\\Controllers\\Admin\\DevToolsController@clearViewCache"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/error-center",
+        "name":  "admin.error-center",
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/events",
+        "name":  "admin.events.index",
+        "action":  "App\\Http\\Controllers\\Admin\\EventController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/events",
+        "name":  "admin.events.store",
+        "action":  "App\\Http\\Controllers\\Admin\\EventController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/events/create",
+        "name":  "admin.events.create",
+        "action":  "App\\Http\\Controllers\\Admin\\EventController@create"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/events/{event}",
+        "name":  "admin.events.show",
+        "action":  "App\\Http\\Controllers\\Admin\\EventController@show"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "admin/events/{event}",
+        "name":  "admin.events.update",
+        "action":  "App\\Http\\Controllers\\Admin\\EventController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "admin/events/{event}",
+        "name":  "admin.events.destroy",
+        "action":  "App\\Http\\Controllers\\Admin\\EventController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/events/{event}/attendance",
+        "name":  "admin.events.attendance.index",
+        "action":  "App\\Http\\Controllers\\Admin\\EventAttendanceController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/events/{event}/attendance/export",
+        "name":  "admin.events.attendance.export",
+        "action":  "App\\Http\\Controllers\\Admin\\EventAttendanceController@export"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/events/{event}/attendance/mobile",
+        "name":  "admin.events.attendance.mobile",
+        "action":  "App\\Http\\Controllers\\Admin\\EventAttendanceController@mobile"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/events/{event}/attendance/report",
+        "name":  "admin.events.attendance.report",
+        "action":  "App\\Http\\Controllers\\Admin\\EventAttendanceController@report"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/events/{event}/attendance/scan",
+        "name":  "admin.events.attendance.scan",
+        "action":  "App\\Http\\Controllers\\Admin\\EventAttendanceController@scan"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/events/{event}/certificates",
+        "name":  "admin.events.certificates",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateController@byEvent"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/events/{event}/certificates/regenerate-bulk",
+        "name":  "admin.events.certificates.regenerate-bulk",
+        "action":  "App\\Http\\Controllers\\Admin\\CertificateController@regenerateBulk"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/events/{event}/edit",
+        "name":  "admin.events.edit",
+        "action":  "App\\Http\\Controllers\\Admin\\EventController@edit"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/featured-photographers",
+        "name":  "admin.featured-photographers",
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/hashtags",
+        "name":  "admin.hashtags",
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/judges",
+        "name":  "admin.judges",
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/notifications",
+        "name":  "admin.notifications",
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/reviews",
+        "name":  "admin.reviews",
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/seo",
+        "name":  "admin.seo",
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/settings/site-links",
+        "name":  "admin.site-links.index",
+        "action":  "App\\Http\\Controllers\\Admin\\SiteLinkController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/settings/site-links",
+        "name":  "admin.site-links.store",
+        "action":  "App\\Http\\Controllers\\Admin\\SiteLinkController@store"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/settings/site-links/clear-cache",
+        "name":  "admin.site-links.clear-cache",
+        "action":  "App\\Http\\Controllers\\Admin\\SiteLinkController@clearCache"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/settings/site-links/create",
+        "name":  "admin.site-links.create",
+        "action":  "App\\Http\\Controllers\\Admin\\SiteLinkController@create"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/settings/site-links/preview",
+        "name":  "admin.site-links.preview",
+        "action":  "App\\Http\\Controllers\\Admin\\SiteLinkController@preview"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/settings/site-links/update-sort-orders",
+        "name":  "admin.site-links.update-sort-orders",
+        "action":  "App\\Http\\Controllers\\Admin\\SiteLinkController@updateSortOrders"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "admin/settings/site-links/{siteLink}",
+        "name":  "admin.site-links.update",
+        "action":  "App\\Http\\Controllers\\Admin\\SiteLinkController@update"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "admin/settings/site-links/{siteLink}",
+        "name":  "admin.site-links.destroy",
+        "action":  "App\\Http\\Controllers\\Admin\\SiteLinkController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/settings/site-links/{siteLink}/edit",
+        "name":  "admin.site-links.edit",
+        "action":  "App\\Http\\Controllers\\Admin\\SiteLinkController@edit"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/settings/site-links/{siteLink}/toggle-active",
+        "name":  "admin.site-links.toggle-active",
+        "action":  "App\\Http\\Controllers\\Admin\\SiteLinkController@toggleActive"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/share-frames",
+        "name":  "admin.share-frames",
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/sponsors",
+        "name":  "admin.sponsors",
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/system-health",
+        "name":  "admin.system-health",
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/system-health/sitemap",
+        "name":  "admin.sitemap.index",
+        "action":  "App\\Http\\Controllers\\Admin\\AdminSitemapController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/system-health/sitemap/checks",
+        "name":  "admin.sitemap.checks",
+        "action":  "App\\Http\\Controllers\\Admin\\AdminSitemapController@getChecks"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/system-health/sitemap/checks/{check}",
+        "name":  "admin.sitemap.show",
+        "action":  "App\\Http\\Controllers\\Admin\\AdminSitemapController@show"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "admin/system-health/sitemap/checks/{check}",
+        "name":  "admin.sitemap.destroy",
+        "action":  "App\\Http\\Controllers\\Admin\\AdminSitemapController@destroy"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/system-health/sitemap/checks/{check}/export",
+        "name":  "admin.sitemap.export",
+        "action":  "App\\Http\\Controllers\\Admin\\AdminSitemapController@export"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/system-health/sitemap/run-test",
+        "name":  "admin.sitemap.run-test",
+        "action":  "App\\Http\\Controllers\\Admin\\AdminSitemapController@runTest"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/transactions",
+        "name":  "admin.transactions",
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/verifications",
+        "name":  "admin.verifications.index",
+        "action":  "App\\Http\\Controllers\\Admin\\VerificationController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/verifications/statistics/get",
+        "name":  "admin.verifications.statistics",
+        "action":  "App\\Http\\Controllers\\Admin\\VerificationController@statistics"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/verifications/{verificationRequest}",
+        "name":  "admin.verifications.show",
+        "action":  "App\\Http\\Controllers\\Admin\\VerificationController@show"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/verifications/{verificationRequest}/approve",
+        "name":  "admin.verifications.approve",
+        "action":  "App\\Http\\Controllers\\Admin\\VerificationController@approve"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/verifications/{verificationRequest}/download/{type}",
+        "name":  "admin.verifications.download",
+        "action":  "App\\Http\\Controllers\\Admin\\VerificationController@downloadDocument"
+    },
+    {
+        "method":  "POST",
+        "uri":  "admin/verifications/{verificationRequest}/reject",
+        "name":  "admin.verifications.reject",
+        "action":  "App\\Http\\Controllers\\Admin\\VerificationController@reject"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "admin/{any}",
+        "name":  null,
+        "action":  "Closure"
+    }
+]

@@ -90,7 +90,7 @@ foreach ($criticalRequests as $requestName) {
     $content = file_get_contents($file);
     
     // Find the rules method
-    if (preg_match('/public function rules.*?\{(.*?)\n\s*\}/s', $content, $matches)) {
+    if (preg_match('#public function rules.*?\{(.*?)\n\s*\}#s', $content, $matches)) {
         $rulesContent = $matches[1];
         
         // Count validation rules

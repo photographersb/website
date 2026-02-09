@@ -19,13 +19,15 @@ class StoreCityRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->route('city')?->id;
+        $id = $this->route('id');
 
         return [
-            'name' => ['required', 'string', 'max:255', 'unique:cities,name,' . ($id ?? 'NULL')],
-            'slug' => ['required', 'string', 'max:255', 'unique:cities,slug,' . ($id ?? 'NULL')],
-            'division' => ['nullable', 'string', 'max:255'],
-            'state' => ['nullable', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', 'unique:locations,name,' . ($id ?? 'NULL')],
+            'slug' => ['required', 'string', 'max:255', 'unique:locations,slug,' . ($id ?? 'NULL')],
+            'type' => ['required', 'in:division,district,upazila'],
+            'parent_id' => ['nullable', 'exists:locations,id'],
+            'is_active' => ['nullable', 'boolean'],
+            'sort_order' => ['nullable', 'integer', 'min:0'],
         ];
     }
 
@@ -35,10 +37,12 @@ class StoreCityRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'City name is required',
-            'name.unique' => 'A city with this name already exists',
-            'slug.required' => 'City slug is required',
-            'slug.unique' => 'A city with this slug already exists',
+            'name.required' => 'Location name is required',
+            'name.unique' => 'A location with this name already exists',
+            'slug.required' => 'Location slug is required',
+            'slug.unique' => 'A location with this slug already exists',
+            'type.required' => 'Location type is required',
+            'type.in' => 'Location type must be division, district, or upazila',
         ];
     }
 }

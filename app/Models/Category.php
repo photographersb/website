@@ -18,6 +18,9 @@ class Category extends Model
         'booking_count',
         'display_order',
         'is_active',
+        'seo_title',
+        'seo_description',
+        'seo_keywords',
     ];
 
     protected $casts = [
@@ -32,5 +35,17 @@ class Category extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function getSeoTitleAttribute($value)
+    {
+        if ($value) return $value;
+        return "{$this->name} in Bangladesh | Photographer SB";
+    }
+
+    public function getSeoDescriptionAttribute($value)
+    {
+        if ($value) return $value;
+        return "Discover verified {$this->name} professionals in Bangladesh. View portfolios, packages, awards and contact instantly.";
     }
 }

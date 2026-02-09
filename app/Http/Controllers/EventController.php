@@ -46,7 +46,7 @@ class EventController extends Controller
             $alreadyRegistered = $userRegistration ? true : false;
         }
 
-        return view('events.show', [
+        return inertia('EventDetail', [
             'event' => $event,
             'registeredCount' => $registeredCount,
             'capacityFull' => $capacityFull,
@@ -144,7 +144,7 @@ class EventController extends Controller
 
         $registration->load(['event']);
 
-        return view('events.payment', [
+        return inertia('PaymentCheckout', [
             'registration' => $registration,
             'event' => $registration->event,
         ]);
@@ -162,12 +162,12 @@ class EventController extends Controller
 
         // For demo: redirect to confirmation
         // In production: verify with payment gateway
-        $provider = $request->input('provider', 'stripe');
+        $provider = $request->input('provider', 'sslcommerz');
         $paymentMethod = $request->input('payment_method');
 
         // Validate payment
         $validated = $request->validate([
-            'provider' => 'required|in:stripe,sslcommerz',
+            'provider' => 'required|in:sslcommerz',
             'payment_method' => 'nullable|in:bkash,nagad,rocket',
         ]);
 
@@ -203,7 +203,7 @@ class EventController extends Controller
             // For now, we'll use a placeholder
         }
 
-        return view('events.confirmation', [
+        return inertia('PaymentSuccess', [
             'registration' => $registration,
             'event' => $registration->event,
         ]);

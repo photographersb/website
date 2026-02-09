@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
-use App\Models\City;
+use App\Models\Location;
 use Illuminate\Http\Request;
 
 class EventListingController extends Controller
@@ -14,7 +14,8 @@ class EventListingController extends Controller
     public function index(Request $request)
     {
         $query = Event::where('status', 'published')
-            ->with(['city', 'mentors', 'registrations'])
+            ->with(['city', 'mentors'])
+            ->withCount('registrations')
             ->orderByDesc('created_at');
 
         // Search
@@ -42,14 +43,14 @@ class EventListingController extends Controller
             $now = now();
 
             if ($when === 'upcoming') {
-                $query->where('start_datetime', '>=', $now);
+                $query->where('event_date', '>=', $now);
             } elseif ($when === 'this_week') {
-                $query->whereBetween('start_datetime', [
+                $query->whereBetween('event_date', [
                     $now,
                     $now->copy()->endOfWeek()
                 ]);
             } elseif ($when === 'this_month') {
-                $query->whereBetween('start_datetime', [
+                $query->whereBetween('event_date', [
                     $now,
                     $now->copy()->endOfMonth()
                 ]);
@@ -79,7 +80,7 @@ class EventListingController extends Controller
         
         switch ($sort) {
             case 'soonest':
-                $query->orderBy('start_datetime', 'asc');
+                $query->orderBy('event_date', 'asc');
                 break;
             case 'price_low':
                 $query->orderBy('price', 'asc');
@@ -96,9 +97,12 @@ class EventListingController extends Controller
         $events = $query->paginate(12);
 
         // Get all cities for filter dropdown
-        $cities = City::orderBy('name')->get();
+        $cities = Location::where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
 
-        return view('events.index', [
+        return inertia('Events', [
             'events' => $events,
             'cities' => $cities,
         ]);
@@ -117,11 +121,11 @@ class EventListingController extends Controller
                 $status = $request->input('status');
                 if ($status === 'upcoming') {
                     $q->whereHas('event', function ($eq) {
-                        $eq->where('start_datetime', '>=', now());
+                        $eq->where('event_date', '>=', now());
                     });
                 } elseif ($status === 'past') {
                     $q->whereHas('event', function ($eq) {
-                        $eq->where('start_datetime', '<', now());
+                        $eq->where('event_date', '<', now());
                     });
                 } elseif ($status === 'attended') {
                     $q->whereHas('attendanceLogs');
@@ -130,7 +134,7 @@ class EventListingController extends Controller
             ->orderByDesc('registered_at')
             ->paginate(12);
 
-        return view('events.my-registrations', [
+        return inertia('MyEventRegistrations', [
             'registrations' => $registrations,
         ]);
     }
@@ -141,13 +145,14 @@ class EventListingController extends Controller
     public function featured()
     {
         $events = Event::where('status', 'published')
-            ->where('featured', true)
-            ->with(['city', 'registrations'])
+            ->where('is_featured', true)
+            ->with(['city'])
+            ->withCount('registrations')
             ->orderByDesc('created_at')
             ->limit(6)
             ->get();
 
-        return view('events.featured', [
+        return inertia('FeaturedEvents', [
             'events' => $events,
         ]);
     }

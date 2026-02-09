@@ -10,11 +10,14 @@ class CompetitionVote extends Model
     protected $fillable = [
         'submission_id',
         'voter_id',
+        'voter_user_id',
         'competition_id',
         'vote_value',
         'voted_at',
         'ip_address',
+        'ip',
         'device_fingerprint',
+        'user_agent',
         'is_verified',
         'is_valid',
     ];

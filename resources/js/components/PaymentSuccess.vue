@@ -5,17 +5,36 @@
       <div class="bg-white rounded-lg shadow-lg p-8 text-center">
         <!-- Success Icon -->
         <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          <svg
+            class="w-12 h-12 text-green-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
           </svg>
         </div>
 
-        <h1 class="text-3xl font-bold text-gray-900 mb-4">Payment Successful!</h1>
-        <p class="text-gray-600 mb-8">Thank you for your payment. Your booking has been confirmed.</p>
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">
+          Payment Successful!
+        </h1>
+        <p class="text-gray-600 mb-8">
+          Thank you for your payment. Your booking has been confirmed.
+        </p>
 
         <!-- Transaction Details -->
-        <div v-if="transaction" class="bg-gray-50 rounded-lg p-6 mb-8 text-left">
-          <h2 class="text-lg font-semibold mb-4">Transaction Details</h2>
+        <div
+          v-if="transaction"
+          class="bg-gray-50 rounded-lg p-6 mb-8 text-left"
+        >
+          <h2 class="text-lg font-semibold mb-4">
+            Transaction Details
+          </h2>
           
           <div class="space-y-3">
             <div class="flex justify-between">
@@ -24,7 +43,7 @@
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Amount Paid:</span>
-              <span class="font-medium">৳{{ Number(transaction.amount).toLocaleString() }}</span>
+              <span class="font-medium">৳{{ formatNumber(transaction.amount) }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Payment Method:</span>
@@ -43,8 +62,13 @@
           </div>
 
           <!-- Booking Info -->
-          <div v-if="transaction.booking" class="mt-6 pt-6 border-t">
-            <h3 class="font-semibold mb-3">Booking Information</h3>
+          <div
+            v-if="transaction.booking"
+            class="mt-6 pt-6 border-t"
+          >
+            <h3 class="font-semibold mb-3">
+              Booking Information
+            </h3>
             <div class="space-y-2">
               <div class="flex justify-between">
                 <span class="text-gray-600">Photographer:</span>
@@ -63,9 +87,14 @@
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="py-8">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-burgundy mx-auto"></div>
-          <p class="text-gray-600 mt-4">Loading transaction details...</p>
+        <div
+          v-if="loading"
+          class="py-8"
+        >
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-burgundy mx-auto" />
+          <p class="text-gray-600 mt-4">
+            Loading transaction details...
+          </p>
         </div>
 
         <!-- Action Buttons -->
@@ -87,12 +116,22 @@
         <!-- Receipt Download -->
         <button
           v-if="transaction"
-          @click="downloadReceipt"
           class="mt-4 text-burgundy hover:text-burgundy-dark transition-colors"
+          @click="downloadReceipt"
         >
           <span class="flex items-center gap-2 justify-center">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
             Download Receipt
           </span>
@@ -111,6 +150,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import api from '../api';
+import { formatDateTime, formatNumber } from '../utils/formatters';
 
 const route = useRoute();
 const transaction = ref(null);
@@ -144,13 +184,7 @@ const formatPaymentMethod = (method) => {
 };
 
 const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  return formatDateTime(date);
 };
 
 const downloadReceipt = () => {
@@ -161,7 +195,7 @@ PHOTOGRAPHER SB - PAYMENT RECEIPT
 
 Transaction ID: ${transaction.value.reference_id}
 Date: ${formatDate(transaction.value.created_at)}
-Amount: ৳${Number(transaction.value.amount).toLocaleString()}
+Amount: ৳${formatNumber(transaction.value.amount)}
 Payment Method: ${formatPaymentMethod(transaction.value.payment_method)}
 Status: ${transaction.value.status.toUpperCase()}
 

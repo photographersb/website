@@ -20,7 +20,7 @@ class UpdateEventRequest extends FormRequest
             'title' => 'sometimes|string|max:255',
             'description' => 'sometimes|string',
             'category_id' => 'sometimes|exists:categories,id',
-            'city_id' => 'sometimes|exists:cities,id',
+            'city_id' => 'sometimes|exists:locations,id',
             'venue' => 'sometimes|string|max:255',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',

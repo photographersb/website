@@ -18,7 +18,7 @@ class StoreEventRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'category_id' => 'required|exists:categories,id',
-            'city_id' => 'required|exists:cities,id',
+            'city_id' => 'required|exists:locations,id',
             'venue' => 'required|string|max:255',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',

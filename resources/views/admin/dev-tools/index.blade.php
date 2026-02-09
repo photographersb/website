@@ -205,10 +205,5 @@
         </div>
     </div>
 
-    <!-- Dev Badge -->
-    {!! \App\Support\DevInfo::renderDebugBadge() !!}
-    
-    <!-- Route Marker -->
-    {!! \App\Support\DevInfo::renderRouteMarker() !!}
 </body>
 </html>

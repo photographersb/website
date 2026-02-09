@@ -3,28 +3,50 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900">Settings Change Tracking</h1>
-        <p class="text-gray-600 mt-1">View and manage all platform configuration changes</p>
+        <h1 class="text-3xl font-bold text-gray-900">
+          Settings Change Tracking
+        </h1>
+        <p class="text-gray-600 mt-1">
+          View and manage all platform configuration changes
+        </p>
       </div>
     </div>
+
+    <AdminQuickNav />
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
       <div class="bg-white rounded-lg shadow p-6">
-        <p class="text-gray-600 text-sm mb-2">Total Changes</p>
-        <p class="text-3xl font-bold text-gray-900">{{ totalChanges }}</p>
+        <p class="text-gray-600 text-sm mb-2">
+          Total Changes
+        </p>
+        <p class="text-3xl font-bold text-gray-900">
+          {{ totalChanges }}
+        </p>
       </div>
       <div class="bg-white rounded-lg shadow p-6">
-        <p class="text-gray-600 text-sm mb-2">This Month</p>
-        <p class="text-3xl font-bold text-orange-600">{{ changesThisMonth }}</p>
+        <p class="text-gray-600 text-sm mb-2">
+          This Month
+        </p>
+        <p class="text-3xl font-bold text-orange-600">
+          {{ changesThisMonth }}
+        </p>
       </div>
       <div class="bg-white rounded-lg shadow p-6">
-        <p class="text-gray-600 text-sm mb-2">Unique Settings</p>
-        <p class="text-3xl font-bold text-blue-600">{{ uniqueSettings }}</p>
+        <p class="text-gray-600 text-sm mb-2">
+          Unique Settings
+        </p>
+        <p class="text-3xl font-bold text-blue-600">
+          {{ uniqueSettings }}
+        </p>
       </div>
       <div class="bg-white rounded-lg shadow p-6">
-        <p class="text-gray-600 text-sm mb-2">Active Admins</p>
-        <p class="text-3xl font-bold text-green-600">{{ activeAdmins }}</p>
+        <p class="text-gray-600 text-sm mb-2">
+          Active Admins
+        </p>
+        <p class="text-3xl font-bold text-green-600">
+          {{ activeAdmins }}
+        </p>
       </div>
     </div>
 
@@ -38,7 +60,7 @@
             type="text"
             placeholder="e.g., mail, cache, feature..."
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
-          />
+          >
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Admin User</label>
@@ -46,8 +68,14 @@
             v-model="adminFilter"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
           >
-            <option value="">All Admins</option>
-            <option v-for="admin in admins" :key="admin.id" :value="admin.id">
+            <option value="">
+              All Admins
+            </option>
+            <option
+              v-for="admin in admins"
+              :key="admin.id"
+              :value="admin.id"
+            >
               {{ admin.name }}
             </option>
           </select>
@@ -58,17 +86,27 @@
             v-model="dateRange"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
           >
-            <option value="all">All Time</option>
-            <option value="today">Today</option>
-            <option value="week">This Week</option>
-            <option value="month">This Month</option>
-            <option value="year">This Year</option>
+            <option value="all">
+              All Time
+            </option>
+            <option value="today">
+              Today
+            </option>
+            <option value="week">
+              This Week
+            </option>
+            <option value="month">
+              This Month
+            </option>
+            <option value="year">
+              This Year
+            </option>
           </select>
         </div>
         <div class="flex items-end">
           <button
-            @click="resetFilters"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm font-medium"
+            @click="resetFilters"
           >
             Reset Filters
           </button>
@@ -77,26 +115,53 @@
     </div>
 
     <!-- Changes Timeline -->
-    <div v-if="loading" class="bg-white rounded-lg shadow p-12 text-center">
-      <p class="text-gray-600">Loading changes...</p>
+    <div
+      v-if="loading"
+      class="bg-white rounded-lg shadow p-12 text-center"
+    >
+      <p class="text-gray-600">
+        Loading changes...
+      </p>
     </div>
 
-    <div v-else-if="filteredChanges.length === 0" class="bg-white rounded-lg shadow p-12 text-center">
-      <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+    <div
+      v-else-if="filteredChanges.length === 0"
+      class="bg-white rounded-lg shadow p-12 text-center"
+    >
+      <svg
+        class="w-16 h-16 text-gray-300 mx-auto mb-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+        />
       </svg>
-      <h3 class="text-lg font-semibold text-gray-900 mb-2">No Changes Found</h3>
-      <p class="text-gray-600">Try adjusting your filters to see settings changes</p>
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">
+        No Changes Found
+      </h3>
+      <p class="text-gray-600">
+        Try adjusting your filters to see settings changes
+      </p>
     </div>
 
-    <div v-else class="space-y-4">
+    <div
+      v-else
+      class="space-y-4"
+    >
       <div 
         v-for="(group, date) in groupedByDate"
         :key="date"
         class="space-y-3"
       >
         <!-- Date Header -->
-        <h3 class="text-sm font-semibold text-gray-900 px-4 pt-4">{{ formatDateGroup(date) }}</h3>
+        <h3 class="text-sm font-semibold text-gray-900 px-4 pt-4">
+          {{ formatDateGroup(date) }}
+        </h3>
 
         <!-- Changes for this date -->
         <div 
@@ -109,35 +174,50 @@
             <div class="flex items-start gap-6">
               <!-- Timeline Dot -->
               <div class="pt-1">
-                <div :class="[
-                  'w-3 h-3 rounded-full border-2',
-                  getChangeIcon(change.action).color
-                ]"></div>
+                <div
+                  :class="[
+                    'w-3 h-3 rounded-full border-2',
+                    getChangeIcon(change.action).color
+                  ]"
+                />
               </div>
 
               <!-- Change Details -->
               <div class="flex-1">
                 <div class="flex items-start justify-between mb-3">
                   <div>
-                    <h4 class="text-lg font-semibold text-gray-900">{{ change.setting_name }}</h4>
-                    <p class="text-sm text-gray-600 mt-1">{{ change.setting_description }}</p>
+                    <h4 class="text-lg font-semibold text-gray-900">
+                      {{ change.setting_name }}
+                    </h4>
+                    <p class="text-sm text-gray-600 mt-1">
+                      {{ change.setting_description }}
+                    </p>
                   </div>
-                  <span :class="[
-                    'px-3 py-1 rounded-full text-xs font-medium',
-                    getActionBadgeClass(change.action)
-                  ]">
+                  <span
+                    :class="[
+                      'px-3 py-1 rounded-full text-xs font-medium',
+                      getActionBadgeClass(change.action)
+                    ]"
+                  >
                     {{ formatAction(change.action) }}
                   </span>
                 </div>
 
                 <!-- Old vs New Values -->
-                <div v-if="change.old_value !== undefined" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div
+                  v-if="change.old_value !== undefined"
+                  class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
+                >
                   <div class="p-3 bg-red-50 rounded-lg border border-red-200">
-                    <p class="text-xs font-semibold text-red-900 mb-2 uppercase">Previous Value</p>
+                    <p class="text-xs font-semibold text-red-900 mb-2 uppercase">
+                      Previous Value
+                    </p>
                     <code class="text-sm text-red-800 break-all">{{ formatValue(change.old_value) }}</code>
                   </div>
                   <div class="p-3 bg-green-50 rounded-lg border border-green-200">
-                    <p class="text-xs font-semibold text-green-900 mb-2 uppercase">New Value</p>
+                    <p class="text-xs font-semibold text-green-900 mb-2 uppercase">
+                      New Value
+                    </p>
                     <code class="text-sm text-green-800 break-all">{{ formatValue(change.new_value) }}</code>
                   </div>
                 </div>
@@ -149,19 +229,29 @@
                       :src="change.admin_avatar || defaultAvatar"
                       :alt="change.admin_name"
                       class="w-6 h-6 rounded-full"
-                    />
+                    >
                     <span class="font-medium">{{ change.admin_name }}</span>
                   </div>
                   <span>📅 {{ formatTime(change.created_at) }}</span>
-                  <span v-if="change.ip_address" class="text-xs text-gray-500">
+                  <span
+                    v-if="change.ip_address"
+                    class="text-xs text-gray-500"
+                  >
                     IP: {{ maskIpAddress(change.ip_address) }}
                   </span>
                 </div>
 
                 <!-- Notes -->
-                <div v-if="change.reason" class="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <p class="text-xs font-semibold text-blue-900 mb-1">Reason/Notes:</p>
-                  <p class="text-sm text-blue-800">{{ change.reason }}</p>
+                <div
+                  v-if="change.reason"
+                  class="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200"
+                >
+                  <p class="text-xs font-semibold text-blue-900 mb-1">
+                    Reason/Notes:
+                  </p>
+                  <p class="text-sm text-blue-800">
+                    {{ change.reason }}
+                  </p>
                 </div>
               </div>
 
@@ -169,8 +259,8 @@
               <div class="flex items-center gap-2">
                 <button
                   v-if="canRollback(change)"
-                  @click="rollbackChange(change)"
                   class="px-3 py-1 text-orange-600 hover:bg-orange-50 rounded transition text-xs font-medium"
+                  @click="rollbackChange(change)"
                 >
                   Rollback
                 </button>
@@ -182,22 +272,25 @@
     </div>
 
     <!-- Pagination -->
-    <div v-if="totalPages > 1" class="flex items-center justify-between">
+    <div
+      v-if="totalPages > 1"
+      class="flex items-center justify-between"
+    >
       <p class="text-sm text-gray-600">
         Showing {{ (currentPage - 1) * perPage + 1 }} to {{ Math.min(currentPage * perPage, totalCount) }} of {{ totalCount }}
       </p>
       <div class="flex gap-2">
         <button
-          @click="previousPage"
           :disabled="currentPage === 1"
           class="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+          @click="previousPage"
         >
           Previous
         </button>
         <button
-          @click="nextPage"
           :disabled="currentPage === totalPages"
           class="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+          @click="nextPage"
         >
           Next
         </button>
@@ -220,6 +313,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import api from '../../../api';
+import AdminQuickNav from '../../../components/AdminQuickNav.vue';
+import { formatDate as formatDateValue, formatDateTime } from '../../../utils/formatters';
 
 const changes = ref([]);
 const admins = ref([]);
@@ -310,9 +405,12 @@ const groupedByDate = computed(() => {
 const loadChanges = async () => {
   loading.value = true;
   try {
-    const { data } = await api.get(
-      `/api/v1/admin/settings/changes?page=${currentPage.value}&per_page=${perPage.value}`
-    );
+    const { data } = await api.get('/admin/settings/changes', {
+      params: {
+        page: currentPage.value,
+        per_page: perPage.value
+      }
+    });
     if (data.status === 'success') {
       changes.value = data.data;
       totalCount.value = data.meta?.total || data.data.length;
@@ -324,7 +422,7 @@ const loadChanges = async () => {
 
   // Load admins list for filter
   try {
-    const { data } = await api.get('/api/v1/admin/users?role=admin&per_page=100');
+    const { data } = await api.get('/admin/users?role=admin&per_page=100');
     if (data.status === 'success') {
       admins.value = data.data;
     }
@@ -339,9 +437,7 @@ const rollbackChange = async (change) => {
   if (!confirm(`Rollback "${change.setting_name}" to previous value?`)) return;
 
   try {
-    const { data } = await api.post(
-      `/api/v1/admin/settings/${change.id}/rollback`
-    );
+    const { data } = await api.post(`/admin/settings/${change.id}/rollback`);
     if (data.status === 'success') {
       showToast('Setting rolled back successfully', 'success');
       loadChanges();
@@ -382,21 +478,11 @@ const showToast = (message, type) => {
 };
 
 const formatTime = (datetime) => {
-  return new Date(datetime).toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  return formatDateTime(datetime);
 };
 
 const formatDateGroup = (date) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+  return formatDateValue(date);
 };
 
 const formatAction = (action) => {

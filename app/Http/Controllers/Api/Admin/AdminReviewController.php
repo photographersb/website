@@ -34,8 +34,8 @@ class AdminReviewController extends Controller
                 'total' => $statsQuery->count(),
                 'pending' => (clone $statsQuery)->where('status', 'pending')->count(),
                 'published' => (clone $statsQuery)->where('status', 'published')->count(),
-                'rejected' => (clone $statsQuery)->where('status', 'rejected')->count(),
-                'reported' => (clone $statsQuery)->whereNotNull('flag_reason')->count(),
+                'rejected' => (clone $statsQuery)->where('status', 'hidden')->count(),
+                'reported' => (clone $statsQuery)->where('status', 'flagged')->count(),
                 'avg_rating' => round((clone $statsQuery)->where('status', 'published')->avg('rating') ?: 0, 2),
             ];
 
@@ -43,7 +43,13 @@ class AdminReviewController extends Controller
 
             // Apply filters
             if ($request->has('status')) {
-                $query->where('status', $request->status);
+                $status = $request->status;
+                if ($status === 'approved') {
+                    $status = 'published';
+                } elseif ($status === 'rejected') {
+                    $status = 'hidden';
+                }
+                $query->where('status', $status);
             }
 
             if ($request->has('rating')) {
@@ -93,8 +99,8 @@ class AdminReviewController extends Controller
                 'total' => Review::count(),
                 'pending' => Review::where('status', 'pending')->count(),
                 'published' => Review::where('status', 'published')->count(),
-                'rejected' => Review::where('status', 'rejected')->count(),
-                'reported' => Review::where('is_reported', true)->count(),
+                'rejected' => Review::where('status', 'hidden')->count(),
+                'reported' => Review::where('status', 'flagged')->count(),
                 'avg_rating' => round(Review::where('status', 'published')->avg('rating'), 2),
             ];
 
@@ -111,14 +117,21 @@ class AdminReviewController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $validated = $request->validate([
-            'status' => 'required|in:pending,published,rejected'
+            'status' => 'required|in:pending,published,flagged,hidden,approved,rejected'
         ]);
+
+        $status = $validated['status'];
+        if ($status === 'approved') {
+            $status = 'published';
+        } elseif ($status === 'rejected') {
+            $status = 'hidden';
+        }
 
         try {
             $review = Review::findOrFail($id);
-            $review->update(['status' => $validated['status']]);
+            $review->update(['status' => $status]);
 
-            Log::info("Review #{$id} status updated to {$validated['status']} by admin " . auth()->user()->id);
+            Log::info("Review #{$id} status updated to {$status} by admin " . auth()->user()->id);
 
             return $this->success($review->load(['user', 'photographer.user']), 'Review status updated successfully');
         } catch (\Exception $e) {
@@ -151,8 +164,12 @@ class AdminReviewController extends Controller
     public function markAsReported(Request $request, $id)
     {
         try {
+            $reason = $request->input('reason') ?? $request->input('flag_reason');
             $review = Review::findOrFail($id);
-            $review->update(['is_reported' => true]);
+            $review->update([
+                'status' => 'flagged',
+                'flag_reason' => $reason ?: $review->flag_reason,
+            ]);
 
             Log::info("Review #{$id} marked as reported by admin " . auth()->user()->id);
 
@@ -169,8 +186,8 @@ class AdminReviewController extends Controller
     public function bulkUpdateStatus(Request $request)
     {
         $validated = $request->validate([
-            'review_ids' => 'required|array',
-            'review_ids.*' => 'required|exists:reviews,id',
+            'review_ids' => 'required|array|min:1|max:100',
+            'review_ids.*' => 'required|integer|exists:reviews,id',
             'status' => 'required|in:pending,published,rejected'
         ]);
 

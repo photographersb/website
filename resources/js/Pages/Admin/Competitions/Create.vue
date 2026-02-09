@@ -9,13 +9,22 @@
       <AdminQuickNav />
 
       <!-- Authorization Error Alert -->
-      <div v-if="errors.auth" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div
+        v-if="errors.auth"
+        class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8"
+      >
         <div class="bg-red-50 border border-red-300 rounded-lg p-4">
           <div class="flex items-start gap-3">
-            <div class="text-red-600 text-lg font-bold">⚠️</div>
+            <div class="text-red-600 text-lg font-bold">
+              ⚠️
+            </div>
             <div>
-              <h3 class="text-red-900 font-semibold">Authorization Error</h3>
-              <p class="text-red-700 text-sm mt-1">{{ errors.auth }}</p>
+              <h3 class="text-red-900 font-semibold">
+                Authorization Error
+              </h3>
+              <p class="text-red-700 text-sm mt-1">
+                {{ errors.auth }}
+              </p>
             </div>
           </div>
         </div>
@@ -23,11 +32,15 @@
 
       <!-- Form -->
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <form @submit.prevent="submitForm" class="space-y-6">
-          
+        <form
+          class="space-y-6"
+          @submit.prevent="submitForm"
+        >
           <!-- Basic Information -->
           <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Basic Information</h2>
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+              Basic Information
+            </h2>
 
             <div class="space-y-4">
               <div>
@@ -38,8 +51,11 @@
                   placeholder="e.g., Spring Photography Contest 2026"
                   required
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                />
-                <span v-if="errors.title" class="text-red-600 text-sm">{{ errors.title }}</span>
+                >
+                <span
+                  v-if="errors.title"
+                  class="text-red-600 text-sm"
+                >{{ errors.title }}</span>
               </div>
 
               <div>
@@ -49,8 +65,11 @@
                   type="text"
                   placeholder="Auto-generated if left blank"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                />
-                <span v-if="errors.slug" class="text-red-600 text-sm">{{ errors.slug }}</span>
+                >
+                <span
+                  v-if="errors.slug"
+                  class="text-red-600 text-sm"
+                >{{ errors.slug }}</span>
               </div>
 
               <div>
@@ -61,8 +80,36 @@
                   placeholder="e.g., Nature & Wildlife"
                   required
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                />
-                <span v-if="errors.theme" class="text-red-600 text-sm">{{ errors.theme }}</span>
+                >
+                <span
+                  v-if="errors.theme"
+                  class="text-red-600 text-sm"
+                >{{ errors.theme }}</span>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Competition Mode *</label>
+                <select
+                  v-model="form.mode"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                  <option value="open">
+                    Open Contest
+                  </option>
+                  <option value="pro">
+                    Pro Awards
+                  </option>
+                  <option value="student">
+                    Student Challenge
+                  </option>
+                  <option value="district_battle">
+                    District Pride Battle
+                  </option>
+                </select>
+                <span
+                  v-if="errors.mode"
+                  class="text-red-600 text-sm"
+                >{{ errors.mode }}</span>
               </div>
 
               <div>
@@ -71,8 +118,14 @@
                   v-model="form.category_id"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
                 >
-                  <option value="">-- Select Category --</option>
-                  <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                  <option value="">
+                    -- Select Category --
+                  </option>
+                  <option
+                    v-for="cat in categories"
+                    :key="cat.id"
+                    :value="cat.id"
+                  >
                     {{ cat.name }}
                   </option>
                 </select>
@@ -85,7 +138,7 @@
                   placeholder="Tell photographers about this competition..."
                   rows="4"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                ></textarea>
+                />
               </div>
 
               <div>
@@ -95,8 +148,97 @@
                   type="url"
                   placeholder="https://..."
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                />
-                <span v-if="errors.hero_image" class="text-red-600 text-sm">{{ errors.hero_image }}</span>
+                >
+                <input
+                  type="file"
+                  accept="image/*"
+                  class="upload-input mt-2 block text-sm"
+                  @change="handleImageUpload('hero_image', $event)"
+                >
+                <div class="mt-2 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    class="rounded-full border border-burgundy px-4 py-1 text-xs font-semibold text-burgundy hover:bg-burgundy hover:text-white"
+                    @click="openPexelsPicker('hero_image', 1600, 900)"
+                  >
+                    Choose from Pexels
+                  </button>
+                </div>
+                <p class="mt-1 upload-hint">Max 5 MB. JPG/PNG. 1600x900 px.</p>
+                <p
+                  v-if="uploadingImages.hero_image"
+                  class="mt-1 text-xs text-gray-500"
+                >
+                  Uploading...
+                </p>
+                <p
+                  v-if="form.hero_image_credit_name"
+                  class="mt-1 text-xs text-gray-500"
+                >
+                  Pexels credit:
+                  <a
+                    :href="form.hero_image_credit_url || 'https://www.pexels.com'"
+                    target="_blank"
+                    rel="noopener"
+                    class="font-semibold text-burgundy underline"
+                  >
+                    {{ form.hero_image_credit_name }}
+                  </a>
+                </p>
+                <span
+                  v-if="errors.hero_image"
+                  class="text-red-600 text-sm"
+                >{{ errors.hero_image }}</span>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Cover Image URL</label>
+                <input
+                  v-model="form.cover_image"
+                  type="url"
+                  placeholder="https://..."
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                <input
+                  type="file"
+                  accept="image/*"
+                  class="upload-input mt-2 block text-sm"
+                  @change="handleImageUpload('cover_image', $event)"
+                >
+                <div class="mt-2 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    class="rounded-full border border-burgundy px-4 py-1 text-xs font-semibold text-burgundy hover:bg-burgundy hover:text-white"
+                    @click="openPexelsPicker('cover_image', 1200, 1200)"
+                  >
+                    Choose from Pexels
+                  </button>
+                </div>
+                <p class="mt-1 upload-hint">Max 5 MB. JPG/PNG. 1200x1200 px.</p>
+                <p
+                  v-if="uploadingImages.cover_image"
+                  class="mt-1 text-xs text-gray-500"
+                >
+                  Uploading...
+                </p>
+                <p
+                  v-if="form.cover_image_credit_name"
+                  class="mt-1 text-xs text-gray-500"
+                >
+                  Pexels credit:
+                  <a
+                    :href="form.cover_image_credit_url || 'https://www.pexels.com'"
+                    target="_blank"
+                    rel="noopener"
+                    class="font-semibold text-burgundy underline"
+                  >
+                    {{ form.cover_image_credit_name }}
+                  </a>
+                </p>
+                <span
+                  v-if="errors.cover_image"
+                  class="text-red-600 text-sm"
+                >{{ errors.cover_image }}</span>
               </div>
 
               <div>
@@ -106,73 +248,276 @@
                   type="url"
                   placeholder="https://..."
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                />
-                <span v-if="errors.banner_image" class="text-red-600 text-sm">{{ errors.banner_image }}</span>
+                >
+                <input
+                  type="file"
+                  accept="image/*"
+                  class="upload-input mt-2 block text-sm"
+                  @change="handleImageUpload('banner_image', $event)"
+                >
+                <div class="mt-2 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    class="rounded-full border border-burgundy px-4 py-1 text-xs font-semibold text-burgundy hover:bg-burgundy hover:text-white"
+                    @click="openPexelsPicker('banner_image', 1920, 600)"
+                  >
+                    Choose from Pexels
+                  </button>
+                </div>
+                <p class="mt-1 upload-hint">Max 5 MB. JPG/PNG. 1920x600 px.</p>
+                <p
+                  v-if="uploadingImages.banner_image"
+                  class="mt-1 text-xs text-gray-500"
+                >
+                  Uploading...
+                </p>
+                <p
+                  v-if="form.banner_image_credit_name"
+                  class="mt-1 text-xs text-gray-500"
+                >
+                  Pexels credit:
+                  <a
+                    :href="form.banner_image_credit_url || 'https://www.pexels.com'"
+                    target="_blank"
+                    rel="noopener"
+                    class="font-semibold text-burgundy underline"
+                  >
+                    {{ form.banner_image_credit_name }}
+                  </a>
+                </p>
+                <span
+                  v-if="errors.banner_image"
+                  class="text-red-600 text-sm"
+                >{{ errors.banner_image }}</span>
               </div>
             </div>
           </div>
 
           <!-- Timeline -->
           <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Timeline</h2>
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+              Competition Timeline
+            </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Submission Deadline *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Competition Start</label>
+                <input
+                  v-model="form.start_date"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="dd-mm-yyyy"
+                  pattern="\d{2}-\d{2}-\d{4}"
+                  class="js-date w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                <p
+                  v-if="errors.start_date"
+                  class="mt-1 text-sm text-red-600"
+                >
+                  {{ Array.isArray(errors.start_date) ? errors.start_date[0] : errors.start_date }}
+                </p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Submission Closes *</label>
                 <input
                   v-model="form.submission_deadline"
-                  type="datetime-local"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="dd-mm-yyyy hh:mm"
+                  pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
                   required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                />
+                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                <p
+                  v-if="errors.submission_deadline"
+                  class="mt-1 text-sm text-red-600"
+                >
+                  {{ Array.isArray(errors.submission_deadline) ? errors.submission_deadline[0] : errors.submission_deadline }}
+                </p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Voting Start *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Competition End</label>
+                <input
+                  v-model="form.end_date"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="dd-mm-yyyy"
+                  pattern="\d{2}-\d{2}-\d{4}"
+                  class="js-date w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                <p
+                  v-if="errors.end_date"
+                  class="mt-1 text-sm text-red-600"
+                >
+                  {{ Array.isArray(errors.end_date) ? errors.end_date[0] : errors.end_date }}
+                </p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Voting Opens *</label>
                 <input
                   v-model="form.voting_start_at"
-                  type="datetime-local"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="dd-mm-yyyy hh:mm"
+                  pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
                   required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                />
+                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                <p
+                  v-if="errors.voting_start_at"
+                  class="mt-1 text-sm text-red-600"
+                >
+                  {{ Array.isArray(errors.voting_start_at) ? errors.voting_start_at[0] : errors.voting_start_at }}
+                </p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Voting End *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Voting Closes *</label>
                 <input
                   v-model="form.voting_end_at"
-                  type="datetime-local"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="dd-mm-yyyy hh:mm"
+                  pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
                   required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                />
+                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                <p
+                  v-if="errors.voting_end_at"
+                  class="mt-1 text-sm text-red-600"
+                >
+                  {{ Array.isArray(errors.voting_end_at) ? errors.voting_end_at[0] : errors.voting_end_at }}
+                </p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Judging Start</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Public Voting Opens</label>
+                <input
+                  v-model="form.voting_start_date"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="dd-mm-yyyy hh:mm"
+                  pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
+                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                <p
+                  v-if="errors.voting_start_date"
+                  class="mt-1 text-sm text-red-600"
+                >
+                  {{ Array.isArray(errors.voting_start_date) ? errors.voting_start_date[0] : errors.voting_start_date }}
+                </p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Public Voting Closes</label>
+                <input
+                  v-model="form.voting_end_date"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="dd-mm-yyyy hh:mm"
+                  pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
+                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                <p
+                  v-if="errors.voting_end_date"
+                  class="mt-1 text-sm text-red-600"
+                >
+                  {{ Array.isArray(errors.voting_end_date) ? errors.voting_end_date[0] : errors.voting_end_date }}
+                </p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Judging Opens</label>
                 <input
                   v-model="form.judging_start_at"
-                  type="datetime-local"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                />
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="dd-mm-yyyy hh:mm"
+                  pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
+                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                <p
+                  v-if="errors.judging_start_at"
+                  class="mt-1 text-sm text-red-600"
+                >
+                  {{ Array.isArray(errors.judging_start_at) ? errors.judging_start_at[0] : errors.judging_start_at }}
+                </p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Judging End</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Judging Closes</label>
                 <input
                   v-model="form.judging_end_at"
-                  type="datetime-local"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                />
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="dd-mm-yyyy hh:mm"
+                  pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
+                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                <p
+                  v-if="errors.judging_end_at"
+                  class="mt-1 text-sm text-red-600"
+                >
+                  {{ Array.isArray(errors.judging_end_at) ? errors.judging_end_at[0] : errors.judging_end_at }}
+                </p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Judging Deadline</label>
+                <input
+                  v-model="form.judging_deadline"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="dd-mm-yyyy"
+                  pattern="\d{2}-\d{2}-\d{4}"
+                  class="js-date w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                <p
+                  v-if="errors.judging_deadline"
+                  class="mt-1 text-sm text-red-600"
+                >
+                  {{ Array.isArray(errors.judging_deadline) ? errors.judging_deadline[0] : errors.judging_deadline }}
+                </p>
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Results Announcement *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Results Announced *</label>
                 <input
                   v-model="form.results_announcement_date"
-                  type="datetime-local"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="dd-mm-yyyy hh:mm"
+                  pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
                   required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                />
+                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                <p
+                  v-if="errors.results_announcement_date"
+                  class="mt-1 text-sm text-red-600"
+                >
+                  {{ Array.isArray(errors.results_announcement_date) ? errors.results_announcement_date[0] : errors.results_announcement_date }}
+                </p>
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Public Announcement Date</label>
+                <input
+                  v-model="form.announcement_date"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="dd-mm-yyyy"
+                  pattern="\d{2}-\d{2}-\d{4}"
+                  class="js-date w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                <p
+                  v-if="errors.announcement_date"
+                  class="mt-1 text-sm text-red-600"
+                >
+                  {{ Array.isArray(errors.announcement_date) ? errors.announcement_date[0] : errors.announcement_date }}
+                </p>
               </div>
             </div>
           </div>
@@ -204,13 +549,13 @@
                           ? 'border-red-300 bg-red-50'
                           : 'border-gray-300 bg-white'
                       ]"
-                    />
+                    >
                     <button
                       v-if="cashPrizeTotal > 0"
                       type="button"
-                      @click="form.total_prize_pool = cashPrizeTotal"
                       title="Sum all cash prizes below and set total prize pool"
                       class="px-4 py-2 bg-burgundy text-white text-sm rounded-lg hover:bg-burgundy-dark transition-all font-medium whitespace-nowrap flex items-center gap-2"
+                      @click="form.total_prize_pool = cashPrizeTotal"
                     >
                       <span>⚡</span>
                       <span>Calculate</span>
@@ -220,7 +565,9 @@
 
                 <!-- Cash Total Info Card -->
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col justify-center">
-                  <div class="text-xs text-blue-600 font-medium mb-1">Cash Prizes Total</div>
+                  <div class="text-xs text-blue-600 font-medium mb-1">
+                    Cash Prizes Total
+                  </div>
                   <div class="text-2xl font-bold text-blue-900">
                     ৳ {{ formatCurrency(cashPrizeTotal) }}
                   </div>
@@ -228,20 +575,35 @@
               </div>
 
               <!-- Match Status Badge -->
-              <div v-if="form.total_prize_pool > 0 || errors.total_prize_pool" class="mb-3">
-                <div v-if="form.total_prize_pool === cashPrizeTotal" class="inline-flex items-center gap-2 px-3 py-2 bg-emerald-50 border border-emerald-300 rounded-lg">
+              <div
+                v-if="form.total_prize_pool > 0 || errors.total_prize_pool"
+                class="mb-3"
+              >
+                <div
+                  v-if="form.total_prize_pool === cashPrizeTotal"
+                  class="inline-flex items-center gap-2 px-3 py-2 bg-emerald-50 border border-emerald-300 rounded-lg"
+                >
                   <span class="text-emerald-700 text-sm font-medium">✅ Total matches cash prizes</span>
                 </div>
-                <div v-else-if="errors.total_prize_pool" class="inline-flex items-center gap-2 px-3 py-2 bg-red-50 border border-red-300 rounded-lg">
+                <div
+                  v-else-if="errors.total_prize_pool"
+                  class="inline-flex items-center gap-2 px-3 py-2 bg-red-50 border border-red-300 rounded-lg"
+                >
                   <span class="text-red-700 text-sm font-medium">⚠️ Mismatch - Check prizes</span>
                 </div>
               </div>
 
               <!-- Error Message -->
-              <p v-if="errors.total_prize_pool" class="mt-2 text-sm text-red-600 font-medium">
+              <p
+                v-if="errors.total_prize_pool"
+                class="mt-2 text-sm text-red-600 font-medium"
+              >
                 {{ errors.total_prize_pool }}
               </p>
-              <p v-else class="mt-2 text-xs text-gray-500">
+              <p
+                v-else
+                class="mt-2 text-xs text-gray-500"
+              >
                 Enter the total prize pool amount. Use Calculate to auto-fill from cash prizes below.
               </p>
             </div>
@@ -251,8 +613,8 @@
                 <label class="block text-sm font-medium text-gray-700">Prizes</label>
                 <button
                   type="button"
-                  @click="addPrize"
                   class="px-3 py-1 bg-burgundy text-white text-sm rounded-lg hover:bg-burgundy-dark transition-all font-medium"
+                  @click="addPrize"
                 >
                   + Add Prize
                 </button>
@@ -275,8 +637,8 @@
                     </div>
                     <button
                       type="button"
-                      @click="removePrize(index)"
                       class="text-sm text-red-600 hover:text-red-700"
+                      @click="removePrize(index)"
                     >
                       Remove
                     </button>
@@ -289,7 +651,13 @@
                         v-model="prize.rank"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent text-sm"
                       >
-                        <option v-for="rank in prizeRanks" :key="rank" :value="rank">{{ rank }}</option>
+                        <option
+                          v-for="rank in prizeRanks"
+                          :key="rank"
+                          :value="rank"
+                        >
+                          {{ rank }}
+                        </option>
                       </select>
                     </div>
                     <div>
@@ -298,7 +666,13 @@
                         v-model="prize.type"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent text-sm"
                       >
-                        <option v-for="type in prizeTypes" :key="type" :value="type">{{ type }}</option>
+                        <option
+                          v-for="type in prizeTypes"
+                          :key="type"
+                          :value="type"
+                        >
+                          {{ type }}
+                        </option>
                       </select>
                     </div>
                     <div class="md:col-span-2">
@@ -311,26 +685,37 @@
                         :disabled="prize.type !== 'Cash'"
                         placeholder="Cash amount"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent text-sm"
-                      />
+                      >
                     </div>
-                    <div class="md:col-span-2" v-if="prize.type !== 'Cash'">
+                    <div
+                      v-if="prize.type !== 'Cash'"
+                      class="md:col-span-2"
+                    >
                       <label class="block text-xs font-medium text-gray-600 mb-1">Description</label>
                       <input
                         v-model="prize.description"
                         type="text"
                         placeholder="e.g., Certificate, Gift Box, Trophy"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent text-sm"
-                      />
+                      >
                     </div>
                   </div>
                 </div>
 
-                <div v-if="form.prizes.length === 0" class="text-sm text-gray-500 text-center py-4 md:col-span-2">
+                <div
+                  v-if="form.prizes.length === 0"
+                  class="text-sm text-gray-500 text-center py-4 md:col-span-2"
+                >
                   No prizes added yet. Click "Add Prize" to create prize entries.
                 </div>
               </div>
 
-              <p v-if="errors.prizes" class="mt-2 text-sm text-red-600">{{ errors.prizes }}</p>
+              <p
+                v-if="errors.prizes"
+                class="mt-2 text-sm text-red-600"
+              >
+                {{ errors.prizes }}
+              </p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -342,7 +727,7 @@
                   min="1"
                   required
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                />
+                >
               </div>
 
               <div>
@@ -352,8 +737,59 @@
                   type="number"
                   min="1"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                />
+                >
               </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Entry Type</label>
+                <select
+                  v-model="form.entry_type"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+                  <option value="single">
+                    Single
+                  </option>
+                  <option value="series">
+                    Series
+                  </option>
+                  <option value="both">
+                    Both
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Series Min Images</label>
+                <input
+                  v-model.number="form.series_min_images"
+                  type="number"
+                  min="1"
+                  :disabled="form.entry_type === 'single'"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Series Max Images</label>
+                <input
+                  v-model.number="form.series_max_images"
+                  type="number"
+                  min="1"
+                  :disabled="form.entry_type === 'single'"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+              </div>
+            </div>
+
+            <div class="flex items-center mt-4">
+              <input
+                v-model="form.district_battle_enabled"
+                type="checkbox"
+                class="h-4 w-4 text-burgundy focus:ring-burgundy border-gray-300 rounded"
+              >
+              <label class="ml-2 block text-sm text-gray-900">
+                Enable District Pride Battle
+              </label>
             </div>
 
             <div class="mt-4">
@@ -361,9 +797,9 @@
                 <label class="block text-sm font-medium text-gray-700">Rules</label>
                 <button
                   type="button"
-                  @click="form.rules = defaultRules"
                   title="Fill with universal competition rules"
                   class="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition"
+                  @click="form.rules = defaultRules"
                 >
                   Use Default
                 </button>
@@ -373,8 +809,10 @@
                 placeholder="Enter competition rules..."
                 rows="5"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-              ></textarea>
-              <p class="mt-1 text-xs text-gray-500">Tip: Click "Use Default" to populate universal rules, then customize as needed.</p>
+              />
+              <p class="mt-1 text-xs text-gray-500">
+                Tip: Click "Use Default" to populate universal rules, then customize as needed.
+              </p>
             </div>
 
             <div class="mt-4">
@@ -382,9 +820,9 @@
                 <label class="block text-sm font-medium text-gray-700">Terms & Conditions</label>
                 <button
                   type="button"
-                  @click="form.terms_and_conditions = defaultTerms"
                   title="Fill with universal terms and conditions"
                   class="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition"
+                  @click="form.terms_and_conditions = defaultTerms"
                 >
                   Use Default
                 </button>
@@ -394,14 +832,18 @@
                 placeholder="Enter terms and conditions..."
                 rows="5"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-              ></textarea>
-              <p class="mt-1 text-xs text-gray-500">Tip: Click "Use Default" to populate standard terms, then customize as needed.</p>
+              />
+              <p class="mt-1 text-xs text-gray-500">
+                Tip: Click "Use Default" to populate standard terms, then customize as needed.
+              </p>
             </div>
           </div>
 
           <!-- Sponsors -->
           <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Sponsors</h2>
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+              Sponsors
+            </h2>
 
             <div class="mb-4">
               <input
@@ -409,11 +851,14 @@
                 type="text"
                 placeholder="Search sponsors..."
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-              />
+              >
             </div>
 
             <div class="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 space-y-3">
-              <div v-if="filteredSponsors.length === 0" class="text-gray-500 text-center py-8">
+              <div
+                v-if="filteredSponsors.length === 0"
+                class="text-gray-500 text-center py-8"
+              >
                 No sponsors available
               </div>
               <label
@@ -422,21 +867,25 @@
                 class="flex items-center p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
               >
                 <input
+                  v-model="form.sponsor_ids"
                   type="checkbox"
                   :value="sponsor.id"
-                  v-model="form.sponsor_ids"
                   class="h-4 w-4 rounded border-gray-300"
-                />
+                >
                 <span class="ml-3 font-medium">{{ sponsor.name }}</span>
               </label>
             </div>
 
-            <p class="mt-2 text-sm text-gray-600">Selected: {{ form.sponsor_ids.length }}</p>
+            <p class="mt-2 text-sm text-gray-600">
+              Selected: {{ form.sponsor_ids.length }}
+            </p>
           </div>
 
           <!-- Judges -->
           <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Judges</h2>
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+              Judges
+            </h2>
 
             <div class="mb-4">
               <input
@@ -444,11 +893,14 @@
                 type="text"
                 placeholder="Search judges..."
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-              />
+              >
             </div>
 
             <div class="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 space-y-3">
-              <div v-if="filteredJudges.length === 0" class="text-gray-500 text-center py-8">
+              <div
+                v-if="filteredJudges.length === 0"
+                class="text-gray-500 text-center py-8"
+              >
                 No judges available
               </div>
               <label
@@ -457,21 +909,55 @@
                 class="flex items-center p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
               >
                 <input
+                  v-model="form.judge_ids"
                   type="checkbox"
                   :value="judge.id"
-                  v-model="form.judge_ids"
                   class="h-4 w-4 rounded border-gray-300"
-                />
+                >
                 <span class="ml-3 font-medium">{{ judge.name }}</span>
               </label>
             </div>
 
-            <p class="mt-2 text-sm text-gray-600">Selected: {{ form.judge_ids.length }}</p>
+            <p class="mt-2 text-sm text-gray-600">
+              Selected: {{ form.judge_ids.length }}
+            </p>
+          </div>
+
+          <!-- Entry Fees & Payment -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+              Entry Fees & Payment
+            </h2>
+            <p class="text-sm text-gray-600 mb-4">
+              Set tiered entry fees (BDT) for different user types. Payments are manually verified (bKash/Nagad/Rocket/manual).
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div
+                v-for="(fee, index) in form.entry_fees"
+                :key="index"
+                class="border border-gray-200 rounded-lg p-4"
+              >
+                <div class="text-sm font-medium text-gray-700 mb-2">
+                  {{ formatUserType(fee.user_type) }}
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-gray-500">৳</span>
+                  <input
+                    v-model.number="fee.fee_amount"
+                    type="number"
+                    min="0"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  >
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Status -->
           <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Status</h2>
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+              Status
+            </h2>
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
@@ -479,12 +965,24 @@
                 v-model="form.status"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
               >
-                <option value="draft">Draft</option>
-                <option value="active">Active</option>
-                <option value="judging">Judging</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
-                <option value="archived">Archived</option>
+                <option value="draft">
+                  Draft
+                </option>
+                <option value="active">
+                  Active
+                </option>
+                <option value="judging">
+                  Judging
+                </option>
+                <option value="completed">
+                  Completed
+                </option>
+                <option value="cancelled">
+                  Cancelled
+                </option>
+                <option value="archived">
+                  Archived
+                </option>
               </select>
             </div>
 
@@ -494,7 +992,7 @@
                   v-model="form.is_featured"
                   type="checkbox"
                   class="h-4 w-4 rounded border-gray-300"
-                />
+                >
                 <span class="ml-2 text-sm font-medium text-gray-700">Featured Competition</span>
               </label>
             </div>
@@ -506,7 +1004,7 @@
                     v-model="form.is_paid_competition"
                     type="checkbox"
                     class="h-4 w-4 rounded border-gray-300"
-                  />
+                  >
                   <span class="ml-2 text-sm font-medium text-gray-700">Paid Competition</span>
                 </label>
               </div>
@@ -518,7 +1016,7 @@
                   min="0"
                   :disabled="!form.is_paid_competition"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                />
+                >
               </div>
             </div>
 
@@ -528,15 +1026,23 @@
                   v-model="form.allow_public_voting"
                   type="checkbox"
                   class="h-4 w-4 rounded border-gray-300"
-                />
+                >
                 <span class="ml-2 text-sm font-medium text-gray-700">Allow Public Voting</span>
+              </label>
+              <label class="flex items-center">
+                <input
+                  v-model="form.voting_enabled"
+                  type="checkbox"
+                  class="h-4 w-4 rounded border-gray-300"
+                >
+                <span class="ml-2 text-sm font-medium text-gray-700">Enable People’s Choice Voting</span>
               </label>
               <label class="flex items-center">
                 <input
                   v-model="form.allow_judge_scoring"
                   type="checkbox"
                   class="h-4 w-4 rounded border-gray-300"
-                />
+                >
                 <span class="ml-2 text-sm font-medium text-gray-700">Allow Judge Scoring</span>
               </label>
               <label class="flex items-center">
@@ -544,7 +1050,7 @@
                   v-model="form.allow_watermark"
                   type="checkbox"
                   class="h-4 w-4 rounded border-gray-300"
-                />
+                >
                 <span class="ml-2 text-sm font-medium text-gray-700">Allow Watermark</span>
               </label>
               <label class="flex items-center">
@@ -552,7 +1058,7 @@
                   v-model="form.require_watermark"
                   type="checkbox"
                   class="h-4 w-4 rounded border-gray-300"
-                />
+                >
                 <span class="ml-2 text-sm font-medium text-gray-700">Require Watermark</span>
               </label>
               <label class="flex items-center">
@@ -560,10 +1066,44 @@
                   v-model="form.is_public"
                   type="checkbox"
                   class="h-4 w-4 rounded border-gray-300"
-                />
+                >
                 <span class="ml-2 text-sm font-medium text-gray-700">Public Competition</span>
               </label>
             </div>
+
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Public Vote Weight (%)</label>
+                <input
+                  v-model.number="form.vote_weight_percent"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="1"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Judge Score Weight (%)</label>
+                <input
+                  v-model.number="form.judge_weight_percent"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="1"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                >
+              </div>
+            </div>
+            <div class="mt-2 text-sm text-gray-600">
+              Total: {{ Number(form.vote_weight_percent || 0) + Number(form.judge_weight_percent || 0) }}%
+            </div>
+            <p
+              v-if="errors.vote_weight"
+              class="mt-1 text-sm text-red-600"
+            >
+              {{ errors.vote_weight }}
+            </p>
           </div>
 
           <!-- Buttons -->
@@ -585,23 +1125,49 @@
         </form>
       </div>
     </div>
+
+    <PexelsPickerModal
+      :visible="pexelsPickerOpen"
+      :target-width="pexelsTarget.width"
+      :target-height="pexelsTarget.height"
+      @close="closePexelsPicker"
+      @select="handlePexelsSelect"
+    />
   </div>
 </template>
 
 <script>
 import AdminHeader from '../../../components/AdminHeader.vue'
 import AdminQuickNav from '../../../components/AdminQuickNav.vue'
+import PexelsPickerModal from '../../../components/PexelsPickerModal.vue'
+import flatpickr from 'flatpickr'
+import 'flatpickr/dist/flatpickr.min.css'
+import { formatNumber } from '../../../utils/formatters'
+import { validateUploadFile } from '../../../utils/imageValidation'
+import api from '../../../api'
 
 export default {
   components: {
     AdminHeader,
-    AdminQuickNav
+    AdminQuickNav,
+    PexelsPickerModal
   },
 
   data() {
     return {
       loading: false,
       errors: {},
+      uploadingImages: {
+        hero_image: false,
+        cover_image: false,
+        banner_image: false,
+      },
+      pexelsPickerOpen: false,
+      pexelsTarget: {
+        field: 'hero_image',
+        width: 1600,
+        height: 900,
+      },
       categories: [],
       judges: [],
       sponsors: [],
@@ -612,18 +1178,35 @@ export default {
         slug: '',
         theme: '',
         description: '',
+        mode: 'open',
         category_id: '',
+        start_date: '',
         submission_deadline: '',
+        end_date: '',
         voting_start_at: '',
         voting_end_at: '',
+        voting_start_date: '',
+        voting_end_date: '',
         judging_start_at: '',
         judging_end_at: '',
+        judging_deadline: '',
         results_announcement_date: '',
+        announcement_date: '',
         hero_image: '',
+        hero_image_credit_name: '',
+        hero_image_credit_url: '',
         banner_image: '',
+        banner_image_credit_name: '',
+        banner_image_credit_url: '',
+        cover_image: '',
+        cover_image_credit_name: '',
+        cover_image_credit_url: '',
         total_prize_pool: 2,
         number_of_winners: 1,
         max_submissions_per_user: 3,
+        entry_type: 'single',
+        series_min_images: 5,
+        series_max_images: 10,
         prizes: [{ rank: '1st', type: 'Cash', amount: 2, description: '' }],
         rules: '',
         terms_and_conditions: '',
@@ -633,12 +1216,24 @@ export default {
         is_paid_competition: false,
         participation_fee: 0,
         allow_public_voting: true,
+        voting_enabled: false,
         allow_judge_scoring: true,
+        vote_weight_percent: 40,
+        judge_weight_percent: 60,
         allow_watermark: false,
         require_watermark: false,
+        district_battle_enabled: false,
         sponsor_ids: [],
+        sponsors: [],
+        entry_fees: [
+          { user_type: 'guest', fee_amount: 0 },
+          { user_type: 'registered', fee_amount: 0 },
+          { user_type: 'verified', fee_amount: 0 },
+          { user_type: 'student', fee_amount: 0 }
+        ],
         judge_ids: []
       },
+        pickerInstances: [],
       prizeRanks: ['1st', '2nd', '3rd', '4th', '5th', '6th', 'Grand Prize', 'Honorable Mention'],
       prizeTypes: ['Cash', 'Certificate', 'Gift Box', 'Trophy', 'Other'],
       defaultRules: `1. Eligibility
@@ -726,18 +1321,17 @@ By participating in this competition, you agree to comply with all rules, regula
 For questions or concerns regarding the competition, please contact our support team at support@photographersb.com`
     }
   },
-
   computed: {
     filteredSponsors() {
       if (!this.sponsorSearch) return this.sponsors;
       return this.sponsors.filter(s =>
-        s.name.toLowerCase().includes(this.sponsorSearch.toLowerCase())
+        (s.name || '').toLowerCase().includes(this.sponsorSearch.toLowerCase())
       );
     },
     filteredJudges() {
       if (!this.judgeSearch) return this.judges;
       return this.judges.filter(j =>
-        j.name.toLowerCase().includes(this.judgeSearch.toLowerCase())
+        (j.name || '').toLowerCase().includes(this.judgeSearch.toLowerCase())
       );
     },
     cashPrizeTotal() {
@@ -747,17 +1341,72 @@ For questions or concerns regarding the competition, please contact our support 
     }
   },
 
+  watch: {
+    'form.sponsor_ids': {
+      handler() {
+        this.syncSponsorRows();
+      },
+      deep: true
+    }
+  },
   mounted() {
+    this.initializePickers();
     this.loadCategories();
     this.loadSponsors();
     this.loadJudges();
   },
+  beforeUnmount() {
+    this.destroyPickers();
+  },
 
   methods: {
+    initializePickers() {
+      this.destroyPickers();
+      const root = this.$el;
+      const dateInputs = root.querySelectorAll('.js-date');
+      const dateTimeInputs = root.querySelectorAll('.js-datetime');
+
+      dateInputs.forEach((input) => {
+        const instance = flatpickr(input, {
+          dateFormat: 'd-m-Y',
+          allowInput: true,
+          onChange: () => input.dispatchEvent(new Event('input'))
+        });
+        this.pickerInstances.push(instance);
+      });
+
+      dateTimeInputs.forEach((input) => {
+        const instance = flatpickr(input, {
+          dateFormat: 'd-m-Y H:i',
+          enableTime: true,
+          time_24hr: true,
+          allowInput: true,
+          onChange: () => input.dispatchEvent(new Event('input'))
+        });
+        this.pickerInstances.push(instance);
+      });
+    },
+    destroyPickers() {
+      this.pickerInstances.forEach((instance) => instance.destroy());
+      this.pickerInstances = [];
+    },
+    syncSponsorRows() {
+      const rows = Array.isArray(this.form.sponsors) ? [...this.form.sponsors] : [];
+      const byId = new Map(rows.map(row => [row.sponsor_id, row]));
+      const next = this.form.sponsor_ids.map((id, index) => {
+        const existing = byId.get(id);
+        return {
+          sponsor_id: id,
+          tier: existing?.tier || 'bronze',
+          sort_order: existing?.sort_order ?? index,
+          sponsored_amount: existing?.sponsored_amount ?? null
+        };
+      });
+      this.form.sponsors = next;
+    },
     async loadCategories() {
       try {
-        const res = await fetch('/api/v1/categories');
-        const data = await res.json();
+        const { data } = await api.get('/categories');
         if (data.data) {
           this.categories = data.data;
         }
@@ -768,14 +1417,7 @@ For questions or concerns regarding the competition, please contact our support 
 
     async loadSponsors() {
       try {
-        const token = localStorage.getItem('auth_token');
-        const res = await fetch('/api/v1/admin/platform-sponsors', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json'
-          }
-        });
-        const data = await res.json();
+        const { data } = await api.get('/admin/platform-sponsors');
         if (data.data) {
           this.sponsors = data.data.filter(s => s.status === 'active');
         }
@@ -786,19 +1428,129 @@ For questions or concerns regarding the competition, please contact our support 
 
     async loadJudges() {
       try {
-        const token = localStorage.getItem('auth_token');
-        const res = await fetch('/api/v1/judges', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json'
+        const { data } = await api.get('/admin/judges', {
+          params: {
+            status: 'active',
+            per_page: 200
           }
         });
-        const data = await res.json();
-        if (data.data) {
-          this.judges = data.data;
-        }
+        const payload = data.data?.data || data.data || [];
+        this.judges = payload;
       } catch (error) {
         console.error('Error loading judges:', error);
+      }
+    },
+
+    async handleImageUpload(field, event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      if (field === 'hero_image') {
+        this.form.hero_image_credit_name = '';
+        this.form.hero_image_credit_url = '';
+      }
+      if (field === 'banner_image') {
+        this.form.banner_image_credit_name = '';
+        this.form.banner_image_credit_url = '';
+      }
+      if (field === 'cover_image') {
+        this.form.cover_image_credit_name = '';
+        this.form.cover_image_credit_url = '';
+      }
+
+      const rules = {
+        hero_image: { width: 1600, height: 900 },
+        cover_image: { width: 1200, height: 1200 },
+        banner_image: { width: 1920, height: 600 }
+      };
+      const rule = rules[field] || {};
+      const validation = await validateUploadFile(file, {
+        label: 'Image',
+        maxBytes: 5 * 1024 * 1024,
+        allowedTypes: ['image/jpeg', 'image/png'],
+        imageWidth: rule.width,
+        imageHeight: rule.height
+      });
+
+      if (!validation.ok) {
+        this.errors[field] = validation.message;
+        event.target.value = '';
+        return;
+      }
+
+      this.uploadingImages[field] = true;
+      this.errors[field] = '';
+
+      try {
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('folder', 'competitions');
+
+        const response = await api.post('/admin/media/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        if (response.data?.status === 'success' && response.data.data?.url) {
+          this.form[field] = response.data.data.url;
+        } else {
+          this.errors[field] = response.data?.message || 'Image upload failed.';
+        }
+      } catch (error) {
+        this.errors[field] = error.response?.data?.message || 'Image upload failed.';
+      } finally {
+        this.uploadingImages[field] = false;
+        event.target.value = '';
+      }
+    },
+
+    openPexelsPicker(field, width, height) {
+      this.pexelsTarget = { field, width, height };
+      this.pexelsPickerOpen = true;
+    },
+
+    closePexelsPicker() {
+      this.pexelsPickerOpen = false;
+    },
+
+    applyPexelsCredit(field, credit) {
+      if (field === 'hero_image') {
+        this.form.hero_image_credit_name = credit?.name || '';
+        this.form.hero_image_credit_url = credit?.url || '';
+      }
+      if (field === 'banner_image') {
+        this.form.banner_image_credit_name = credit?.name || '';
+        this.form.banner_image_credit_url = credit?.url || '';
+      }
+      if (field === 'cover_image') {
+        this.form.cover_image_credit_name = credit?.name || '';
+        this.form.cover_image_credit_url = credit?.url || '';
+      }
+    },
+
+    async handlePexelsSelect({ file, credit }) {
+      const field = this.pexelsTarget.field;
+      this.uploadingImages[field] = true;
+      this.errors[field] = '';
+      try {
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('folder', 'competitions');
+
+        const response = await api.post('/admin/media/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        if (response.data?.status === 'success' && response.data.data?.url) {
+          this.form[field] = response.data.data.url;
+          this.applyPexelsCredit(field, credit);
+        } else {
+          this.errors[field] = response.data?.message || 'Image upload failed.';
+        }
+      } catch (error) {
+        this.errors[field] = error.response?.data?.message || 'Image upload failed.';
+      } finally {
+        this.uploadingImages[field] = false;
+        this.closePexelsPicker();
       }
     },
 
@@ -807,8 +1559,6 @@ For questions or concerns regarding the competition, please contact our support 
       this.errors = {};
 
       try {
-        const token = localStorage.getItem('auth_token');
-
         const invalidCashPrize = this.form.prizes.some(
           prize => prize.type === 'Cash' && Number(prize.amount) <= 1
         );
@@ -831,29 +1581,106 @@ For questions or concerns regarding the competition, please contact our support 
           throw new Error(this.errors.total_prize_pool);
         }
 
+        this.syncSponsorRows();
+
+        const startDate = this.parseDateInput(this.form.start_date);
+        const endDate = this.parseDateInput(this.form.end_date);
+        const judgingDeadline = this.parseDateInput(this.form.judging_deadline);
+        const announcementDate = this.parseDateInput(this.form.announcement_date);
+        const submissionDeadline = this.parseDateTimeInput(this.form.submission_deadline);
+        const votingStartAt = this.parseDateTimeInput(this.form.voting_start_at);
+        const votingEndAt = this.parseDateTimeInput(this.form.voting_end_at);
+        const votingStartDate = this.parseDateTimeInput(this.form.voting_start_date);
+        const votingEndDate = this.parseDateTimeInput(this.form.voting_end_date);
+        const judgingStartAt = this.parseDateTimeInput(this.form.judging_start_at);
+        const judgingEndAt = this.parseDateTimeInput(this.form.judging_end_at);
+        const resultsAnnouncementDate = this.parseDateTimeInput(this.form.results_announcement_date);
+
+        if (!submissionDeadline) {
+          this.errors.submission_deadline = 'Use DD-MM-YYYY HH:mm format.';
+        }
+        if (!votingStartAt) {
+          this.errors.voting_start_at = 'Use DD-MM-YYYY HH:mm format.';
+        }
+        if (!votingEndAt) {
+          this.errors.voting_end_at = 'Use DD-MM-YYYY HH:mm format.';
+        }
+        if (!resultsAnnouncementDate) {
+          this.errors.results_announcement_date = 'Use DD-MM-YYYY HH:mm format.';
+        }
+        if (this.form.start_date && !startDate) {
+          this.errors.start_date = 'Use DD-MM-YYYY format.';
+        }
+        if (this.form.end_date && !endDate) {
+          this.errors.end_date = 'Use DD-MM-YYYY format.';
+        }
+        if (this.form.judging_deadline && !judgingDeadline) {
+          this.errors.judging_deadline = 'Use DD-MM-YYYY format.';
+        }
+        if (this.form.announcement_date && !announcementDate) {
+          this.errors.announcement_date = 'Use DD-MM-YYYY format.';
+        }
+        if (this.form.voting_start_date && !votingStartDate) {
+          this.errors.voting_start_date = 'Use DD-MM-YYYY HH:mm format.';
+        }
+        if (this.form.voting_end_date && !votingEndDate) {
+          this.errors.voting_end_date = 'Use DD-MM-YYYY HH:mm format.';
+        }
+        if (this.form.judging_start_at && !judgingStartAt) {
+          this.errors.judging_start_at = 'Use DD-MM-YYYY HH:mm format.';
+        }
+        if (this.form.judging_end_at && !judgingEndAt) {
+          this.errors.judging_end_at = 'Use DD-MM-YYYY HH:mm format.';
+        }
+
+        if (Object.keys(this.errors).length > 0) {
+          throw new Error('Please fix the timeline dates.');
+        }
+
+        const voteWeightTotal = Number(this.form.vote_weight_percent || 0) + Number(this.form.judge_weight_percent || 0);
+        if (this.form.status !== 'draft' && Math.abs(voteWeightTotal - 100) > 0.5) {
+          this.errors.vote_weight = 'Public vote and judge score must total 100%.';
+          throw new Error(this.errors.vote_weight);
+        }
+
         const payload = {
           title: this.form.title,
           slug: this.form.slug || null,
           theme: this.form.theme,
           description: this.form.description,
+          mode: this.form.mode,
           category_id: this.form.category_id || null,
-          submission_deadline: this.form.submission_deadline + ':00',
-          voting_start_at: this.form.voting_start_at + ':00',
-          voting_end_at: this.form.voting_end_at + ':00',
-          judging_start_at: this.form.judging_start_at ? this.form.judging_start_at + ':00' : null,
-          judging_end_at: this.form.judging_end_at ? this.form.judging_end_at + ':00' : null,
-          results_announcement_date: this.form.results_announcement_date + ':00',
+          start_date: startDate || null,
+          submission_deadline: submissionDeadline + ':00',
+          end_date: endDate || null,
+          voting_start_at: votingStartAt + ':00',
+          voting_end_at: votingEndAt + ':00',
+          voting_start_date: votingStartDate ? votingStartDate + ':00' : null,
+          voting_end_date: votingEndDate ? votingEndDate + ':00' : null,
+          judging_start_at: judgingStartAt ? judgingStartAt + ':00' : null,
+          judging_end_at: judgingEndAt ? judgingEndAt + ':00' : null,
+          judging_deadline: judgingDeadline || null,
+          results_announcement_date: resultsAnnouncementDate + ':00',
+          announcement_date: announcementDate || null,
           hero_image: this.form.hero_image || null,
           banner_image: this.form.banner_image || null,
+          cover_image: this.form.cover_image || null,
           total_prize_pool: this.form.total_prize_pool,
           number_of_winners: this.form.number_of_winners,
           participation_fee: this.form.is_paid_competition ? this.form.participation_fee : 0,
           is_paid_competition: this.form.is_paid_competition,
           max_submissions_per_user: this.form.max_submissions_per_user,
+          entry_type: this.form.entry_type,
+          series_min_images: this.form.series_min_images,
+          series_max_images: this.form.series_max_images,
           prizes: this.form.prizes.map(prize => {
             const prizeData = {
               position: prize.rank,
-              amount: prize.amount || 0
+              amount: prize.amount || 0,
+              prize_type: prize.type === 'Cash' ? 'cash' : 'gift',
+              award_type: prize.award_type || 'global',
+              sponsor_id: prize.sponsor_id || null,
+              sort_order: prize.sort_order || 0
             };
             if (prize.description && prize.description.trim()) {
               prizeData.description = prize.description;
@@ -866,43 +1693,36 @@ For questions or concerns regarding the competition, please contact our support 
           is_featured: this.form.is_featured ? 1 : 0,
           is_public: this.form.is_public,
           allow_public_voting: this.form.allow_public_voting,
+          voting_enabled: this.form.voting_enabled,
           allow_judge_scoring: this.form.allow_judge_scoring,
+          vote_weight: Number(this.form.vote_weight_percent || 0) / 100,
+          judge_weight: Number(this.form.judge_weight_percent || 0) / 100,
           allow_watermark: this.form.allow_watermark,
           require_watermark: this.form.require_watermark,
+          district_battle_enabled: this.form.district_battle_enabled,
           sponsor_ids: this.form.sponsor_ids,
+          sponsors: this.form.sponsors,
+          entry_fees: this.form.entry_fees,
           judge_ids: this.form.judge_ids
         };
 
-        const res = await fetch('/api/v1/admin/competitions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          // Handle authorization errors specifically
-          if (res.status === 401) {
-            this.errors.auth = 'Your session has expired. Please log in again.';
-            setTimeout(() => this.$router.push('/login'), 2000);
-          } else if (res.status === 403) {
-            this.errors.auth = `Access denied. Your role (${data.user_role}) does not have permission to create competitions. Admin/Super Admin access required.`;
-          } else {
-            this.errors = data.errors || {};
-          }
-          throw new Error(data.message || 'Failed to create competition');
-        }
+        await api.post('/admin/competitions', payload);
 
         // Success
         this.$router.push('/admin/competitions');
       } catch (error) {
         console.error('Error creating competition:', error);
-        alert(error.message || 'Error creating competition');
+        const status = error.response?.status;
+        const data = error.response?.data || {};
+        if (status === 401) {
+          this.errors.auth = 'Your session has expired. Please log in again.';
+          setTimeout(() => this.$router.push('/login'), 2000);
+        } else if (status === 403) {
+          this.errors.auth = `Access denied. Your role (${data.user_role}) does not have permission to create competitions. Admin/Super Admin access required.`;
+        } else if (data.errors) {
+          this.errors = data.errors || {};
+        }
+        alert(data.message || error.message || 'Error creating competition');
       } finally {
         this.loading = false;
       }
@@ -921,6 +1741,16 @@ For questions or concerns regarding the competition, please contact our support 
       this.form.prizes.splice(index, 1);
     },
 
+    formatUserType(type) {
+      const map = {
+        guest: 'Guest',
+        registered: 'Registered',
+        verified: 'Verified',
+        student: 'Student'
+      };
+      return map[type] || type;
+    },
+
     formatPrizeLabel(prize) {
       const rank = prize.rank || 'Prize';
       const type = prize.type || 'Reward';
@@ -928,11 +1758,21 @@ For questions or concerns regarding the competition, please contact our support 
     },
 
     formatCurrency(value) {
-      const num = parseFloat(value) || 0;
-      return num.toLocaleString('bn-BD', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      });
+      return formatNumber(value)
+    },
+    parseDateInput(value) {
+      if (!value) return null;
+      const match = value.trim().match(/^(\d{2})-(\d{2})-(\d{4})$/);
+      if (!match) return null;
+      const [, day, month, year] = match;
+      return `${year}-${month}-${day}`;
+    },
+    parseDateTimeInput(value) {
+      if (!value) return null;
+      const match = value.trim().match(/^(\d{2})-(\d{2})-(\d{4})\s(\d{2}):(\d{2})$/);
+      if (!match) return null;
+      const [, day, month, year, hour, minute] = match;
+      return `${year}-${month}-${day}T${hour}:${minute}`;
     }
   }
 }

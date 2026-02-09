@@ -15,26 +15,51 @@ class StorePhotographerRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $data = $this->all();
+
+        foreach (['specializations', 'favorite_hashtags', 'category_ids'] as $field) {
+            if (isset($data[$field]) && is_string($data[$field])) {
+                $data[$field] = array_values(array_filter(array_map('trim', explode(',', $data[$field]))));
+            }
+        }
+
+        if (array_key_exists('city_id', $data) && $data['city_id'] === '') {
+            $data['city_id'] = null;
+        }
+
+        $this->replace($data);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array
     {
-        $photographerId = $this->route('photographer')?->id;
-
         return [
-            'user_id' => ['required_on:create', 'exists:users,id'],
+            'username' => ['sometimes', 'string', 'min:3', 'max:30', 'regex:/^[a-z0-9_.-]+$/i'],
+            'user_id' => ['sometimes', 'exists:users,id'],
             'bio' => ['nullable', 'string', 'max:1000'],
-            'city_id' => ['required', 'exists:cities,id'],
-            'profile_photo_url' => ['nullable', 'url'],
-            'phone' => ['nullable', 'string', 'regex:/^[\d\s\-\+\(\)]+$/'],
-            'years_of_experience' => ['nullable', 'integer', 'min:0'],
-            'hourly_rate' => ['nullable', 'numeric', 'min:0'],
-            'is_verified' => ['boolean'],
-            'social_media' => ['nullable', 'array'],
-            'social_media.instagram' => ['nullable', 'url'],
-            'social_media.facebook' => ['nullable', 'url'],
-            'social_media.twitter' => ['nullable', 'url'],
-            'social_media.portfolio' => ['nullable', 'url'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'city_id' => ['nullable', 'exists:locations,id'],
+            'profile_picture' => ['nullable', 'string', 'max:2048'],
+            'experience_years' => ['nullable', 'integer', 'min:0'],
+            'specializations' => ['nullable', 'array'],
+            'specializations.*' => ['string', 'max:100'],
+            'favorite_hashtags' => ['nullable', 'array'],
+            'favorite_hashtags.*' => ['string', 'max:50'],
+            'service_area_radius' => ['nullable', 'numeric', 'min:0'],
+            'website_url' => ['nullable', 'url', 'max:2048'],
+            'facebook_url' => ['nullable', 'url', 'max:2048'],
+            'instagram_url' => ['nullable', 'url', 'max:2048'],
+            'twitter_url' => ['nullable', 'url', 'max:2048'],
+            'linkedin_url' => ['nullable', 'url', 'max:2048'],
+            'youtube_url' => ['nullable', 'url', 'max:2048'],
+            'category_ids' => ['nullable', 'array'],
+            'category_ids.*' => ['integer', 'exists:categories,id'],
         ];
     }
 
@@ -44,10 +69,9 @@ class StorePhotographerRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'city_id.required' => 'City is required',
-            'city_id.exists' => 'Selected city does not exist',
-            'phone.regex' => 'Invalid phone number format',
-            'hourly_rate.numeric' => 'Hourly rate must be a valid number',
+            'city_id.exists' => 'Selected location does not exist',
+            'experience_years.integer' => 'Experience must be a valid number',
+            'service_area_radius.numeric' => 'Service area radius must be a valid number',
         ];
     }
 }

@@ -1,5 +1,8 @@
 <template>
-  <div v-if="isVerified" class="inline-flex items-center gap-1">
+  <div
+    v-if="isVerified"
+    class="inline-flex items-center gap-1"
+  >
     <div :class="`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${badgeClass}`">
       <svg
         class="w-4 h-4 mr-1"
@@ -14,7 +17,10 @@
       </svg>
       <span>{{ label }}</span>
     </div>
-    <span v-if="showTooltip" class="text-xs text-gray-600 whitespace-nowrap">Verified photographer</span>
+    <span
+      v-if="showTooltip"
+      class="text-xs text-gray-600 whitespace-nowrap"
+    >Verified photographer</span>
   </div>
 </template>
 

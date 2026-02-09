@@ -11,6 +11,7 @@ class VerificationRequest extends Model
     protected $fillable = [
         'user_id',
         'type',
+        'request_type',
         'full_name',
         'phone',
         'nid_number',
@@ -20,6 +21,7 @@ class VerificationRequest extends Model
         'selfie_path',
         'note',
         'status',
+        'submitted_documents',
         'admin_note',
         'reviewed_by_user_id',
         'reviewed_at'
@@ -28,7 +30,8 @@ class VerificationRequest extends Model
     protected $casts = [
         'reviewed_at' => 'datetime',
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
+        'submitted_documents' => 'array'
     ];
 
     /**
@@ -152,4 +155,4 @@ class VerificationRequest extends Model
             default => 'secondary'
         };
     }
-}}
+}

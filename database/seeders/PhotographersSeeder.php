@@ -119,6 +119,7 @@ class PhotographersSeeder extends Seeder
                     'user_id' => $user->id,
                     'slug' => Str::slug($photographerData['business_name']),
                     'bio' => $photographerData['bio'],
+                    'city_id' => $photographerData['city_id'],
                     'experience_years' => rand(3, 15),
                     'average_rating' => rand(40, 50) / 10, // 4.0 to 5.0
                     'rating_count' => rand(5, 50),

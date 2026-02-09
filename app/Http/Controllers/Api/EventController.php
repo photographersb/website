@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Event;
-use App\Models\EventRegistration;
+use App\Models\EventRsvp;
 use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -213,7 +213,7 @@ class EventController extends Controller
             return $this->unauthorized('Unauthorized');
         }
 
-        $registrations = EventRegistration::with('event', 'ticket')
+        $registrations = EventRsvp::with('event')
             ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->paginate($request->input('per_page', 10));

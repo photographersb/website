@@ -62,7 +62,7 @@ class SeoService
 
         // Try first portfolio image
         if ($photographer) {
-            $portfolio = $photographer->portfolios()->first();
+            $portfolio = $photographer->albums()->first();
             if ($portfolio && $portfolio->image_url) {
                 return $portfolio->image_url;
             }

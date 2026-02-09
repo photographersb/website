@@ -14,8 +14,10 @@ class Event extends Model
         'uuid',
         'title',
         'slug',
+        'type',
         'category_id',
         'organizer_id',
+        'created_by',
         'description',
         'location',
         'location_text',
@@ -24,6 +26,7 @@ class Event extends Model
         'venue_name',
         'venue_address',
         'address',
+        'google_map_link',
         'latitude',
         'longitude',
         'event_date',
@@ -36,12 +39,21 @@ class Event extends Model
         'duration_hours',
         'theme',
         'hero_image_url',
+        'hero_image_credit_name',
+        'hero_image_credit_url',
+        'banner_image',
+        'banner_image_credit_name',
+        'banner_image_credit_url',
+        'gallery_images',
         'event_type',
+        'event_mode',
         'base_price',
         'ticket_price',
         'price',
+        'currency',
         'capacity',
         'max_attendees',
+        'max_tickets_per_user',
         'require_registration',
         'is_ticketed',
         'registration_deadline',
@@ -49,12 +61,13 @@ class Event extends Model
         'certificate_template_id',
         'booking_close_datetime',
         'refund_policy',
-        'banner_image',
+        'meta_title',
+        'meta_description',
+        'og_image',
         'status',
         'is_featured',
         'featured_until',
         'requirements',
-        'created_by',
     ];
 
     protected $casts = [
@@ -73,6 +86,7 @@ class Event extends Model
         'base_price' => 'decimal:2',
         'ticket_price' => 'decimal:2',
         'price' => 'decimal:2',
+        'gallery_images' => 'array',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
         'duration_hours' => 'decimal:2',
@@ -107,7 +121,7 @@ class Event extends Model
 
     public function city()
     {
-        return $this->belongsTo(City::class);
+        return $this->belongsTo(Location::class, 'city_id');
     }
 
     public function creator()
@@ -133,12 +147,27 @@ class Event extends Model
     public function mentors()
     {
         return $this->belongsToMany(Mentor::class, 'event_mentors', 'event_id', 'mentor_id')
+                    ->withPivot(['role', 'sort_order'])
                     ->withTimestamps();
+    }
+
+    public function sponsors()
+    {
+        return $this->belongsToMany(Sponsor::class, 'event_sponsors', 'event_id', 'sponsor_id')
+            ->withPivot(['tier', 'sort_order', 'sponsored_amount'])
+            ->withTimestamps();
+    }
+
+    public function staff()
+    {
+        return $this->belongsToMany(User::class, 'event_staff', 'event_id', 'user_id')
+            ->withPivot(['role'])
+            ->withTimestamps();
     }
 
     public function payments()
     {
-        return $this->hasManyThrough(EventPayment::class, EventRsvp::class);
+        return $this->hasMany(EventPayment::class);
     }
 
     public function attendanceLogs()
@@ -210,11 +239,19 @@ class Event extends Model
 
     public function getIsFreeAttribute()
     {
+        if (!is_null($this->event_mode)) {
+            return $this->event_mode === 'free';
+        }
+
         return $this->event_type === 'free';
     }
 
     public function getIsPaidAttribute()
     {
+        if (!is_null($this->event_mode)) {
+            return $this->event_mode === 'paid';
+        }
+
         return $this->event_type === 'paid';
     }
 

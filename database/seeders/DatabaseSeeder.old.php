@@ -65,6 +65,7 @@ class DatabaseSeeder extends Seeder
     }
 }
 
+__halt_compiler();
 
         // All 64 Districts of Bangladesh
         $bangladeshCities = [

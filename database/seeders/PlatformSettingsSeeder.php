@@ -37,9 +37,6 @@ class PlatformSettingsSeeder extends Seeder
             ['key' => 'send_verification_email', 'value' => '1', 'group' => 'email', 'data_type' => 'boolean', 'description' => 'Send email verification on signup', 'is_public' => false],
 
             // Payment Settings
-            ['key' => 'stripe_public_key', 'value' => '', 'group' => 'payment', 'data_type' => 'string', 'description' => 'Stripe public key', 'is_public' => false],
-            ['key' => 'stripe_secret_key', 'value' => '', 'group' => 'payment', 'data_type' => 'string', 'description' => 'Stripe secret key', 'is_public' => false],
-            ['key' => 'enable_stripe', 'value' => '0', 'group' => 'payment', 'data_type' => 'boolean', 'description' => 'Enable Stripe payments', 'is_public' => false],
 
             // File Storage
             ['key' => 'max_upload_size_mb', 'value' => '10', 'group' => 'storage', 'data_type' => 'integer', 'description' => 'Max file upload size (MB)', 'is_public' => false],

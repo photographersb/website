@@ -1,13 +1,26 @@
 <template>
-  <div class="relative" ref="dropdownRef">
+  <div
+    ref="dropdownRef"
+    class="relative"
+  >
     <!-- Notification Bell Button -->
     <button
-      @click="toggleDropdown"
       class="relative p-2 text-gray-600 hover:text-burgundy hover:bg-gray-100 rounded-full transition-colors"
       :class="{ 'bg-gray-100 text-burgundy': isOpen }"
+      @click="toggleDropdown"
     >
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+      <svg
+        class="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+        />
       </svg>
       
       <!-- Unread Badge -->
@@ -34,24 +47,34 @@
       >
         <!-- Header -->
         <div class="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-          <h3 class="text-lg font-semibold text-gray-900">Notifications</h3>
+          <h3 class="text-lg font-semibold text-gray-900">
+            Notifications
+          </h3>
           <button
             v-if="unreadCount > 0"
-            @click="markAllAsRead"
             class="text-sm text-burgundy hover:underline"
+            @click="markAllAsRead"
           >
             Mark all read
           </button>
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="p-8 text-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-burgundy mx-auto"></div>
-          <p class="text-sm text-gray-600 mt-2">Loading notifications...</p>
+        <div
+          v-if="loading"
+          class="p-8 text-center"
+        >
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-burgundy mx-auto" />
+          <p class="text-sm text-gray-600 mt-2">
+            Loading notifications...
+          </p>
         </div>
 
         <!-- Notifications List -->
-        <div v-else-if="notifications.length > 0" class="max-h-96 overflow-y-auto">
+        <div
+          v-else-if="notifications.length > 0"
+          class="max-h-96 overflow-y-auto"
+        >
           <div
             v-for="notification in notifications"
             :key="notification.id"
@@ -66,39 +89,73 @@
                   class="w-8 h-8 rounded-full flex items-center justify-center"
                   :class="getNotificationIconColor(notification.type)"
                 >
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" v-html="getNotificationIcon(notification.type)"></svg>
+                  <svg
+                    class="w-4 h-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    v-html="getNotificationIcon(notification.type)"
+                  />
                 </div>
               </div>
 
               <!-- Content -->
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900">{{ notification.title }}</p>
-                <p class="text-sm text-gray-600 mt-1">{{ notification.message }}</p>
-                <p class="text-xs text-gray-500 mt-1">{{ formatTime(notification.created_at) }}</p>
+                <p class="text-sm font-medium text-gray-900">
+                  {{ notification.title }}
+                </p>
+                <p class="text-sm text-gray-600 mt-1">
+                  {{ notification.message }}
+                </p>
+                <p class="text-xs text-gray-500 mt-1">
+                  {{ formatTime(notification.created_at) }}
+                </p>
               </div>
 
               <!-- Unread indicator -->
-              <div v-if="!notification.is_read" class="flex-shrink-0">
-                <div class="w-2 h-2 bg-burgundy rounded-full"></div>
+              <div
+                v-if="!notification.is_read"
+                class="flex-shrink-0"
+              >
+                <div class="w-2 h-2 bg-burgundy rounded-full" />
               </div>
             </div>
           </div>
         </div>
 
         <!-- Empty State -->
-        <div v-else class="p-8 text-center">
-          <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        <div
+          v-else
+          class="p-8 text-center"
+        >
+          <svg
+            class="w-16 h-16 mx-auto text-gray-400 mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+            />
           </svg>
-          <p class="text-gray-600">No notifications yet</p>
-          <p class="text-sm text-gray-500 mt-1">We'll notify you when something important happens</p>
+          <p class="text-gray-600">
+            No notifications yet
+          </p>
+          <p class="text-sm text-gray-500 mt-1">
+            We'll notify you when something important happens
+          </p>
         </div>
 
         <!-- Footer -->
-        <div v-if="notifications.length > 0" class="px-4 py-3 border-t border-gray-200 text-center">
+        <div
+          v-if="notifications.length > 0"
+          class="px-4 py-3 border-t border-gray-200 text-center"
+        >
           <button
-            @click="viewAllNotifications"
             class="text-sm text-burgundy hover:underline font-medium"
+            @click="viewAllNotifications"
           >
             View all notifications
           </button>
@@ -111,6 +168,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import api from '@/api';
+import { formatDate } from '@/utils/formatters';
 
 const isOpen = ref(false);
 const notifications = ref([]);
@@ -236,7 +294,7 @@ const formatTime = (timestamp) => {
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
   if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
   
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return formatDate(date);
 };
 
 // Close dropdown when clicking outside

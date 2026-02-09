@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen">
     <!-- Admin Header with Back Button & Notifications -->
     <AdminHeader 
       title="📧 Contact Messages & Inquiries" 
@@ -8,7 +8,50 @@
 
     <!-- Main Content -->
     <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      
+      <section class="page-hero">
+        <div class="hero-copy">
+          <p class="hero-kicker">INBOX CONTROL</p>
+          <h1 class="hero-title">Inquiries, triaged and transparent.</h1>
+          <p class="hero-subtitle">
+            Keep customer conversations moving with clarity and speed.
+          </p>
+          <div class="hero-actions">
+            <button
+              class="btn-admin-primary"
+              @click="exportMessages"
+            >
+              Export Messages
+            </button>
+            <button
+              class="btn-admin-secondary"
+              @click="fetchMessages"
+            >
+              Refresh Inbox
+            </button>
+          </div>
+        </div>
+        <div class="hero-status">
+          <div class="status-card">
+            <span class="status-label">Pending</span>
+            <span class="status-value">{{ stats.pending || 0 }}</span>
+          </div>
+          <div class="status-card">
+            <span class="status-label">Responded</span>
+            <span class="status-value">{{ stats.responded || 0 }}</span>
+          </div>
+          <div class="status-card">
+            <span class="status-label">Total</span>
+            <span class="status-value">{{ stats.total || 0 }}</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="page-topbar">
+        <div class="status-chip">
+          Filter by type, status, and response cadence
+        </div>
+      </div>
+
       <!-- Quick Navigation -->
       <AdminQuickNav />
 
@@ -16,8 +59,18 @@
       <div class="stats-grid">
         <div class="stat-card stat-yellow">
           <div class="stat-icon">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
           <div class="stat-content">
@@ -28,8 +81,18 @@
 
         <div class="stat-card stat-green">
           <div class="stat-icon">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
           <div class="stat-content">
@@ -40,8 +103,18 @@
 
         <div class="stat-card stat-blue">
           <div class="stat-icon">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
             </svg>
           </div>
           <div class="stat-content">
@@ -52,8 +125,18 @@
 
         <div class="stat-card stat-purple">
           <div class="stat-icon">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+              />
             </svg>
           </div>
           <div class="stat-content">
@@ -67,121 +150,295 @@
       <div class="content-card">
         <div class="filters-bar">
           <div class="search-box">
-            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg
+              class="search-icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
             <input 
               v-model="searchQuery" 
-              @input="debounceSearch"
-              type="text" 
+              type="text"
               placeholder="Search messages by name, email, or subject..." 
-              class="search-input"
-            />
+              class="search-input" 
+              @input="debounceSearch"
+            >
           </div>
 
-          <select v-model="filterType" @change="fetchMessages" class="filter-select">
-            <option value="">All Types</option>
-            <option value="sponsorship">Sponsorship</option>
-            <option value="general">General Inquiry</option>
-            <option value="support">Support Request</option>
+          <select
+            v-model="filterType"
+            class="filter-select"
+            @change="fetchMessages"
+          >
+            <option value="">
+              All Types
+            </option>
+            <option value="contact">
+              Contact
+            </option>
+            <option value="sponsorship">
+              Sponsorship
+            </option>
+            <option value="general">
+              General Inquiry
+            </option>
+            <option value="support">
+              Support Request
+            </option>
           </select>
 
-          <select v-model="filterStatus" @change="fetchMessages" class="filter-select">
-            <option value="">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="responded">Responded</option>
-            <option value="archived">Archived</option>
+          <select
+            v-model="filterStatus"
+            class="filter-select"
+            @change="fetchMessages"
+          >
+            <option value="">
+              All Status
+            </option>
+            <option value="pending">
+              Pending
+            </option>
+            <option value="read">
+              Read
+            </option>
+            <option value="resolved">
+              Resolved
+            </option>
+            <option value="archived">
+              Archived
+            </option>
           </select>
 
-          <button @click="exportMessages" class="btn-export">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            Export Messages
-          </button>
+          
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="loading-state">
-          <div class="spinner"></div>
+        <div
+          v-if="loading"
+          class="loading-state"
+        >
+          <div class="spinner" />
           <p>Loading messages...</p>
         </div>
 
         <!-- Messages Grid -->
-        <div v-else-if="messages.length > 0" class="messages-grid">
-          <div v-for="message in messages" :key="message.id" class="message-card">
+        <div
+          v-else-if="messages.length > 0"
+          class="messages-grid"
+        >
+          <div
+            v-for="message in messages"
+            :key="message.id"
+            class="message-card"
+          >
             <div class="message-header">
               <div class="message-type">
-                <span :class="getTypeClass(message.type)" class="type-badge">
+                <span
+                  :class="getTypeClass(message.type)"
+                  class="type-badge"
+                >
                   {{ getTypeLabel(message.type) }}
                 </span>
-                <span :class="getStatusClass(message.status)" class="status-badge">
+                <span
+                  :class="getStatusClass(message.status)"
+                  class="status-badge"
+                >
                   {{ message.status }}
                 </span>
               </div>
               <div class="quick-actions">
-                <button v-if="message.status === 'pending'" @click.stop="markAsResponded(message.id)" class="quick-action-btn success" title="Mark as Responded">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <button
+                  v-if="message.status === 'pending'"
+                  class="quick-action-btn success"
+                  title="Mark as Responded"
+                  @click.stop="markAsResponded(message.id)"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </button>
-                <button v-if="message.status !== 'archived'" @click.stop="archiveMessage(message.id)" class="quick-action-btn archive" title="Archive">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                <button
+                  v-if="message.status !== 'archived'"
+                  class="quick-action-btn archive"
+                  title="Archive"
+                  @click.stop="archiveMessage(message.id)"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                    />
                   </svg>
                 </button>
               </div>
             </div>
 
-            <h3 class="message-subject">{{ message.subject }}</h3>
+            <h3 class="message-subject">
+              {{ message.subject }}
+            </h3>
             
             <div class="message-date-row">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
               </svg>
               <span>{{ formatDate(message.created_at) }}</span>
             </div>
             
             <div class="message-contact-info">
               <div class="contact-detail">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
                 </svg>
                 <span>{{ message.name }}</span>
               </div>
               <div class="contact-detail">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
                 </svg>
                 <span>{{ message.email }}</span>
               </div>
-              <div v-if="message.phone" class="contact-detail">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              <div
+                v-if="message.phone"
+                class="contact-detail"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                  />
                 </svg>
                 <span>{{ message.phone }}</span>
               </div>
             </div>
 
-            <p class="message-preview">{{ truncateMessage(message.message) }}</p>
+            <p class="message-preview">
+              {{ truncateMessage(message.message) }}
+            </p>
 
             <div class="card-actions">
-              <button @click="viewMessage(message)" class="btn-action btn-view">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              <button
+                class="btn-action btn-view"
+                @click="viewMessage(message)"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
                 </svg>
                 View Full Message
               </button>
-              <button v-if="message.status === 'pending'" @click="markAsResponded(message.id)" class="btn-action btn-respond">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <button
+                v-if="message.status === 'pending'"
+                class="btn-action btn-respond"
+                @click="markAsResponded(message.id)"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 Mark Responded
               </button>
-              <button v-if="message.status !== 'archived'" @click="archiveMessage(message.id)" class="btn-action btn-archive">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              <button
+                v-if="message.status !== 'archived'"
+                class="btn-action btn-archive"
+                @click="archiveMessage(message.id)"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                  />
                 </svg>
                 Archive
               </button>
@@ -190,33 +447,57 @@
         </div>
 
         <!-- Empty State -->
-        <div v-else class="empty-state">
-          <div class="empty-icon">📧</div>
-          <p class="empty-title">No messages found</p>
-          <p class="empty-subtitle">Messages will appear here when users contact you</p>
+        <div
+          v-else
+          class="empty-state"
+        >
+          <div class="empty-icon">
+            📧
+          </div>
+          <p class="empty-title">
+            No messages found
+          </p>
+          <p class="empty-subtitle">
+            Messages will appear here when users contact you
+          </p>
         </div>
       </div>
     </div>
 
     <!-- View Message Modal -->
-    <div v-if="viewingMessage" class="modal-overlay" @click.self="viewingMessage = null">
+    <div
+      v-if="viewingMessage"
+      class="modal-overlay"
+      @click.self="viewingMessage = null"
+    >
       <div class="modal modal-large">
         <div class="modal-header">
           <h3>Message Details</h3>
-          <button @click="viewingMessage = null" class="modal-close">&times;</button>
+          <button
+            class="modal-close"
+            @click="viewingMessage = null"
+          >
+            &times;
+          </button>
         </div>
         <div class="modal-body">
           <div class="message-detail-section">
             <div class="detail-grid">
               <div class="detail-item">
                 <span class="detail-label">Type:</span>
-                <span :class="getTypeClass(viewingMessage.type)" class="type-badge">
+                <span
+                  :class="getTypeClass(viewingMessage.type)"
+                  class="type-badge"
+                >
                   {{ getTypeLabel(viewingMessage.type) }}
                 </span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Status:</span>
-                <span :class="getStatusClass(viewingMessage.status)" class="status-badge">
+                <span
+                  :class="getStatusClass(viewingMessage.status)"
+                  class="status-badge"
+                >
                   {{ viewingMessage.status }}
                 </span>
               </div>
@@ -237,11 +518,17 @@
                   <span class="detail-label">Email:</span>
                   <span class="detail-value">{{ viewingMessage.email }}</span>
                 </div>
-                <div v-if="viewingMessage.phone" class="detail-item">
+                <div
+                  v-if="viewingMessage.phone"
+                  class="detail-item"
+                >
                   <span class="detail-label">Phone:</span>
                   <span class="detail-value">{{ viewingMessage.phone }}</span>
                 </div>
-                <div v-if="viewingMessage.company" class="detail-item">
+                <div
+                  v-if="viewingMessage.company"
+                  class="detail-item"
+                >
                   <span class="detail-label">Company:</span>
                   <span class="detail-value">{{ viewingMessage.company }}</span>
                 </div>
@@ -254,15 +541,43 @@
             </div>
 
             <div class="modal-actions">
-              <button v-if="viewingMessage.status === 'pending'" @click="markAsResponded(viewingMessage.id); viewingMessage = null" class="btn-respond-full">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <button
+                v-if="viewingMessage.status === 'pending'"
+                class="btn-respond-full"
+                @click="markAsResponded(viewingMessage.id); viewingMessage = null"
+              >
+                <svg
+                  class="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 Mark as Responded
               </button>
-              <button v-if="viewingMessage.status !== 'archived'" @click="archiveMessage(viewingMessage.id); viewingMessage = null" class="btn-archive-full">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              <button
+                v-if="viewingMessage.status !== 'archived'"
+                class="btn-archive-full"
+                @click="archiveMessage(viewingMessage.id); viewingMessage = null"
+              >
+                <svg
+                  class="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                  />
                 </svg>
                 Archive Message
               </button>
@@ -273,7 +588,10 @@
     </div>
 
     <!-- Toast -->
-    <div v-if="showToast" class="toast">
+    <div
+      v-if="showToast"
+      class="toast"
+    >
       {{ toastMessage }}
     </div>
   </div>
@@ -284,6 +602,7 @@ import { ref, onMounted } from 'vue'
 import AdminHeader from '../../../components/AdminHeader.vue'
 import AdminQuickNav from '../../../components/AdminQuickNav.vue'
 import api from '../../../api'
+import { formatDate as formatDateValue, formatDateTime as formatDateTimeValue } from '../../../utils/formatters'
 
 const messages = ref([])
 const loading = ref(false)
@@ -379,6 +698,7 @@ const exportMessages = () => {
 
 const getTypeClass = (type) => {
   const classes = {
+    contact: 'badge-blue',
     sponsorship: 'badge-purple',
     general: 'badge-blue',
     support: 'badge-yellow'
@@ -388,6 +708,7 @@ const getTypeClass = (type) => {
 
 const getTypeLabel = (type) => {
   const labels = {
+    contact: '📬 Contact',
     sponsorship: '💼 Sponsorship',
     general: '📝 General Inquiry',
     support: '🆘 Support Request'
@@ -398,28 +719,19 @@ const getTypeLabel = (type) => {
 const getStatusClass = (status) => {
   const classes = {
     pending: 'badge-yellow',
-    responded: 'badge-success',
+    read: 'badge-success',
+    resolved: 'badge-success',
     archived: 'badge-gray'
   }
   return classes[status] || 'badge-gray'
 }
 
 const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('en-US', { 
-    month: 'short', 
-    day: 'numeric', 
-    year: 'numeric' 
-  })
+  return formatDateValue(date)
 }
 
 const formatDateTime = (date) => {
-  return new Date(date).toLocaleString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  return formatDateTimeValue(date)
 }
 
 const truncateMessage = (message) => {
@@ -442,6 +754,20 @@ const showToastMessage = (message) => {
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
+
+.page-hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 1.5rem; padding: 1.75rem 2rem; border-radius: 1.5rem; border: 1px solid rgba(142, 14, 63, 0.2); background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(247, 239, 233, 0.82)), linear-gradient(90deg, rgba(142, 14, 63, 0.06), transparent 45%, rgba(109, 72, 56, 0.08)); box-shadow: 0 25px 55px rgba(24, 12, 8, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6); backdrop-filter: blur(6px); }
+.hero-copy { display: flex; flex-direction: column; gap: 0.85rem; }
+.hero-kicker { font-size: 0.7rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--admin-text-secondary); font-weight: 700; }
+.hero-title { font-size: 2rem; line-height: 1.1; color: var(--admin-text-primary); text-shadow: 0 2px 14px rgba(142, 14, 63, 0.18); }
+.hero-subtitle { color: var(--admin-text-secondary); max-width: 480px; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.hero-status { display: grid; gap: 0.8rem; }
+.status-card { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(142, 14, 63, 0.2); border-radius: 1rem; padding: 1rem 1.25rem; box-shadow: 0 16px 35px rgba(22, 12, 8, 0.08); display: flex; flex-direction: column; gap: 0.35rem; }
+.status-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--admin-text-secondary); }
+.status-value { font-size: 1.1rem; font-weight: 700; color: var(--admin-text-primary); }
+.page-topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1.25rem; background: rgba(255, 255, 255, 0.88); border: 1px solid rgba(140, 108, 95, 0.2); border-radius: 1.1rem; box-shadow: 0 18px 35px rgba(18, 9, 6, 0.08); backdrop-filter: blur(8px); }
+.status-chip { background: rgba(142, 14, 63, 0.12); color: var(--admin-text-primary); padding: 0.4rem 0.8rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+@media (max-width: 1024px) { .page-hero { grid-template-columns: 1fr; } }
 
 .stat-card {
   background: white;

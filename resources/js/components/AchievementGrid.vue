@@ -2,36 +2,65 @@
   <div class="achievement-grid">
     <!-- Header with Stats -->
     <div class="mb-6 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg p-6 text-white">
-      <h2 class="text-2xl font-bold mb-2">🏆 Your Achievements</h2>
+      <h2 class="text-2xl font-bold mb-2">
+        🏆 Your Achievements
+      </h2>
       <div class="flex items-center space-x-6">
         <div>
-          <p class="text-3xl font-bold">{{ unlockedCount }}/{{ totalCount }}</p>
-          <p class="text-sm text-purple-100">Achievements Unlocked</p>
+          <p class="text-3xl font-bold">
+            {{ unlockedCount }}/{{ totalCount }}
+          </p>
+          <p class="text-sm text-purple-100">
+            Achievements Unlocked
+          </p>
         </div>
         <div>
-          <p class="text-3xl font-bold">{{ completionPercentage }}%</p>
-          <p class="text-sm text-purple-100">Completion Rate</p>
+          <p class="text-3xl font-bold">
+            {{ completionPercentage }}%
+          </p>
+          <p class="text-sm text-purple-100">
+            Completion Rate
+          </p>
         </div>
         <div>
-          <p class="text-3xl font-bold">{{ totalPoints }}</p>
-          <p class="text-sm text-purple-100">Total Points</p>
+          <p class="text-3xl font-bold">
+            {{ totalPoints }}
+          </p>
+          <p class="text-sm text-purple-100">
+            Total Points
+          </p>
         </div>
         <div>
-          <p class="text-3xl font-bold">Level {{ currentLevel }}</p>
-          <p class="text-sm text-purple-100">Current Level</p>
+          <p class="text-3xl font-bold">
+            Level {{ currentLevel }}
+          </p>
+          <p class="text-sm text-purple-100">
+            Current Level
+          </p>
         </div>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="flex justify-center items-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+    <div
+      v-if="loading"
+      class="flex justify-center items-center py-12"
+    >
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600" />
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+    <div
+      v-else-if="error"
+      class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700"
+    >
       <p>{{ error }}</p>
-      <button @click="loadAchievements" class="mt-2 text-sm underline">Try again</button>
+      <button
+        class="mt-2 text-sm underline"
+        @click="loadAchievements"
+      >
+        Try again
+      </button>
     </div>
 
     <!-- Achievements by Category -->
@@ -41,11 +70,11 @@
         <button
           v-for="category in categories"
           :key="category"
-          @click="selectedCategory = category"
           class="px-4 py-2 font-medium text-sm transition-colors border-b-2"
           :class="selectedCategory === category 
             ? 'text-purple-600 border-purple-600' 
             : 'text-gray-500 border-transparent hover:text-gray-700'"
+          @click="selectedCategory = category"
         >
           {{ categoryLabels[category] }} ({{ getCategoryCount(category) }})
         </button>
@@ -61,9 +90,16 @@
       </div>
 
       <!-- Empty State -->
-      <div v-if="filteredAchievements.length === 0" class="text-center py-12 text-gray-500">
-        <p class="text-lg">No achievements in this category yet.</p>
-        <p class="text-sm mt-2">Keep working to unlock your first achievement!</p>
+      <div
+        v-if="filteredAchievements.length === 0"
+        class="text-center py-12 text-gray-500"
+      >
+        <p class="text-lg">
+          No achievements in this category yet.
+        </p>
+        <p class="text-sm mt-2">
+          Keep working to unlock your first achievement!
+        </p>
       </div>
     </div>
   </div>

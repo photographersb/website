@@ -10,71 +10,143 @@
 
       <div class="max-w-4xl mx-auto">
         <div class="bg-white rounded-lg shadow p-6">
-          <form @submit.prevent="saveJudge" class="space-y-6">
+          <form
+            class="space-y-6"
+            @submit.prevent="saveJudge"
+          >
             <!-- Basic Information -->
             <div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                Basic Information
+              </h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
-                  <input v-model="form.name" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required placeholder="Judge Name" />
-                  <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
+                  <input
+                    v-model="form.name"
+                    type="text"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    required
+                    placeholder="Judge Name"
+                  >
+                  <p
+                    v-if="errors.name"
+                    class="mt-1 text-sm text-red-600"
+                  >
+                    {{ errors.name }}
+                  </p>
                 </div>
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Title</label>
-                  <input v-model="form.title" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="e.g., Photography Judge" />
+                  <input
+                    v-model="form.title"
+                    type="text"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    placeholder="e.g., Photography Judge"
+                  >
                 </div>
               </div>
             </div>
 
             <!-- Organization -->
             <div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-4">Organization</h3>
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                Organization
+              </h3>
               <label class="block text-sm font-medium text-gray-700 mb-2">Organization</label>
-              <input v-model="form.organization" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Organization Name" />
+              <input
+                v-model="form.organization"
+                type="text"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                placeholder="Organization Name"
+              >
             </div>
 
             <!-- Link to User -->
             <div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-4">Link to User (Optional)</h3>
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                Link to User (Optional)
+              </h3>
               <label class="block text-sm font-medium text-gray-700 mb-2">Promote Existing User to Judge</label>
-              <select v-model.number="form.user_id" @change="onUserSelected" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                <option :value="null">-- Select a user or leave blank --</option>
-                <option v-for="user in availableUsers" :key="user.id" :value="user.id">
+              <select
+                v-model.number="form.user_id"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                @change="onUserSelected"
+              >
+                <option :value="null">
+                  -- Select a user or leave blank --
+                </option>
+                <option
+                  v-for="user in availableUsers"
+                  :key="user.id"
+                  :value="user.id"
+                >
                   {{ user.name }} ({{ user.email }})
                 </option>
               </select>
-              <small v-if="form.user_id" class="text-gray-500">Selected user data will auto-populate above</small>
+              <small
+                v-if="form.user_id"
+                class="text-gray-500"
+              >Selected user data will auto-populate above</small>
             </div>
 
             <!-- Contact Information -->
             <div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-4">Contact Information</h3>
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                Contact Information
+              </h3>
               <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-              <input v-model="form.email" type="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="judge@example.com" />
+              <input
+                v-model="form.email"
+                type="email"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                placeholder="judge@example.com"
+              >
             </div>
 
             <!-- Bio -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
-              <textarea v-model="form.bio" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Tell us about the judge..."></textarea>
+              <textarea
+                v-model="form.bio"
+                rows="4"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                placeholder="Tell us about the judge..."
+              />
             </div>
 
             <!-- Social Media -->
             <div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-4">Social Media & Web</h3>
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                Social Media & Web
+              </h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Facebook URL</label>
-                  <input v-model="form.facebook_url" type="url" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="https://facebook.com/..." />
+                  <input
+                    v-model="form.facebook_url"
+                    type="url"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    placeholder="https://facebook.com/..."
+                  >
                 </div>
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Instagram URL</label>
-                  <input v-model="form.instagram_url" type="url" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="https://instagram.com/..." />
+                  <input
+                    v-model="form.instagram_url"
+                    type="url"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    placeholder="https://instagram.com/..."
+                  >
                 </div>
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Website URL</label>
-                  <input v-model="form.website_url" type="url" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="https://..." />
+                  <input
+                    v-model="form.website_url"
+                    type="url"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    placeholder="https://..."
+                  >
                 </div>
               </div>
             </div>
@@ -82,20 +154,37 @@
             <!-- Profile Image -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Profile Image</label>
-              <input @change="handleFileChange" type="file" accept="image/*" class="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+              <input
+                type="file"
+                accept="image/*"
+                class="upload-input"
+                @change="handleFileChange"
+              >
+              <p class="mt-1 upload-hint">Max 5 MB. JPG/PNG. 800x800 px.</p>
             </div>
 
             <!-- Additional Settings -->
             <div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-4">Additional Settings</h3>
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                Additional Settings
+              </h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Sort Order</label>
-                  <input v-model.number="form.sort_order" type="number" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="0" />
+                  <input
+                    v-model.number="form.sort_order"
+                    type="number"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    placeholder="0"
+                  >
                 </div>
                 <div class="flex items-end">
                   <label class="flex items-center gap-2">
-                    <input v-model="form.is_active" type="checkbox" class="w-4 h-4" />
+                    <input
+                      v-model="form.is_active"
+                      type="checkbox"
+                      class="w-4 h-4"
+                    >
                     <span class="text-sm font-medium text-gray-700">Active</span>
                   </label>
                 </div>
@@ -104,19 +193,34 @@
 
             <!-- Form Actions -->
             <div class="flex justify-end gap-3 pt-4 border-t">
-              <button type="button" @click="router.back()" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+              <button
+                type="button"
+                class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                @click="router.push('/admin/judges')"
+              >
                 Cancel
               </button>
-              <button type="submit" :disabled="saving" class="px-4 py-2 text-white rounded-lg hover:bg-opacity-90" style="background-color: var(--admin-brand-primary);">
+              <button
+                type="submit"
+                :disabled="saving"
+                class="px-4 py-2 text-white rounded-lg hover:bg-opacity-90"
+                style="background-color: var(--admin-brand-primary);"
+              >
                 {{ saving ? 'Creating...' : 'Create Judge' }}
               </button>
             </div>
           </form>
 
-          <div v-if="showToast" class="mt-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg">
+          <div
+            v-if="showToast"
+            class="mt-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg"
+          >
             {{ toastMessage }}
           </div>
-          <div v-if="generalError" class="mt-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+          <div
+            v-if="generalError"
+            class="mt-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg"
+          >
             {{ generalError }}
           </div>
         </div>
@@ -130,9 +234,10 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import AdminHeader from '../../../components/AdminHeader.vue'
 import AdminQuickNav from '../../../components/AdminQuickNav.vue'
+import api from '../../../api'
+import { validateUploadFile } from '../../../utils/imageValidation'
 
 const router = useRouter()
-
 const form = ref({
   name: '',
   title: '',
@@ -155,8 +260,30 @@ const generalError = ref('')
 const selectedFile = ref(null)
 const availableUsers = ref([])
 
-const handleFileChange = (event) => {
-  selectedFile.value = event.target.files[0] || null
+const handleFileChange = async (event) => {
+  const file = event.target.files?.[0] || null
+  if (!file) {
+    selectedFile.value = null
+    return
+  }
+
+  const validation = await validateUploadFile(file, {
+    label: 'Profile image',
+    maxBytes: 5 * 1024 * 1024,
+    allowedTypes: ['image/jpeg', 'image/png'],
+    imageWidth: 800,
+    imageHeight: 800
+  })
+
+  if (!validation.ok) {
+    generalError.value = validation.message
+    selectedFile.value = null
+    event.target.value = ''
+    return
+  }
+
+  generalError.value = ''
+  selectedFile.value = file
 }
 
 const onUserSelected = () => {
@@ -169,15 +296,18 @@ const onUserSelected = () => {
   }
 }
 
+const normalizeUsers = (payload) => {
+  const users = payload?.data?.users || payload?.data?.data || payload?.data || []
+  return Array.isArray(users) ? users : []
+}
+
 const fetchAvailableUsers = async () => {
   try {
-    const token = localStorage.getItem('auth_token')
-    const response = await fetch(`/api/v1/admin/users?limit=500`, {
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+    const { data } = await api.get('/admin/users', {
+      params: { per_page: 500 }
     })
-    const data = await response.json()
     if (data.status === 'success') {
-      availableUsers.value = data.data.data || data.data || []
+      availableUsers.value = normalizeUsers(data)
     }
   } catch (error) {
     console.error('Error fetching users', error)
@@ -190,7 +320,6 @@ const saveJudge = async () => {
   generalError.value = ''
 
   try {
-    const token = localStorage.getItem('auth_token')
     const formData = new FormData()
 
     Object.entries(form.value).forEach(([key, value]) => {
@@ -205,15 +334,11 @@ const saveJudge = async () => {
       formData.append('profile_image', selectedFile.value)
     }
 
-    const response = await fetch('/api/v1/admin/judges', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
-      body: formData
+    const { data } = await api.post('/admin/judges', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
     })
 
-    const data = await response.json()
-
-    if (response.ok && data.status === 'success') {
+    if (data.status === 'success') {
       toastMessage.value = 'Judge created successfully!'
       showToast.value = true
       setTimeout(() => {

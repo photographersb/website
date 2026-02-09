@@ -8,6 +8,7 @@ use App\Models\UserVerification;
 use App\Models\VerificationRequest;
 use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class VerificationController extends Controller
 {
@@ -65,6 +66,7 @@ class VerificationController extends Controller
         ]);
 
         try {
+            // Handle file uploads and store paths
             $documents = [];
             if ($request->hasFile('submitted_documents')) {
                 foreach ($request->file('submitted_documents') as $file) {
@@ -72,19 +74,28 @@ class VerificationController extends Controller
                     $documents[] = [
                         'filename' => $file->getClientOriginalName(),
                         'path' => $path,
-                        'upload_date' => now()
+                        'upload_date' => now()->toIso8601String()
                     ];
                 }
             }
 
-            $verificationRequest = $user->verificationRequests()->create([
+            // Build the data array matching actual table schema
+            $data = [
+                'user_id' => $user->id,
                 'request_type' => $validated['request_type'],
-                'submitted_documents' => $documents ?: null,
-                'status' => 'pending'
-            ]);
+                'submitted_documents' => $documents ? json_encode($documents) : null,
+                'status' => 'submitted',
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+
+            // Insert using query builder with proper parameter binding
+            $id = \DB::table('verification_requests')->insertGetId($data);
+            $verificationRequest = VerificationRequest::find($id);
 
             return $this->success($verificationRequest, 'Verification request submitted successfully', 201);
         } catch (\Exception $e) {
+            \Log::error('Verification Request Error: ' . $e->getMessage(), ['exception' => $e]);
             return $this->error('Failed to submit verification request: ' . $e->getMessage(), 500);
         }
     }
@@ -101,14 +112,43 @@ class VerificationController extends Controller
 
         $perPage = $request->get('per_page', 15);
 
-        $requests = VerificationRequest::where('status', 'pending')
+        $query = VerificationRequest::query()
             ->with(['user' => function ($query) {
                 $query->select('id', 'name', 'email', 'phone');
             }])
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+            ->orderBy('created_at', 'desc');
 
-        return $this->success($requests, 'Pending verification requests retrieved');
+        $status = $request->get('status');
+        if ($status) {
+            if ($status === 'pending') {
+                $query->whereIn('status', ['pending', 'submitted']);
+            } else {
+                $query->where('status', $status);
+            }
+        } else {
+            $query->whereIn('status', ['pending', 'submitted']);
+        }
+
+        if ($request->filled('type')) {
+            $type = $request->get('type');
+            $query->where(function ($q) use ($type) {
+                $q->where('request_type', $type)
+                  ->orWhere('type', $type);
+            });
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        $requests = $query->paginate($perPage);
+
+        return $this->paginated($requests, 'Verification requests retrieved');
     }
 
     /**

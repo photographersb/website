@@ -2,28 +2,52 @@
   <div class="achievements-page max-w-7xl mx-auto px-4 py-8">
     <!-- Page Header -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-2">Achievements & Growth</h1>
-      <p class="text-gray-600">Track your progress, unlock achievements, and level up your photography career</p>
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">
+        Achievements & Growth
+      </h1>
+      <p class="text-gray-600">
+        Track your progress, unlock achievements, and level up your photography career
+      </p>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="flex justify-center items-center py-20">
+    <div
+      v-if="loading"
+      class="flex justify-center items-center py-20"
+    >
       <div class="text-center">
-        <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
-        <p class="text-gray-600">Loading your achievements...</p>
+        <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4" />
+        <p class="text-gray-600">
+          Loading your achievements...
+        </p>
       </div>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-      <svg class="w-12 h-12 text-red-500 mx-auto mb-3" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+    <div
+      v-else-if="error"
+      class="bg-red-50 border border-red-200 rounded-lg p-6 text-center"
+    >
+      <svg
+        class="w-12 h-12 text-red-500 mx-auto mb-3"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+          clip-rule="evenodd"
+        />
       </svg>
-      <p class="text-red-700 font-medium mb-2">Failed to load achievements</p>
-      <p class="text-red-600 text-sm mb-4">{{ error }}</p>
+      <p class="text-red-700 font-medium mb-2">
+        Failed to load achievements
+      </p>
+      <p class="text-red-600 text-sm mb-4">
+        {{ error }}
+      </p>
       <button 
-        @click="loadAchievements" 
-        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors" 
+        @click="loadAchievements"
       >
         Try Again
       </button>
@@ -51,7 +75,7 @@
           subtitle="This month"
           icon="👀"
           :value="stats.profile_views_this_month"
-          :secondary-value="`${stats.profile_views.toLocaleString()} total views`"
+          :secondary-value="`${formatNumber(stats.profile_views)} total views`"
           color-scheme="blue"
         />
         
@@ -80,7 +104,7 @@
           title="Response Rate"
           subtitle="Client inquiries"
           icon="⚡"
-          :value="stats.response_rate ? stats.response_rate.toFixed(0) + '%' : '0%'"
+          :value="stats.response_rate ? formatFixed(stats.response_rate, 0, '0') + '%' : '0%'"
           :secondary-value="stats.average_response_time ? `Avg: ${stats.average_response_time}h` : ''"
           color-scheme="purple"
         />
@@ -92,11 +116,21 @@
       <!-- Helpful Tips -->
       <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
         <div class="flex items-start space-x-3">
-          <svg class="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+          <svg
+            class="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+              clip-rule="evenodd"
+            />
           </svg>
           <div>
-            <h3 class="text-lg font-semibold text-blue-900 mb-2">💡 Tips to Unlock More Achievements</h3>
+            <h3 class="text-lg font-semibold text-blue-900 mb-2">
+              💡 Tips to Unlock More Achievements
+            </h3>
             <ul class="space-y-2 text-sm text-blue-800">
               <li class="flex items-start">
                 <span class="mr-2">•</span>
@@ -132,6 +166,7 @@ import LevelProgress from '../components/LevelProgress.vue';
 import StatsCard from '../components/StatsCard.vue';
 import AchievementGrid from '../components/AchievementGrid.vue';
 import api from '../api';
+import { formatFixed, formatNumber } from '../utils/formatters';
 
 const loading = ref(true);
 const error = ref(null);

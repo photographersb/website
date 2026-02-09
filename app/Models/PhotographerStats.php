@@ -10,6 +10,8 @@ class PhotographerStats extends Model
         'photographer_id',
         'profile_views',
         'profile_views_this_month',
+        'profile_share_clicks',
+        'profile_share_visits',
         'total_points',
         'level',
         'conversion_rate',

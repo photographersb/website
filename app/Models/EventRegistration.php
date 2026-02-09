@@ -13,8 +13,11 @@ class EventRegistration extends Model
     protected $fillable = [
         'event_id',
         'user_id',
+        'registration_code',
+        'ticket_qr_path',
         'ticket_id',
         'qty',
+        'quantity',
         'total_amount',
         'qr_token',
         'status',

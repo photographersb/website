@@ -113,12 +113,46 @@ class SubmissionShareFrameController extends Controller
      */
     public function voteRedirect(string $shortUrl)
     {
-        $submission = CompetitionSubmission::where('short_url', $shortUrl)->firstOrFail();
+        $submission = CompetitionSubmission::with('competition')
+            ->where('short_url', $shortUrl)
+            ->firstOrFail();
 
-        return redirect()->route('competitions.submissions.show', [
+        $voteUrl = route('competitions.submissions.show', [
             $submission->competition_id,
-            $submission->id
+            $submission->id,
         ]);
+
+        $imageUrl = $this->resolveSubmissionImage($submission);
+
+        return response()->view('vote-share', [
+            'submission' => $submission,
+            'competition' => $submission->competition,
+            'voteUrl' => $voteUrl,
+            'imageUrl' => $imageUrl,
+        ]);
+    }
+
+    private function resolveSubmissionImage(CompetitionSubmission $submission): string
+    {
+        $image = $submission->image_url ?: $submission->thumbnail_url;
+
+        if (!$image && $submission->image_path) {
+            $image = Storage::disk('public')->url($submission->image_path);
+        }
+
+        if (!$image) {
+            return asset('images/og-image.jpg');
+        }
+
+        if (str_starts_with($image, 'http')) {
+            return $image;
+        }
+
+        if (str_starts_with($image, '/')) {
+            return url($image);
+        }
+
+        return Storage::disk('public')->url($image);
     }
 
     /**

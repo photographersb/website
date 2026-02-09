@@ -17,6 +17,8 @@ class CompetitionSubmission extends Model
         'uuid',
         'competition_id',
         'photographer_id',
+        'user_id',
+        'district_id',
         'image_path',
         'image_url',
         'thumbnail_url',
@@ -30,9 +32,11 @@ class CompetitionSubmission extends Model
         'hashtags',
         'is_watermarked',
         'status',
+        'reject_reason',
         'rejection_reason',
         'view_count',
         'vote_count',
+        'submitted_at',
         'judge_score',
         'final_score',
         'ranking',
@@ -40,6 +44,7 @@ class CompetitionSubmission extends Model
         'winner_position',
         'short_url',
         'share_token',
+        'terms_accepted_at',
     ];
 
     protected $casts = [
@@ -51,6 +56,8 @@ class CompetitionSubmission extends Model
         'view_count' => 'integer',
         'vote_count' => 'integer',
         'ranking' => 'integer',
+        'submitted_at' => 'datetime',
+        'terms_accepted_at' => 'datetime',
     ];
     
     protected static function boot()
@@ -74,6 +81,16 @@ class CompetitionSubmission extends Model
         return $this->belongsTo(User::class, 'photographer_id');
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function district(): BelongsTo
+    {
+        return $this->belongsTo(Location::class, 'district_id');
+    }
+
     public function votes(): HasMany
     {
         return $this->hasMany(CompetitionVote::class, 'submission_id');
@@ -82,6 +99,16 @@ class CompetitionSubmission extends Model
     public function scores(): HasMany
     {
         return $this->hasMany(CompetitionScore::class, 'submission_id');
+    }
+
+    public function files(): HasMany
+    {
+        return $this->hasMany(CompetitionSubmissionFile::class, 'submission_id');
+    }
+
+    public function payment(): HasOne
+    {
+        return $this->hasOne(CompetitionPayment::class, 'submission_id');
     }
 
     public function shareFrame(): HasOne
@@ -111,7 +138,7 @@ class CompetitionSubmission extends Model
     
     public function scopePending($query)
     {
-        return $query->where('status', 'pending_review');
+        return $query->whereIn('status', ['pending', 'payment_pending', 'pending_review']);
     }
     
     public function scopeForCompetition($query, $competitionId)

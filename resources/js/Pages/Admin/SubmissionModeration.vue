@@ -9,32 +9,62 @@
       <AdminQuickNav />
 
       <!-- Competition Info -->
-      <div v-if="competition" class="bg-white rounded-lg shadow-md p-4">
-        <h2 class="font-bold text-xl text-gray-900">{{ competition.title }}</h2>
-        <p class="text-sm text-gray-600">{{ competition.description }}</p>
+      <div
+        v-if="competition"
+        class="bg-white rounded-lg shadow-md p-4"
+      >
+        <h2 class="font-bold text-xl text-gray-900">
+          {{ competition.title }}
+        </h2>
+        <p class="text-sm text-gray-600">
+          {{ competition.description }}
+        </p>
       </div>
 
       <!-- Statistics -->
-      <div v-if="stats" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+      <div
+        v-if="stats"
+        class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6"
+      >
         <div class="bg-white rounded-lg shadow p-4">
-          <p class="text-sm text-gray-600">Total</p>
-          <p class="text-2xl font-bold text-gray-900">{{ stats.total }}</p>
+          <p class="text-sm text-gray-600">
+            Total
+          </p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ stats.total }}
+          </p>
         </div>
         <div class="bg-warning-50 rounded-lg shadow p-4 border-2 border-warning-200">
-          <p class="text-sm text-warning-700">Pending</p>
-          <p class="text-2xl font-bold text-warning-700">{{ stats.pending }}</p>
+          <p class="text-sm text-warning-700">
+            Pending
+          </p>
+          <p class="text-2xl font-bold text-warning-700">
+            {{ stats.pending }}
+          </p>
         </div>
         <div class="bg-success-50 rounded-lg shadow p-4">
-          <p class="text-sm text-success-700">Approved</p>
-          <p class="text-2xl font-bold text-success-700">{{ stats.approved }}</p>
+          <p class="text-sm text-success-700">
+            Approved
+          </p>
+          <p class="text-2xl font-bold text-success-700">
+            {{ stats.approved }}
+          </p>
         </div>
         <div class="bg-danger-50 rounded-lg shadow p-4">
-          <p class="text-sm text-danger-700">Rejected</p>
-          <p class="text-2xl font-bold text-danger-700">{{ stats.rejected }}</p>
+          <p class="text-sm text-danger-700">
+            Rejected
+          </p>
+          <p class="text-2xl font-bold text-danger-700">
+            {{ stats.rejected }}
+          </p>
         </div>
         <div class="bg-gray-50 rounded-lg shadow p-4">
-          <p class="text-sm text-gray-700">Disqualified</p>
-          <p class="text-2xl font-bold text-gray-800">{{ stats.disqualified }}</p>
+          <p class="text-sm text-gray-700">
+            Disqualified
+          </p>
+          <p class="text-2xl font-bold text-gray-800">
+            {{ stats.disqualified }}
+          </p>
         </div>
       </div>
 
@@ -45,14 +75,24 @@
           <div class="flex-1">
             <select 
               v-model="statusFilter"
-              @change="fetchSubmissions"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
+              @change="fetchSubmissions"
             >
-              <option value="">All Status</option>
-              <option value="pending">Pending Review</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
-              <option value="disqualified">Disqualified</option>
+              <option value="">
+                All Status
+              </option>
+              <option value="pending">
+                Pending Review
+              </option>
+              <option value="approved">
+                Approved
+              </option>
+              <option value="rejected">
+                Rejected
+              </option>
+              <option value="disqualified">
+                Disqualified
+              </option>
             </select>
           </div>
 
@@ -60,23 +100,31 @@
           <div class="flex-1">
             <input 
               v-model="searchQuery"
-              @input="debouncedSearch"
-              type="text" 
-              placeholder="Search by title or photographer..."
+              type="text"
+              placeholder="Search by title or photographer..." 
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
-            />
+              @input="debouncedSearch"
+            >
           </div>
         </div>
       </div>
 
       <!-- Loading -->
-      <div v-if="loading" class="text-center py-12">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-burgundy"></div>
-        <p class="mt-4 text-gray-600">Loading submissions...</p>
+      <div
+        v-if="loading"
+        class="text-center py-12"
+      >
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-burgundy" />
+        <p class="mt-4 text-gray-600">
+          Loading submissions...
+        </p>
       </div>
 
       <!-- Submissions List -->
-      <div v-else-if="submissions.length > 0" class="space-y-4">
+      <div
+        v-else-if="submissions.length > 0"
+        class="space-y-4"
+      >
         <div 
           v-for="submission in submissions" 
           :key="submission.id"
@@ -90,18 +138,25 @@
                 :alt="submission.title"
                 class="w-full h-full object-cover cursor-pointer hover:opacity-75 transition-opacity"
                 @click="viewFullImage(submission)"
-              />
+              >
             </div>
 
             <!-- Content -->
             <div class="flex-1 p-6">
               <div class="flex items-start justify-between mb-4">
                 <div class="flex-1">
-                  <h3 class="text-xl font-bold text-gray-900 mb-2">{{ submission.title }}</h3>
+                  <h3 class="text-xl font-bold text-gray-900 mb-2">
+                    {{ submission.title }}
+                  </h3>
                   <p class="text-sm text-gray-600 mb-2">
                     by <span class="font-medium">{{ submission.photographer?.name || 'Unknown' }}</span>
                   </p>
-                  <p v-if="submission.description" class="text-gray-700 mb-3">{{ submission.description }}</p>
+                  <p
+                    v-if="submission.description"
+                    class="text-gray-700 mb-3"
+                  >
+                    {{ submission.description }}
+                  </p>
                   
                   <!-- Metadata -->
                   <div class="flex flex-wrap gap-4 text-sm text-gray-600 mb-3">
@@ -112,9 +167,16 @@
                   </div>
 
                   <!-- Rejection Reason -->
-                  <div v-if="submission.rejection_reason" class="alert alert-danger mb-3">
-                    <p class="text-sm font-medium text-red-800">Rejection Reason:</p>
-                    <p class="text-sm text-red-700">{{ submission.rejection_reason }}</p>
+                  <div
+                    v-if="submission.rejection_reason"
+                    class="alert alert-danger mb-3"
+                  >
+                    <p class="text-sm font-medium text-red-800">
+                      Rejection Reason:
+                    </p>
+                    <p class="text-sm text-red-700">
+                      {{ submission.rejection_reason }}
+                    </p>
                   </div>
 
                   <!-- Submitted Date -->
@@ -124,7 +186,10 @@
                 </div>
 
                 <!-- Status Badge -->
-                <span :class="getStatusClass(submission.status)" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ml-4">
+                <span
+                  :class="getStatusClass(submission.status)"
+                  class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ml-4"
+                >
                   {{ formatStatus(submission.status) }}
                 </span>
               </div>
@@ -133,34 +198,34 @@
               <div class="flex flex-wrap gap-2">
                 <button 
                   v-if="submission.status === 'pending_review'"
-                  @click="approveSubmission(submission)"
                   :disabled="processing"
                   class="btn-admin-success px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
+                  @click="approveSubmission(submission)"
                 >
                   ✓ Approve
                 </button>
                 
                 <button 
                   v-if="submission.status === 'pending_review'"
-                  @click="openRejectModal(submission)"
                   :disabled="processing"
                   class="btn-admin-danger px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
+                  @click="openRejectModal(submission)"
                 >
                   ✗ Reject
                 </button>
 
                 <button 
                   v-if="submission.status === 'approved'"
-                  @click="openDisqualifyModal(submission)"
                   :disabled="processing"
                   class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
+                  @click="openDisqualifyModal(submission)"
                 >
                   Disqualify
                 </button>
 
                 <button 
-                  @click="viewFullImage(submission)"
                   class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium text-sm"
+                  @click="viewFullImage(submission)"
                 >
                   View Full Image
                 </button>
@@ -171,21 +236,41 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else class="text-center py-12 bg-white rounded-lg shadow">
-        <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      <div
+        v-else
+        class="text-center py-12 bg-white rounded-lg shadow"
+      >
+        <svg
+          class="mx-auto h-16 w-16 text-gray-400 mb-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
         </svg>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">No submissions found</h3>
-        <p class="text-gray-600">There are no submissions matching your filters.</p>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">
+          No submissions found
+        </h3>
+        <p class="text-gray-600">
+          There are no submissions matching your filters.
+        </p>
       </div>
 
       <!-- Pagination -->
-      <div v-if="pagination && pagination.last_page > 1" class="mt-6 flex justify-center">
+      <div
+        v-if="pagination && pagination.last_page > 1"
+        class="mt-6 flex justify-center"
+      >
         <div class="flex gap-2">
           <button 
-            @click="changePage(pagination.current_page - 1)"
             :disabled="pagination.current_page === 1"
             class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            @click="changePage(pagination.current_page - 1)"
           >
             Previous
           </button>
@@ -194,22 +279,22 @@
             <button 
               v-for="page in visiblePages" 
               :key="page"
-              @click="changePage(page)"
               :class="[
                 'px-4 py-2 border rounded-lg',
                 page === pagination.current_page 
                   ? 'bg-red-600 text-white border-red-600' 
                   : 'border-gray-300 hover:bg-gray-50'
               ]"
+              @click="changePage(page)"
             >
               {{ page }}
             </button>
           </div>
 
           <button 
-            @click="changePage(pagination.current_page + 1)"
             :disabled="pagination.current_page === pagination.last_page"
             class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            @click="changePage(pagination.current_page + 1)"
           >
             Next
           </button>
@@ -218,29 +303,36 @@
     </div>
 
     <!-- Reject Modal -->
-    <div v-if="showRejectModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div
+      v-if="showRejectModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+    >
       <div class="bg-white rounded-lg max-w-md w-full p-6">
-        <h3 class="text-xl font-bold text-gray-900 mb-4">Reject Submission</h3>
-        <p class="text-gray-600 mb-4">Please provide a reason for rejecting this submission:</p>
+        <h3 class="text-xl font-bold text-gray-900 mb-4">
+          Reject Submission
+        </h3>
+        <p class="text-gray-600 mb-4">
+          Please provide a reason for rejecting this submission:
+        </p>
         
         <textarea 
           v-model="rejectReason"
           rows="4"
           placeholder="Enter rejection reason..."
           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent mb-4"
-        ></textarea>
+        />
         
         <div class="flex gap-3 justify-end">
           <button 
-            @click="closeRejectModal"
             class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            @click="closeRejectModal"
           >
             Cancel
           </button>
           <button 
-            @click="confirmReject"
             :disabled="!rejectReason || processing"
             class="btn-admin-danger px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            @click="confirmReject"
           >
             Confirm Reject
           </button>
@@ -249,29 +341,36 @@
     </div>
 
     <!-- Disqualify Modal -->
-    <div v-if="showDisqualifyModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div
+      v-if="showDisqualifyModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+    >
       <div class="bg-white rounded-lg max-w-md w-full p-6">
-        <h3 class="text-xl font-bold text-gray-900 mb-4">Disqualify Submission</h3>
-        <p class="text-gray-600 mb-4">Please provide a reason for disqualifying this submission:</p>
+        <h3 class="text-xl font-bold text-gray-900 mb-4">
+          Disqualify Submission
+        </h3>
+        <p class="text-gray-600 mb-4">
+          Please provide a reason for disqualifying this submission:
+        </p>
         
         <textarea 
           v-model="disqualifyReason"
           rows="4"
           placeholder="Enter disqualification reason..."
           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent mb-4"
-        ></textarea>
+        />
         
         <div class="flex gap-3 justify-end">
           <button 
-            @click="closeDisqualifyModal"
             class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            @click="closeDisqualifyModal"
           >
             Cancel
           </button>
           <button 
-            @click="confirmDisqualify"
             :disabled="!disqualifyReason || processing"
             class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            @click="confirmDisqualify"
           >
             Confirm Disqualify
           </button>
@@ -280,13 +379,17 @@
     </div>
 
     <!-- Full Image Modal -->
-    <div v-if="showImageModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4" @click="closeImageModal">
+    <div
+      v-if="showImageModal"
+      class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4"
+      @click="closeImageModal"
+    >
       <div class="max-w-6xl max-h-full">
         <img 
           :src="selectedSubmission?.image_url" 
           :alt="selectedSubmission?.title"
           class="max-w-full max-h-[90vh] object-contain"
-        />
+        >
       </div>
     </div>
   </div>
@@ -294,12 +397,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
 import api from '../../api';
 import AdminHeader from '../../components/AdminHeader.vue'
 import AdminQuickNav from '../../components/AdminQuickNav.vue'
-
-const route = useRoute();
+import { formatDate as formatDateValue } from '../../utils/formatters';
 
 const competition = ref(null);
 const submissions = ref([]);
@@ -309,6 +410,7 @@ const processing = ref(false);
 const statusFilter = ref('');
 const searchQuery = ref('');
 const pagination = ref(null);
+const competitionId = ref(null);
 
 const showRejectModal = ref(false);
 const showDisqualifyModal = ref(false);
@@ -320,19 +422,25 @@ const disqualifyReason = ref('');
 let searchTimeout = null;
 
 onMounted(() => {
+  competitionId.value = resolveCompetitionId();
   fetchCompetition();
   fetchStats();
   fetchSubmissions();
 });
 
+const resolveCompetitionId = () => {
+  const match = window.location.pathname.match(/\/admin\/competitions\/([^/]+)/);
+  return match ? match[1] : null;
+};
+
 const fetchCompetition = async () => {
   // Skip fetching competition if no ID is provided (viewing all submissions)
-  if (!route.params.id) {
+  if (!competitionId.value) {
     return;
   }
   
   try {
-    const { data } = await api.get(`/competitions/${route.params.id}`);
+    const { data } = await api.get(`/competitions/${competitionId.value}`);
     competition.value = data.data;
   } catch (error) {
     console.error('Error fetching competition:', error);
@@ -343,8 +451,8 @@ const fetchCompetition = async () => {
 const fetchStats = async () => {
   try {
     // Use different endpoint based on whether viewing specific competition or all submissions
-    const endpoint = route.params.id 
-      ? `/admin/competitions/${route.params.id}/submissions/stats`
+    const endpoint = competitionId.value 
+      ? `/admin/competitions/${competitionId.value}/submissions/stats`
       : `/admin/submissions/stats`;
     const { data } = await api.get(endpoint);
     stats.value = data.data;
@@ -363,18 +471,20 @@ const fetchSubmissions = async (page = 1) => {
     };
 
     // Use different endpoint based on whether viewing specific competition or all submissions
-    const endpoint = route.params.id 
-      ? `/admin/competitions/${route.params.id}/submissions`
+    const endpoint = competitionId.value 
+      ? `/admin/competitions/${competitionId.value}/submissions`
       : `/admin/submissions`;
     const { data } = await api.get(endpoint, { params });
     
-    submissions.value = data.data.data || data.data;
-    pagination.value = {
-      current_page: data.data.current_page,
-      last_page: data.data.last_page,
-      per_page: data.data.per_page,
-      total: data.data.total
-    };
+    if (data.status === 'success') {
+      submissions.value = data.data || [];
+      pagination.value = {
+        current_page: data.pagination?.current_page || 1,
+        last_page: data.pagination?.last_page || 1,
+        per_page: data.pagination?.per_page || submissions.value.length,
+        total: data.pagination?.total || submissions.value.length
+      };
+    }
   } catch (error) {
     console.error('Error fetching submissions:', error);
     alert('Failed to load submissions');
@@ -420,7 +530,7 @@ const approveSubmission = async (submission) => {
   
   processing.value = true;
   try {
-    await api.post(`/admin/competitions/${route.params.id}/submissions/${submission.id}/approve`);
+    await api.post(`/admin/competitions/${competitionId.value}/submissions/${submission.id}/approve`);
     alert('Submission approved successfully!');
     await fetchStats();
     await fetchSubmissions(pagination.value.current_page);
@@ -448,7 +558,7 @@ const confirmReject = async () => {
   processing.value = true;
   try {
     await api.post(
-      `/admin/competitions/${route.params.id}/submissions/${selectedSubmission.value.id}/reject`,
+      `/admin/competitions/${competitionId.value}/submissions/${selectedSubmission.value.id}/reject`,
       { reason: rejectReason.value }
     );
     alert('Submission rejected successfully!');
@@ -479,7 +589,7 @@ const confirmDisqualify = async () => {
   processing.value = true;
   try {
     await api.post(
-      `/admin/competitions/${route.params.id}/submissions/${selectedSubmission.value.id}/disqualify`,
+      `/admin/competitions/${competitionId.value}/submissions/${selectedSubmission.value.id}/disqualify`,
       { reason: disqualifyReason.value }
     );
     alert('Submission disqualified successfully!');
@@ -534,6 +644,6 @@ const formatDate = (dateString) => {
   if (diffDays < 7) return `${diffDays} days ago`;
   if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
   
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  return formatDateValue(date);
 };
 </script>

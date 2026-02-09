@@ -27,6 +27,7 @@ class AuthController extends Controller
             'password' => 'required|min:8|confirmed',
             'phone' => 'required|unique:users',
             'role' => 'required|in:client,photographer,studio_owner',
+            'accept_terms' => 'accepted',
         ]);
 
         $user = User::create([
@@ -37,6 +38,7 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
             'email_verified_at' => null, // Require email verification
+            'terms_accepted_at' => now(),
         ]);
 
         // Create photographer profile if role is photographer
@@ -88,13 +90,16 @@ class AuthController extends Controller
             return $this->error('Please verify your email before logging in. Check your inbox for verification link.', 403);
         }
 
-        // Check if account is approved
-        if ($user->approval_status === 'pending') {
-            return $this->error('Your account is pending admin approval. You will receive an email once approved.', 403);
-        }
+        // Super admin ALWAYS bypasses approval checks
+        if ($user->role !== 'super_admin') {
+            // Check if account is approved
+            if ($user->approval_status === 'pending') {
+                return $this->error('Your account is pending admin approval. You will receive an email once approved.', 403);
+            }
 
-        if ($user->approval_status === 'rejected') {
-            return $this->error('Your account registration was rejected. Reason: ' . ($user->rejection_reason ?? 'Not specified'), 403);
+            if ($user->approval_status === 'rejected') {
+                return $this->error('Your account registration was rejected. Reason: ' . ($user->rejection_reason ?? 'Not specified'), 403);
+            }
         }
 
         // Check if account is suspended

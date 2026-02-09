@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Package;
 use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use App\Services\ImageProcessingService;
 
 class PackageController extends Controller
 {
@@ -136,6 +137,75 @@ class PackageController extends Controller
         $package->update($validated);
 
         return $this->success($package->fresh(), 'Package updated successfully');
+    }
+
+    /**
+     * Upload package images (cover + samples)
+     */
+    public function uploadImages(Request $request, $id, ImageProcessingService $imageService)
+    {
+        $user = $request->user();
+        $photographer = $user->photographer;
+
+        if (!$photographer) {
+            return $this->notFound('Photographer profile not found');
+        }
+
+        $package = Package::where('photographer_id', $photographer->id)
+            ->findOrFail($id);
+
+        $validated = $request->validate([
+            'cover_image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:10240',
+            'sample_images' => 'nullable|array|max:10',
+            'sample_images.*' => 'image|mimes:jpeg,jpg,png,webp|max:10240',
+        ]);
+
+        $path = 'packages/' . $photographer->id . '/' . $package->id;
+        $updated = [];
+
+        if ($request->hasFile('cover_image')) {
+            $coverFile = $request->file('cover_image');
+            $coverResult = $imageService->processAndSave($coverFile, $path, [
+                'max_width' => 2048,
+                'max_height' => 2048,
+                'quality' => 85,
+                'format' => 'jpg'
+            ]);
+
+            if (!$coverResult['success']) {
+                return $this->error('Failed to upload cover image: ' . $coverResult['error'], 500);
+            }
+
+            $updated['cover_image'] = $coverResult['url'];
+        }
+
+        if ($request->hasFile('sample_images')) {
+            $existingSamples = $package->sample_images ?? [];
+            $newSamples = [];
+
+            foreach ($request->file('sample_images') as $file) {
+                $sampleResult = $imageService->processAndSave($file, $path, [
+                    'max_width' => 2048,
+                    'max_height' => 2048,
+                    'quality' => 85,
+                    'format' => 'jpg'
+                ]);
+
+                if (!$sampleResult['success']) {
+                    return $this->error('Failed to upload sample image: ' . $sampleResult['error'], 500);
+                }
+
+                $newSamples[] = $sampleResult['url'];
+            }
+
+            $updated['sample_images'] = array_values(array_unique(array_merge($existingSamples, $newSamples)));
+        }
+
+        if (!empty($updated)) {
+            $package->update($updated);
+        }
+
+        return $this->success($package->fresh(), 'Package images uploaded successfully');
     }
 
     /**

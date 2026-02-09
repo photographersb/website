@@ -9,13 +9,22 @@
       <AdminQuickNav />
 
       <!-- Success/Error Messages -->
-      <div v-if="$page.props.flash?.success" class="mb-6">
+      <div
+        v-if="$page.props.flash?.success"
+        class="mb-6"
+      >
         <div class="bg-green-50 border border-green-300 rounded-lg p-4">
           <div class="flex items-start gap-3">
-            <div class="text-green-600 text-lg font-bold">✓</div>
+            <div class="text-green-600 text-lg font-bold">
+              ✓
+            </div>
             <div>
-              <h3 class="text-green-900 font-semibold">Success</h3>
-              <p class="text-green-700 text-sm mt-1">{{ $page.props.flash.success }}</p>
+              <h3 class="text-green-900 font-semibold">
+                Success
+              </h3>
+              <p class="text-green-700 text-sm mt-1">
+                {{ $page.props.flash.success }}
+              </p>
             </div>
           </div>
         </div>
@@ -24,10 +33,15 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Left: Configuration Form -->
         <div class="space-y-6">
-          <form @submit.prevent="submitForm" class="space-y-6">
+          <form
+            class="space-y-6"
+            @submit.prevent="submitForm"
+          >
             <!-- Colors -->
             <div class="bg-white rounded-lg shadow-card p-6">
-              <h2 class="text-xl font-bold text-gray-900 mb-4">Colors</h2>
+              <h2 class="text-xl font-bold text-gray-900 mb-4">
+                Colors
+              </h2>
               
               <div class="space-y-4">
                 <div>
@@ -37,13 +51,13 @@
                       v-model="form.background_color"
                       type="color"
                       class="h-10 w-20 rounded border border-gray-300"
-                    />
+                    >
                     <input
                       v-model="form.background_color"
                       type="text"
                       class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500"
                       placeholder="#1a1a1a"
-                    />
+                    >
                   </div>
                 </div>
 
@@ -54,13 +68,13 @@
                       v-model="form.text_color"
                       type="color"
                       class="h-10 w-20 rounded border border-gray-300"
-                    />
+                    >
                     <input
                       v-model="form.text_color"
                       type="text"
                       class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500"
                       placeholder="#ffffff"
-                    />
+                    >
                   </div>
                 </div>
 
@@ -71,13 +85,13 @@
                       v-model="form.accent_color"
                       type="color"
                       class="h-10 w-20 rounded border border-gray-300"
-                    />
+                    >
                     <input
                       v-model="form.accent_color"
                       type="text"
                       class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500"
                       placeholder="#3b82f6"
-                    />
+                    >
                   </div>
                 </div>
               </div>
@@ -85,7 +99,9 @@
 
             <!-- Typography -->
             <div class="bg-white rounded-lg shadow-card p-6">
-              <h2 class="text-xl font-bold text-gray-900 mb-4">Typography</h2>
+              <h2 class="text-xl font-bold text-gray-900 mb-4">
+                Typography
+              </h2>
               
               <div class="space-y-4">
                 <div>
@@ -94,12 +110,24 @@
                     v-model="form.primary_font"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500"
                   >
-                    <option value="Inter">Inter</option>
-                    <option value="Roboto">Roboto</option>
-                    <option value="Open Sans">Open Sans</option>
-                    <option value="Lato">Lato</option>
-                    <option value="Montserrat">Montserrat</option>
-                    <option value="Poppins">Poppins</option>
+                    <option value="Inter">
+                      Inter
+                    </option>
+                    <option value="Roboto">
+                      Roboto
+                    </option>
+                    <option value="Open Sans">
+                      Open Sans
+                    </option>
+                    <option value="Lato">
+                      Lato
+                    </option>
+                    <option value="Montserrat">
+                      Montserrat
+                    </option>
+                    <option value="Poppins">
+                      Poppins
+                    </option>
                   </select>
                 </div>
 
@@ -109,12 +137,24 @@
                     v-model="form.secondary_font"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500"
                   >
-                    <option value="Inter">Inter</option>
-                    <option value="Roboto">Roboto</option>
-                    <option value="Open Sans">Open Sans</option>
-                    <option value="Lato">Lato</option>
-                    <option value="Montserrat">Montserrat</option>
-                    <option value="Poppins">Poppins</option>
+                    <option value="Inter">
+                      Inter
+                    </option>
+                    <option value="Roboto">
+                      Roboto
+                    </option>
+                    <option value="Open Sans">
+                      Open Sans
+                    </option>
+                    <option value="Lato">
+                      Lato
+                    </option>
+                    <option value="Montserrat">
+                      Montserrat
+                    </option>
+                    <option value="Poppins">
+                      Poppins
+                    </option>
                   </select>
                 </div>
 
@@ -125,14 +165,16 @@
                     type="text"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500"
                     placeholder="Scan to vote for my photo!"
-                  />
+                  >
                 </div>
               </div>
             </div>
 
             <!-- Watermark Settings -->
             <div class="bg-white rounded-lg shadow-card p-6">
-              <h2 class="text-xl font-bold text-gray-900 mb-4">Watermark</h2>
+              <h2 class="text-xl font-bold text-gray-900 mb-4">
+                Watermark
+              </h2>
               
               <div class="space-y-4">
                 <div class="flex items-center gap-3">
@@ -140,7 +182,7 @@
                     v-model="form.watermark_enabled"
                     type="checkbox"
                     class="h-4 w-4 text-burgundy-600 rounded focus:ring-burgundy-500"
-                  />
+                  >
                   <label class="text-sm font-medium text-gray-700">Enable Watermark</label>
                 </div>
 
@@ -151,7 +193,7 @@
                     type="text"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500"
                     placeholder="Photographar"
-                  />
+                  >
                 </div>
 
                 <div v-if="form.watermark_enabled">
@@ -164,14 +206,16 @@
                     min="0"
                     max="100"
                     class="w-full"
-                  />
+                  >
                 </div>
               </div>
             </div>
 
             <!-- QR Code Settings -->
             <div class="bg-white rounded-lg shadow-card p-6">
-              <h2 class="text-xl font-bold text-gray-900 mb-4">QR Code</h2>
+              <h2 class="text-xl font-bold text-gray-900 mb-4">
+                QR Code
+              </h2>
               
               <div class="space-y-4">
                 <div class="flex items-center gap-3">
@@ -179,7 +223,7 @@
                     v-model="form.qr_code_enabled"
                     type="checkbox"
                     class="h-4 w-4 text-burgundy-600 rounded focus:ring-burgundy-500"
-                  />
+                  >
                   <label class="text-sm font-medium text-gray-700">Enable QR Code</label>
                 </div>
 
@@ -194,14 +238,16 @@
                     max="400"
                     step="10"
                     class="w-full"
-                  />
+                  >
                 </div>
               </div>
             </div>
 
             <!-- Layout Settings -->
             <div class="bg-white rounded-lg shadow-card p-6">
-              <h2 class="text-xl font-bold text-gray-900 mb-4">Layout</h2>
+              <h2 class="text-xl font-bold text-gray-900 mb-4">
+                Layout
+              </h2>
               
               <div class="space-y-4">
                 <div>
@@ -210,8 +256,12 @@
                     v-model="form.fit_strategy"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500"
                   >
-                    <option value="contain">Contain (Show entire image)</option>
-                    <option value="cover">Cover (Fill frame, may crop)</option>
+                    <option value="contain">
+                      Contain (Show entire image)
+                    </option>
+                    <option value="cover">
+                      Cover (Fill frame, may crop)
+                    </option>
                   </select>
                   <p class="mt-1 text-sm text-gray-500">
                     <span v-if="form.fit_strategy === 'contain'">
@@ -234,24 +284,28 @@
                     max="200"
                     step="5"
                     class="w-full"
-                  />
+                  >
                 </div>
               </div>
             </div>
 
             <!-- Background Image (Optional) -->
             <div class="bg-white rounded-lg shadow-card p-6">
-              <h2 class="text-xl font-bold text-gray-900 mb-4">Background Image (Optional)</h2>
+              <h2 class="text-xl font-bold text-gray-900 mb-4">
+                Background Image (Optional)
+              </h2>
               
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Upload Background</label>
                 <input
                   type="file"
                   accept="image/*"
+                  class="upload-input"
                   @change="handleBackgroundUpload"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500"
-                />
-                <p class="mt-1 text-sm text-gray-500">Optional: Use a custom background image instead of solid color</p>
+                >
+                <p class="mt-1 text-sm text-gray-500">
+                  Optional: Use a custom background image instead of solid color. 1080x1080 px.
+                </p>
               </div>
             </div>
 
@@ -278,7 +332,9 @@
         <!-- Right: Live Preview -->
         <div class="space-y-6">
           <div class="bg-white rounded-lg shadow-card p-6 sticky top-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Preview</h2>
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+              Preview
+            </h2>
             
             <div class="space-y-4">
               <!-- Format Selector -->
@@ -286,13 +342,13 @@
                 <button
                   v-for="format in previewFormats"
                   :key="format.value"
-                  @click="selectedFormat = format.value"
                   :class="[
                     'flex-1 px-3 py-2 rounded-lg text-sm font-medium transition',
                     selectedFormat === format.value
                       ? 'bg-burgundy-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   ]"
+                  @click="selectedFormat = format.value"
                 >
                   {{ format.label }}
                 </button>
@@ -311,9 +367,16 @@
                 >
                   <!-- Simulated Content -->
                   <div class="absolute inset-0 flex items-center justify-center">
-                    <div :style="{ color: form.text_color }" class="text-center p-4">
-                      <p class="text-sm opacity-70">Sample Photo</p>
-                      <p class="text-xs opacity-50 mt-2">{{ competition.name }}</p>
+                    <div
+                      :style="{ color: form.text_color }"
+                      class="text-center p-4"
+                    >
+                      <p class="text-sm opacity-70">
+                        Sample Photo
+                      </p>
+                      <p class="text-xs opacity-50 mt-2">
+                        {{ competition.name }}
+                      </p>
                     </div>
                   </div>
 
@@ -325,13 +388,22 @@
                       padding: `${form.padding}px`,
                     }"
                   >
-                    <p :style="{ color: form.text_color }" class="text-sm font-bold mb-1">
+                    <p
+                      :style="{ color: form.text_color }"
+                      class="text-sm font-bold mb-1"
+                    >
                       {{ competition.name }}
                     </p>
-                    <p :style="{ color: form.text_color }" class="text-xs opacity-90">
+                    <p
+                      :style="{ color: form.text_color }"
+                      class="text-xs opacity-90"
+                    >
                       by Sample Photographer
                     </p>
-                    <p :style="{ color: form.accent_color }" class="text-xs mt-2">
+                    <p
+                      :style="{ color: form.accent_color }"
+                      class="text-xs mt-2"
+                    >
                       {{ form.cta_message }}
                     </p>
                   </div>
@@ -356,7 +428,9 @@
                       opacity: form.watermark_opacity / 100,
                     }"
                   >
-                    <p class="text-xs font-light">{{ form.watermark_text }}</p>
+                    <p class="text-xs font-light">
+                      {{ form.watermark_text }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -376,6 +450,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useForm, Link } from '@inertiajs/vue3';
+import { validateUploadFile } from '../../../utils/imageValidation'
 import AdminHeader from '@/Components/Admin/AdminHeader.vue';
 import AdminQuickNav from '@/Components/Admin/AdminQuickNav.vue';
 
@@ -431,11 +506,25 @@ const getFormatInfo = (format) => {
   return info[format];
 };
 
-const handleBackgroundUpload = (event) => {
+const handleBackgroundUpload = async (event) => {
   const file = event.target.files[0];
-  if (file) {
-    form.background_image = file;
+  if (!file) return;
+
+  const validation = await validateUploadFile(file, {
+    label: 'Background image',
+    maxBytes: 5 * 1024 * 1024,
+    allowedTypes: ['image/jpeg', 'image/png'],
+    imageWidth: 1080,
+    imageHeight: 1080
+  })
+
+  if (!validation.ok) {
+    alert(validation.message)
+    event.target.value = ''
+    return
   }
+
+  form.background_image = file;
 };
 
 const submitForm = () => {

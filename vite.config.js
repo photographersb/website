@@ -37,9 +37,9 @@ export default defineConfig({
         minify: 'terser',
         rollupOptions: {
             output: {
-                entryFileNames: 'js/[name].js',
-                chunkFileNames: 'js/[name].js',
-                assetFileNames: 'assets/[name].[ext]',
+                entryFileNames: 'js/[name].[hash].js',
+                chunkFileNames: 'js/[name].[hash].js',
+                assetFileNames: 'assets/[name].[hash].[ext]',
             },
         },
     },

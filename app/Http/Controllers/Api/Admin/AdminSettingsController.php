@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Validator;
 
 class AdminSettingsController extends Controller
 {
@@ -39,14 +41,20 @@ class AdminSettingsController extends Controller
     public function update(Request $request, $key)
     {
         $validated = $request->validate([
-            'value' => 'required|string'
+            'value' => 'required'
         ]);
+
+        $normalizedValue = $this->normalizeSettingValue($validated['value']);
+        $dataType = $this->inferDataType($validated['value']);
+        $group = $this->inferGroup($key);
 
         try {
             DB::table('settings')->updateOrInsert(
                 ['key' => $key],
                 [
-                    'value' => $validated['value'],
+                    'value' => $normalizedValue,
+                    'group' => $group,
+                    'data_type' => $dataType,
                     'updated_at' => now()
                 ]
             );
@@ -69,17 +77,48 @@ class AdminSettingsController extends Controller
     public function bulkUpdate(Request $request)
     {
         $validated = $request->validate([
-            'settings' => 'required|array',
-            'settings.*.key' => 'required|string',
-            'settings.*.value' => 'required|string'
+            'settings' => 'required|array|min:1|max:500'
         ]);
 
+        $rawSettings = $validated['settings'];
+        $normalizedSettings = [];
+
+        if (Arr::isList($rawSettings)) {
+            $normalizedSettings = $rawSettings;
+        } else {
+            foreach ($rawSettings as $key => $value) {
+                $normalizedSettings[] = ['key' => $key, 'value' => $value];
+            }
+        }
+
+        $validatedSettings = Validator::make([
+            'settings' => $normalizedSettings,
+        ], [
+            'settings' => 'required|array|min:1|max:500',
+            'settings.*.key' => 'required|string|max:255',
+            'settings.*.value' => 'nullable',
+            'settings.*.group' => 'nullable|string|max:50',
+            'settings.*.data_type' => 'nullable|string|max:20',
+            'settings.*.description' => 'nullable|string|max:1000',
+            'settings.*.is_public' => 'nullable|boolean',
+        ])->validate();
+
         try {
-            foreach ($validated['settings'] as $setting) {
+            foreach ($validatedSettings['settings'] as $setting) {
+                $normalizedValue = $this->normalizeSettingValue($setting['value'] ?? null);
+                $dataType = $setting['data_type'] ?? $this->inferDataType($setting['value'] ?? null);
+                $group = $setting['group'] ?? $this->inferGroup($setting['key']);
+                $description = $setting['description'] ?? null;
+                $isPublic = array_key_exists('is_public', $setting) ? (bool) $setting['is_public'] : false;
+
                 DB::table('settings')->updateOrInsert(
                     ['key' => $setting['key']],
                     [
-                        'value' => $setting['value'],
+                        'value' => $normalizedValue,
+                        'group' => $group,
+                        'data_type' => $dataType,
+                        'description' => $description,
+                        'is_public' => $isPublic,
                         'updated_at' => now()
                     ]
                 );
@@ -155,5 +194,53 @@ class AdminSettingsController extends Controller
             Log::error('Failed to reset settings: ' . $e->getMessage());
             return $this->error('Failed to reset settings', 500);
         }
+    }
+
+    private function normalizeSettingValue($value): ?string
+    {
+        if (is_array($value) || is_object($value)) {
+            return json_encode($value, JSON_UNESCAPED_UNICODE);
+        }
+
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        if ($value === null) {
+            return null;
+        }
+
+        return (string) $value;
+    }
+
+    private function inferDataType($value): string
+    {
+        if (is_bool($value)) {
+            return 'boolean';
+        }
+
+        if (is_int($value)) {
+            return 'integer';
+        }
+
+        if (is_float($value)) {
+            return 'float';
+        }
+
+        if (is_array($value) || is_object($value)) {
+            return 'json';
+        }
+
+        return 'string';
+    }
+
+    private function inferGroup(string $key): string
+    {
+        $prefix = explode('.', $key)[0] ?? '';
+        if ($prefix === '') {
+            return 'general';
+        }
+
+        return $prefix;
     }
 }

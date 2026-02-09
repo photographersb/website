@@ -7,26 +7,44 @@ use App\Http\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryController extends Controller
 {
     use ApiResponse;
     public function index(): JsonResponse
     {
-        $categories = Category::where('is_active', true)
-            ->orderBy('display_order')
-            ->orderBy('name')
-            ->get();
+        $categories = Cache::remember('categories_public_list', 3600, function () {
+            return Category::where('is_active', true)
+                ->withCount(['photographers' => function ($query) {
+                    $query->where('is_verified', true);
+                }])
+                ->orderByDesc('photographers_count')
+                ->orderBy('display_order')
+                ->orderBy('name')
+                ->get();
+        });
 
         return $this->success($categories, 'Categories retrieved successfully');
     }
 
-    public function adminIndex(): JsonResponse
+    public function adminIndex(Request $request): JsonResponse
     {
-        $categories = Category::withCount('photographers')
+        $query = Category::withCount('photographers')
             ->orderBy('display_order')
-            ->orderBy('name')
-            ->get();
+            ->orderBy('name');
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        $perPage = $request->input('per_page', 20);
+        $categories = $query->paginate($perPage);
 
         return $this->success($categories, 'Categories retrieved successfully');
     }
@@ -44,6 +62,10 @@ class CategoryController extends Controller
         $validated['slug'] = Str::slug($validated['name']);
 
         $category = Category::create($validated);
+
+        // Clear category caches
+        Cache::forget('categories_public_list');
+        Cache::forget('categories_admin_list');
 
         return $this->created($category, 'Category created successfully');
     }
@@ -71,6 +93,10 @@ class CategoryController extends Controller
 
         $category->update($validated);
 
+        // Clear category caches
+        Cache::forget('categories_public_list');
+        Cache::forget('categories_admin_list');
+
         return $this->success($category->fresh(), 'Category updated successfully');
     }
 
@@ -84,6 +110,10 @@ class CategoryController extends Controller
         }
 
         $category->delete();
+
+        // Clear category caches
+        Cache::forget('categories_public_list');
+        Cache::forget('categories_admin_list');
 
         return $this->success([], 'Category deleted successfully');
     }

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Event;
-use App\Models\City;
+use App\Models\Location;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class EventApiController extends Controller
 {
@@ -14,9 +16,50 @@ class EventApiController extends Controller
      */
     public function index(Request $request)
     {
+        $columns = [
+            'id',
+            'slug',
+            'title',
+            'description',
+            'city_id',
+            'organizer_id',
+            'event_type',
+            'event_mode',
+            'price',
+            'ticket_price',
+            'is_ticketed',
+            'event_date',
+            'event_end_date',
+            'start_time',
+            'end_time',
+            'max_attendees',
+            'capacity',
+            'location',
+            'location_text',
+            'venue',
+            'venue_name',
+            'hero_image_url',
+            'banner_image',
+            'is_featured',
+            'created_at',
+        ];
+
+        $columns = array_values(array_filter($columns, function ($column) {
+            return Schema::hasColumn('events', $column);
+        }));
+
         $query = Event::where('status', 'published')
-            ->with(['city', 'mentors:id,name,specialization', 'registrations'])
-            ->select('id', 'slug', 'title', 'description', 'city_id', 'event_type', 'price', 'start_datetime', 'end_datetime', 'capacity', 'banner_image_path', 'featured', 'created_at');
+            ->with([
+                'city',
+                'organizer' => function ($q) {
+                    $q->select('id', 'user_id', 'slug')
+                      ->with('user:id,name');
+                },
+                'mentors:id,name',
+                'sponsors',
+            ])
+            ->withCount(['registrations as rsvp_count'])
+            ->select($columns);
 
         // Search
         if ($request->filled('search')) {
@@ -35,27 +78,41 @@ class EventApiController extends Controller
         // Filter by type
         if ($request->filled('type')) {
             $query->where('event_type', $request->input('type'));
+        } elseif ($request->filled('event_type')) {
+            $query->where('event_type', $request->input('event_type'));
         }
 
         // Filter by date range
         if ($request->filled('start_date')) {
-            $query->where('start_datetime', '>=', $request->input('start_date'));
+            $query->where('event_date', '>=', $request->input('start_date'));
+        } elseif ($request->filled('from_date')) {
+            $query->where('event_date', '>=', $request->input('from_date'));
         }
 
         if ($request->filled('end_date')) {
-            $query->where('end_datetime', '<=', $request->input('end_date'));
+            $query->where('event_end_date', '<=', $request->input('end_date'));
+        } elseif ($request->filled('to_date')) {
+            $query->where('event_end_date', '<=', $request->input('to_date'));
         }
 
         // Filter featured only
         if ($request->boolean('featured')) {
-            $query->where('featured', true);
+            $query->where('is_featured', true);
         }
 
         // Sorting
         $sort = $request->input('sort', 'newest');
         switch ($sort) {
+            case 'date_asc':
             case 'soonest':
-                $query->orderBy('start_datetime', 'asc');
+                $query->orderBy('event_date', 'asc');
+                break;
+            case 'date_desc':
+                $query->orderBy('event_date', 'desc');
+                break;
+            case 'featured':
+                $query->orderByDesc('is_featured')
+                    ->orderByDesc('created_at');
                 break;
             case 'popular':
                 $query->withCount('registrations')
@@ -87,18 +144,26 @@ class EventApiController extends Controller
     /**
      * Get single event by slug
      */
-    public function show(Event $event)
+    public function show(Request $request, $slug)
     {
-        if ($event->status !== 'published') {
+        $event = Event::where('slug', $slug)->first();
+        
+        if (!$event || $event->status !== 'published') {
             return response()->json(['error' => 'Event not found'], 404);
         }
 
-        $event->load(['city', 'mentors', 'category', 'organizer', 'registrations']);
+        $event->load(['city', 'mentors', 'category', 'organizer.user', 'registrations', 'sponsors']);
 
         // Calculate stats
         $registeredCount = $event->registrations()->count();
-        $capacityFull = $event->capacity && $registeredCount >= $event->capacity;
-        $capacityPercent = $event->capacity ? min(round(($registeredCount / $event->capacity) * 100), 100) : 0;
+        $capacityFull = $event->max_attendees && $registeredCount >= $event->max_attendees;
+        $capacityPercent = $event->max_attendees ? min(round(($registeredCount / $event->max_attendees) * 100), 100) : 0;
+
+        $userRegistration = null;
+        $user = Auth::guard('sanctum')->user() ?: Auth::user();
+        if ($user) {
+            $userRegistration = $event->getUserRegistration($user->id);
+        }
 
         return response()->json([
             'success' => true,
@@ -110,21 +175,37 @@ class EventApiController extends Controller
                 'city' => $event->city,
                 'venue_name' => $event->venue_name,
                 'venue_address' => $event->venue_address,
-                'event_type' => $event->event_type,
+                'type' => $event->type,
+                'event_mode' => $event->event_mode,
                 'price' => $event->price,
+                'currency' => $event->currency,
+                'max_tickets_per_user' => $event->max_tickets_per_user,
+                'registration_deadline' => $event->registration_deadline,
+                'google_map_link' => $event->google_map_link,
+                'event_date' => $event->event_date,
+                'event_end_date' => $event->event_end_date,
                 'start_datetime' => $event->start_datetime,
                 'end_datetime' => $event->end_datetime,
+                'max_attendees' => $event->max_attendees,
                 'capacity' => $event->capacity,
                 'registered_count' => $registeredCount,
                 'capacity_full' => $capacityFull,
                 'capacity_percent' => $capacityPercent,
-                'banner_image_path' => $event->banner_image_path,
+                'hero_image_url' => $event->hero_image_url,
+                'hero_image_credit_name' => $event->hero_image_credit_name,
+                'hero_image_credit_url' => $event->hero_image_credit_url,
+                'banner_image' => $event->banner_image,
+                'banner_image_credit_name' => $event->banner_image_credit_name,
+                'banner_image_credit_url' => $event->banner_image_credit_url,
+                'gallery_images' => $event->gallery_images,
                 'requirements' => $event->requirements,
                 'refund_policy' => $event->refund_policy,
-                'registration_deadline' => $event->registration_deadline,
                 'certificates_enabled' => $event->certificates_enabled,
                 'mentors' => $event->mentors,
-                'featured' => $event->featured,
+                'sponsors' => $event->sponsors,
+                'is_featured' => $event->is_featured,
+                'organizer' => $event->organizer,
+                'user_registration' => $userRegistration,
                 'created_at' => $event->created_at,
             ],
         ]);
@@ -136,7 +217,7 @@ class EventApiController extends Controller
     public function featured(Request $request)
     {
         $events = Event::where('status', 'published')
-            ->where('featured', true)
+            ->where('is_featured', true)
             ->with(['city', 'registrations:id,event_id'])
             ->orderByDesc('created_at')
             ->limit($request->input('limit', 6))
@@ -161,12 +242,12 @@ class EventApiController extends Controller
                     ->withCount('registrations')
                     ->get()
                     ->sum('registrations_count'),
-                'total_cities' => City::has('events')->count(),
+                'total_cities' => Location::has('events')->count(),
                 'free_events' => Event::where('status', 'published')
-                    ->where('event_type', 'free')
+                    ->where('event_mode', 'free')
                     ->count(),
                 'paid_events' => Event::where('status', 'published')
-                    ->where('event_type', 'paid')
+                    ->where('event_mode', 'paid')
                     ->count(),
             ],
         ]);
@@ -177,7 +258,7 @@ class EventApiController extends Controller
      */
     public function cities()
     {
-        $cities = City::has('events')
+        $cities = Location::has('events')
             ->withCount('events')
             ->orderBy('name')
             ->get();

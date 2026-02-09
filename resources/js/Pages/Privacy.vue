@@ -1,7 +1,24 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-12">
-    <div class="container mx-auto px-4 max-w-4xl">
-      <h1 class="text-4xl font-bold mb-8">Privacy Policy</h1>
+  <div class="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <section class="relative overflow-hidden bg-gradient-to-br from-burgundy via-[#8E0E3F] to-[#6F112D] text-white">
+      <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+      </div>
+      <div class="container mx-auto px-4 py-12 md:py-16 relative z-10 text-center">
+        <p class="text-xs uppercase tracking-[0.35em] text-white/70">
+          Legal
+        </p>
+        <h1 class="text-3xl md:text-5xl font-bold mt-4 tracking-tight">
+          Privacy Policy
+        </h1>
+        <p class="text-base md:text-lg text-white/85 max-w-3xl mx-auto mt-4">
+          How we collect, use, and protect your information.
+        </p>
+      </div>
+    </section>
+
+    <div class="container mx-auto px-4 max-w-4xl -mt-10 relative z-10 pb-12">
 
       <div class="bg-white rounded-lg shadow-lg p-8 space-y-6">
         <div class="text-sm text-gray-600 mb-6">
@@ -10,7 +27,9 @@
 
         <!-- Introduction -->
         <section>
-          <h2 class="text-2xl font-bold mb-4 text-burgundy">Introduction</h2>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">
+            Introduction
+          </h2>
           <p class="text-gray-700 mb-4">
             At Photographer SB ("we", "us", "our"), we are committed to protecting your privacy and personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform.
           </p>
@@ -21,10 +40,16 @@
 
         <!-- Information We Collect -->
         <section>
-          <h2 class="text-2xl font-bold mb-4 text-burgundy">Information We Collect</h2>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">
+            Information We Collect
+          </h2>
           
-          <h3 class="text-lg font-bold mb-2">Personal Information</h3>
-          <p class="text-gray-700 mb-3">We collect information that you provide directly to us, including:</p>
+          <h3 class="text-lg font-bold mb-2">
+            Personal Information
+          </h3>
+          <p class="text-gray-700 mb-3">
+            We collect information that you provide directly to us, including:
+          </p>
           <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4 ml-4">
             <li>Name, email address, phone number</li>
             <li>Profile information (bio, location, specialties)</li>
@@ -33,7 +58,9 @@
             <li>Communications between users and photographers</li>
           </ul>
 
-          <h3 class="text-lg font-bold mb-2">Automatically Collected Information</h3>
+          <h3 class="text-lg font-bold mb-2">
+            Automatically Collected Information
+          </h3>
           <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
             <li>Device information (IP address, browser type, operating system)</li>
             <li>Usage data (pages visited, features used, time spent)</li>
@@ -44,8 +71,12 @@
 
         <!-- How We Use Your Information -->
         <section>
-          <h2 class="text-2xl font-bold mb-4 text-burgundy">How We Use Your Information</h2>
-          <p class="text-gray-700 mb-3">We use the collected information for:</p>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">
+            How We Use Your Information
+          </h2>
+          <p class="text-gray-700 mb-3">
+            We use the collected information for:
+          </p>
           <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
             <li><strong>Service Delivery:</strong> Facilitating bookings, payments, and communications</li>
             <li><strong>Account Management:</strong> Creating and maintaining your account</li>
@@ -58,8 +89,12 @@
 
         <!-- Information Sharing -->
         <section>
-          <h2 class="text-2xl font-bold mb-4 text-burgundy">Information Sharing and Disclosure</h2>
-          <p class="text-gray-700 mb-3">We may share your information with:</p>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">
+            Information Sharing and Disclosure
+          </h2>
+          <p class="text-gray-700 mb-3">
+            We may share your information with:
+          </p>
           <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
             <li><strong>Other Users:</strong> Profile information visible to photographers/clients for booking purposes</li>
             <li><strong>Service Providers:</strong> Third-party vendors helping us operate (payment processors, hosting)</li>
@@ -73,7 +108,9 @@
 
         <!-- Data Security -->
         <section>
-          <h2 class="text-2xl font-bold mb-4 text-burgundy">Data Security</h2>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">
+            Data Security
+          </h2>
           <p class="text-gray-700 mb-3">
             We implement appropriate security measures to protect your information:
           </p>
@@ -90,8 +127,12 @@
 
         <!-- Your Rights -->
         <section>
-          <h2 class="text-2xl font-bold mb-4 text-burgundy">Your Rights and Choices</h2>
-          <p class="text-gray-700 mb-3">You have the right to:</p>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">
+            Your Rights and Choices
+          </h2>
+          <p class="text-gray-700 mb-3">
+            You have the right to:
+          </p>
           <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
             <li><strong>Access:</strong> Request a copy of your personal information</li>
             <li><strong>Correction:</strong> Update or correct inaccurate information</li>
@@ -100,13 +141,18 @@
             <li><strong>Data Portability:</strong> Request your data in a portable format</li>
           </ul>
           <p class="text-gray-700 mt-3">
-            To exercise these rights, contact us at <a href="mailto:privacy@photographersb.com" class="text-burgundy hover:underline">privacy@photographersb.com</a>
+            To exercise these rights, contact us at <a
+              href="mailto:privacy@photographersb.com"
+              class="text-burgundy hover:underline"
+            >privacy@photographersb.com</a>
           </p>
         </section>
 
         <!-- Cookies -->
         <section>
-          <h2 class="text-2xl font-bold mb-4 text-burgundy">Cookies and Tracking</h2>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">
+            Cookies and Tracking
+          </h2>
           <p class="text-gray-700 mb-3">
             We use cookies and similar technologies to:
           </p>
@@ -122,7 +168,9 @@
 
         <!-- Children's Privacy -->
         <section>
-          <h2 class="text-2xl font-bold mb-4 text-burgundy">Children's Privacy</h2>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">
+            Children's Privacy
+          </h2>
           <p class="text-gray-700">
             Our services are not intended for users under 18 years of age. We do not knowingly collect information from children. If we discover we have collected information from a child, we will delete it promptly.
           </p>
@@ -130,7 +178,9 @@
 
         <!-- International Users -->
         <section>
-          <h2 class="text-2xl font-bold mb-4 text-burgundy">International Users</h2>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">
+            International Users
+          </h2>
           <p class="text-gray-700">
             Photographer SB is based in Bangladesh. If you access our services from outside Bangladesh, please be aware that your information may be transferred to and processed in Bangladesh where data protection laws may differ.
           </p>
@@ -138,7 +188,9 @@
 
         <!-- Changes to Policy -->
         <section>
-          <h2 class="text-2xl font-bold mb-4 text-burgundy">Changes to This Policy</h2>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">
+            Changes to This Policy
+          </h2>
           <p class="text-gray-700">
             We may update this Privacy Policy from time to time. We will notify you of significant changes via email or prominent notice on our platform. Your continued use after changes indicates acceptance of the updated policy.
           </p>
@@ -146,13 +198,22 @@
 
         <!-- Contact -->
         <section class="border-t pt-6">
-          <h2 class="text-2xl font-bold mb-4 text-burgundy">Contact Us</h2>
+          <h2 class="text-2xl font-bold mb-4 text-burgundy">
+            Contact Us
+          </h2>
           <p class="text-gray-700 mb-3">
             If you have questions or concerns about this Privacy Policy, please contact us:
           </p>
           <div class="bg-gray-50 p-4 rounded-lg">
-            <p class="text-gray-700"><strong>Email:</strong> <a href="mailto:privacy@photographersb.com" class="text-burgundy hover:underline">privacy@photographersb.com</a></p>
-            <p class="text-gray-700"><strong>Address:</strong> Dhaka, Bangladesh</p>
+            <p class="text-gray-700">
+              <strong>Email:</strong> <a
+                href="mailto:privacy@photographersb.com"
+                class="text-burgundy hover:underline"
+              >privacy@photographersb.com</a>
+            </p>
+            <p class="text-gray-700">
+              <strong>Address:</strong> Dhaka, Bangladesh
+            </p>
           </div>
         </section>
       </div>

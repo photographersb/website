@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +11,7 @@ use Illuminate\Support\Str;
 
 class Judge extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'user_id',
         'name',
@@ -30,6 +32,22 @@ class Judge extends Model
         'is_active' => 'boolean',
         'sort_order' => 'integer',
     ];
+
+    protected $appends = ['profile_image_url'];
+
+    public function getProfileImageUrlAttribute(): ?string
+    {
+        $value = $this->profile_image;
+        if (!$value) {
+            return null;
+        }
+
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, '/storage/')) {
+            return $value;
+        }
+
+        return '/storage/' . ltrim($value, '/');
+    }
 
     protected static function boot()
     {

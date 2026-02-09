@@ -3,8 +3,12 @@
     <div class="max-w-4xl mx-auto">
       <!-- Page Header -->
       <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Notifications</h1>
-        <p class="text-gray-600">Stay updated with your bookings, payments, and activity</p>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+          Notifications
+        </h1>
+        <p class="text-gray-600">
+          Stay updated with your bookings, payments, and activity
+        </p>
       </div>
       <div class="bg-white rounded-lg shadow">
         <!-- Header -->
@@ -12,9 +16,9 @@
           <div class="flex items-center justify-between mb-4">
             <button
               v-if="unreadCount > 0"
-              @click="markAllAsRead"
               class="ml-auto px-4 py-2 btn-text transition-colors text-sm font-medium"
               style="color: var(--admin-brand-primary);"
+              @click="markAllAsRead"
             >
               Mark all as read
             </button>
@@ -23,35 +27,35 @@
           <!-- Filters -->
           <div class="mt-4 flex gap-3">
             <button
-              @click="filter = 'all'"
               :class="[
                 'px-4 py-2 rounded-lg transition-colors text-sm font-medium',
                 filter === 'all'
                   ? 'btn-primary'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               ]"
+              @click="filter = 'all'"
             >
               All
             </button>
             <button
-              @click="filter = 'unread'"
               :class="[
                 'px-4 py-2 rounded-lg transition-colors text-sm font-medium',
                 filter === 'unread'
                   ? 'btn-primary'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               ]"
+              @click="filter = 'unread'"
             >
               Unread {{ unreadCount > 0 ? `(${unreadCount})` : '' }}
             </button>
             <button
-              @click="filter = 'read'"
               :class="[
                 'px-4 py-2 rounded-lg transition-colors text-sm font-medium',
                 filter === 'read'
                   ? 'btn-primary'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               ]"
+              @click="filter = 'read'"
             >
               Read
             </button>
@@ -59,13 +63,24 @@
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="py-12 text-center">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style="border-bottom-color: var(--admin-brand-primary);\"></div>
-          <p class="text-gray-600 mt-4">Loading notifications...</p>
+        <div
+          v-if="loading"
+          class="py-12 text-center"
+        >
+          <div
+            class="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"
+            style="border-bottom-color: var(--admin-brand-primary);\"
+          />
+          <p class="text-gray-600 mt-4">
+            Loading notifications...
+          </p>
         </div>
 
         <!-- Notifications List -->
-        <div v-else-if="filteredNotifications.length > 0" class="divide-y divide-gray-200">
+        <div
+          v-else-if="filteredNotifications.length > 0"
+          class="divide-y divide-gray-200"
+        >
           <div
             v-for="notification in filteredNotifications"
             :key="notification.id"
@@ -90,7 +105,7 @@
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   v-html="getNotificationIcon(notification.type).path"
-                ></svg>
+                />
               </div>
 
               <!-- Content -->
@@ -109,21 +124,40 @@
                   </div>
 
                   <!-- Unread Badge -->
-                  <div v-if="!notification.read_at" class="flex-shrink-0">
-                    <span class="w-3 h-3 rounded-full block" style="background-color: var(--admin-brand-primary);"></span>
+                  <div
+                    v-if="!notification.read_at"
+                    class="flex-shrink-0"
+                  >
+                    <span
+                      class="w-3 h-3 rounded-full block"
+                      style="background-color: var(--admin-brand-primary);"
+                    />
                   </div>
                 </div>
 
                 <!-- Action Button -->
-                <div class="mt-3" v-if="getNotificationAction(notification)">
+                <div
+                  v-if="getNotificationAction(notification)"
+                  class="mt-3"
+                >
                   <router-link
                     :to="getNotificationAction(notification)"
                     class="inline-flex items-center btn-text text-sm font-medium"
                     style="color: var(--admin-brand-primary);"
                   >
                     View Details
-                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    <svg
+                      class="w-4 h-4 ml-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5l7 7-7 7"
+                      />
                     </svg>
                   </router-link>
                 </div>
@@ -133,7 +167,10 @@
         </div>
 
         <!-- Empty State -->
-        <div v-else class="py-16 text-center">
+        <div
+          v-else
+          class="py-16 text-center"
+        >
           <svg
             class="w-16 h-16 text-gray-400 mx-auto mb-4"
             fill="none"
@@ -145,10 +182,14 @@
               stroke-linejoin="round"
               stroke-width="2"
               d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-            ></path>
+            />
           </svg>
-          <h3 class="text-lg font-medium text-gray-900 mb-1">No notifications</h3>
-          <p class="text-gray-600">You're all caught up!</p>
+          <h3 class="text-lg font-medium text-gray-900 mb-1">
+            No notifications
+          </h3>
+          <p class="text-gray-600">
+            You're all caught up!
+          </p>
         </div>
       </div>
     </div>
@@ -159,6 +200,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '../api';
+import { formatDate as formatDateValue, formatNumber } from '../utils/formatters';
 
 const router = useRouter();
 const notifications = ref([]);
@@ -267,7 +309,7 @@ const getNotificationMessage = (notification) => {
   } else if (notification.type === 'App\\Notifications\\BookingStatusUpdated') {
     return `Your booking with ${data.photographer_name} is now ${data.new_status}`;
   } else if (notification.type === 'App\\Notifications\\PaymentReceived') {
-    return `Payment of ৳${Number(data.amount).toLocaleString()} received`;
+    return `Payment of ৳${formatNumber(data.amount)} received`;
   } else if (notification.type === 'App\\Notifications\\ReviewRequest') {
     return `Share your experience with ${data.photographer_name}`;
   }
@@ -300,10 +342,6 @@ const formatDateTime = (date) => {
   if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
   if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`;
   
-  return notifDate.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: notifDate.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-  });
+  return formatDateValue(notifDate);
 };
 </script>

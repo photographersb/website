@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BookingRequest;
 use App\Models\User;
 use App\Models\Category;
+use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -17,6 +18,12 @@ class BookingRequestController extends Controller
     {
         $photographer = User::where('username', $photographerUsername)->firstOrFail();
 
+        if (auth()->check() && auth()->id() === $photographer->id) {
+            return redirect()
+                ->route('home')
+                ->with('error', 'You cannot create a booking request for your own profile.');
+        }
+
         return inertia('Bookings/Create', [
             'photographer' => [
                 'id' => $photographer->id,
@@ -25,6 +32,10 @@ class BookingRequestController extends Controller
                 'profile_image' => $photographer->profile_image_url,
             ],
             'categories' => Category::all(['id', 'name']),
+            'locations' => Location::where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name']),
+            'currentUserId' => auth()->id(),
         ]);
     }
 
@@ -36,7 +47,7 @@ class BookingRequestController extends Controller
         $validated = $request->validate([
             'photographer_user_id' => 'required|exists:users,id',
             'category_id' => 'nullable|exists:categories,id',
-            'city_id' => 'nullable|integer',
+            'city_id' => 'nullable|exists:locations,id',
             'venue_address' => 'nullable|string|max:500',
             'event_date' => 'required|date|after_or_equal:today',
             'event_time' => 'nullable|date_format:H:i',
@@ -45,6 +56,12 @@ class BookingRequestController extends Controller
             'budget_max' => 'nullable|numeric|min:0',
             'notes' => 'nullable|string|max:2000',
         ]);
+
+        if (auth()->check() && (int) $validated['photographer_user_id'] === (int) auth()->id()) {
+            return back()->withErrors([
+                'photographer_user_id' => 'You cannot create a booking request for your own profile.'
+            ])->withInput();
+        }
 
         $validated['client_user_id'] = auth()->id();
         $validated['booking_code'] = $this->generateBookingCode();

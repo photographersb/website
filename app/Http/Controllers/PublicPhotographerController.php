@@ -28,19 +28,9 @@ class PublicPhotographerController extends Controller
         // Find user by username (handles history redirects)
         $user = $this->usernameService->findByUsername($username);
 
-        // Handle old username redirect (301)
+        // If not found, return 404
         if (!$user) {
             return $this->handleNotFound();
-        }
-
-        // Check if this is an old username (should redirect with 301)
-        $currentUser = User::where('username', $username)->first();
-        if (!$currentUser && $user) {
-            // This is from username history - do 301 redirect
-            return redirect(
-                $this->usernameService->getProfileUrl($user),
-                Response::HTTP_MOVED_PERMANENTLY
-            );
         }
 
         // Verify user is photographer
@@ -57,8 +47,8 @@ class PublicPhotographerController extends Controller
         $this->incrementProfileViews($user);
 
         // Get photographer data
-        $portfolios = $photographer->portfolios()->orderBy('featured', 'desc')->paginate(12);
-        $packages = $photographer->packages()->active()->get();
+        $portfolios = $photographer->albums()->orderBy('display_order', 'desc')->paginate(12);
+        $packages = $photographer->packages()->where('is_active', true)->get();
         $reviews = $photographer->reviews()->with('reviewer')->orderBy('created_at', 'desc')->paginate(5);
         $averageRating = $photographer->averageRating;
         $ratingCount = $photographer->reviews()->count();
@@ -133,8 +123,8 @@ class PublicPhotographerController extends Controller
         $page = $request->query('page', 1);
         $perPage = $request->query('per_page', 12);
 
-        $portfolios = $photographer->portfolios()
-            ->orderBy('featured', 'desc')
+        $portfolios = $photographer->albums()
+            ->orderBy('display_order', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
 
         return response()->json($portfolios);
@@ -152,7 +142,7 @@ class PublicPhotographerController extends Controller
         }
 
         $packages = $user->photographer->packages()
-            ->active()
+            ->where('is_active', true)
             ->get()
             ->map(fn ($pkg) => [
                 'id' => $pkg->id,

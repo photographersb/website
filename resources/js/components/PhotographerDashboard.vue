@@ -1,145 +1,379 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Header -->
-    <div class="bg-white border-b">
-      <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
+    <div class="bg-gradient-to-r from-white via-white to-rose-50 border-b">
+      <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-5">
         <div class="flex items-center gap-3 sm:gap-4">
-          <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-burgundy flex items-center justify-center text-white font-bold text-lg sm:text-2xl flex-shrink-0">
-            <img 
-              v-if="photographer?.profile_picture" 
-              :src="`/storage/${photographer.profile_picture}`" 
+          <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-burgundy flex items-center justify-center text-white font-bold text-lg sm:text-2xl flex-shrink-0 shadow-md">
+            <img
+              v-if="photographer?.profile_picture"
+              :src="`/storage/${photographer.profile_picture}`"
               :alt="user?.name"
               class="w-full h-full object-cover"
-            />
+            >
             <span v-else>{{ user?.name?.charAt(0).toUpperCase() }}</span>
           </div>
           <div class="min-w-0 flex-1">
-            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold truncate">Photographer Dashboard</h1>
-            <p class="text-sm sm:text-base text-gray-600 truncate">Welcome, {{ user?.name }}</p>
+            <div class="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-burgundy/70">
+              Photographer HQ
+            </div>
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold truncate">Welcome, {{ user?.name }}</h1>
+            <p class="text-sm sm:text-base text-gray-600 truncate">Build momentum, respond fast, and grow bookings.</p>
           </div>
-          <!-- Notification Bell -->
-          <div class="ml-4">
+          <div class="flex items-center gap-3">
             <NotificationBell />
           </div>
         </div>
       </div>
     </div>
 
-    <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
+    <div class="container mx-auto px-3 sm:px-4 py-3 sm:py-5 md:py-6">
       <!-- Stats Overview -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8">
-        <div class="bg-white rounded-lg shadow p-3 sm:p-4 md:p-6">
-          <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Total Bookings</p>
-          <p class="text-xl sm:text-2xl md:text-3xl font-bold text-burgundy">{{ stats.total_bookings || 0 }}</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-3 sm:mb-4 md:mb-6">
+        <div class="bg-white rounded-xl border border-gray-200/70 shadow-sm p-3 sm:p-4 md:p-6">
+          <p class="text-[11px] sm:text-xs uppercase tracking-wide text-gray-500 mb-1">Total Bookings</p>
+          <p class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{{ stats.total_bookings || 0 }}</p>
+          <p class="text-xs text-gray-500 mt-1">All time</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-3 sm:p-4 md:p-6">
-          <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Pending Requests</p>
-          <p class="text-xl sm:text-2xl md:text-3xl font-bold text-yellow-600">{{ stats.pending_bookings || 0 }}</p>
+        <div class="bg-white rounded-xl border border-amber-200/70 shadow-sm p-3 sm:p-4 md:p-6">
+          <p class="text-[11px] sm:text-xs uppercase tracking-wide text-amber-700 mb-1">Pending Requests</p>
+          <p class="text-xl sm:text-2xl md:text-3xl font-bold text-amber-800">{{ stats.pending_bookings || 0 }}</p>
+          <p class="text-xs text-amber-700 mt-1">Needs response</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-3 sm:p-4 md:p-6">
-          <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Average Rating</p>
-          <p class="text-xl sm:text-2xl md:text-3xl font-bold text-green-600">{{ stats.average_rating || 0 }}</p>
+        <div class="bg-white rounded-xl border border-emerald-200/70 shadow-sm p-3 sm:p-4 md:p-6">
+          <p class="text-[11px] sm:text-xs uppercase tracking-wide text-emerald-700 mb-1">Average Rating</p>
+          <p class="text-xl sm:text-2xl md:text-3xl font-bold text-emerald-800">{{ stats.average_rating || 0 }}</p>
+          <p class="text-xs text-emerald-700 mt-1">Last 90 days</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-3 sm:p-4 md:p-6">
-          <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Total Revenue</p>
-          <p class="text-xl sm:text-2xl md:text-3xl font-bold text-burgundy">৳{{ stats.total_revenue || 0 }}</p>
+        <div class="bg-white rounded-xl border border-rose-200/70 shadow-sm p-3 sm:p-4 md:p-6">
+          <p class="text-[11px] sm:text-xs uppercase tracking-wide text-rose-700 mb-1">Total Revenue</p>
+          <p class="text-xl sm:text-2xl md:text-3xl font-bold text-rose-800">৳{{ stats.total_revenue || 0 }}</p>
+          <p class="text-xs text-rose-700 mt-1">Gross earnings</p>
         </div>
       </div>
 
-      <!-- Share Profile -->
-      <div class="bg-gradient-to-r from-burgundy to-[#8B1538] rounded-lg shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 md:mb-8 text-white">
-        <h3 class="text-base sm:text-lg font-bold mb-1 sm:mb-2">Share Your Profile</h3>
-        <p class="text-xs sm:text-sm text-white/90 mb-3">Share your professional profile with clients</p>
-        <div class="flex flex-col sm:flex-row gap-2">
-          <input
-            type="text"
-            :value="profileUrl"
-            readonly
-            class="flex-1 px-3 sm:px-4 py-2 text-sm sm:text-base rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
-          />
-          <div class="flex gap-2">
-            <button
-              @click="copyProfileLink"
-              class="flex-1 sm:flex-none px-4 sm:px-6 py-2 bg-white text-burgundy rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base min-h-[44px]"
+      <div class="rounded-2xl border border-rose-100 bg-gradient-to-r from-rose-50 via-white to-amber-50 p-4 sm:p-5 mb-3 sm:mb-4 md:mb-6 shadow-sm">
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="rounded-xl border border-rose-100 bg-white/70 p-4">
+            <p class="text-[11px] uppercase tracking-[0.2em] text-rose-600 mb-2">Share The Spotlight</p>
+            <h3 class="text-base sm:text-lg font-semibold text-gray-900">
+              Post your latest shots on Instagram and tag our handle to get featured.
+            </h3>
+            <p class="text-sm text-gray-600 mt-1">
+              Tag <span class="font-semibold text-rose-700">@thephotographersbd</span> so we can celebrate your work with the community.
+            </p>
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+              <a
+                href="https://www.instagram.com/thephotographersbd"
+                target="_blank"
+                rel="noopener"
+                class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-100"
+              >
+                Open Instagram
+              </a>
+            </div>
+          </div>
+          <div class="rounded-xl border border-amber-100 bg-white/70 p-4">
+            <p class="text-[11px] uppercase tracking-[0.2em] text-amber-700 mb-2">Share Your Profile</p>
+            <h3 class="text-base sm:text-lg font-semibold text-gray-900">
+              Put your work in front of the right people, fast.
+            </h3>
+            <p class="text-sm text-gray-600 mt-1">
+              Share your profile like a digital business card so every click becomes a future booking.
+            </p>
+            <div class="mt-3 flex flex-col sm:flex-row sm:items-center gap-2">
+              <input
+                :value="profileUrl"
+                readonly
+                class="w-full sm:flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700"
+                aria-label="Profile share link"
+              >
+              <button
+                type="button"
+                class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg border border-amber-200 text-amber-700 hover:bg-amber-100"
+                @click="copyProfileLink"
+              >
+                {{ copied ? 'Copied' : 'Copy link' }}
+              </button>
+              <a
+                :href="profileUrl"
+                target="_blank"
+                rel="noopener"
+                class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg bg-amber-600 text-white hover:bg-amber-700"
+                @click="openProfile"
+              >
+                Open profile
+              </a>
+            </div>
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                class="inline-flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border border-emerald-200 text-emerald-700 hover:bg-emerald-100"
+                @click="shareProfile('whatsapp')"
+              >
+                WhatsApp
+              </button>
+              <button
+                type="button"
+                class="inline-flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border border-blue-200 text-blue-700 hover:bg-blue-100"
+                @click="shareProfile('facebook')"
+              >
+                Facebook
+              </button>
+              <button
+                type="button"
+                class="inline-flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border border-indigo-200 text-indigo-700 hover:bg-indigo-100"
+                @click="shareProfile('messenger')"
+              >
+                Messenger
+              </button>
+              <button
+                type="button"
+                class="inline-flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border border-sky-200 text-sky-700 hover:bg-sky-100"
+                @click="shareProfile('telegram')"
+              >
+                Telegram
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Revenue Funnel -->
+      <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-4 sm:p-6 mb-3 sm:mb-4 md:mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-base sm:text-lg font-bold">
+            Revenue Funnel
+          </h3>
+          <span class="text-xs sm:text-sm text-gray-500">Views → Inquiries → Bookings → Revenue</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div class="rounded-xl border border-gray-200/70 bg-gradient-to-b from-white to-gray-50 p-3 sm:p-4">
+            <p class="text-[11px] uppercase tracking-wide text-gray-500 mb-1">
+              Profile Views
+            </p>
+            <p class="text-lg sm:text-2xl font-bold text-gray-900">
+              {{ funnelStats.views }}
+            </p>
+            <div class="h-2 bg-gray-200 rounded-full overflow-hidden mt-3">
+              <div
+                class="h-full bg-burgundy"
+                :style="{ width: funnelStats.viewBar + '%' }"
+              />
+            </div>
+          </div>
+          <div class="rounded-xl border border-amber-200/70 bg-gradient-to-b from-white to-amber-50/60 p-3 sm:p-4">
+            <p class="text-[11px] uppercase tracking-wide text-amber-700 mb-1">
+              Inquiries
+            </p>
+            <p class="text-lg sm:text-2xl font-bold text-gray-900">
+              {{ funnelStats.inquiries }}
+            </p>
+            <p class="text-xs text-gray-500">
+              {{ funnelStats.inquiryRate }}% from views
+            </p>
+            <div class="h-2 bg-gray-200 rounded-full overflow-hidden mt-3">
+              <div
+                class="h-full bg-amber-500"
+                :style="{ width: funnelStats.inquiryBar + '%' }"
+              />
+            </div>
+          </div>
+          <div class="rounded-xl border border-emerald-200/70 bg-gradient-to-b from-white to-emerald-50/60 p-3 sm:p-4">
+            <p class="text-[11px] uppercase tracking-wide text-emerald-700 mb-1">
+              Bookings
+            </p>
+            <p class="text-lg sm:text-2xl font-bold text-gray-900">
+              {{ funnelStats.bookings }}
+            </p>
+            <p class="text-xs text-gray-500">
+              {{ funnelStats.bookingRate }}% from inquiries
+            </p>
+            <div class="h-2 bg-gray-200 rounded-full overflow-hidden mt-3">
+              <div
+                class="h-full bg-emerald-500"
+                :style="{ width: funnelStats.bookingBar + '%' }"
+              />
+            </div>
+          </div>
+          <div class="rounded-xl border border-rose-200/70 bg-gradient-to-b from-white to-rose-50/60 p-3 sm:p-4">
+            <p class="text-[11px] uppercase tracking-wide text-rose-700 mb-1">
+              Revenue
+            </p>
+            <p class="text-lg sm:text-2xl font-bold text-gray-900">
+              ৳{{ funnelStats.revenue }}
+            </p>
+            <p class="text-xs text-gray-500">
+              ৳{{ funnelStats.revenuePerBooking }} per booking
+            </p>
+            <div class="h-2 bg-gray-200 rounded-full overflow-hidden mt-3">
+              <div
+                class="h-full bg-rose-600"
+                :style="{ width: funnelStats.revenueBar + '%' }"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Summary -->
+      <div class="bg-white rounded-lg shadow p-4 sm:p-6 mb-3 sm:mb-4 md:mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-base sm:text-lg font-bold">
+            Upcoming
+          </h3>
+          <span class="text-xs sm:text-sm text-gray-500">Next 7 days</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div class="rounded-xl border border-gray-200/70 bg-gradient-to-b from-white to-gray-50 p-3 sm:p-4">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-sm font-semibold text-gray-900">Bookings</p>
+              <button
+                type="button"
+                class="text-xs font-semibold text-burgundy hover:text-burgundy-dark"
+                @click="activeTab = 'bookings'"
+              >
+                View all
+              </button>
+            </div>
+            <p class="text-xs text-gray-500">{{ upcomingBookings.length }} scheduled</p>
+            <p class="text-sm text-gray-700 mt-2">
+              {{ upcomingBookings[0]?.client?.name || 'No upcoming bookings' }}
+            </p>
+            <p class="text-xs text-gray-500">
+              {{ upcomingBookings[0]?.event_date ? formatDate(upcomingBookings[0].event_date) : 'Add availability to get booked' }}
+            </p>
+          </div>
+          <div class="rounded-xl border border-gray-200/70 bg-gradient-to-b from-white to-gray-50 p-3 sm:p-4">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-sm font-semibold text-gray-900">Events</p>
+              <button
+                type="button"
+                class="text-xs font-semibold text-burgundy hover:text-burgundy-dark"
+                @click="activeTab = 'events'"
+              >
+                View all
+              </button>
+            </div>
+            <p class="text-xs text-gray-500">{{ upcomingEvents.length }} upcoming</p>
+            <p class="text-sm text-gray-700 mt-2">
+              {{ upcomingEvents[0]?.title || 'No upcoming events' }}
+            </p>
+            <p class="text-xs text-gray-500">
+              {{ upcomingEvents[0]?.event_date ? formatDate(upcomingEvents[0].event_date) : 'Create an event to stay visible' }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Response SLA -->
+      <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-4 sm:p-6 mb-3 sm:mb-4 md:mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-base sm:text-lg font-bold">
+            Response Time
+          </h3>
+          <span class="text-xs sm:text-sm text-gray-500">Faster replies win more bookings</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="rounded-xl border border-gray-200/70 bg-gradient-to-b from-white to-gray-50 p-4">
+            <p class="text-[11px] uppercase tracking-wide text-gray-500 mb-1">
+              Average response
+            </p>
+            <p class="text-2xl font-bold text-gray-900">
+              {{ responseStats.average }} hrs
+            </p>
+            <p class="text-xs text-gray-500">
+              Goal: under {{ responseStats.target }} hrs
+            </p>
+          </div>
+          <div class="rounded-xl border border-gray-200/70 bg-gradient-to-b from-white to-gray-50 p-4">
+            <p class="text-[11px] uppercase tracking-wide text-gray-500 mb-1">
+              Performance
+            </p>
+            <p
+              class="text-2xl font-bold"
+              :class="responseStats.statusClass"
             >
-              <svg v-if="!copied" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-              <svg v-else class="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-              </svg>
-              <span class="hidden sm:inline">{{ copied ? 'Copied!' : 'Copy' }}</span>
-            </button>
-            <a
-              :href="profileUrl"
-              target="_blank"
-              class="flex-1 sm:flex-none px-4 sm:px-6 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-lg font-medium hover:bg-white/20 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base min-h-[44px]"
+              {{ responseStats.statusLabel }}
+            </p>
+            <div class="h-2 bg-gray-200 rounded-full overflow-hidden mt-3">
+              <div
+                class="h-full"
+                :class="responseStats.barClass"
+                :style="{ width: responseStats.progress + '%' }"
+              />
+            </div>
+          </div>
+          <div class="rounded-xl border border-rose-200/70 bg-gradient-to-b from-white to-rose-50/60 p-4 flex flex-col justify-between">
+            <div>
+              <p class="text-[11px] uppercase tracking-wide text-rose-700 mb-1">
+                Tip
+              </p>
+              <p class="text-sm text-gray-700">
+                Use quick replies to answer within 1 hour.
+              </p>
+            </div>
+            <router-link
+              to="/photographer/settings"
+              class="mt-3 inline-flex items-center justify-center px-3 py-2 rounded-lg text-sm font-semibold bg-burgundy text-white hover:bg-burgundy-dark transition-colors"
             >
-              <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-              View
-            </a>
+              Update account settings
+            </router-link>
           </div>
         </div>
       </div>
 
       <!-- Tabs -->
-      <div class="bg-white rounded-lg shadow">
-        <div class="border-b">
+      <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm">
+        <div class="border-b border-gray-200/70 bg-gray-50/70">
           <div class="overflow-x-auto scrollbar-hide">
             <div class="flex gap-3 sm:gap-6 px-3 sm:px-6 py-3 sm:py-4 min-w-max">
               <button
+                v-if="canViewBookings"
+                :class="`pb-2 font-semibold whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 transition-colors ${activeTab === 'bookings' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600 hover:text-gray-900'}`"
                 @click="activeTab = 'bookings'"
-                :class="`pb-2 font-medium whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 ${activeTab === 'bookings' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600'}`"
               >
-                Bookings
+                {{ isPhotographerRole ? 'Incoming Requests' : 'Bookings' }}
               </button>
               <button
-                @click="activeTab = 'profile'"
-                :class="`pb-2 font-medium whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 ${activeTab === 'profile' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600'}`"
-              >
-                Profile
-              </button>
-              <button
+                :class="`pb-2 font-semibold whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 transition-colors ${activeTab === 'portfolio' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600 hover:text-gray-900'}`"
                 @click="activeTab = 'portfolio'"
-                :class="`pb-2 font-medium whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 ${activeTab === 'portfolio' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600'}`"
               >
                 Portfolio
               </button>
               <button
+                :class="`pb-2 font-semibold whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 transition-colors ${activeTab === 'packages' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600 hover:text-gray-900'}`"
                 @click="activeTab = 'packages'"
-                :class="`pb-2 font-medium whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 ${activeTab === 'packages' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600'}`"
               >
                 Packages
               </button>
               <button
+                :class="`pb-2 font-semibold whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 transition-colors ${activeTab === 'reviews' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600 hover:text-gray-900'}`"
                 @click="activeTab = 'reviews'"
-                :class="`pb-2 font-medium whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 ${activeTab === 'reviews' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600'}`"
               >
                 Reviews
               </button>
               <button
+                :class="`pb-2 font-semibold whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 transition-colors ${activeTab === 'competitions' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600 hover:text-gray-900'}`"
                 @click="activeTab = 'competitions'"
-                :class="`pb-2 font-medium whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 ${activeTab === 'competitions' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600'}`"
               >
                 Competitions
               </button>
               <button
+                :class="`pb-2 font-semibold whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 transition-colors ${activeTab === 'events' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600 hover:text-gray-900'}`"
                 @click="activeTab = 'events'"
-                :class="`pb-2 font-medium whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 ${activeTab === 'events' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600'}`"
               >
                 Events
               </button>
               <button
+                :class="`pb-2 font-semibold whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 transition-colors ${activeTab === 'achievements' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600 hover:text-gray-900'}`"
                 @click="activeTab = 'achievements'"
-                :class="`pb-2 font-medium whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 ${activeTab === 'achievements' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600'}`"
               >
                 🌟 Achievements
               </button>
               <button
+                :class="`pb-2 font-semibold whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 transition-colors ${activeTab === 'awards' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600 hover:text-gray-900'}`"
                 @click="activeTab = 'awards'"
-                :class="`pb-2 font-medium whitespace-nowrap text-sm sm:text-base min-h-[44px] px-2 ${activeTab === 'awards' ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-600'}`"
               >
                 🏆 Awards
               </button>
@@ -149,29 +383,72 @@
 
         <div class="p-3 sm:p-4 md:p-6">
           <!-- Bookings Tab -->
-          <div v-if="activeTab === 'bookings'">
-            <h2 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Recent Bookings</h2>
+          <div v-if="activeTab === 'bookings' && canViewBookings">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3 sm:mb-4">
+              <h2 class="text-lg sm:text-xl font-bold">
+                {{ isPhotographerRole ? 'Incoming Requests' : 'Recent Bookings' }}
+              </h2>
+              <router-link
+                v-if="!isPhotographerRole"
+                to="/bookings"
+                class="text-sm font-semibold text-burgundy hover:underline"
+              >
+                View all bookings
+              </router-link>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 mb-4">
+              <div class="rounded-xl border border-gray-200/70 bg-gradient-to-b from-white to-gray-50 p-3">
+                <p class="text-[11px] uppercase tracking-wide text-gray-500">Total</p>
+                <p class="text-lg sm:text-xl font-bold text-gray-900">{{ incomingSummary.total }}</p>
+              </div>
+              <div class="rounded-xl border border-amber-200/70 bg-gradient-to-b from-white to-amber-50/60 p-3">
+                <p class="text-[11px] uppercase tracking-wide text-amber-700">Pending</p>
+                <p class="text-lg sm:text-xl font-bold text-amber-800">{{ incomingSummary.pending }}</p>
+              </div>
+              <div class="rounded-xl border border-orange-200/70 bg-gradient-to-b from-white to-orange-50/60 p-3">
+                <p class="text-[11px] uppercase tracking-wide text-orange-700">Awaiting Payment</p>
+                <p class="text-lg sm:text-xl font-bold text-orange-800">{{ incomingSummary.pendingPayment }}</p>
+              </div>
+              <div class="rounded-xl border border-green-200/70 bg-gradient-to-b from-white to-green-50/60 p-3">
+                <p class="text-[11px] uppercase tracking-wide text-green-700">Confirmed</p>
+                <p class="text-lg sm:text-xl font-bold text-green-800">{{ incomingSummary.confirmed }}</p>
+              </div>
+            </div>
             <EmptyState 
               v-if="bookings.length === 0"
               icon="calendar"
-              title="No bookings yet"
-              description="Your booking requests will appear here"
+              :title="isPhotographerRole ? 'No incoming requests' : 'No bookings yet'"
+              :description="isPhotographerRole ? 'New booking requests will appear here' : 'Your booking requests will appear here'"
             />
-            <div v-else class="space-y-3 sm:space-y-4">
+            <div
+              v-else
+              class="space-y-3 sm:space-y-4"
+            >
               <div
                 v-for="booking in bookings"
                 :key="booking.id"
-                class="border rounded-lg p-3 sm:p-4 hover:bg-gray-50 active:bg-gray-100"
+                class="rounded-xl border border-gray-200/70 bg-white p-3 sm:p-4 hover:bg-gray-50 active:bg-gray-100"
               >
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2 sm:mb-3">
                   <div class="min-w-0 flex-1">
-                    <h3 class="font-bold text-sm sm:text-base truncate">{{ booking.client?.name || 'Unknown Client' }}</h3>
-                    <p class="text-xs sm:text-sm text-gray-600 truncate">{{ booking.event_location }}</p>
+                    <h3 class="font-bold text-sm sm:text-base truncate">
+                      <router-link
+                        v-if="booking.id"
+                        :to="`/bookings/${booking.id}/messages`"
+                        class="hover:underline"
+                      >
+                        {{ booking.client?.name || 'Unknown Client' }}
+                      </router-link>
+                      <span v-else>{{ booking.client?.name || 'Unknown Client' }}</span>
+                    </h3>
+                    <p class="text-xs sm:text-sm text-gray-600 truncate">
+                      {{ booking.event_location }}
+                    </p>
                   </div>
                   <span
                     :class="`px-2 sm:px-3 py-1 rounded-full text-xs whitespace-nowrap ${getBookingStatusClass(booking.status)}`"
                   >
-                    {{ booking.status }}
+                    {{ formatStatus(booking.status) }}
                   </span>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm mb-3">
@@ -198,30 +475,80 @@
                     <span class="ml-2 text-gray-500 italic">Not specified</span>
                   </div>
                 </div>
-                <div v-if="booking.status === 'pending'" class="flex flex-col sm:flex-row gap-2">
+                <div class="mb-3">
+                  <div
+                    v-if="isPhotographerRole"
+                    class="rounded-lg border border-rose-100 bg-rose-50/70 p-3"
+                  >
+                    <p class="text-[11px] uppercase tracking-wide text-rose-700 mb-2">
+                      Photographer Details
+                    </p>
+                    <div class="flex flex-wrap items-center gap-2">
+                      <a
+                        v-if="booking.id"
+                        :href="`/bookings/${booking.id}`"
+                        class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-100 min-h-[40px] sm:min-h-0"
+                      >
+                        View Details
+                      </a>
+                      <router-link
+                        v-if="booking.id"
+                        :to="`/bookings/${booking.id}/messages`"
+                        class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg border border-burgundy text-burgundy hover:bg-burgundy hover:text-white min-h-[40px] sm:min-h-0"
+                      >
+                        Open Messages
+                      </router-link>
+                    </div>
+                  </div>
+                  <div
+                    v-else
+                    class="flex flex-wrap items-center gap-2"
+                  >
+                    <router-link
+                      v-if="booking.id"
+                      :to="`/bookings/${booking.id}/messages`"
+                      class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg border border-burgundy text-burgundy hover:bg-burgundy hover:text-white min-h-[40px] sm:min-h-0"
+                    >
+                      Open Messages
+                    </router-link>
+                    <router-link
+                      to="/bookings"
+                      class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 min-h-[40px] sm:min-h-0"
+                    >
+                      View Details
+                    </router-link>
+                  </div>
+                </div>
+                <div
+                  v-if="booking.status === 'pending'"
+                  class="flex flex-col sm:flex-row gap-2"
+                >
                   <button 
-                    @click="updateBookingStatus(booking.id, 'confirmed')"
                     class="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm font-medium min-h-[44px] sm:min-h-0"
+                    @click="updateBookingStatus(booking.id, 'confirmed')"
                   >
                     Accept
                   </button>
                   <button 
-                    @click="updateBookingStatus(booking.id, 'rejected')"
                     class="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm font-medium min-h-[44px] sm:min-h-0"
+                    @click="updateBookingStatus(booking.id, 'rejected')"
                   >
                     Decline
                   </button>
                 </div>
-                <div v-else-if="booking.status === 'confirmed'" class="flex flex-col sm:flex-row gap-2">
+                <div
+                  v-else-if="booking.status === 'confirmed'"
+                  class="flex flex-col sm:flex-row gap-2"
+                >
                   <button 
-                    @click="updateBookingStatus(booking.id, 'completed')"
                     class="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium min-h-[44px] sm:min-h-0"
+                    @click="updateBookingStatus(booking.id, 'completed')"
                   >
                     Mark Completed
                   </button>
                   <button 
-                    @click="updateBookingStatus(booking.id, 'cancelled')"
                     class="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm font-medium min-h-[44px] sm:min-h-0"
+                    @click="updateBookingStatus(booking.id, 'cancelled')"
                   >
                     Cancel
                   </button>
@@ -230,209 +557,16 @@
             </div>
           </div>
 
-          <!-- Profile Tab -->
-          <div v-if="activeTab === 'profile'">
-            <h2 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Profile Settings</h2>
-            <div class="space-y-4 sm:space-y-6">
-              <div>
-                <label class="block text-sm font-medium mb-2">Profile Picture</label>
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 mb-3">
-                  <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center flex-shrink-0">
-                    <img 
-                      v-if="photographer?.profile_picture" 
-                      :src="`/storage/${photographer.profile_picture}`" 
-                      :alt="user?.name"
-                      class="w-full h-full object-cover"
-                    />
-                    <svg v-else class="w-12 h-12 sm:w-14 sm:h-14 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </div>
-                  <div class="flex-1 w-full">
-                    <ImageUpload
-                      label=""
-                      placeholder="Upload your profile picture"
-                      @upload="handleProfileImageUpload"
-                    />
-                    <p class="text-xs text-gray-500 mt-1">Recommended: Square image, at least 400x400px</p>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-medium mb-2">Bio</label>
-                <textarea
-                  v-model="profileForm.bio"
-                  rows="4"
-                  class="w-full border rounded px-3 sm:px-4 py-2 text-sm sm:text-base focus:ring-2 focus:ring-burgundy"
-                  placeholder="Tell clients about yourself..."
-                ></textarea>
-              </div>
-              <div>
-                <label class="block text-sm font-medium mb-2">City/Location</label>
-                <select
-                  v-model="profileForm.city_id"
-                  class="w-full border rounded px-3 sm:px-4 py-2 text-sm sm:text-base focus:ring-2 focus:ring-burgundy"
-                >
-                  <option value="">Select your city</option>
-                  <option v-for="city in cities" :key="city.id" :value="city.id">
-                    {{ city.name }}{{ city.state ? ', ' + city.state : '' }}
-                  </option>
-                </select>
-                <p class="text-xs text-gray-500 mt-1">Select your primary work location</p>
-              </div>
-              <div>
-                <label class="block text-sm font-medium mb-2">Categories</label>
-                <div class="border rounded px-3 sm:px-4 py-2 focus-within:ring-2 focus-within:ring-burgundy max-h-48 overflow-y-auto">
-                  <div v-if="categories.length === 0" class="text-gray-400 text-sm">Loading categories...</div>
-                  <label v-for="category in categories" :key="category.id" class="flex items-center gap-2 py-1.5 cursor-pointer hover:bg-gray-50 px-2 rounded">
-                    <input
-                      type="checkbox"
-                      :value="category.id"
-                      v-model="profileForm.category_ids"
-                      class="rounded text-burgundy focus:ring-burgundy"
-                    />
-                    <span class="text-sm">{{ category.name }}</span>
-                  </label>
-                </div>
-                <p class="text-xs text-gray-500 mt-1">Select photography types you specialize in</p>
-              </div>
-              <div>
-                <label class="block text-sm font-medium mb-2">Favorite Hashtags</label>
-                <div class="border rounded px-3 sm:px-4 py-2 focus-within:ring-2 focus-within:ring-burgundy max-h-48 overflow-y-auto">
-                  <div v-if="hashtags.length === 0" class="text-gray-400 text-sm">Loading hashtags...</div>
-                  <label v-for="hashtag in hashtags" :key="hashtag.id" class="flex items-center gap-2 py-1.5 cursor-pointer hover:bg-gray-50 px-2 rounded">
-                    <input
-                      type="checkbox"
-                      :value="hashtag.name"
-                      v-model="profileForm.favorite_hashtags"
-                      class="rounded text-burgundy focus:ring-burgundy"
-                    />
-                    <span class="text-sm">#{{ hashtag.name }}</span>
-                    <span v-if="hashtag.usage_count" class="text-xs text-gray-400 ml-auto">{{ hashtag.usage_count }}</span>
-                  </label>
-                </div>
-                <p class="text-xs text-gray-500 mt-1">Select relevant hashtags for your photography style</p>
-              </div>
-              <div>
-                <label class="block text-sm font-medium mb-2">Experience (Years)</label>
-                <input
-                  v-model.number="profileForm.experience_years"
-                  type="number"
-                  class="w-full border rounded px-3 sm:px-4 py-2 text-sm sm:text-base focus:ring-2 focus:ring-burgundy"
-                />
-              </div>
-
-              <!-- Social Media Links Section -->
-              <div class="border-t pt-4 mt-6">
-                <h3 class="text-base sm:text-lg font-bold mb-3 sm:mb-4">Social Media Links</h3>
-                <p class="text-xs sm:text-sm text-gray-600 mb-4">Add your social media profiles to help clients connect with you</p>
-                <div class="space-y-3 sm:space-y-4">
-                  <div>
-                    <label class="block text-sm font-medium mb-2 flex items-center gap-2">
-                      <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                      </svg>
-                      Facebook
-                    </label>
-                    <input
-                      v-model="profileForm.facebook_url"
-                      type="url"
-                      class="w-full border rounded px-3 sm:px-4 py-2 text-sm sm:text-base focus:ring-2 focus:ring-burgundy"
-                      placeholder="https://facebook.com/yourpage"
-                    />
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium mb-2 flex items-center gap-2">
-                      <svg class="w-4 h-4 text-pink-600" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                      </svg>
-                      Instagram
-                    </label>
-                    <input
-                      v-model="profileForm.instagram_url"
-                      type="url"
-                      class="w-full border rounded px-3 sm:px-4 py-2 text-sm sm:text-base focus:ring-2 focus:ring-burgundy"
-                      placeholder="https://instagram.com/yourusername"
-                    />
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium mb-2 flex items-center gap-2">
-                      <svg class="w-4 h-4 text-sky-500" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                      </svg>
-                      Twitter / X
-                    </label>
-                    <input
-                      v-model="profileForm.twitter_url"
-                      type="url"
-                      class="w-full border rounded px-3 sm:px-4 py-2 text-sm sm:text-base focus:ring-2 focus:ring-burgundy"
-                      placeholder="https://twitter.com/yourusername"
-                    />
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium mb-2 flex items-center gap-2">
-                      <svg class="w-4 h-4 text-blue-700" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                      </svg>
-                      LinkedIn
-                    </label>
-                    <input
-                      v-model="profileForm.linkedin_url"
-                      type="url"
-                      class="w-full border rounded px-3 sm:px-4 py-2 text-sm sm:text-base focus:ring-2 focus:ring-burgundy"
-                      placeholder="https://linkedin.com/in/yourprofile"
-                    />
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium mb-2 flex items-center gap-2">
-                      <svg class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                      </svg>
-                      YouTube
-                    </label>
-                    <input
-                      v-model="profileForm.youtube_url"
-                      type="url"
-                      class="w-full border rounded px-3 sm:px-4 py-2 text-sm sm:text-base focus:ring-2 focus:ring-burgundy"
-                      placeholder="https://youtube.com/@yourchannel"
-                    />
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium mb-2 flex items-center gap-2">
-                      <svg class="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-                      </svg>
-                      Website
-                    </label>
-                    <input
-                      v-model="profileForm.website_url"
-                      type="url"
-                      class="w-full border rounded px-3 sm:px-4 py-2 text-sm sm:text-base focus:ring-2 focus:ring-burgundy"
-                      placeholder="https://yourwebsite.com"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <button 
-                @click="saveProfile"
-                class="w-full sm:w-auto px-6 py-3 sm:py-2 bg-burgundy text-white rounded hover:bg-[#6F112D] font-medium min-h-[44px] sm:min-h-0"
-              >
-                Save Changes
-              </button>
-            </div>
-          </div>
-
           <!-- Portfolio Tab -->
           <div v-if="activeTab === 'portfolio'">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-              <h2 class="text-lg sm:text-xl font-bold">Portfolio Albums</h2>
-              <button @click="showAlbumModal = true" class="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-burgundy text-white rounded hover:bg-[#6F112D] font-medium min-h-[44px] sm:min-h-0">
+              <h2 class="text-lg sm:text-xl font-bold">
+                Portfolio Albums
+              </h2>
+              <button
+                class="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-burgundy text-white rounded hover:bg-[#6F112D] font-medium min-h-[44px] sm:min-h-0"
+                @click="showAlbumModal = true"
+              >
                 + Add Album
               </button>
             </div>
@@ -444,7 +578,10 @@
               description="Create your first album to showcase your work!"
             />
 
-            <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div
+              v-else
+              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+            >
               <div
                 v-for="album in albums"
                 :key="album.id"
@@ -454,29 +591,45 @@
                   <img
                     v-if="album.cover_photo"
                     :src="album.cover_photo"
-                    :alt="album.title"
+                    :alt="album.name"
                     class="w-full h-full object-cover"
-                  />
-                  <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                  >
+                  <div class="absolute inset-0 bg-black/40 flex items-center justify-center gap-2 opacity-0 hover:opacity-100 transition-opacity">
                     <button
+                      class="px-3 py-2 bg-white text-burgundy rounded-lg font-medium text-sm hover:bg-gray-100"
                       @click="viewAlbum(album)"
-                      class="px-4 py-2 bg-white text-burgundy rounded-lg font-medium"
                     >
-                      View Album
+                      View Photos
+                    </button>
+                    <button
+                      class="px-3 py-2 bg-blue-500 text-white rounded-lg font-medium text-sm hover:bg-blue-600"
+                      @click="editAlbum(album)"
+                    >
+                      Edit
                     </button>
                   </div>
                 </div>
                 <div class="p-4">
-                  <h3 class="font-bold text-lg mb-1">{{ album.title }}</h3>
-                  <p class="text-sm text-gray-600 mb-2">{{ album.description }}</p>
-                  <div class="flex items-center justify-between text-sm">
-                    <span class="text-gray-500">{{ album.photo_count || 0 }} photos</span>
+                  <h3 class="font-bold text-lg mb-1">
+                    {{ album.name }}
+                  </h3>
+                  <p class="text-sm text-gray-600 mb-3">
+                    {{ album.description }}
+                  </p>
+                  <div class="flex items-center justify-between text-sm mb-3">
+                    <span class="text-gray-500">{{ album.photos_count || 0 }} photos</span>
                     <span
                       :class="`px-2 py-1 rounded text-xs ${album.is_public ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`"
                     >
                       {{ album.is_public ? 'Public' : 'Private' }}
                     </span>
                   </div>
+                  <button
+                    class="w-full px-3 py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 font-medium text-sm"
+                    @click="deleteAlbum(album)"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             </div>
@@ -489,7 +642,9 @@
             @click.self="showAlbumModal = false"
           >
             <div class="bg-white rounded-lg max-w-md w-full p-6">
-              <h3 class="text-xl font-bold mb-4">Create New Album</h3>
+              <h3 class="text-xl font-bold mb-4">
+                {{ editingAlbumId ? 'Edit Album' : 'Create New Album' }}
+              </h3>
               <div class="space-y-4">
                 <div>
                   <label class="block text-sm font-medium mb-2">Album Name *</label>
@@ -498,7 +653,7 @@
                     type="text"
                     class="w-full border rounded px-4 py-2 focus:ring-2 focus:ring-burgundy"
                     placeholder="Wedding Photography"
-                  />
+                  >
                 </div>
                 <div>
                   <label class="block text-sm font-medium mb-2">Description</label>
@@ -507,29 +662,32 @@
                     rows="3"
                     class="w-full border rounded px-4 py-2 focus:ring-2 focus:ring-burgundy"
                     placeholder="Beautiful wedding moments captured..."
-                  ></textarea>
+                  />
                 </div>
                 <div class="flex items-center gap-2">
                   <input
+                    id="is_public"
                     v-model="albumForm.is_public"
                     type="checkbox"
-                    id="is_public"
                     class="w-4 h-4 text-burgundy focus:ring-burgundy"
-                  />
-                  <label for="is_public" class="text-sm font-medium">Make this album public</label>
+                  >
+                  <label
+                    for="is_public"
+                    class="text-sm font-medium"
+                  >Make this album public</label>
                 </div>
               </div>
               <div class="flex gap-3 mt-6">
                 <button
-                  @click="createAlbum"
                   :disabled="!albumForm.name || creatingAlbum"
                   class="flex-1 px-4 py-2 bg-burgundy text-white rounded hover:bg-[#6F112D] disabled:opacity-50 disabled:cursor-not-allowed"
+                  @click="editingAlbumId ? updateAlbum() : createAlbum()"
                 >
-                  {{ creatingAlbum ? 'Creating...' : 'Create Album' }}
+                  {{ creatingAlbum ? 'Saving...' : (editingAlbumId ? 'Update Album' : 'Create Album') }}
                 </button>
                 <button
-                  @click="showAlbumModal = false"
                   class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+                  @click="closeAlbumModal"
                 >
                   Cancel
                 </button>
@@ -548,8 +706,13 @@
           <!-- Packages Tab -->
           <div v-if="activeTab === 'packages'">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-              <h2 class="text-lg sm:text-xl font-bold">Service Packages</h2>
-              <button @click="showPackageModal = true" class="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-burgundy text-white rounded hover:bg-[#6F112D] font-medium min-h-[44px] sm:min-h-0">
+              <h2 class="text-lg sm:text-xl font-bold">
+                Service Packages
+              </h2>
+              <button
+                class="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-burgundy text-white rounded hover:bg-[#6F112D] font-medium min-h-[44px] sm:min-h-0"
+                @click="showPackageModal = true"
+              >
                 + Add Package
               </button>
             </div>
@@ -561,31 +724,54 @@
               description="Create service packages to attract clients!"
             />
 
-            <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div
+              v-else
+              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+            >
               <div
                 v-for="pkg in packages"
                 :key="pkg.id"
                 class="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <!-- Package Cover Image -->
-                <div v-if="pkg.cover_image" class="h-48 bg-gray-100">
+                <div
+                  v-if="pkg.cover_image"
+                  class="h-48 bg-gray-100"
+                >
                   <img
                     :src="pkg.cover_image"
                     :alt="pkg.name"
                     class="w-full h-full object-cover"
-                  />
+                  >
                 </div>
-                <div v-else class="h-48 bg-gradient-to-br from-burgundy/10 to-purple-100 flex items-center justify-center">
-                  <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <div
+                  v-else
+                  class="h-48 bg-gradient-to-br from-burgundy/10 to-purple-100 flex items-center justify-center"
+                >
+                  <svg
+                    class="w-16 h-16 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
                   </svg>
                 </div>
                 
                 <div class="p-6">
                   <div class="flex items-start justify-between mb-4">
                     <div>
-                      <h3 class="font-bold text-xl mb-1">{{ pkg.name }}</h3>
-                      <p class="text-2xl font-bold text-burgundy">৳{{ pkg.price }}</p>
+                      <h3 class="font-bold text-xl mb-1">
+                        {{ pkg.name }}
+                      </h3>
+                      <p class="text-2xl font-bold text-burgundy">
+                        ৳{{ pkg.price }}
+                      </p>
                     </div>
                     <span
                       :class="`px-3 py-1 rounded-full text-xs font-medium ${pkg.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`"
@@ -594,30 +780,75 @@
                     </span>
                   </div>
                   
-                  <p class="text-sm text-gray-600 mb-4">{{ pkg.description }}</p>
+                  <p class="text-sm text-gray-600 mb-4">
+                    {{ pkg.description }}
+                  </p>
                   
                   <div class="space-y-2 mb-4">
                     <div class="flex items-center gap-2 text-sm">
-                      <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      <svg
+                        class="w-4 h-4 text-green-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                       <span>{{ pkg.duration_hours }} hours coverage</span>
                     </div>
                     <div class="flex items-center gap-2 text-sm">
-                      <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      <svg
+                        class="w-4 h-4 text-green-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                       <span>{{ pkg.edited_photos }} edited photos</span>
                     </div>
-                    <div v-if="pkg.raw_photos" class="flex items-center gap-2 text-sm">
-                      <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    <div
+                      v-if="pkg.raw_photos"
+                      class="flex items-center gap-2 text-sm"
+                    >
+                      <svg
+                        class="w-4 h-4 text-green-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                       <span>{{ pkg.raw_photos }} raw photos</span>
                     </div>
                     <div class="flex items-center gap-2 text-sm">
-                      <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      <svg
+                        class="w-4 h-4 text-green-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                       <span>{{ pkg.delivery_days }} days delivery</span>
                     </div>
@@ -625,14 +856,14 @@
 
                   <div class="flex gap-2">
                     <button
-                      @click="editPackage(pkg)"
                       class="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                      @click="editPackage(pkg)"
                     >
                       Edit
                     </button>
                     <button
-                      @click="deletePackage(pkg)"
                       class="px-3 py-2 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+                      @click="deletePackage(pkg)"
                     >
                       Delete
                     </button>
@@ -649,7 +880,9 @@
             @click.self="closePackageModal"
           >
             <div class="bg-white rounded-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
-              <h3 class="text-xl font-bold mb-4">{{ editingPackage ? 'Edit Package' : 'Create New Package' }}</h3>
+              <h3 class="text-xl font-bold mb-4">
+                {{ editingPackage ? 'Edit Package' : 'Create New Package' }}
+              </h3>
               <div class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -659,7 +892,7 @@
                       type="text"
                       class="w-full border rounded px-4 py-2 focus:ring-2 focus:ring-burgundy"
                       placeholder="Basic Package"
-                    />
+                    >
                   </div>
                   <div>
                     <label class="block text-sm font-medium mb-2">Price (৳) *</label>
@@ -668,7 +901,7 @@
                       type="number"
                       class="w-full border rounded px-4 py-2 focus:ring-2 focus:ring-burgundy"
                       placeholder="15000"
-                    />
+                    >
                   </div>
                 </div>
 
@@ -679,11 +912,13 @@
                     rows="3"
                     class="w-full border rounded px-4 py-2 focus:ring-2 focus:ring-burgundy"
                     placeholder="Perfect for small events and gatherings..."
-                  ></textarea>
+                  />
                 </div>
 
                 <div class="bg-purple-50 border border-purple-200 rounded p-4">
-                  <p class="text-sm font-medium mb-2">📸 Package Images (Optional)</p>
+                  <p class="text-sm font-medium mb-2">
+                    📸 Package Images (Optional)
+                  </p>
                   <div class="space-y-3">
                     <div>
                       <label class="block text-xs text-gray-600 mb-1">Cover Image URL</label>
@@ -692,11 +927,94 @@
                         type="url"
                         class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-purple-600"
                         placeholder="https://images.pexels.com/photos/..."
-                      />
-                      <p class="text-xs text-gray-500 mt-1">Add a Pexels or external image URL</p>
+                      >
+                      <p class="text-xs text-gray-500 mt-1">
+                        Add a Pexels or external image URL
+                      </p>
                     </div>
-                    <div v-if="packageForm.cover_image" class="mt-2">
-                      <img :src="packageForm.cover_image" alt="Cover preview" class="w-32 h-32 object-cover rounded" />
+                    <div>
+                      <label class="block text-xs text-gray-600 mb-1">Cover Image Upload</label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        class="upload-input text-sm"
+                        @change="onPackageCoverSelected"
+                      >
+                      <p class="text-xs text-gray-500 mt-1">
+                        Upload a local image file (JPG/PNG/WEBP, max 10MB, 1200x800 px)
+                      </p>
+                    </div>
+                    <div
+                      v-if="packageForm.cover_image"
+                      class="mt-2"
+                    >
+                      <img
+                        :src="packageForm.cover_image"
+                        alt="Cover preview"
+                        class="w-32 h-32 object-cover rounded"
+                      >
+                    </div>
+                    <div
+                      v-if="packageCoverFile"
+                      class="text-xs text-green-700"
+                    >
+                      ✅ Selected cover file: {{ packageCoverFile.name }}
+                    </div>
+
+                    <div class="border-t pt-3">
+                      <label class="block text-xs text-gray-600 mb-1">Sample Images (URLs)</label>
+                      <div class="flex gap-2">
+                        <input
+                          v-model="packageSampleUrlInput"
+                          type="url"
+                          class="flex-1 border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-purple-600"
+                          placeholder="https://images.pexels.com/photos/..."
+                        >
+                        <button
+                          type="button"
+                          class="px-3 py-2 text-sm bg-purple-600 text-white rounded hover:bg-purple-700"
+                          @click="addSampleUrl"
+                        >
+                          Add
+                        </button>
+                      </div>
+                      <div
+                        v-if="packageForm.sample_images?.length"
+                        class="mt-2 flex flex-wrap gap-2"
+                      >
+                        <span
+                          v-for="(url, idx) in packageForm.sample_images"
+                          :key="url + idx"
+                          class="inline-flex items-center gap-2 px-2 py-1 bg-white border rounded text-xs"
+                        >
+                          {{ url.length > 40 ? url.slice(0, 40) + '…' : url }}
+                          <button
+                            type="button"
+                            class="text-red-600"
+                            @click="removeSampleUrl(idx)"
+                          >×</button>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="border-t pt-3">
+                      <label class="block text-xs text-gray-600 mb-1">Sample Images (Upload)</label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        class="upload-input text-sm"
+                        @change="onPackageSamplesSelected"
+                      >
+                      <p class="text-xs text-gray-500 mt-1">
+                        Upload up to 10 images (JPG/PNG/WEBP, max 10MB each, 1600x1200 px)
+                      </p>
+                      <div
+                        v-if="packageSampleFiles.length"
+                        class="text-xs text-green-700 mt-1"
+                      >
+                        ✅ Selected {{ packageSampleFiles.length }} file(s)
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -709,7 +1027,7 @@
                       type="number"
                       class="w-full border rounded px-4 py-2 focus:ring-2 focus:ring-burgundy"
                       placeholder="4"
-                    />
+                    >
                   </div>
                   <div>
                     <label class="block text-sm font-medium mb-2">Edited Photos *</label>
@@ -718,7 +1036,7 @@
                       type="number"
                       class="w-full border rounded px-4 py-2 focus:ring-2 focus:ring-burgundy"
                       placeholder="50"
-                    />
+                    >
                   </div>
                   <div>
                     <label class="block text-sm font-medium mb-2">Raw Photos</label>
@@ -727,7 +1045,7 @@
                       type="number"
                       class="w-full border rounded px-4 py-2 focus:ring-2 focus:ring-burgundy"
                       placeholder="0"
-                    />
+                    >
                   </div>
                   <div>
                     <label class="block text-sm font-medium mb-2">Delivery Days *</label>
@@ -736,32 +1054,35 @@
                       type="number"
                       class="w-full border rounded px-4 py-2 focus:ring-2 focus:ring-burgundy"
                       placeholder="7"
-                    />
+                    >
                   </div>
                 </div>
 
                 <div class="flex items-center gap-2">
                   <input
+                    id="pkg_is_active"
                     v-model="packageForm.is_active"
                     type="checkbox"
-                    id="pkg_is_active"
                     class="w-4 h-4 text-burgundy focus:ring-burgundy"
-                  />
-                  <label for="pkg_is_active" class="text-sm font-medium">Make this package active</label>
+                  >
+                  <label
+                    for="pkg_is_active"
+                    class="text-sm font-medium"
+                  >Make this package active</label>
                 </div>
               </div>
               
               <div class="flex gap-3 mt-6">
                 <button
-                  @click="savePackage"
                   :disabled="!packageForm.name || !packageForm.price || creatingPackage"
                   class="flex-1 px-4 py-2 bg-burgundy text-white rounded hover:bg-[#6F112D] disabled:opacity-50 disabled:cursor-not-allowed"
+                  @click="savePackage"
                 >
                   {{ creatingPackage ? 'Saving...' : (editingPackage ? 'Update Package' : 'Create Package') }}
                 </button>
                 <button
-                  @click="closePackageModal"
                   class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+                  @click="closePackageModal"
                 >
                   Cancel
                 </button>
@@ -771,7 +1092,9 @@
 
           <!-- Reviews Tab -->
           <div v-if="activeTab === 'reviews'">
-            <h2 class="text-xl font-bold mb-4">Client Reviews</h2>
+            <h2 class="text-xl font-bold mb-4">
+              Client Reviews
+            </h2>
             <EmptyState
               icon="star"
               title="No reviews yet"
@@ -782,50 +1105,95 @@
           <!-- Competitions Tab -->
           <div v-if="activeTab === 'competitions'">
             <div class="mb-6">
-              <h2 class="text-xl font-bold">My Competition Submissions</h2>
-              <p class="text-sm text-gray-600 mt-1">View and manage your submissions to photography competitions</p>
+              <h2 class="text-xl font-bold">
+                My Competition Submissions
+              </h2>
+              <p class="text-sm text-gray-600 mt-1">
+                View and manage your submissions to photography competitions
+              </p>
             </div>
 
             <!-- Loading State -->
-            <div v-if="loadingSubmissions" class="grid grid-cols-1 gap-4">
-              <LoadingSkeleton type="card" v-for="n in 3" :key="n" />
+            <div
+              v-if="loadingSubmissions"
+              class="grid grid-cols-1 gap-4"
+            >
+              <LoadingSkeleton
+                v-for="n in 3"
+                :key="n"
+                type="card"
+              />
             </div>
 
             <!-- Submissions List -->
-            <div v-else-if="submissions.length > 0" class="space-y-4">
-              <div v-for="submission in submissions" :key="submission.id" class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+            <div
+              v-else-if="submissions.length > 0"
+              class="space-y-4"
+            >
+              <div
+                v-for="submission in submissions"
+                :key="submission.id"
+                class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+              >
                 <div class="flex items-start gap-4">
                   <!-- Submission Image -->
                   <div class="w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                     <img 
-                      v-if="submission.photo_url" 
-                      :src="submission.photo_url" 
+                      v-if="submission.thumbnail_url || submission.image_url || submission.photo_url" 
+                      :src="submission.thumbnail_url || submission.image_url || submission.photo_url" 
                       :alt="submission.title"
                       class="w-full h-full object-cover"
-                    />
-                    <div v-else class="w-full h-full flex items-center justify-center">
-                      <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    >
+                    <div
+                      v-else
+                      class="w-full h-full flex items-center justify-center"
+                    >
+                      <svg
+                        class="w-12 h-12 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
                       </svg>
                     </div>
                   </div>
 
                   <!-- Submission Details -->
                   <div class="flex-1">
-                    <h3 class="font-semibold text-lg mb-1">{{ submission.title }}</h3>
-                    <p class="text-sm text-gray-600 mb-3">{{ submission.description }}</p>
+                    <h3 class="font-semibold text-lg mb-1">
+                      {{ submission.title }}
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                      {{ submission.description }}
+                    </p>
                     
                     <!-- Competition Info -->
                     <div class="flex items-center gap-2 mb-2">
-                      <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      <svg
+                        class="w-4 h-4 text-gray-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                        />
                       </svg>
-                      <a 
-                        :href="`/competitions/${submission.competition?.slug}`" 
+                      <router-link
+                        :to="`/competitions/${submission.competition?.slug}`"
                         class="text-sm text-burgundy hover:underline"
                       >
                         {{ submission.competition?.title }}
-                      </a>
+                      </router-link>
                       <span 
                         class="px-2 py-1 text-xs rounded-full"
                         :class="{
@@ -842,14 +1210,34 @@
                     <!-- Stats -->
                     <div class="flex items-center gap-4 text-sm text-gray-600">
                       <div class="flex items-center gap-1">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
+                          />
                         </svg>
                         <span>{{ submission.votes_count || 0 }} votes</span>
                       </div>
                       <div class="flex items-center gap-1">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
                         </svg>
                         <span>Submitted {{ formatDate(submission.created_at) }}</span>
                       </div>
@@ -857,44 +1245,78 @@
                   </div>
 
                   <!-- View Button -->
-                  <a 
-                    :href="`/competitions/${submission.competition?.slug}`"
+                  <router-link
+                    :to="`/competitions/${submission.competition?.slug}`"
                     class="px-4 py-2 bg-burgundy text-white rounded-lg hover:bg-burgundy-dark transition-colors text-sm font-medium"
                   >
                     View Competition
-                  </a>
+                  </router-link>
                 </div>
               </div>
             </div>
 
             <!-- Empty State -->
-            <div v-else class="space-y-4">
+            <div
+              v-else
+              class="space-y-4"
+            >
               <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div class="flex items-start gap-3">
-                  <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    class="w-5 h-5 text-blue-600 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                   <div>
-                    <h3 class="font-semibold text-blue-900">Participate in Competitions</h3>
-                    <p class="text-sm text-blue-700 mt-1">Submit your best work to photography competitions and compete for prizes.</p>
+                    <h3 class="font-semibold text-blue-900">
+                      Participate in Competitions
+                    </h3>
+                    <p class="text-sm text-blue-700 mt-1">
+                      Submit your best work to photography competitions and compete for prizes.
+                    </p>
                     <ul class="mt-2 text-sm text-blue-700 space-y-1">
                       <li>• Browse active competitions in the Competitions page</li>
                       <li>• Submit your best photographs</li>
                       <li>• Get public votes and judge ratings</li>
                       <li>• Win prizes and build your reputation</li>
                     </ul>
-                    <a href="/competitions" class="inline-block mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                    <router-link
+                      to="/competitions"
+                      class="inline-block mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                    >
                       Browse Competitions
-                    </a>
+                    </router-link>
                   </div>
                 </div>
               </div>
               <div class="text-center py-12 text-gray-600">
-                <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                <svg
+                  class="w-16 h-16 mx-auto text-gray-400 mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                  />
                 </svg>
-                <p class="text-lg font-medium mb-2">No submissions yet</p>
-                <p class="text-sm mb-4">Submit to a competition to see your entries here</p>
+                <p class="text-lg font-medium mb-2">
+                  No submissions yet
+                </p>
+                <p class="text-sm mb-4">
+                  Submit to a competition to see your entries here
+                </p>
               </div>
             </div>
           </div>
@@ -902,30 +1324,59 @@
           <!-- Events Tab -->
           <div v-if="activeTab === 'events'">
             <div class="mb-6">
-              <h2 class="text-xl font-bold">My Events</h2>
-              <p class="text-sm text-gray-600 mt-1">Events you've registered for or attended</p>
+              <h2 class="text-xl font-bold">
+                My Events
+              </h2>
+              <p class="text-sm text-gray-600 mt-1">
+                Events you've registered for or attended
+              </p>
             </div>
 
             <!-- Events coming soon notice -->
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
               <div class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  class="w-5 h-5 text-blue-600 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <div>
-                  <h3 class="font-semibold text-blue-900">Participate in Events</h3>
-                  <p class="text-sm text-blue-700 mt-1">Browse photography events, workshops, and meetups organized by admins.</p>
-                  <a href="/events" class="inline-block mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                  <h3 class="font-semibold text-blue-900">
+                    Participate in Events
+                  </h3>
+                  <p class="text-sm text-blue-700 mt-1">
+                    Browse photography events, workshops, and meetups organized by admins.
+                  </p>
+                  <router-link
+                    to="/events"
+                    class="inline-block mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                  >
                     Browse Events
-                  </a>
+                  </router-link>
                 </div>
               </div>
             </div>
 
             <!-- Create Event Form -->
-            <div v-if="showEventForm" class="bg-white border rounded-lg p-6 mb-6">
-              <h3 class="text-lg font-semibold mb-4">Create New Event</h3>
-              <form @submit.prevent="createEvent" class="space-y-4">
+            <div
+              v-if="showEventForm"
+              class="bg-white border rounded-lg p-6 mb-6"
+            >
+              <h3 class="text-lg font-semibold mb-4">
+                Create New Event
+              </h3>
+              <form
+                class="space-y-4"
+                @submit.prevent="createEvent"
+              >
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Event Title *</label>
                   <input
@@ -934,7 +1385,7 @@
                     required
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
                     placeholder="Photography Workshop 2026"
-                  />
+                  >
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -945,13 +1396,27 @@
                       required
                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
                     >
-                      <option value="">Select type</option>
-                      <option value="workshop">Workshop</option>
-                      <option value="exhibition">Exhibition</option>
-                      <option value="meetup">Meetup</option>
-                      <option value="competition">Competition</option>
-                      <option value="seminar">Seminar</option>
-                      <option value="other">Other</option>
+                      <option value="">
+                        Select type
+                      </option>
+                      <option value="workshop">
+                        Workshop
+                      </option>
+                      <option value="exhibition">
+                        Exhibition
+                      </option>
+                      <option value="meetup">
+                        Meetup
+                      </option>
+                      <option value="competition">
+                        Competition
+                      </option>
+                      <option value="seminar">
+                        Seminar
+                      </option>
+                      <option value="other">
+                        Other
+                      </option>
                     </select>
                   </div>
 
@@ -962,7 +1427,7 @@
                       type="datetime-local"
                       required
                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
-                    />
+                    >
                   </div>
                 </div>
 
@@ -973,7 +1438,7 @@
                     rows="3"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
                     placeholder="Describe your event..."
-                  ></textarea>
+                  />
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -985,18 +1450,24 @@
                       required
                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
                       placeholder="123 Main St"
-                    />
+                    >
                   </div>
 
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Location *</label>
                     <select
                       v-model="eventForm.city_id"
                       required
                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
                     >
-                      <option value="">Select city</option>
-                      <option v-for="city in cities" :key="city.id" :value="city.id">
+                      <option value="">
+                        Select location
+                      </option>
+                      <option
+                        v-for="city in cities"
+                        :key="city.id"
+                        :value="city.id"
+                      >
                         {{ city.name }}
                       </option>
                     </select>
@@ -1013,8 +1484,10 @@
                       max="500"
                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
                       placeholder="50"
-                    />
-                    <p class="text-xs text-gray-500 mt-1">Max 500 for photographers</p>
+                    >
+                    <p class="text-xs text-gray-500 mt-1">
+                      Max 500 for photographers
+                    </p>
                   </div>
 
                   <div>
@@ -1026,8 +1499,10 @@
                       max="50000"
                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
                       placeholder="500"
-                    />
-                    <p class="text-xs text-gray-500 mt-1">Max ৳50,000</p>
+                    >
+                    <p class="text-xs text-gray-500 mt-1">
+                      Max ৳50,000
+                    </p>
                   </div>
 
                   <div>
@@ -1040,18 +1515,32 @@
                       step="0.5"
                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
                       placeholder="2.5"
-                    />
-                    <p class="text-xs text-gray-500 mt-1">Max 24 hours</p>
+                    >
+                    <p class="text-xs text-gray-500 mt-1">
+                      Max 24 hours
+                    </p>
                   </div>
                 </div>
 
                 <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <div class="flex items-start gap-3">
-                    <svg class="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      class="w-5 h-5 text-yellow-600 mt-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     <div class="text-sm text-yellow-800">
-                      <p class="font-medium">Event Approval Required</p>
+                      <p class="font-medium">
+                        Event Approval Required
+                      </p>
                       <p>Your event will be saved as a draft and requires admin approval before going live. You'll be notified once approved.</p>
                     </div>
                   </div>
@@ -1060,8 +1549,8 @@
                 <div class="flex justify-end gap-3">
                   <button
                     type="button"
-                    @click="showEventForm = false"
                     class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                    @click="showEventForm = false"
                   >
                     Cancel
                   </button>
@@ -1084,7 +1573,10 @@
               description="Create your first event to get started"
             />
 
-            <div v-else class="space-y-4">
+            <div
+              v-else
+              class="space-y-4"
+            >
               <div
                 v-for="event in events"
                 :key="event.id"
@@ -1093,7 +1585,9 @@
                 <div class="flex justify-between items-start mb-3">
                   <div class="flex-1">
                     <div class="flex items-center gap-2 mb-2">
-                      <h3 class="text-lg font-bold">{{ event.title }}</h3>
+                      <h3 class="text-lg font-bold">
+                        {{ event.title }}
+                      </h3>
                       <span
                         :class="{
                           'px-2 py-1 rounded text-xs font-medium': true,
@@ -1105,54 +1599,64 @@
                         {{ event.status }}
                       </span>
                     </div>
-                    <p class="text-sm text-gray-600">{{ event.event_type }} • {{ event.location }}</p>
+                    <p class="text-sm text-gray-600">
+                      {{ event.event_type }} • {{ event.location }}
+                    </p>
                   </div>
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
                   <div>
                     <span class="text-gray-600">Date:</span>
-                    <p class="font-medium">{{ formatDate(event.event_date) }}</p>
+                    <p class="font-medium">
+                      {{ formatDate(event.event_date) }}
+                    </p>
                   </div>
                   <div>
                     <span class="text-gray-600">RSVPs:</span>
-                    <p class="font-medium">{{ event.rsvp_count || 0 }}</p>
+                    <p class="font-medium">
+                      {{ event.rsvp_count || 0 }}
+                    </p>
                   </div>
                   <div>
                     <span class="text-gray-600">Views:</span>
-                    <p class="font-medium">{{ event.view_count || 0 }}</p>
+                    <p class="font-medium">
+                      {{ event.view_count || 0 }}
+                    </p>
                   </div>
                   <div>
                     <span class="text-gray-600">Price:</span>
-                    <p class="font-medium">{{ event.ticket_price ? `৳${event.ticket_price}` : 'Free' }}</p>
+                    <p class="font-medium">
+                      {{ event.ticket_price ? `৳${event.ticket_price}` : 'Free' }}
+                    </p>
                   </div>
                 </div>
 
                 <div class="flex gap-2">
                   <button
-                    @click="viewEvent(event)"
                     class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
+                    @click="viewEvent(event)"
                   >
                     View
                   </button>
                   <button
                     v-if="event.status === 'draft'"
-                    @click="editEvent(event)"
                     class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+                    @click="editEvent(event)"
                   >
                     Edit
                   </button>
                   <button
                     v-if="event.status === 'published'"
-                    @click="cancelEvent(event)"
                     class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                    @click="cancelEvent(event)"
                   >
                     Cancel Event
                   </button>
                   <button
                     v-if="event.status === 'draft' && (event.rsvp_count === 0 || !event.rsvp_count)"
-                    @click="deleteEvent(event)"
                     class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                    @click="deleteEvent(event)"
                   >
                     Delete
                   </button>
@@ -1161,17 +1665,30 @@
             </div>
 
             <!-- Registered Events Section -->
-            <div v-if="eventRsvps.length > 0" class="mt-8">
-              <h3 class="text-lg font-bold mb-4">Registered Events</h3>
-              <p class="text-sm text-gray-600 mb-4">Events you've registered to attend</p>
+            <div
+              v-if="eventRsvps.length > 0"
+              class="mt-8"
+            >
+              <h3 class="text-lg font-bold mb-4">
+                Registered Events
+              </h3>
+              <p class="text-sm text-gray-600 mb-4">
+                Events you've registered to attend
+              </p>
               
               <!-- Loading State -->
-              <div v-if="loadingEventRsvps" class="flex items-center justify-center py-8">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-burgundy"></div>
+              <div
+                v-if="loadingEventRsvps"
+                class="flex items-center justify-center py-8"
+              >
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-burgundy" />
               </div>
 
               <!-- RSVPs List -->
-              <div v-else class="space-y-4">
+              <div
+                v-else
+                class="space-y-4"
+              >
                 <div
                   v-for="rsvp in eventRsvps"
                   :key="rsvp.id"
@@ -1179,20 +1696,27 @@
                 >
                   <div class="flex items-start gap-4">
                     <!-- Event Banner -->
-                    <div v-if="rsvp.event?.banner_image" class="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                    <div
+                      v-if="rsvp.event?.banner_image"
+                      class="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100"
+                    >
                       <img 
                         :src="rsvp.event.banner_image" 
                         :alt="rsvp.event.title"
                         class="w-full h-full object-cover"
-                      />
+                      >
                     </div>
                     
                     <!-- Event Details -->
                     <div class="flex-1">
                       <div class="flex items-start justify-between mb-2">
                         <div>
-                          <h4 class="font-semibold text-lg mb-1">{{ rsvp.event?.title }}</h4>
-                          <p class="text-sm text-gray-600">{{ rsvp.event?.location_text || 'Location TBA' }}</p>
+                          <h4 class="font-semibold text-lg mb-1">
+                            {{ rsvp.event?.title }}
+                          </h4>
+                          <p class="text-sm text-gray-600">
+                            {{ rsvp.event?.location_text || 'Location TBA' }}
+                          </p>
                         </div>
                         <span 
                           class="px-3 py-1 text-xs rounded-full"
@@ -1207,29 +1731,54 @@
 
                       <div class="grid grid-cols-2 gap-4 text-sm mb-3">
                         <div class="flex items-center gap-2">
-                          <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          <svg
+                            class="w-4 h-4 text-gray-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
                           </svg>
                           <span class="text-gray-700">
                             {{ formatDate(rsvp.event?.event_date) }}
                           </span>
                         </div>
                         <div class="flex items-center gap-2">
-                          <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <svg
+                            class="w-4 h-4 text-gray-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                            />
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
                           </svg>
                           <span class="text-gray-700">{{ rsvp.event?.city?.name }}</span>
                         </div>
                       </div>
 
                       <div class="flex gap-2">
-                        <a 
-                          :href="`/events/${rsvp.event?.slug}`"
+                        <router-link
+                          :to="`/events/${rsvp.event?.slug}`"
                           class="px-4 py-2 bg-burgundy text-white rounded-lg hover:bg-burgundy-dark transition-colors text-sm font-medium"
                         >
                           View Event
-                        </a>
+                        </router-link>
                       </div>
                     </div>
                   </div>
@@ -1239,36 +1788,71 @@
           </div>
 
           <!-- Achievements Tab -->
-          <div v-if="activeTab === 'achievements'" class="p-4 sm:p-6">
+          <div
+            v-if="activeTab === 'achievements'"
+            class="p-4 sm:p-6"
+          >
             <div class="flex flex-col lg:flex-row gap-6">
               <div class="flex-1 bg-gradient-to-r from-burgundy to-[#8B1538] rounded-lg p-6 text-white">
-                <h2 class="text-xl font-bold mb-2">Your Progress</h2>
-                <p class="text-sm text-white/90 mb-4">Track your achievements, points, and level</p>
+                <h2 class="text-xl font-bold mb-2">
+                  Your Progress
+                </h2>
+                <p class="text-sm text-white/90 mb-4">
+                  Track your achievements, points, and level
+                </p>
 
-                <div v-if="loadingAchievementsSummary" class="text-sm text-white/80">Loading achievements...</div>
-                <div v-else class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div
+                  v-if="loadingAchievementsSummary"
+                  class="text-sm text-white/80"
+                >
+                  Loading achievements...
+                </div>
+                <div
+                  v-else
+                  class="grid grid-cols-2 sm:grid-cols-4 gap-4"
+                >
                   <div>
-                    <p class="text-2xl font-bold">{{ achievementsSummary.stats?.level || 1 }}</p>
-                    <p class="text-xs text-white/80">Level</p>
+                    <p class="text-2xl font-bold">
+                      {{ achievementsSummary.stats?.level || 1 }}
+                    </p>
+                    <p class="text-xs text-white/80">
+                      Level
+                    </p>
                   </div>
                   <div>
-                    <p class="text-2xl font-bold">{{ achievementsSummary.stats?.total_points || 0 }}</p>
-                    <p class="text-xs text-white/80">Total Points</p>
+                    <p class="text-2xl font-bold">
+                      {{ achievementsSummary.stats?.total_points || 0 }}
+                    </p>
+                    <p class="text-xs text-white/80">
+                      Total Points
+                    </p>
                   </div>
                   <div>
-                    <p class="text-2xl font-bold">{{ achievementsSummary.unlocked_achievements || 0 }}/{{ achievementsSummary.total_achievements || 0 }}</p>
-                    <p class="text-xs text-white/80">Unlocked</p>
+                    <p class="text-2xl font-bold">
+                      {{ achievementsSummary.unlocked_achievements || 0 }}/{{ achievementsSummary.total_achievements || 0 }}
+                    </p>
+                    <p class="text-xs text-white/80">
+                      Unlocked
+                    </p>
                   </div>
                   <div>
-                    <p class="text-2xl font-bold">{{ achievementsSummary.completion_percentage || 0 }}%</p>
-                    <p class="text-xs text-white/80">Completion</p>
+                    <p class="text-2xl font-bold">
+                      {{ achievementsSummary.completion_percentage || 0 }}%
+                    </p>
+                    <p class="text-xs text-white/80">
+                      Completion
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div class="w-full lg:w-80 bg-white border rounded-lg p-6">
-                <h3 class="text-lg font-bold mb-2">Next Level</h3>
-                <p class="text-sm text-gray-600 mb-4">Keep earning points to level up!</p>
+                <h3 class="text-lg font-bold mb-2">
+                  Next Level
+                </h3>
+                <p class="text-sm text-gray-600 mb-4">
+                  Keep earning points to level up!
+                </p>
                 <div class="mb-4">
                   <div class="flex justify-between text-sm text-gray-600 mb-2">
                     <span>Points Needed</span>
@@ -1278,7 +1862,7 @@
                     <div
                       class="bg-burgundy h-2 rounded-full"
                       :style="{ width: ((achievementsSummary.stats?.total_points || 0) % 100) + '%' }"
-                    ></div>
+                    />
                   </div>
                 </div>
                 <a
@@ -1292,19 +1876,36 @@
           </div>
 
           <!-- Awards Tab -->
-          <div v-if="activeTab === 'awards'" class="p-4 sm:p-6">
+          <div
+            v-if="activeTab === 'awards'"
+            class="p-4 sm:p-6"
+          >
             <div class="mb-6">
               <div class="flex items-center justify-between">
                 <div>
-                  <h2 class="text-xl font-bold">Awards & Achievements</h2>
-                  <p class="text-sm text-gray-600 mt-1">Showcase your awards, certifications, and achievements</p>
+                  <h2 class="text-xl font-bold">
+                    Awards & Achievements
+                  </h2>
+                  <p class="text-sm text-gray-600 mt-1">
+                    Showcase your awards, certifications, and achievements
+                  </p>
                 </div>
                 <button
-                  @click="showAddAwardModal = true"
                   class="px-4 py-2 bg-burgundy text-white rounded-lg hover:bg-burgundy-dark transition-colors flex items-center gap-2"
+                  @click="showAddAwardModal = true"
                 >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 4v16m8-8H4"
+                    />
                   </svg>
                   Add Award
                 </button>
@@ -1312,28 +1913,53 @@
             </div>
 
             <!-- Loading State -->
-            <div v-if="loadingAwards" class="text-center py-12">
-              <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-burgundy"></div>
-              <p class="text-sm text-gray-600 mt-2">Loading awards...</p>
+            <div
+              v-if="loadingAwards"
+              class="text-center py-12"
+            >
+              <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-burgundy" />
+              <p class="text-sm text-gray-600 mt-2">
+                Loading awards...
+              </p>
             </div>
 
             <!-- Empty State -->
-            <div v-else-if="awards.length === 0" class="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed">
-              <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+            <div
+              v-else-if="awards.length === 0"
+              class="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed"
+            >
+              <svg
+                class="w-16 h-16 mx-auto text-gray-400 mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                />
               </svg>
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">No Awards Yet</h3>
-              <p class="text-sm text-gray-600 mb-4">Start building your credibility by adding your awards and achievements</p>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                No Awards Yet
+              </h3>
+              <p class="text-sm text-gray-600 mb-4">
+                Start building your credibility by adding your awards and achievements
+              </p>
               <button
-                @click="showAddAwardModal = true"
                 class="px-6 py-2 bg-burgundy text-white rounded-lg hover:bg-burgundy-dark transition-colors"
+                @click="showAddAwardModal = true"
               >
                 Add Your First Award
               </button>
             </div>
 
             <!-- Awards List -->
-            <div v-else class="space-y-4">
+            <div
+              v-else
+              class="space-y-4"
+            >
               <div
                 v-for="award in awards"
                 :key="award.id"
@@ -1351,8 +1977,15 @@
                   <div class="flex-1 min-w-0">
                     <div class="flex items-start justify-between gap-2">
                       <div class="flex-1">
-                        <h3 class="font-semibold text-lg text-gray-900">{{ award.title }}</h3>
-                        <p v-if="award.organization" class="text-sm text-gray-600 mt-1">{{ award.organization }}</p>
+                        <h3 class="font-semibold text-lg text-gray-900">
+                          {{ award.title }}
+                        </h3>
+                        <p
+                          v-if="award.organization"
+                          class="text-sm text-gray-600 mt-1"
+                        >
+                          {{ award.organization }}
+                        </p>
                       </div>
                       <div class="flex items-center gap-2">
                         <span class="px-3 py-1 bg-burgundy/10 text-burgundy rounded-full text-sm font-medium">
@@ -1364,7 +1997,12 @@
                       </div>
                     </div>
 
-                    <p v-if="award.description" class="text-sm text-gray-600 mt-2">{{ award.description }}</p>
+                    <p
+                      v-if="award.description"
+                      class="text-sm text-gray-600 mt-2"
+                    >
+                      {{ award.description }}
+                    </p>
 
                     <!-- Certificate Link -->
                     <a
@@ -1373,8 +2011,18 @@
                       target="_blank"
                       class="inline-flex items-center gap-1 text-sm text-burgundy hover:underline mt-2"
                     >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
                       </svg>
                       View Certificate
                     </a>
@@ -1382,14 +2030,14 @@
                     <!-- Actions -->
                     <div class="flex gap-2 mt-3">
                       <button
-                        @click="editAward(award)"
                         class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                        @click="editAward(award)"
                       >
                         Edit
                       </button>
                       <button
-                        @click="deleteAward(award.id)"
                         class="px-3 py-1 text-sm bg-red-50 text-red-600 rounded hover:bg-red-100"
+                        @click="deleteAward(award.id)"
                       >
                         Delete
                       </button>
@@ -1411,15 +2059,33 @@
         >
           <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div class="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
-              <h3 class="text-xl font-bold">{{ editingAward ? 'Edit Award' : 'Add New Award' }}</h3>
-              <button @click="closeAwardModal" class="text-gray-400 hover:text-gray-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              <h3 class="text-xl font-bold">
+                {{ editingAward ? 'Edit Award' : 'Add New Award' }}
+              </h3>
+              <button
+                class="text-gray-400 hover:text-gray-600"
+                @click="closeAwardModal"
+              >
+                <svg
+                  class="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
 
-            <form @submit.prevent="saveAward" class="p-6 space-y-4">
+            <form
+              class="p-6 space-y-4"
+              @submit.prevent="saveAward"
+            >
               <!-- Title -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -1431,8 +2097,13 @@
                   required
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
                   placeholder="Best Wedding Photographer 2024"
-                />
-                <p v-if="awardErrors.title" class="text-sm text-red-600 mt-1">{{ awardErrors.title[0] }}</p>
+                >
+                <p
+                  v-if="awardErrors.title"
+                  class="text-sm text-red-600 mt-1"
+                >
+                  {{ awardErrors.title[0] }}
+                </p>
               </div>
 
               <!-- Organization -->
@@ -1445,7 +2116,7 @@
                   type="text"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
                   placeholder="Bangladesh Photography Association"
-                />
+                >
               </div>
 
               <!-- Year and Type -->
@@ -1461,8 +2132,13 @@
                     min="1950"
                     :max="currentYear + 1"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
-                  />
-                  <p v-if="awardErrors.year" class="text-sm text-red-600 mt-1">{{ awardErrors.year[0] }}</p>
+                  >
+                  <p
+                    v-if="awardErrors.year"
+                    class="text-sm text-red-600 mt-1"
+                  >
+                    {{ awardErrors.year[0] }}
+                  </p>
                 </div>
 
                 <div>
@@ -1474,10 +2150,18 @@
                     required
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
                   >
-                    <option value="award">🏆 Award</option>
-                    <option value="achievement">⭐ Achievement</option>
-                    <option value="recognition">🎖️ Recognition</option>
-                    <option value="certification">📜 Certification</option>
+                    <option value="award">
+                      🏆 Award
+                    </option>
+                    <option value="achievement">
+                      ⭐ Achievement
+                    </option>
+                    <option value="recognition">
+                      🎖️ Recognition
+                    </option>
+                    <option value="certification">
+                      📜 Certification
+                    </option>
                   </select>
                 </div>
               </div>
@@ -1492,7 +2176,7 @@
                   rows="3"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
                   placeholder="Brief description of the award and what you achieved..."
-                ></textarea>
+                />
               </div>
 
               <!-- Certificate Upload -->
@@ -1502,20 +2186,38 @@
                 </label>
                 <input
                   type="file"
-                  @change="handleCertificateUpload"
                   accept="image/jpeg,image/jpg,image/png,application/pdf"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
-                />
-                <p v-if="awardErrors.certificate_file" class="text-sm text-red-600 mt-1">{{ awardErrors.certificate_file[0] }}</p>
-                <p v-if="editingAward && editingAward.certificate_url" class="text-sm text-gray-600 mt-1">
+                  class="upload-input"
+                  @change="handleCertificateUpload"
+                >
+                <p class="mt-1 upload-hint">Images: 2000x1400 px recommended. PDF accepted.</p>
+                <p
+                  v-if="awardErrors.certificate_file"
+                  class="text-sm text-red-600 mt-1"
+                >
+                  {{ awardErrors.certificate_file[0] }}
+                </p>
+                <p
+                  v-if="editingAward && editingAward.certificate_url"
+                  class="text-sm text-gray-600 mt-1"
+                >
                   Current certificate: 
-                  <a :href="editingAward.certificate_url" target="_blank" class="text-burgundy hover:underline">View</a>
+                  <a
+                    :href="editingAward.certificate_url"
+                    target="_blank"
+                    class="text-burgundy hover:underline"
+                  >View</a>
                 </p>
               </div>
 
               <!-- Error Message -->
-              <div v-if="awardErrorMessage" class="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p class="text-sm text-red-600">{{ awardErrorMessage }}</p>
+              <div
+                v-if="awardErrorMessage"
+                class="p-3 bg-red-50 border border-red-200 rounded-lg"
+              >
+                <p class="text-sm text-red-600">
+                  {{ awardErrorMessage }}
+                </p>
               </div>
 
               <!-- Buttons -->
@@ -1529,8 +2231,8 @@
                 </button>
                 <button
                   type="button"
-                  @click="closeAwardModal"
                   class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium"
+                  @click="closeAwardModal"
                 >
                   Cancel
                 </button>
@@ -1541,65 +2243,260 @@
       </teleport>
 
       <!-- Quick Links -->
+      <div class="mt-4 sm:mt-6 md:mt-8 bg-white rounded-2xl border border-gray-200/80 shadow-sm p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-3 sm:mb-4">
+          <h3 class="text-base sm:text-lg font-semibold">
+            Quick Links
+          </h3>
+          <span class="text-xs sm:text-sm text-gray-500">Shortcuts</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-3">
+          <router-link
+            to="/competitions"
+            class="flex flex-col items-center p-2.5 sm:p-3 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[72px] sm:min-h-0 hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-burgundy/30"
+          >
+            <span class="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-burgundy/10 text-burgundy group-hover:bg-burgundy/15 mb-1.5">
+              <svg
+                class="w-4.5 h-4.5 sm:w-5 sm:h-5 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                />
+              </svg>
+            </span>
+            <span class="text-[11px] sm:text-xs font-medium text-center leading-tight">Competitions</span>
+          </router-link>
+
+          <router-link
+            to="/events"
+            class="flex flex-col items-center p-2.5 sm:p-3 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[72px] sm:min-h-0 hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-burgundy/30"
+          >
+            <span class="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-burgundy/10 text-burgundy group-hover:bg-burgundy/15 mb-1.5">
+              <svg
+                class="w-4.5 h-4.5 sm:w-5 sm:h-5 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+            </span>
+            <span class="text-[11px] sm:text-xs font-medium text-center leading-tight">Events</span>
+          </router-link>
+
+          <router-link
+            to="/transactions"
+            class="flex flex-col items-center p-2.5 sm:p-3 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[72px] sm:min-h-0 hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-burgundy/30"
+          >
+            <span class="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-burgundy/10 text-burgundy group-hover:bg-burgundy/15 mb-1.5">
+              <svg
+                class="w-4.5 h-4.5 sm:w-5 sm:h-5 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+            </span>
+            <span class="text-[11px] sm:text-xs font-medium text-center leading-tight">Transactions</span>
+          </router-link>
+
+          <router-link
+            to="/notifications"
+            class="flex flex-col items-center p-2.5 sm:p-3 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[72px] sm:min-h-0 hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-burgundy/30"
+          >
+            <span class="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-burgundy/10 text-burgundy group-hover:bg-burgundy/15 mb-1.5">
+              <svg
+                class="w-4.5 h-4.5 sm:w-5 sm:h-5 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                />
+              </svg>
+            </span>
+            <span class="text-[11px] sm:text-xs font-medium text-center leading-tight">Notifications</span>
+          </router-link>
+
+          <router-link
+            to="/settings"
+            class="flex flex-col items-center p-2.5 sm:p-3 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[72px] sm:min-h-0 hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-burgundy/30"
+          >
+            <span class="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-burgundy/10 text-burgundy group-hover:bg-burgundy/15 mb-1.5">
+              <svg
+                class="w-4.5 h-4.5 sm:w-5 sm:h-5 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  d="M11.25 3a.75.75 0 00-.75.75v1.142a7.5 7.5 0 00-1.77.738l-.807-.807a.75.75 0 00-1.06 0l-1.06 1.06a.75.75 0 000 1.06l.807.807a7.5 7.5 0 00-.738 1.77H3.75a.75.75 0 00-.75.75v1.5c0 .414.336.75.75.75h1.142a7.5 7.5 0 00.738 1.77l-.807.807a.75.75 0 000 1.06l1.06 1.06c.293.293.768.293 1.06 0l.807-.807a7.5 7.5 0 001.77.738v1.142c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75v-1.142a7.5 7.5 0 001.77-.738l.807.807c.293.293.768.293 1.06 0l1.06-1.06a.75.75 0 000-1.06l-.807-.807a7.5 7.5 0 00.738-1.77h1.142a.75.75 0 00.75-.75v-1.5a.75.75 0 00-.75-.75h-1.142a7.5 7.5 0 00-.738-1.77l.807-.807a.75.75 0 000-1.06l-1.06-1.06a.75.75 0 00-1.06 0l-.807.807a7.5 7.5 0 00-1.77-.738V3.75a.75.75 0 00-.75-.75h-1.5z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+            </span>
+            <span class="text-[11px] sm:text-xs font-medium text-center leading-tight">Account Settings</span>
+          </router-link>
+
+          <router-link
+            to="/verification"
+            class="flex flex-col items-center p-2.5 sm:p-3 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[72px] sm:min-h-0 hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-burgundy/30"
+          >
+            <span class="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-burgundy/10 text-burgundy group-hover:bg-burgundy/15 mb-1.5">
+              <svg
+                class="w-4.5 h-4.5 sm:w-5 sm:h-5 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  d="M9 12l2 2 4-4m5 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </span>
+            <span class="text-[11px] sm:text-xs font-medium text-center leading-tight">Verify Profile</span>
+          </router-link>
+
+          <router-link
+            to="/help"
+            class="flex flex-col items-center p-2.5 sm:p-3 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[72px] sm:min-h-0 hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-burgundy/30"
+          >
+            <span class="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-burgundy/10 text-burgundy group-hover:bg-burgundy/15 mb-1.5">
+              <svg
+                class="w-4.5 h-4.5 sm:w-5 sm:h-5 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  d="M18.364 5.636a9 9 0 11-12.728 0 9 9 0 0112.728 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  d="M12 7v5l3 3"
+                />
+              </svg>
+            </span>
+            <span class="text-[11px] sm:text-xs font-medium text-center leading-tight">Support Center</span>
+          </router-link>
+
+          <router-link
+            to="/photographer/achievements"
+            class="flex flex-col items-center p-2.5 sm:p-3 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[72px] sm:min-h-0 hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-burgundy/30"
+          >
+            <span class="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-burgundy/10 text-burgundy group-hover:bg-burgundy/15 mb-1.5">
+              <svg
+                class="w-4.5 h-4.5 sm:w-5 sm:h-5 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </span>
+            <span class="text-[11px] sm:text-xs font-medium text-center leading-tight">Certificates</span>
+          </router-link>
+        </div>
+      </div>
+
+      <!-- Photography Resources -->
       <div class="mt-4 sm:mt-6 md:mt-8 bg-white rounded-lg shadow p-4 sm:p-6">
-        <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Quick Links</h3>
+        <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
+          Photography Resources
+        </h3>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
-          <button @click="$router.push('/competitions')" class="flex flex-col items-center p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[88px] sm:min-h-0">
-            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-gray-600 group-hover:text-red-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-            </svg>
-            <span class="text-xs sm:text-sm font-medium text-center leading-tight">Competitions</span>
-          </button>
-
-          <button @click="$router.push('/events')" class="flex flex-col items-center p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[88px] sm:min-h-0">
-            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-gray-600 group-hover:text-red-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span class="text-xs sm:text-sm font-medium text-center leading-tight">Events</span>
-          </button>
-
-          <button @click="$router.push('/transactions')" class="flex flex-col items-center p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[88px] sm:min-h-0">
-            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-gray-600 group-hover:text-red-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            <span class="text-xs sm:text-sm font-medium text-center leading-tight">Transactions</span>
-          </button>
-
-          <button @click="$router.push('/notifications')" class="flex flex-col items-center p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[88px] sm:min-h-0">
-            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-gray-600 group-hover:text-red-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-            <span class="text-xs sm:text-sm font-medium text-center leading-tight">Notifications</span>
-          </button>
-
-          <button @click="$router.push('/photographer')" class="flex flex-col items-center p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[88px] sm:min-h-0">
-            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-gray-600 group-hover:text-red-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <span class="text-xs sm:text-sm font-medium text-center leading-tight">Search</span>
-          </button>
-
-          <button @click="$router.push('/help')" class="flex flex-col items-center p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[88px] sm:min-h-0">
-            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-gray-600 group-hover:text-red-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span class="text-xs sm:text-sm font-medium text-center leading-tight">Help</span>
-          </button>
-
-          <button @click="$router.push('/settings')" class="flex flex-col items-center p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[88px] sm:min-h-0">
-            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-gray-600 group-hover:text-red-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span class="text-xs sm:text-sm font-medium text-center leading-tight">Settings</span>
-          </button>
-
-          <button @click="logout" class="flex flex-col items-center p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[88px] sm:min-h-0">
-            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-gray-600 group-hover:text-red-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            <span class="text-xs sm:text-sm font-medium text-center leading-tight">Logout</span>
-          </button>
+          <a
+            class="flex flex-col items-center p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-burgundy hover:bg-burgundy/5 active:bg-burgundy/10 transition-all min-h-[88px] sm:min-h-0"
+            href="https://www.pexels.com"
+            target="_blank"
+            rel="noopener"
+          >
+            <img
+              src="/images/pexels.webp"
+              alt="Pexels"
+              class="w-8 h-8 mb-2"
+              loading="lazy"
+            >
+            <span class="text-sm font-semibold">Pexels</span>
+            <span class="text-xs text-gray-500 text-center">Free stock photos</span>
+          </a>
+          <a
+            class="flex flex-col items-center p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-burgundy hover:bg-burgundy/5 active:bg-burgundy/10 transition-all min-h-[88px] sm:min-h-0"
+            href="https://unsplash.com"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="text-sm font-semibold">Unsplash</span>
+            <span class="text-xs text-gray-500 text-center">Editorial visuals</span>
+          </a>
+          <a
+            class="flex flex-col items-center p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-burgundy hover:bg-burgundy/5 active:bg-burgundy/10 transition-all min-h-[88px] sm:min-h-0"
+            href="https://pixabay.com"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="text-sm font-semibold">Pixabay</span>
+            <span class="text-xs text-gray-500 text-center">Free photos and videos</span>
+          </a>
+          <a
+            class="flex flex-col items-center p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-burgundy hover:bg-burgundy/5 active:bg-burgundy/10 transition-all min-h-[88px] sm:min-h-0"
+            href="https://www.behance.net"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="text-sm font-semibold">Behance</span>
+            <span class="text-xs text-gray-500 text-center">Portfolios and inspiration</span>
+          </a>
         </div>
       </div>
     </div>
@@ -1617,22 +2514,71 @@
           'bg-yellow-500 text-white': toast.type === 'warning'
         }"
       >
-        <svg v-if="toast.type === 'success'" class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        <svg
+          v-if="toast.type === 'success'"
+          class="w-5 h-5 flex-shrink-0"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clip-rule="evenodd"
+          />
         </svg>
-        <svg v-else-if="toast.type === 'error'" class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        <svg
+          v-else-if="toast.type === 'error'"
+          class="w-5 h-5 flex-shrink-0"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+            clip-rule="evenodd"
+          />
         </svg>
-        <svg v-else-if="toast.type === 'info'" class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+        <svg
+          v-else-if="toast.type === 'info'"
+          class="w-5 h-5 flex-shrink-0"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+            clip-rule="evenodd"
+          />
         </svg>
-        <svg v-else class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+        <svg
+          v-else
+          class="w-5 h-5 flex-shrink-0"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+            clip-rule="evenodd"
+          />
         </svg>
-        <p class="flex-1 text-sm font-medium">{{ toast.message }}</p>
-        <button @click="removeToast(toast.id)" class="flex-shrink-0 hover:opacity-75">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+        <p class="flex-1 text-sm font-medium">
+          {{ toast.message }}
+        </p>
+        <button
+          class="flex-shrink-0 hover:opacity-75"
+          @click="removeToast(toast.id)"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+              clip-rule="evenodd"
+            />
           </svg>
         </button>
       </div>
@@ -1643,11 +2589,13 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import api from '../api';
+import { validateUploadFile } from '../utils/imageValidation';
 import ImageUpload from './ImageUpload.vue';
 import AlbumPhotoManager from './AlbumPhotoManager.vue';
 import NotificationBell from './NotificationBell.vue';
 import LoadingSkeleton from './ui/LoadingSkeleton.vue';
 import EmptyState from './ui/EmptyState.vue';
+import { formatDate as formatDateValue } from '../utils/formatters';
 
 const user = ref(null);
 const activeTab = ref('bookings');
@@ -1674,6 +2622,7 @@ const hashtags = ref([]);
 const albums = ref([]);
 const creatingAlbum = ref(false);
 const selectedAlbum = ref(null);
+const editingAlbumId = ref(null);
 const packages = ref([]);
 const creatingPackage = ref(false);
 const editingPackage = ref(null);
@@ -1689,6 +2638,28 @@ const loadingEventRsvps = ref(false);
 // Toast notifications
 const toasts = ref([]);
 let toastId = 0;
+
+const disallowedBookingRoles = ['judge', 'admin', 'super_admin', 'moderator'];
+const normalizeRole = (role) => String(role || '').toLowerCase().replace(/[\s-]+/g, '_');
+const userRole = computed(() => {
+  const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+  return normalizeRole(localStorage.getItem('user_role') || storedUser.role || user.value?.role);
+});
+const canViewBookings = computed(() => !disallowedBookingRoles.includes(userRole.value));
+const isPhotographerRole = computed(() => userRole.value === 'photographer');
+
+const incomingSummary = computed(() => {
+  const total = bookings.value.length;
+  const pending = bookings.value.filter(b => b.status === 'pending').length;
+  const pendingPayment = bookings.value.filter(b => b.status === 'pending_payment').length;
+  const confirmed = bookings.value.filter(b => b.status === 'confirmed').length;
+  return {
+    total,
+    pending,
+    pendingPayment,
+    confirmed,
+  };
+});
 
 const showToast = (message, type = 'info') => {
   const id = toastId++;
@@ -1719,6 +2690,9 @@ const packageForm = ref({
   cover_image: '',
   sample_images: [],
 });
+const packageCoverFile = ref(null);
+const packageSampleFiles = ref([]);
+const packageSampleUrlInput = ref('');
 
 const eventForm = ref({
   title: '',
@@ -1733,6 +2707,7 @@ const eventForm = ref({
 });
 
 const profileForm = ref({
+  username: '',
   bio: '',
   city_id: '',
   category_ids: [],
@@ -1747,20 +2722,293 @@ const profileForm = ref({
 });
 
 const profileUrl = computed(() => {
-  const slug = user.value?.photographer?.slug;
-  if (!slug) return window.location.origin + '/photographer/your-username';
-  return window.location.origin + '/photographer/' + slug;
+  const slug = photographer.value?.slug || user.value?.photographer?.slug;
+  const shareCode = photographer.value?.share_code || user.value?.photographer?.share_code;
+  let baseUrl = '';
+
+  if (slug) {
+    baseUrl = window.location.origin + '/photographer/' + slug;
+  } else if (user.value?.username) {
+    baseUrl = window.location.origin + '/@' + user.value.username;
+  } else {
+    baseUrl = window.location.origin + '/photographer/your-profile';
+  }
+
+  if (shareCode) {
+    return baseUrl + '?ref=' + encodeURIComponent(shareCode);
+  }
+
+  return baseUrl;
+});
+
+const shareLinks = computed(() => {
+  const encodedUrl = encodeURIComponent(profileUrl.value);
+  const message = 'Discover my work on Photographer SB - book trusted photographers across Bangladesh.';
+  const encodedMessage = encodeURIComponent(message);
+  return {
+    whatsapp: `https://wa.me/?text=${encodedMessage}%20${encodedUrl}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedMessage}`,
+    messenger: `fb-messenger://share?link=${encodedUrl}&app_id=0&redirect_uri=${encodedUrl}`,
+    telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedMessage}`,
+  };
+});
+
+watch(canViewBookings, (allowed) => {
+  if (!allowed && activeTab.value === 'bookings') {
+    activeTab.value = 'portfolio';
+  }
+}, { immediate: true });
+
+const profileCompleteness = computed(() => {
+  return Number(photographer.value?.profile_completeness ?? user.value?.photographer?.profile_completeness ?? 0);
+});
+
+const profileChecklist = computed(() => {
+  const hasBio = Boolean(profileForm.value.bio && profileForm.value.bio.trim().length >= 30);
+  const hasPhoto = Boolean(photographer.value?.profile_picture || user.value?.photographer?.profile_picture);
+  const hasCity = Boolean(profileForm.value.city_id);
+  const hasCategories = Array.isArray(profileForm.value.category_ids) && profileForm.value.category_ids.length > 0;
+  const hasPortfolio = albums.value.length > 0;
+  const hasPackages = packages.value.length > 0;
+
+  return [
+    { key: 'bio', label: 'Add a detailed bio', done: hasBio },
+    { key: 'photo', label: 'Upload a profile photo', done: hasPhoto },
+    { key: 'city', label: 'Select your city', done: hasCity },
+    { key: 'categories', label: 'Pick specialties', done: hasCategories },
+    { key: 'portfolio', label: 'Create at least 1 album', done: hasPortfolio },
+    { key: 'packages', label: 'Add at least 1 package', done: hasPackages },
+  ];
+});
+
+const profileCompletionPercent = computed(() => {
+  if (profileCompleteness.value > 0) return Math.min(100, Math.max(0, Math.round(profileCompleteness.value)));
+  const total = profileChecklist.value.length;
+  const done = profileChecklist.value.filter(item => item.done).length;
+  return total > 0 ? Math.round((done / total) * 100) : 0;
+});
+
+const funnelStats = computed(() => {
+  const views = Number(stats.value?.profile_views || 0);
+  const inquiries = Number(stats.value?.profile_clicks || 0);
+  const bookingsCount = Number(stats.value?.total_bookings || 0);
+  const revenue = Number(stats.value?.total_revenue || 0);
+
+  const inquiryRate = views > 0 ? Math.round((inquiries / views) * 100) : 0;
+  const bookingRate = inquiries > 0 ? Math.round((bookingsCount / inquiries) * 100) : 0;
+  const revenuePerBooking = bookingsCount > 0 ? Math.round(revenue / bookingsCount) : 0;
+
+  const viewBar = 100;
+  const inquiryBar = Math.min(100, Math.round(inquiryRate));
+  const bookingBar = Math.min(100, Math.round(bookingRate));
+  const revenueBar = bookingsCount > 0 ? Math.min(100, Math.round((revenuePerBooking / 1000) * 100)) : 0;
+
+  return {
+    views,
+    inquiries,
+    bookings: bookingsCount,
+    revenue,
+    inquiryRate,
+    bookingRate,
+    revenuePerBooking,
+    viewBar,
+    inquiryBar,
+    bookingBar,
+    revenueBar,
+  };
+});
+
+const upcomingBookings = computed(() => {
+  const now = new Date();
+  const end = new Date();
+  end.setDate(now.getDate() + 7);
+
+  return bookings.value
+    .filter(booking => {
+      if (!booking?.event_date) return false;
+      const date = new Date(booking.event_date);
+      return date >= now && date <= end;
+    })
+    .sort((a, b) => new Date(a.event_date) - new Date(b.event_date))
+    .slice(0, 4);
+});
+
+const upcomingEvents = computed(() => {
+  const now = new Date();
+  const end = new Date();
+  end.setDate(now.getDate() + 7);
+
+  return events.value
+    .filter(eventItem => {
+      if (!eventItem?.event_date) return false;
+      const date = new Date(eventItem.event_date);
+      return date >= now && date <= end;
+    })
+    .sort((a, b) => new Date(a.event_date) - new Date(b.event_date))
+    .slice(0, 4);
+});
+
+const responseStats = computed(() => {
+  const average = Number(photographer.value?.response_time_avg || 0);
+  const target = 2;
+  const progress = target > 0 ? Math.max(0, Math.min(100, Math.round((target / Math.max(average, 0.5)) * 100))) : 0;
+
+  let statusLabel = 'Needs work';
+  let statusClass = 'text-red-600';
+  let barClass = 'bg-red-500';
+
+  if (average > 0 && average <= target) {
+    statusLabel = 'Great';
+    statusClass = 'text-green-600';
+    barClass = 'bg-green-500';
+  } else if (average > 0 && average <= target * 2) {
+    statusLabel = 'Good';
+    statusClass = 'text-yellow-600';
+    barClass = 'bg-yellow-500';
+  }
+
+  return {
+    average: average > 0 ? average.toFixed(1) : '0.0',
+    target,
+    progress,
+    statusLabel,
+    statusClass,
+    barClass,
+  };
+});
+
+const openQuickAction = (action) => {
+  switch (action) {
+    case 'album':
+      activeTab.value = 'portfolio';
+      showAlbumModal.value = true;
+      break;
+    case 'package':
+      activeTab.value = 'packages';
+      showPackageModal.value = true;
+      break;
+    case 'event':
+      activeTab.value = 'events';
+      showEventForm.value = true;
+      break;
+    case 'profile':
+      window.location.href = '/photographer/settings';
+      break;
+    default:
+      break;
+  }
+};
+
+const trustStats = computed(() => {
+  const rating = Number(stats.value?.average_rating || 0);
+  const reviews = Number(photographer.value?.rating_count || stats.value?.rating_count || 0);
+  const albumsCount = albums.value.length;
+  const photos = albums.value.reduce((total, album) => total + (album.photos_count || 0), 0);
+
+  return {
+    verified: Boolean(photographer.value?.is_verified),
+    rating: rating > 0 ? rating.toFixed(1) : '0.0',
+    reviews,
+    albums: albumsCount,
+    photos,
+    tipsEnabled: Boolean(photographer.value?.accept_tips),
+  };
+});
+
+const priorityActions = computed(() => {
+  const pendingRequests = Number(stats.value?.pending_bookings || 0);
+  const completeness = profileCompleteness.value;
+  const albumCount = albums.value.length;
+  const packageCount = packages.value.length;
+
+  return [
+    {
+      key: 'pending-requests',
+      title: 'Pending Requests',
+      value: pendingRequests,
+      description: pendingRequests > 0
+        ? 'Respond quickly to win bookings.'
+        : 'No pending requests right now.',
+      cta: pendingRequests > 0 ? 'Review bookings' : 'View bookings',
+      onClick: () => {
+        activeTab.value = 'bookings';
+      },
+      badge: pendingRequests > 0 ? 'Urgent' : null,
+      cardClass: pendingRequests > 0 ? 'border-yellow-200 bg-yellow-50' : 'border-gray-200 bg-gray-50',
+      badgeClass: pendingRequests > 0 ? 'bg-yellow-200 text-yellow-900' : '',
+      buttonClass: pendingRequests > 0
+        ? 'bg-yellow-600 text-white hover:bg-yellow-700'
+        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100',
+    },
+    {
+      key: 'profile-completeness',
+      title: 'Profile Completion',
+      value: `${Math.min(100, Math.max(0, completeness))}%`,
+      description: completeness < 80
+        ? 'Complete your profile to rank higher.'
+        : 'Great work - keep it updated.',
+      cta: 'Account settings',
+      onClick: () => {
+        window.location.href = '/photographer/settings';
+      },
+      badge: completeness < 80 ? 'Boost' : null,
+      cardClass: completeness < 80 ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50',
+      badgeClass: completeness < 80 ? 'bg-blue-200 text-blue-900' : '',
+      buttonClass: 'bg-burgundy text-white hover:bg-burgundy-dark',
+    },
+    {
+      key: 'portfolio',
+      title: 'Portfolio Albums',
+      value: albumCount,
+      description: albumCount === 0
+        ? 'Add your best work to build trust.'
+        : 'Refresh albums with recent work.',
+      cta: albumCount === 0 ? 'Add album' : 'Manage albums',
+      onClick: () => {
+        activeTab.value = 'portfolio';
+        if (albumCount === 0) showAlbumModal.value = true;
+      },
+      badge: albumCount === 0 ? 'Missing' : null,
+      cardClass: albumCount === 0 ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-gray-50',
+      badgeClass: albumCount === 0 ? 'bg-red-200 text-red-900' : '',
+      buttonClass: albumCount === 0
+        ? 'bg-red-600 text-white hover:bg-red-700'
+        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100',
+    },
+    {
+      key: 'packages',
+      title: 'Service Packages',
+      value: packageCount,
+      description: packageCount === 0
+        ? 'Packages help clients book faster.'
+        : 'Review pricing for competitiveness.',
+      cta: packageCount === 0 ? 'Create package' : 'Manage packages',
+      onClick: () => {
+        activeTab.value = 'packages';
+        if (packageCount === 0) showPackageModal.value = true;
+      },
+      badge: packageCount === 0 ? 'Missing' : null,
+      cardClass: packageCount === 0 ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-gray-50',
+      badgeClass: packageCount === 0 ? 'bg-red-200 text-red-900' : '',
+      buttonClass: packageCount === 0
+        ? 'bg-red-600 text-white hover:bg-red-700'
+        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100',
+    },
+  ];
 });
 
 const copyProfileLink = async () => {
   try {
+    trackProfileShare('copy');
     await navigator.clipboard.writeText(profileUrl.value);
     copied.value = true;
+    showToast('Profile link copied to clipboard.', 'success');
     setTimeout(() => {
       copied.value = false;
     }, 2000);
   } catch (error) {
     console.error('Failed to copy:', error);
+    showToast('Copy failed. Please try again.', 'error');
     // Fallback for older browsers
     const input = document.createElement('input');
     input.value = profileUrl.value;
@@ -1769,10 +3017,38 @@ const copyProfileLink = async () => {
     document.execCommand('copy');
     document.body.removeChild(input);
     copied.value = true;
+    showToast('Profile link copied to clipboard.', 'success');
     setTimeout(() => {
       copied.value = false;
     }, 2000);
   }
+};
+
+const openProfile = () => {
+  trackProfileShare('open');
+  showToast('Opening your public profile...', 'info');
+};
+
+const trackProfileShare = async (action) => {
+  try {
+    await api.post('/photographer/profile-share', { action });
+  } catch (error) {
+    console.warn('Profile share tracking failed:', error);
+  }
+};
+
+const shareProfile = async (channel) => {
+  const link = shareLinks.value[channel];
+  if (!link) return;
+  trackProfileShare(channel);
+  window.open(link, '_blank', 'noopener');
+  const labels = {
+    whatsapp: 'WhatsApp',
+    facebook: 'Facebook',
+    messenger: 'Messenger',
+    telegram: 'Telegram',
+  };
+  showToast(`Opening ${labels[channel] || 'share'}...`, 'info');
 };
 
 const fetchDashboardData = async () => {
@@ -1783,6 +3059,7 @@ const fetchDashboardData = async () => {
       
       // Load photographer data into profile form
       if (user.value.photographer) {
+        profileForm.value.username = user.value.username || '';
         profileForm.value.bio = user.value.photographer.bio || '';
         profileForm.value.city_id = user.value.photographer.city_id || '';
         profileForm.value.category_ids = user.value.photographer.categories?.map(c => c.id) || [];
@@ -1821,6 +3098,10 @@ const fetchDashboardData = async () => {
         pending_bookings: bookings.value.filter(b => b.status === 'pending').length,
         average_rating: 0,
         total_revenue: 0,
+        profile_views: 0,
+        profile_clicks: 0,
+        vote_count: 0,
+        share_count: 0,
       };
     }
   } catch (error) {
@@ -1845,12 +3126,21 @@ const fetchAchievementsSummary = async () => {
 const getBookingStatusClass = (status) => {
   const classes = {
     pending: 'bg-yellow-100 text-yellow-800',
+    pending_payment: 'bg-amber-100 text-amber-800',
     confirmed: 'bg-green-100 text-green-800',
     completed: 'bg-blue-100 text-blue-800',
     cancelled: 'bg-red-100 text-red-800',
     rejected: 'bg-gray-100 text-gray-800',
   };
   return classes[status] || 'bg-gray-100 text-gray-800';
+};
+
+const formatStatus = (status) => {
+  if (!status) return 'Unknown';
+  return status
+    .toString()
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
 const updateBookingStatus = async (bookingId, newStatus) => {
@@ -1874,11 +3164,7 @@ const updateBookingStatus = async (bookingId, newStatus) => {
 };
 
 const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  return formatDateValue(date);
 };
 
 const handleProfileImageUpload = async (file) => {
@@ -1931,10 +3217,11 @@ const saveProfile = async () => {
 // Event Management Functions
 const fetchCities = async () => {
   try {
-    const { data } = await api.get('/cities');
-    cities.value = data.data || data;
+    const { data } = await api.get('/locations');
+    const locations = data.data || data || [];
+    cities.value = locations.filter(location => location.type !== 'division');
   } catch (error) {
-    console.error('Error fetching cities:', error);
+    console.error('Error fetching locations:', error);
   }
 };
 
@@ -1969,9 +3256,11 @@ const fetchEvents = async () => {
 const fetchSubmissions = async () => {
   loadingSubmissions.value = true;
   try {
-    const { data } = await api.get('/photographer/submissions');
+    const { data } = await api.get('/photographer/submissions', {
+      params: { per_page: 1000 }
+    });
     if (data.status === 'success') {
-      submissions.value = data.data || [];
+      submissions.value = data.data?.data || data.data || [];
     }
   } catch (error) {
     console.error('Error fetching submissions:', error);
@@ -2128,6 +3417,67 @@ const createAlbum = async () => {
   }
 };
 
+const editAlbum = (album) => {
+  editingAlbumId.value = album.id;
+  albumForm.value = {
+    name: album.name,
+    description: album.description,
+    is_public: album.is_public,
+  };
+  showAlbumModal.value = true;
+};
+
+const updateAlbum = async () => {
+  if (!albumForm.value.name) {
+    showToast('Please enter an album name', 'warning');
+    return;
+  }
+
+  creatingAlbum.value = true;
+  try {
+    const { data } = await api.put(`/photographer/albums/${editingAlbumId.value}`, albumForm.value);
+    
+    if (data.status === 'success') {
+      showToast('Album updated successfully!', 'success');
+      closeAlbumModal();
+      fetchAlbums();
+    }
+  } catch (error) {
+    console.error('Error updating album:', error);
+    showToast(error.response?.data?.message || 'Failed to update album', 'error');
+  } finally {
+    creatingAlbum.value = false;
+  }
+};
+
+const deleteAlbum = async (album) => {
+  if (!confirm(`Are you sure you want to delete "${album.name}"? This will also delete all photos in this album. This action cannot be undone.`)) {
+    return;
+  }
+
+  try {
+    const { data } = await api.delete(`/photographer/albums/${album.id}`);
+    
+    if (data.status === 'success') {
+      showToast('Album deleted successfully', 'success');
+      fetchAlbums();
+    }
+  } catch (error) {
+    console.error('Error deleting album:', error);
+    showToast(error.response?.data?.message || 'Failed to delete album', 'error');
+  }
+};
+
+const closeAlbumModal = () => {
+  showAlbumModal.value = false;
+  editingAlbumId.value = null;
+  albumForm.value = {
+    name: '',
+    description: '',
+    is_public: true,
+  };
+};
+
 const viewAlbum = (album) => {
   selectedAlbum.value = album;
 };
@@ -2164,6 +3514,25 @@ const savePackage = async () => {
     const { data } = await api[method](endpoint, packageForm.value);
     
     if (data.status === 'success') {
+      const savedPackage = data.data || data.package || data;
+
+      // Upload images if selected
+      if ((packageCoverFile.value || packageSampleFiles.value.length) && savedPackage?.id) {
+        const formData = new FormData();
+        if (packageCoverFile.value) {
+          formData.append('cover_image', packageCoverFile.value);
+        }
+        if (packageSampleFiles.value.length) {
+          packageSampleFiles.value.forEach((file) => {
+            formData.append('sample_images[]', file);
+          });
+        }
+
+        await api.post(`/photographer/packages/${savedPackage.id}/images`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      }
+
       showToast(editingPackage.value ? 'Package updated successfully!' : 'Package created successfully!', 'success');
       closePackageModal();
       fetchPackages();
@@ -2190,6 +3559,9 @@ const editPackage = (pkg) => {
     cover_image: pkg.cover_image || '',
     sample_images: pkg.sample_images || [],
   };
+  packageCoverFile.value = null;
+  packageSampleFiles.value = [];
+  packageSampleUrlInput.value = '';
   showPackageModal.value = true;
 };
 
@@ -2226,6 +3598,74 @@ const closePackageModal = () => {
     cover_image: '',
     sample_images: [],
   };
+  packageCoverFile.value = null;
+  packageSampleFiles.value = [];
+  packageSampleUrlInput.value = '';
+};
+
+const onPackageCoverSelected = async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) {
+    packageCoverFile.value = null;
+    return;
+  }
+
+  const validation = await validateUploadFile(file, {
+    label: 'Cover image',
+    maxBytes: 10 * 1024 * 1024,
+    allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    imageWidth: 1200,
+    imageHeight: 800
+  });
+
+  if (!validation.ok) {
+    showToast(validation.message, 'error');
+    packageCoverFile.value = null;
+    event.target.value = '';
+    return;
+  }
+
+  packageCoverFile.value = file;
+};
+
+const onPackageSamplesSelected = async (event) => {
+  const files = Array.from(event.target.files || []).slice(0, 10);
+  const valid = [];
+
+  for (const file of files) {
+    const validation = await validateUploadFile(file, {
+      label: 'Sample image',
+      maxBytes: 10 * 1024 * 1024,
+      allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
+      imageWidth: 1600,
+      imageHeight: 1200
+    });
+
+    if (!validation.ok) {
+      showToast(validation.message, 'error');
+      continue;
+    }
+
+    valid.push(file);
+  }
+
+  packageSampleFiles.value = valid;
+};
+
+const addSampleUrl = () => {
+  const url = packageSampleUrlInput.value.trim();
+  if (!url) return;
+  if (!packageForm.value.sample_images) {
+    packageForm.value.sample_images = [];
+  }
+  if (!packageForm.value.sample_images.includes(url)) {
+    packageForm.value.sample_images.push(url);
+  }
+  packageSampleUrlInput.value = '';
+};
+
+const removeSampleUrl = (index) => {
+  packageForm.value.sample_images.splice(index, 1);
 };
 
 // ==================== AWARDS FUNCTIONALITY ====================
@@ -2293,18 +3733,27 @@ const getTypeBadgeColor = (type) => {
 };
 
 // Handle certificate file upload
-const handleCertificateUpload = (event) => {
+const handleCertificateUpload = async (event) => {
   const file = event.target.files[0];
-  if (file) {
-    // Validate file size (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      awardErrors.value.certificate_file = ['Certificate file must not exceed 5MB'];
-      event.target.value = '';
-      return;
-    }
-    certificateFile.value = file;
-    delete awardErrors.value.certificate_file;
+  if (!file) return;
+
+  const validation = await validateUploadFile(file, {
+    label: 'Certificate',
+    maxBytes: 5 * 1024 * 1024,
+    allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'],
+    imageWidth: 2000,
+    imageHeight: 1400
+  });
+
+  if (!validation.ok) {
+    awardErrors.value.certificate_file = [validation.message];
+    event.target.value = '';
+    certificateFile.value = null;
+    return;
   }
+
+  certificateFile.value = file;
+  delete awardErrors.value.certificate_file;
 };
 
 // Edit award

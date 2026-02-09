@@ -10,18 +10,29 @@
           {{ icon }}
         </div>
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">{{ title }}</h3>
-          <p class="text-sm text-gray-500">{{ subtitle }}</p>
+          <h3 class="text-lg font-semibold text-gray-900">
+            {{ title }}
+          </h3>
+          <p class="text-sm text-gray-500">
+            {{ subtitle }}
+          </p>
         </div>
       </div>
-      <div v-if="trend" class="flex items-center space-x-1">
+      <div
+        v-if="trend"
+        class="flex items-center space-x-1"
+      >
         <svg 
           v-if="trend === 'up'" 
           class="w-5 h-5 text-green-500" 
           fill="currentColor" 
           viewBox="0 0 20 20"
         >
-          <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+          <path
+            fill-rule="evenodd"
+            d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"
+            clip-rule="evenodd"
+          />
         </svg>
         <svg 
           v-else-if="trend === 'down'" 
@@ -29,7 +40,11 @@
           fill="currentColor" 
           viewBox="0 0 20 20"
         >
-          <path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          <path
+            fill-rule="evenodd"
+            d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z"
+            clip-rule="evenodd"
+          />
         </svg>
         <span 
           class="text-sm font-medium"
@@ -42,12 +57,25 @@
 
     <!-- Main Value -->
     <div class="mb-4">
-      <p class="text-4xl font-bold" :class="valueColorClass">{{ displayValue }}</p>
-      <p v-if="secondaryValue" class="text-sm text-gray-500 mt-1">{{ secondaryValue }}</p>
+      <p
+        class="text-4xl font-bold"
+        :class="valueColorClass"
+      >
+        {{ displayValue }}
+      </p>
+      <p
+        v-if="secondaryValue"
+        class="text-sm text-gray-500 mt-1"
+      >
+        {{ secondaryValue }}
+      </p>
     </div>
 
     <!-- Progress Bar (optional) -->
-    <div v-if="showProgress && maxValue" class="mb-4">
+    <div
+      v-if="showProgress && maxValue"
+      class="mb-4"
+    >
       <div class="flex justify-between items-center mb-2">
         <span class="text-xs text-gray-600">{{ progressLabel }}</span>
         <span class="text-xs font-medium text-gray-700">{{ progressPercentage }}%</span>
@@ -57,20 +85,25 @@
           class="h-2 rounded-full transition-all duration-500"
           :class="progressBarColor"
           :style="{ width: progressPercentage + '%' }"
-        ></div>
+        />
       </div>
     </div>
 
     <!-- Footer Info -->
-    <div v-if="footerText" class="pt-4 border-t border-gray-100">
-      <p class="text-xs text-gray-500">{{ footerText }}</p>
+    <div
+      v-if="footerText"
+      class="pt-4 border-t border-gray-100"
+    >
+      <p class="text-xs text-gray-500">
+        {{ footerText }}
+      </p>
     </div>
 
     <!-- Action Button (optional) -->
     <button 
       v-if="actionText"
-      @click="$emit('action')"
       class="mt-4 w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
+      @click="$emit('action')"
     >
       {{ actionText }}
     </button>
@@ -79,6 +112,7 @@
 
 <script setup>
 import { computed } from 'vue';
+import { formatNumber as formatNumberValue } from '../utils/formatters';
 
 const props = defineProps({
   title: {
@@ -141,7 +175,7 @@ defineEmits(['action']);
 
 const displayValue = computed(() => {
   if (typeof props.value === 'number') {
-    return props.value.toLocaleString();
+    return formatNumberValue(props.value);
   }
   return props.value;
 });

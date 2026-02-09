@@ -37,6 +37,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'rejection_reason',
         'approved_at',
         'approved_by_admin_id',
+        'terms_accepted_at',
     ];
 
     protected $hidden = [
@@ -54,6 +55,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password' => 'hashed',
         'approval_status' => 'string',
         'approved_at' => 'datetime',
+        'terms_accepted_at' => 'datetime',
     ];
 
     /**
@@ -171,6 +173,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isAdmin()
     {
         return in_array($this->role, ['admin', 'super_admin', 'moderator']);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
     }
 
     public function isJudge()

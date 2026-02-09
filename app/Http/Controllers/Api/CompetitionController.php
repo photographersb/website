@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Competition;
 use App\Models\CompetitionSubmission;
-use App\Models\CompetitionVote;
+use App\Models\CompetitionScore;
 use App\Http\Traits\ApiResponse;
 use App\Services\WinnerCalculationService;
 use App\Services\CertificateService;
@@ -134,36 +134,70 @@ class CompetitionController extends Controller
      */
     public function show(Competition $competition)
     {
-        // Check if competition is published or active (public only)
-        if (!in_array($competition->status, ['published', 'active'])) {
+        // Check if competition is publicly viewable
+        if (!in_array($competition->status, ['published', 'active', 'judging', 'completed'])) {
             return $this->notFound('This competition is not available');
         }
 
-        $cacheKey = "competition:{$competition->id}:details";
+        $cacheKey = "competition:{$competition->id}:details:{$competition->updated_at?->timestamp}";
         
         $competition = Cache::remember($cacheKey, 3600, function () use ($competition) {
             // Eager load relationships to avoid N+1 queries
             return $competition->load([
-            'admin',
-            'organizer.user',
-            'prizes' => function ($q) {
-                $q->orderBy('rank');
-            },
-            'sponsors',
-            'mentors' => function ($q) {
-                $q->where('mentors.is_active', true);
-            },
-            'judgeProfiles' => function ($q) {
-                $q->where('judges.is_active', true);
-            },
-            'submissions' => function ($q) {
-                $q->where('status', 'approved')
-                  ->with('photographer:id,name')
-                  ->orderBy('vote_count', 'desc')
-                  ->limit(10);
-            },
+                'admin',
+                'organizer.user',
+                'prizes' => function ($q) {
+                    $q->orderBy('rank');
+                },
+                'sponsors' => function ($q) {
+                    $q->where('is_active', true);
+                },
+                'sponsorRecords' => function ($q) {
+                    $q->wherePivot('is_active', true)
+                      ->orderBy('competition_sponsors.sort_order');
+                },
+                'mentors' => function ($q) {
+                    $q->where('mentors.is_active', true);
+                },
+                'judgeProfiles' => function ($q) {
+                    $q->where('judges.is_active', true);
+                },
+                'submissions' => function ($q) {
+                    $q->where('status', 'approved')
+                      ->with('photographer:id,name')
+                      ->orderBy('vote_count', 'desc')
+                      ->limit(10);
+                },
             ]);
         });
+
+        $judgeReactions = null;
+        if ($competition->show_judge_reactions) {
+            $summary = CompetitionScore::where('competition_id', $competition->id)
+                ->where('status', 'completed')
+                ->selectRaw('COUNT(*) as score_count')
+                ->selectRaw('AVG(composition_score) as composition_avg')
+                ->selectRaw('AVG(technical_score) as technical_avg')
+                ->selectRaw('AVG(creativity_score) as creativity_avg')
+                ->selectRaw('AVG(story_score) as story_avg')
+                ->selectRaw('AVG(impact_score) as impact_avg')
+                ->selectRaw('AVG(total_score) as total_avg')
+                ->first();
+
+            if ($summary && (int) $summary->score_count > 0) {
+                $judgeReactions = [
+                    'score_count' => (int) $summary->score_count,
+                    'composition_avg' => round((float) $summary->composition_avg, 1),
+                    'technical_avg' => round((float) $summary->technical_avg, 1),
+                    'creativity_avg' => round((float) $summary->creativity_avg, 1),
+                    'story_avg' => round((float) $summary->story_avg, 1),
+                    'impact_avg' => round((float) $summary->impact_avg, 1),
+                    'total_avg' => round((float) $summary->total_avg, 1),
+                ];
+            }
+        }
+
+        $competition->setAttribute('judge_reactions', $judgeReactions);
 
         return $this->success($competition, 'Competition details retrieved successfully');
     }
@@ -206,54 +240,6 @@ class CompetitionController extends Controller
         ]);
 
         return $this->created($submission, 'Photo submitted successfully');
-    }
-
-    /**
-     * Vote on submission (with fraud prevention)
-     */
-    public function vote(Request $request, CompetitionSubmission $submission)
-    {
-        $competition = $submission->competition;
-
-        // Check if voting is active
-        if (now() < $competition->voting_start_at || now() > $competition->voting_end_at) {
-            return $this->error('Voting is not currently active', 422);
-        }
-
-        // Check daily vote limit
-        $voteCountToday = CompetitionVote::where('competition_id', $competition->id)
-            ->where('voter_id', auth()->id())
-            ->whereDate('voted_at', today())
-            ->count();
-
-        if ($voteCountToday >= 50) {
-            return $this->error('You have reached your daily voting limit', 422);
-        }
-
-        // Check if already voted on this submission
-        $existingVote = CompetitionVote::where('submission_id', $submission->id)
-            ->where('voter_id', auth()->id())
-            ->first();
-
-        if ($existingVote) {
-            return $this->error('You have already voted on this submission', 422);
-        }
-
-        // Record vote
-        $vote = CompetitionVote::create([
-            'submission_id' => $submission->id,
-            'voter_id' => auth()->id(),
-            'competition_id' => $competition->id,
-            'voted_at' => now(),
-            'ip_address' => $request->ip(),
-            'is_verified' => auth()->check(),
-            'is_valid' => true,
-        ]);
-
-        // Update submission vote count
-        $submission->increment('vote_count');
-
-        return $this->created($vote, 'Vote recorded');
     }
 
     /**

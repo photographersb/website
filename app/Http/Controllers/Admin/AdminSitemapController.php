@@ -17,7 +17,7 @@ class AdminSitemapController extends Controller
     {
         $this->testService = $testService;
         $this->middleware('auth');
-        $this->middleware('admin');
+        $this->middleware('role:admin,super_admin');
     }
 
     /**

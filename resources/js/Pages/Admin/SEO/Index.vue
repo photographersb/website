@@ -9,121 +9,329 @@
       <AdminQuickNav />
 
       <div class="content-card">
-        <h3 class="section-title">🔎 SEO Meta Management</h3>
-        <p class="section-desc">Manage search engine optimization metadata for platform entities</p>
+        <h3 class="section-title">
+          🔎 SEO Meta Management
+        </h3>
+        <p class="section-desc">
+          Manage search engine optimization metadata for platform entities
+        </p>
         
         <div class="form-row">
           <div class="form-group">
             <label>Entity Type *</label>
-            <select v-model="modelType" @change="loadEntities" class="form-input">
-              <option value="">Select entity type...</option>
-              <option value="User">Photographer</option>
-              <option value="Competition">Competition</option>
-              <option value="Event">Event</option>
-              <option value="Album">Album</option>
+            <select
+              v-model="modelType"
+              class="form-input"
+              @change="loadEntities"
+            >
+              <option value="">
+                Select entity type...
+              </option>
+              <option value="User">
+                Photographer
+              </option>
+              <option value="Competition">
+                Competition
+              </option>
+              <option value="Event">
+                Event
+              </option>
+              <option value="Album">
+                Album
+              </option>
             </select>
           </div>
           <div class="form-group">
             <label>Entity *</label>
-            <select v-model.number="modelId" @change="fetchMeta" class="form-input" :disabled="!modelType || loadingEntities">
-              <option value="">{{ loadingEntities ? 'Loading...' : 'Select entity...' }}</option>
-              <option v-for="entity in entities" :key="entity.id" :value="entity.id">
-                {{ entity.name || entity.title || `ID: ${entity.id}` }}
+            <select
+              v-model.number="modelId"
+              class="form-input"
+              :disabled="!modelType || loadingEntities"
+              @change="fetchMeta"
+            >
+              <option value="">
+                {{ loadingEntities ? 'Loading...' : 'Select entity...' }}
+              </option>
+              <option
+                v-for="entity in entities"
+                :key="entity.id"
+                :value="entity.id"
+              >
+                {{ entity.name || entity.title || entity.user?.name || entity.slug || `ID: ${entity.id}` }}
               </option>
             </select>
           </div>
         </div>
 
         <div class="actions-row">
-          <button @click="fetchMeta" class="btn-secondary">Load</button>
-          <button @click="generateMeta" class="btn-secondary">Auto-Generate</button>
-          <button @click="previewMeta" class="btn-secondary">Preview</button>
-          <button @click="deleteMeta" class="btn-danger">Delete</button>
+          <button
+            class="btn-secondary"
+            @click="fetchMeta"
+          >
+            Load
+          </button>
+          <button
+            class="btn-secondary"
+            @click="generateMeta"
+          >
+            Auto-Generate
+          </button>
+          <button
+            class="btn-secondary"
+            @click="previewMeta"
+          >
+            Preview
+          </button>
+          <button
+            class="btn-secondary"
+            @click="resetForm"
+          >
+            Reset
+          </button>
+          <button
+            class="btn-danger"
+            @click="deleteMeta"
+          >
+            Delete
+          </button>
         </div>
 
-        <div v-if="preview" class="preview-card">
+        <div
+          v-if="preview"
+          class="preview-card"
+        >
           <h4>Preview</h4>
-          <p class="preview-title">{{ preview.title }}</p>
-          <p class="preview-url">{{ preview.url }}</p>
-          <p class="preview-desc">{{ preview.description }}</p>
+          <p class="preview-title">
+            {{ preview.title }}
+          </p>
+          <p class="preview-url">
+            {{ preview.url }}
+          </p>
+          <p class="preview-desc">
+            {{ preview.description }}
+          </p>
         </div>
 
-        <form @submit.prevent="saveMeta" class="edit-form">
+        <form
+          class="edit-form"
+          @submit.prevent="saveMeta"
+        >
           <div class="form-row">
             <div class="form-group">
               <label>Meta Title</label>
-              <input v-model="form.meta_title" type="text" class="form-input" />
+              <input
+                v-model="form.meta_title"
+                type="text"
+                class="form-input"
+              >
+              <p
+                class="text-xs"
+                :class="metaTitleStatus"
+              >
+                {{ metaTitleCount }} / 60 recommended
+              </p>
             </div>
             <div class="form-group">
               <label>Meta Keywords</label>
-              <input v-model="form.meta_keywords" type="text" class="form-input" />
+              <input
+                v-model="form.meta_keywords"
+                type="text"
+                class="form-input"
+              >
             </div>
           </div>
 
           <div class="form-group">
             <label>Meta Description</label>
-            <textarea v-model="form.meta_description" rows="3" class="form-input"></textarea>
+            <textarea
+              v-model="form.meta_description"
+              rows="3"
+              class="form-input"
+            />
+            <p
+              class="text-xs"
+              :class="metaDescStatus"
+            >
+              {{ metaDescCount }} / 160 recommended
+            </p>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label>Canonical URL</label>
-              <input v-model="form.canonical_url" type="url" class="form-input" />
+              <input
+                v-model="form.canonical_url"
+                type="url"
+                class="form-input"
+              >
             </div>
             <div class="form-group">
               <label>OG Image</label>
-              <input v-model="form.og_image" type="url" class="form-input" />
+              <input
+                v-model="form.og_image"
+                type="url"
+                class="form-input"
+              >
+              <input
+                type="file"
+                accept="image/*"
+                class="upload-input mt-2 block text-sm"
+                @change="handleImageUpload('og_image', $event)"
+              >
+              <div class="mt-2 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  class="rounded-full border border-burgundy px-4 py-1 text-xs font-semibold text-burgundy hover:bg-burgundy hover:text-white"
+                  @click="openPexelsPicker('og_image', 1200, 630)"
+                >
+                  Choose from Pexels
+                </button>
+              </div>
+              <p class="mt-1 upload-hint">Max 5 MB. JPG/PNG. 1200x630 px.</p>
+              <p
+                v-if="uploadingImages.og_image"
+                class="mt-1 text-xs text-gray-500"
+              >
+                Uploading...
+              </p>
+              <p
+                v-if="form.og_image_credit_name"
+                class="mt-1 text-xs text-gray-500"
+              >
+                Pexels credit:
+                <a
+                  :href="form.og_image_credit_url || 'https://www.pexels.com'"
+                  target="_blank"
+                  rel="noopener"
+                  class="font-semibold text-burgundy underline"
+                >
+                  {{ form.og_image_credit_name }}
+                </a>
+              </p>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label>Twitter Card</label>
-              <select v-model="form.twitter_card" class="form-input">
-                <option value="summary">summary</option>
-                <option value="summary_large_image">summary_large_image</option>
-                <option value="app">app</option>
-                <option value="player">player</option>
+              <select
+                v-model="form.twitter_card"
+                class="form-input"
+              >
+                <option value="summary">
+                  summary
+                </option>
+                <option value="summary_large_image">
+                  summary_large_image
+                </option>
+                <option value="app">
+                  app
+                </option>
+                <option value="player">
+                  player
+                </option>
               </select>
             </div>
             <div class="form-group">
               <label>OG Title</label>
-              <input v-model="form.og_title" type="text" class="form-input" />
+              <input
+                v-model="form.og_title"
+                type="text"
+                class="form-input"
+              >
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label>OG Description</label>
-              <textarea v-model="form.og_description" rows="2" class="form-input"></textarea>
+              <textarea
+                v-model="form.og_description"
+                rows="2"
+                class="form-input"
+              />
             </div>
             <div class="form-group">
               <label>Twitter Description</label>
-              <textarea v-model="form.twitter_description" rows="2" class="form-input"></textarea>
+              <textarea
+                v-model="form.twitter_description"
+                rows="2"
+                class="form-input"
+              />
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label>Twitter Image</label>
-              <input v-model="form.twitter_image" type="url" class="form-input" />
+              <input
+                v-model="form.twitter_image"
+                type="url"
+                class="form-input"
+              >
+              <input
+                type="file"
+                accept="image/*"
+                class="upload-input mt-2 block text-sm"
+                @change="handleImageUpload('twitter_image', $event)"
+              >
+              <div class="mt-2 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  class="rounded-full border border-burgundy px-4 py-1 text-xs font-semibold text-burgundy hover:bg-burgundy hover:text-white"
+                  @click="openPexelsPicker('twitter_image', 1200, 630)"
+                >
+                  Choose from Pexels
+                </button>
+              </div>
+              <p class="mt-1 upload-hint">Max 5 MB. JPG/PNG. 1200x630 px.</p>
+              <p
+                v-if="uploadingImages.twitter_image"
+                class="mt-1 text-xs text-gray-500"
+              >
+                Uploading...
+              </p>
+              <p
+                v-if="form.twitter_image_credit_name"
+                class="mt-1 text-xs text-gray-500"
+              >
+                Pexels credit:
+                <a
+                  :href="form.twitter_image_credit_url || 'https://www.pexels.com'"
+                  target="_blank"
+                  rel="noopener"
+                  class="font-semibold text-burgundy underline"
+                >
+                  {{ form.twitter_image_credit_name }}
+                </a>
+              </p>
             </div>
             <div class="form-group">
               <label>Robots Snippet</label>
-              <input v-model="form.robots_snippet" type="text" class="form-input" />
+              <input
+                v-model="form.robots_snippet"
+                type="text"
+                class="form-input"
+              >
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label class="checkbox-label">
-                <input v-model="form.robots_index" type="checkbox" />
+                <input
+                  v-model="form.robots_index"
+                  type="checkbox"
+                >
                 <span>Robots Index</span>
               </label>
             </div>
             <div class="form-group">
               <label class="checkbox-label">
-                <input v-model="form.robots_follow" type="checkbox" />
+                <input
+                  v-model="form.robots_follow"
+                  type="checkbox"
+                >
                 <span>Robots Follow</span>
               </label>
             </div>
@@ -131,11 +339,19 @@
 
           <div class="form-group">
             <label>Schema JSON</label>
-            <textarea v-model="form.schema_json" rows="4" class="form-input"></textarea>
+            <textarea
+              v-model="form.schema_json"
+              rows="4"
+              class="form-input"
+            />
           </div>
 
           <div class="modal-actions">
-            <button type="submit" class="btn-save" :disabled="saving">
+            <button
+              type="submit"
+              class="btn-save"
+              :disabled="saving"
+            >
               {{ saving ? 'Saving...' : 'Save SEO Meta' }}
             </button>
           </div>
@@ -143,19 +359,37 @@
       </div>
 
       <div class="content-card">
-        <h3 class="section-title">📋 Existing SEO Meta Records</h3>
-        <div class="table-actions">
-          <button @click="loadAllMeta" class="btn-secondary" :disabled="loadingAll">
+        <h3 class="section-title">
+          📋 Existing SEO Meta Records
+        </h3>
+        <div class="table-actions flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+          <input
+            v-model="metaSearch"
+            type="text"
+            class="form-input max-w-xs"
+            placeholder="Search type, ID, title..."
+          >
+          <button
+            class="btn-secondary"
+            :disabled="loadingAll"
+            @click="loadAllMeta"
+          >
             {{ loadingAll ? 'Loading...' : 'Refresh List' }}
           </button>
         </div>
         
-        <div v-if="loadingAll" class="loading-state">
-          <div class="spinner"></div>
+        <div
+          v-if="loadingAll"
+          class="loading-state"
+        >
+          <div class="spinner" />
           <p>Loading SEO meta records...</p>
         </div>
 
-        <div v-else-if="allMeta.length > 0" class="table-wrapper">
+        <div
+          v-else-if="filteredMeta.length > 0"
+          class="table-wrapper"
+        >
           <table class="data-table">
             <thead>
               <tr>
@@ -168,7 +402,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="meta in allMeta" :key="meta.id">
+              <tr
+                v-for="meta in filteredMeta"
+                :key="meta.id"
+              >
                 <td>{{ meta.model_type }}</td>
                 <td>{{ meta.model_id }}</td>
                 <td>{{ meta.meta_title || '(No title)' }}</td>
@@ -179,29 +416,60 @@
                 </td>
                 <td>{{ formatDate(meta.updated_at) }}</td>
                 <td class="actions">
-                  <button @click="loadMetaRecord(meta)" class="btn-action btn-edit">Edit</button>
+                  <button
+                    class="btn-action btn-edit"
+                    @click="loadMetaRecord(meta)"
+                  >
+                    Edit
+                  </button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <div v-else class="empty-state">
-          <div class="empty-icon">📝</div>
-          <p class="empty-title">No SEO Meta Records Yet</p>
-          <p class="empty-desc">Create SEO metadata using the form above</p>
+        <div
+          v-else
+          class="empty-state"
+        >
+          <div class="empty-icon">
+            📝
+          </div>
+          <p class="empty-title">
+            No SEO Meta Records Yet
+          </p>
+          <p class="empty-desc">
+            Create SEO metadata using the form above
+          </p>
         </div>
       </div>
     </div>
 
-    <div v-if="showToast" class="toast">{{ toastMessage }}</div>
+    <div
+      v-if="showToast"
+      class="toast"
+    >
+      {{ toastMessage }}
+    </div>
+
+    <PexelsPickerModal
+      :visible="pexelsPickerOpen"
+      :target-width="pexelsTarget.width"
+      :target-height="pexelsTarget.height"
+      @close="closePexelsPicker"
+      @select="handlePexelsSelect"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import AdminHeader from '../../../components/AdminHeader.vue'
 import AdminQuickNav from '../../../components/AdminQuickNav.vue'
+import PexelsPickerModal from '../../../components/PexelsPickerModal.vue'
+import { formatDate as formatDateValue } from '../../../utils/formatters'
+import api from '../../../api'
+import { validateUploadFile } from '../../../utils/imageValidation'
 
 const modelType = ref('')
 const modelId = ref(null)
@@ -213,6 +481,18 @@ const entities = ref([])
 const loadingEntities = ref(false)
 const allMeta = ref([])
 const loadingAll = ref(false)
+const metaSearch = ref('')
+const uploadingImages = ref({
+  og_image: false,
+  twitter_image: false,
+})
+
+const pexelsPickerOpen = ref(false)
+const pexelsTarget = ref({
+  field: 'og_image',
+  width: 1200,
+  height: 630,
+})
 
 const form = ref({
   meta_title: '',
@@ -222,14 +502,41 @@ const form = ref({
   og_title: '',
   og_description: '',
   og_image: '',
+  og_image_credit_name: '',
+  og_image_credit_url: '',
   twitter_card: 'summary',
   twitter_title: '',
   twitter_description: '',
   twitter_image: '',
+  twitter_image_credit_name: '',
+  twitter_image_credit_url: '',
   robots_index: true,
   robots_follow: true,
   robots_snippet: '',
   schema_json: ''
+})
+
+const metaTitleCount = computed(() => form.value.meta_title?.length || 0)
+const metaDescCount = computed(() => form.value.meta_description?.length || 0)
+const metaTitleStatus = computed(() => {
+  if (metaTitleCount.value > 60) return 'text-red-600'
+  if (metaTitleCount.value < 30) return 'text-yellow-600'
+  return 'text-green-600'
+})
+const metaDescStatus = computed(() => {
+  if (metaDescCount.value > 160) return 'text-red-600'
+  if (metaDescCount.value < 70) return 'text-yellow-600'
+  return 'text-green-600'
+})
+
+const filteredMeta = computed(() => {
+  if (!metaSearch.value) return allMeta.value
+  const q = metaSearch.value.toLowerCase()
+  return allMeta.value.filter(meta =>
+    `${meta.model_type}`.toLowerCase().includes(q) ||
+    `${meta.model_id}`.toLowerCase().includes(q) ||
+    `${meta.meta_title || ''}`.toLowerCase().includes(q)
+  )
 })
 
 const showToastMessage = (message) => {
@@ -238,30 +545,162 @@ const showToastMessage = (message) => {
   setTimeout(() => { showToast.value = false }, 3000)
 }
 
+const handleImageUpload = async (field, event) => {
+  const file = event.target.files?.[0]
+  if (!file) return
+
+  if (field === 'og_image') {
+    form.value.og_image_credit_name = ''
+    form.value.og_image_credit_url = ''
+  }
+  if (field === 'twitter_image') {
+    form.value.twitter_image_credit_name = ''
+    form.value.twitter_image_credit_url = ''
+  }
+
+  const validation = await validateUploadFile(file, {
+    label: 'Image',
+    maxBytes: 5 * 1024 * 1024,
+    allowedTypes: ['image/jpeg', 'image/png'],
+    imageWidth: 1200,
+    imageHeight: 630
+  })
+
+  if (!validation.ok) {
+    showToastMessage(validation.message)
+    event.target.value = ''
+    return
+  }
+
+  uploadingImages.value[field] = true
+  try {
+    const formData = new FormData()
+    formData.append('image', file)
+    formData.append('folder', 'seo')
+
+    const response = await api.post('/admin/media/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+
+    if (response.data?.status === 'success' && response.data.data?.url) {
+      form.value[field] = response.data.data.url
+    } else {
+      showToastMessage(response.data?.message || 'Image upload failed.')
+    }
+  } catch (error) {
+    showToastMessage(error.response?.data?.message || 'Image upload failed.')
+  } finally {
+    uploadingImages.value[field] = false
+    event.target.value = ''
+  }
+}
+
+const openPexelsPicker = (field, width, height) => {
+  pexelsTarget.value = { field, width, height }
+  pexelsPickerOpen.value = true
+}
+
+const closePexelsPicker = () => {
+  pexelsPickerOpen.value = false
+}
+
+const applyPexelsCredit = (field, credit) => {
+  if (field === 'og_image') {
+    form.value.og_image_credit_name = credit?.name || ''
+    form.value.og_image_credit_url = credit?.url || ''
+  }
+  if (field === 'twitter_image') {
+    form.value.twitter_image_credit_name = credit?.name || ''
+    form.value.twitter_image_credit_url = credit?.url || ''
+  }
+}
+
+const handlePexelsSelect = async ({ file, credit }) => {
+  const field = pexelsTarget.value.field
+  uploadingImages.value[field] = true
+  try {
+    const formData = new FormData()
+    formData.append('image', file)
+    formData.append('folder', 'seo')
+
+    const response = await api.post('/admin/media/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+
+    if (response.data?.status === 'success' && response.data.data?.url) {
+      form.value[field] = response.data.data.url
+      applyPexelsCredit(field, credit)
+    } else {
+      showToastMessage(response.data?.message || 'Image upload failed.')
+    }
+  } catch (error) {
+    showToastMessage(error.response?.data?.message || 'Image upload failed.')
+  } finally {
+    uploadingImages.value[field] = false
+    closePexelsPicker()
+  }
+}
+
+const resetForm = () => {
+  preview.value = null
+  Object.assign(form.value, {
+    meta_title: '',
+    meta_description: '',
+    meta_keywords: '',
+    canonical_url: '',
+    og_title: '',
+    og_description: '',
+    og_image: '',
+    og_image_credit_name: '',
+    og_image_credit_url: '',
+    twitter_card: 'summary',
+    twitter_title: '',
+    twitter_description: '',
+    twitter_image: '',
+    twitter_image_credit_name: '',
+    twitter_image_credit_url: '',
+    robots_index: true,
+    robots_follow: true,
+    robots_snippet: '',
+    schema_json: ''
+  })
+}
+
 const loadEntities = async () => {
   if (!modelType.value) return
   loadingEntities.value = true
   entities.value = []
   modelId.value = null
   try {
-    const token = localStorage.getItem('auth_token')
     let endpoint = ''
-    if (modelType.value === 'User') endpoint = '/api/v1/admin/photographers'
-    else if (modelType.value === 'Competition') endpoint = '/api/v1/admin/competitions'
-    else if (modelType.value === 'Event') endpoint = '/api/v1/admin/events'
-    else if (modelType.value === 'Album') endpoint = '/api/v1/albums'
+    if (modelType.value === 'User') endpoint = '/admin/photographers'
+    else if (modelType.value === 'Competition') endpoint = '/admin/competitions'
+    else if (modelType.value === 'Event') endpoint = '/admin/events'
+    else if (modelType.value === 'Album') endpoint = '/albums'
     
     if (!endpoint) return
     
-    const response = await fetch(endpoint, {
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-    })
-    const data = await response.json()
-    if (data.status === 'success') {
+    const response = await api.get(endpoint)
+    const data = response.data
+    if (Array.isArray(data)) {
+      entities.value = data
+    } else if (Array.isArray(data?.data?.photographers)) {
+      entities.value = data.data.photographers
+    } else if (Array.isArray(data?.data?.items)) {
+      entities.value = data.data.items
+    } else if (Array.isArray(data?.data)) {
+      entities.value = data.data
+    } else if (Array.isArray(data?.data?.data)) {
+      entities.value = data.data.data
+    } else if (data?.status === 'success') {
       entities.value = data.data?.data || data.data || []
+    } else {
+      entities.value = []
+      showToastMessage(data?.message || 'No entities found')
     }
   } catch (error) {
     console.error('Error loading entities', error)
+    showToastMessage('Error loading entities')
   } finally {
     loadingEntities.value = false
   }
@@ -270,11 +709,7 @@ const loadEntities = async () => {
 const loadAllMeta = async () => {
   loadingAll.value = true
   try {
-    const token = localStorage.getItem('auth_token')
-    const response = await fetch('/api/v1/admin/seo/all', {
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-    })
-    const data = await response.json()
+    const { data } = await api.get('/admin/seo/all')
     if (data.status === 'success') {
       allMeta.value = data.data || []
     }
@@ -293,21 +728,20 @@ const loadMetaRecord = (meta) => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-const formatDate = (dateString) => {
-  if (!dateString) return 'N/A'
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
+const formatDate = (value) => {
+  const formatted = formatDateValue(value)
+  return formatted || 'N/A'
 }
 
 const fetchMeta = async () => {
   if (!modelType.value || !modelId.value) return showToastMessage('Model type and ID required')
   try {
-    const token = localStorage.getItem('auth_token')
-    const params = new URLSearchParams({ model_type: modelType.value, model_id: modelId.value })
-    const response = await fetch(`/api/v1/admin/seo?${params}`, {
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+    const { data } = await api.get('/admin/seo', {
+      params: {
+        model_type: modelType.value,
+        model_id: modelId.value
+      }
     })
-    const data = await response.json()
     if (data.status === 'success') {
       if (data.data) {
         Object.assign(form.value, data.data)
@@ -323,13 +757,10 @@ const fetchMeta = async () => {
 const generateMeta = async () => {
   if (!modelType.value || !modelId.value) return showToastMessage('Model type and ID required')
   try {
-    const token = localStorage.getItem('auth_token')
-    const response = await fetch('/api/v1/admin/seo/generate', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model_type: modelType.value, model_id: modelId.value })
+    const { data } = await api.post('/admin/seo/generate', {
+      model_type: modelType.value,
+      model_id: modelId.value
     })
-    const data = await response.json()
     if (data.status === 'success') {
       Object.assign(form.value, data.data || {})
       showToastMessage('SEO meta generated')
@@ -345,13 +776,10 @@ const generateMeta = async () => {
 const previewMeta = async () => {
   if (!modelType.value || !modelId.value) return showToastMessage('Model type and ID required')
   try {
-    const token = localStorage.getItem('auth_token')
-    const response = await fetch('/api/v1/admin/seo/preview', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model_type: modelType.value, model_id: modelId.value })
+    const { data } = await api.post('/admin/seo/preview', {
+      model_type: modelType.value,
+      model_id: modelId.value
     })
-    const data = await response.json()
     if (data.status === 'success') preview.value = data.data
   } catch (error) {
     console.error('Error previewing SEO meta', error)
@@ -363,15 +791,9 @@ const saveMeta = async () => {
   if (!modelType.value || !modelId.value) return showToastMessage('Model type and ID required')
   saving.value = true
   try {
-    const token = localStorage.getItem('auth_token')
     const payload = { model_type: modelType.value, model_id: modelId.value, ...form.value }
-    const response = await fetch('/api/v1/admin/seo', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
-    const data = await response.json()
-    if (response.ok && data.status === 'success') {
+    const { data } = await api.post('/admin/seo', payload)
+    if (data.status === 'success') {
       showToastMessage('SEO meta saved')
     } else {
       showToastMessage(data.message || 'Error saving SEO meta')
@@ -388,14 +810,10 @@ const deleteMeta = async () => {
   if (!modelType.value || !modelId.value) return showToastMessage('Model type and ID required')
   if (!confirm('Delete SEO meta for this entity?')) return
   try {
-    const token = localStorage.getItem('auth_token')
-    const response = await fetch('/api/v1/admin/seo', {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model_type: modelType.value, model_id: modelId.value })
+    const { data } = await api.delete('/admin/seo', {
+      data: { model_type: modelType.value, model_id: modelId.value }
     })
-    const data = await response.json()
-    if (response.ok && data.status === 'success') {
+    if (data.status === 'success') {
       showToastMessage('SEO meta deleted')
     } else {
       showToastMessage(data.message || 'Error deleting SEO meta')

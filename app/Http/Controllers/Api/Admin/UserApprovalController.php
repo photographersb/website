@@ -82,7 +82,7 @@ class UserApprovalController extends Controller
 
         $user->update([
             'approval_status' => 'approved',
-            'approved_by' => $request->user()->id,
+            'approved_by_admin_id' => $request->user()->id,
             'approved_at' => now(),
             'rejection_reason' => null,
         ]);
@@ -116,7 +116,7 @@ class UserApprovalController extends Controller
 
         $user->update([
             'approval_status' => 'rejected',
-            'approved_by' => $request->user()->id,
+            'approved_by_admin_id' => $request->user()->id,
             'approved_at' => now(),
             'rejection_reason' => $validated['reason'],
         ]);
@@ -157,7 +157,7 @@ class UserApprovalController extends Controller
             if ($user->approval_status !== 'approved') {
                 $user->update([
                     'approval_status' => 'approved',
-                    'approved_by' => $request->user()->id,
+                    'approved_by_admin_id' => $request->user()->id,
                     'approved_at' => now(),
                     'rejection_reason' => null,
                 ]);

@@ -17,10 +17,14 @@ class Inquiry extends Model
         'event_location',
         'latitude',
         'longitude',
+        'preferred_time_slot',
+        'event_type_detail',
+        'indoor_outdoor',
         'guest_count',
         'budget_min',
         'budget_max',
         'requirements',
+        'additional_services',
         'status',
         'response_message',
         'responded_at',
@@ -35,6 +39,7 @@ class Inquiry extends Model
         'budget_max' => 'decimal:2',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
+        'additional_services' => 'array',
     ];
 
     protected static function boot()

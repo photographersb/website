@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\City;
+use App\Models\Location;
 use App\Models\Photographer;
 use Illuminate\Http\Request;
 
@@ -13,7 +13,9 @@ class LocationController extends Controller
      */
     public function index()
     {
-        $locations = City::withCount('photographers')
+        $locations = Location::withCount('photographers')
+            ->where('is_active', true)
+            ->whereIn('type', ['district', 'upazila'])
             ->orderBy('photographers_count', 'desc')
             ->get();
 
@@ -41,29 +43,31 @@ class LocationController extends Controller
      */
     public function show(string $slug)
     {
-        $city = City::where('slug', $slug)->firstOrFail();
+        $location = Location::where('slug', $slug)->firstOrFail();
         
-        $photographers = Photographer::with('user')
-            ->where('city', $city->name)
-            ->orWhere('district', $city->name)
+        $photographers = Photographer::with(['user', 'city'])
+            ->where(function ($query) use ($location) {
+                $query->where('city_id', $location->id)
+                    ->orWhere('location', 'like', '%' . $location->name . '%');
+            })
             ->where('is_verified', true)
             ->paginate(24);
 
         $seoMeta = (object) [
-            'meta_title' => "Photographers in {$city->name} | Local Photography Services | Photographer SB",
-            'meta_description' => "Hire verified photographers in {$city->name}, Bangladesh. View portfolios, packages, and reviews. Book local photography services instantly.",
+            'meta_title' => "Photographers in {$location->name} | Local Photography Services | Photographer SB",
+            'meta_description' => "Hire verified photographers in {$location->name}, Bangladesh. View portfolios, packages, and reviews. Book local photography services instantly.",
             'canonical_url' => url("/locations/{$slug}"),
-            'og_title' => "Photographers in {$city->name} - Photographer SB",
-            'og_description' => "Find the best photographers in {$city->name}. {$photographers->total()} verified professionals ready to capture your moments.",
-            'og_image' => $city->image_url ?? asset('images/og-locations.jpg'),
+            'og_title' => "Photographers in {$location->name} - Photographer SB",
+            'og_description' => "Find the best photographers in {$location->name}. {$photographers->total()} verified professionals ready to capture your moments.",
+            'og_image' => $location->image_url ?? asset('images/og-locations.jpg'),
             'og_url' => url("/locations/{$slug}"),
             'robots_index' => true,
             'robots_follow' => true,
-            'schema_json' => $this->getLocationPhotographersSchema($city, $photographers),
+            'schema_json' => $this->getLocationPhotographersSchema($location, $photographers),
         ];
 
         return view('locations.show', [
-            'city' => $city,
+            'city' => $location,
             'photographers' => $photographers,
             'seoMeta' => $seoMeta,
         ]);
@@ -114,10 +118,10 @@ class LocationController extends Controller
                     'item' => [
                         '@type' => 'Person',
                         'name' => $photographer->user->name,
-                        'url' => url("/@{$photographer->user->username}"),
+                        'url' => url("/photographer/{$photographer->slug}"),
                         'address' => [
                             '@type' => 'PostalAddress',
-                            'addressLocality' => $photographer->city,
+                            'addressLocality' => $photographer->city?->name ?? $photographer->location ?? '',
                             'addressCountry' => 'BD',
                         ],
                     ],

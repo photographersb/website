@@ -11,9 +11,35 @@
     <meta name="description" content="Bangladesh's premier photography marketplace by Somogro Bangladesh. Connect with 500+ verified professional photographers for weddings, events, portraits & more. Book now with secure payments.">
     <meta name="keywords" content="photographers in bangladesh, wedding photographer dhaka, professional photography, event photography, portrait photographer, photography competition, hire photographer bangladesh, somogro bangladesh">
     <meta name="author" content="Somogro Bangladesh">
+    @if(strpos(request()->path(), 'admin') === 0)
+    <meta name="robots" content="noindex, nofollow">
+    @else
     <meta name="robots" content="index, follow">
+    @endif
+    @php
+        $trackingSettings = cache()->remember('tracking_settings', 300, function () {
+            return DB::table('settings')
+                ->whereIn('key', [
+                    'tracking.enable',
+                    'tracking.ga4_measurement_id',
+                    'tracking.gtm_id',
+                    'tracking.fb_pixel_id',
+                    'tracking.gsc_verification'
+                ])
+                ->pluck('value', 'key')
+                ->toArray();
+        });
+        $trackingEnabled = filter_var($trackingSettings['tracking.enable'] ?? env('ANALYTICS_ENABLED', true), FILTER_VALIDATE_BOOLEAN);
+        $ga4Id = $trackingSettings['tracking.ga4_measurement_id'] ?? env('GA4_MEASUREMENT_ID');
+        $gtmId = $trackingSettings['tracking.gtm_id'] ?? env('GTM_ID');
+        $fbPixelId = $trackingSettings['tracking.fb_pixel_id'] ?? env('FB_PIXEL_ID');
+        $gscVerification = $trackingSettings['tracking.gsc_verification'] ?? env('GSC_VERIFICATION');
+    @endphp
     <meta name="language" content="English">
     <meta name="revisit-after" content="7 days">
+    @if(!empty($gscVerification))
+    <meta name="google-site-verification" content="{{ $gscVerification }}">
+    @endif
     
     <!-- Open Graph / Facebook Meta Tags -->
     <meta property="og:type" content="website">
@@ -85,6 +111,45 @@
         }
     }
     </script>
+
+    @if($trackingEnabled && !empty($gtmId))
+    <!-- Google Tag Manager -->
+    <script>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','{{ $gtmId }}');
+    </script>
+    <!-- End Google Tag Manager -->
+    @endif
+
+    @if($trackingEnabled && !empty($ga4Id))
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $ga4Id }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ $ga4Id }}');
+    </script>
+    @endif
+
+    @if($trackingEnabled && !empty($fbPixelId))
+    <!-- Meta Pixel -->
+    <script>
+        !(function(f,b,e,v,n,t,s){
+            if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)
+        })(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '{{ $fbPixelId }}');
+        fbq('track', 'PageView');
+    </script>
+    @endif
     
     <script type="application/ld+json">
     {
@@ -124,12 +189,19 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
-    <!-- DEBUG-VIEW: app.blade.php loaded -->
-    {!! \App\Support\DevInfo::renderRouteMarker() !!}
-    
+    @if($trackingEnabled && !empty($gtmId))
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtmId }}"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    @endif
+
+    @if($trackingEnabled && !empty($fbPixelId))
+    <!-- Meta Pixel (noscript) -->
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id={{ $fbPixelId }}&ev=PageView&noscript=1"/></noscript>
+    @endif
+
     <div id="app"></div>
-    
-    <!-- Dev Debug Badge -->
-    {!! \App\Support\DevInfo::renderDebugBadge() !!}
 </body>
 </html>

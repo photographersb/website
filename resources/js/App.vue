@@ -1,173 +1,207 @@
 <template>
-  <div id="app" class="bg-gray-50 min-h-screen">
+  <div
+    id="app"
+    :class="['min-h-screen flex flex-col', isAdminRoute ? 'admin-theme' : 'bg-gray-50']"
+  >
     <MetaTags />
+
     <!-- Marketplace Navigation (Hidden in Admin Area) -->
-    <nav v-if="!isAdminRoute" class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm overflow-x-hidden">
-      <div class="container mx-auto px-4 md:px-6 py-3">
-        <div class="flex justify-between items-center">
-          <!-- Logo -->
-          <router-link to="/" class="flex items-center group">
-            <img src="/images/logo.svg" alt="Photographers - Across Somagro Bangladesh" class="h-8 md:h-12 w-auto" />
+    <nav
+      v-if="!isAdminRoute"
+      class="sticky top-0 z-50 sb-nav"
+    >
+      <div class="sb-nav__bg" aria-hidden="true"></div>
+      <div class="container mx-auto px-4 md:px-6 py-3 sb-nav__inner">
+        <div class="flex items-center justify-between gap-4">
+          <router-link
+            to="/"
+            class="flex items-center"
+          >
+            <img
+              src="/images/logo.svg"
+              alt="Photographers - Across Somagro Bangladesh"
+              class="h-8 md:h-12 w-auto"
+            >
           </router-link>
 
-          <!-- Mobile Menu Button -->
-          <button 
+          <button
+            class="md:hidden p-2 rounded-lg sb-nav__icon-btn"
             @click="mobileMenuOpen = !mobileMenuOpen"
-            class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            <svg v-if="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            <svg
+              v-if="!mobileMenuOpen"
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
-            <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <svg
+              v-else
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
 
-          <!-- Desktop Navigation Links -->
-          <div class="hidden md:flex gap-1 items-center">
+          <div class="hidden md:flex items-center gap-2">
             <router-link
               v-for="link in navLinks"
               :key="link.path"
               :to="link.path"
-              class="flex flex-col items-center gap-1 px-4 py-2 rounded-lg text-gray-600 hover:text-burgundy hover:bg-gray-50 transition-colors"
-              active-class="text-burgundy bg-burgundy-50"
+              class="sb-nav__link"
+              active-class="sb-nav__link--active"
             >
-              <component :is="link.icon" class="w-5 h-5" />
-              <span class="text-xs font-medium">{{ link.name }}</span>
+              <component
+                :is="link.icon"
+                class="w-5 h-5"
+              />
+              <span class="text-sm font-medium">{{ link.name }}</span>
             </router-link>
+          </div>
 
-            <!-- User Menu -->
-            <div v-if="user" class="flex gap-2 items-center ml-4 pl-4 border-l border-gray-200">
-              <!-- Notifications -->
-              <router-link
-                to="/notifications"
-                class="relative flex flex-col items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                <span class="text-xs text-gray-600">Alerts</span>
-                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              </router-link>
-
-              <!-- Transactions -->
-              <router-link
-                to="/transactions"
-                class="flex flex-col items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                </svg>
-                <span class="text-xs text-gray-600">Wallet</span>
-              </router-link>
-
-              <!-- Verification Center -->
-              <router-link
-                v-if="isPhotographer"
-                to="/verification"
-                class="flex flex-col items-center gap-1 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span class="text-xs text-gray-600">Verify</span>
-              </router-link>
-
-              <!-- User Avatar -->
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-burgundy-50 border border-burgundy-100">
-                <div class="w-8 h-8 rounded-full bg-burgundy flex items-center justify-center text-white text-sm font-bold">
+          <div class="hidden md:flex items-center gap-2">
+            <span class="mx-1 h-1.5 w-1.5 rounded-full bg-gray-300" aria-hidden="true" />
+            <div
+              v-if="user"
+              class="flex items-center gap-2"
+            >
+              <div class="sb-user-chip">
+                <div class="sb-user-chip__avatar">
                   {{ user.name.charAt(0).toUpperCase() }}
                 </div>
-                <span class="text-sm font-medium text-gray-900">{{ user.name }}</span>
+                <span class="text-sm font-semibold text-gray-900">{{ user.name }}</span>
               </div>
 
-              <!-- Dashboard Links -->
               <router-link
                 v-if="isJudge"
                 to="/judge/dashboard"
-                class="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                class="sb-btn sb-btn--judge"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                </svg>
                 Judge Panel
               </router-link>
               <router-link
                 v-if="isPhotographer"
                 to="/dashboard"
-                class="flex items-center gap-2 px-4 py-2 bg-burgundy text-white rounded-lg hover:bg-burgundy-dark transition-colors font-medium"
+                class="sb-btn sb-btn--primary"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
                 Dashboard
               </router-link>
               <router-link
                 v-if="isAdmin"
                 to="/admin/dashboard"
-                class="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                class="sb-btn sb-btn--admin"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                Admin
+                Admin Dashboard
               </router-link>
 
-              <!-- Logout Button -->
               <button
-                @click="logout"
-                class="flex flex-col items-center gap-1 px-3 py-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors"
+                class="sb-btn sb-btn--logout"
                 title="Logout"
+                @click="logout"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                <span class="text-xs">Logout</span>
+                Logout
               </button>
             </div>
 
-            <!-- Login Button (Only show when NOT logged in) -->
-            <router-link
-              v-if="!user"
-              to="/auth"
-              class="flex items-center gap-2 px-5 py-2 bg-burgundy text-white rounded-lg hover:bg-burgundy-dark transition-colors font-medium ml-4"
+            <div
+              v-else
+              class="flex items-center gap-2"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-              </svg>
-              Login
-            </router-link>
+              <router-link
+                to="/auth?tab=register"
+                class="sb-btn sb-btn--ghost sb-btn--ghost-sm justify-center"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2m13-11a4 4 0 11-8 0 4 4 0 018 0zm5 3v4m2-2h-4"
+                  />
+                </svg>
+                Register
+              </router-link>
+              <router-link
+                to="/auth"
+                class="sb-btn sb-btn--primary justify-center"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 11V7a4 4 0 00-8 0v4m-1 0h10a2 2 0 012 2v6a2 2 0 01-2 2H3a2 2 0 01-2-2v-6a2 2 0 012-2z"
+                  />
+                </svg>
+                Login
+              </router-link>
+            </div>
           </div>
         </div>
 
-        <!-- Mobile Menu -->
-        <div v-if="mobileMenuOpen" class="md:hidden mt-4 pb-4 space-y-2 border-t pt-4">
+        <div
+          v-if="mobileMenuOpen"
+          class="md:hidden mt-4 pb-4 space-y-2 border-t pt-4 sb-nav__panel"
+        >
           <router-link
             v-for="link in navLinks"
             :key="link.path"
             :to="link.path"
+            class="sb-nav__link sb-nav__link--mobile"
+            active-class="sb-nav__link--active"
             @click="mobileMenuOpen = false"
-            class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
-            active-class="bg-burgundy-50 text-burgundy"
           >
-            <component :is="link.icon" class="w-5 h-5" />
+            <component
+              :is="link.icon"
+              class="w-5 h-5"
+            />
             <span class="font-medium">{{ link.name }}</span>
           </router-link>
 
-          <div v-if="user" class="space-y-2 border-t pt-4 mt-4">
-            <!-- User Info Toggle -->
+          <div
+            v-if="user"
+            class="space-y-2 border-t pt-4 mt-4"
+          >
             <button
-              class="w-full flex items-center justify-between gap-3 px-4 py-3 bg-burgundy-50 rounded-lg"
+              class="w-full flex items-center justify-between gap-3 px-4 py-3 sb-user-chip"
               @click="mobileUserMenuOpen = !mobileUserMenuOpen"
             >
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-burgundy flex items-center justify-center text-white font-bold">
+                <div class="sb-user-chip__avatar sb-user-chip__avatar--lg">
                   {{ user.name.charAt(0).toUpperCase() }}
                 </div>
                 <div class="text-left">
-                  <p class="font-medium text-gray-900">{{ user.name }}</p>
-                  <p class="text-xs text-gray-600">{{ user.email }}</p>
+                  <p class="font-semibold text-gray-900">
+                    {{ user.name }}
+                  </p>
+                  <p class="text-xs text-gray-600">
+                    {{ user.email }}
+                  </p>
                 </div>
               </div>
               <svg
@@ -177,101 +211,103 @@
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </button>
 
-            <!-- Mobile User Links -->
-            <div v-if="mobileUserMenuOpen" class="space-y-2">
+            <div
+              v-if="mobileUserMenuOpen"
+              class="space-y-2"
+            >
               <router-link
-                to="/notifications"
+                v-if="isJudge"
+                to="/judge/dashboard"
+                class="sb-btn sb-btn--judge w-full"
                 @click="mobileMenuOpen = false"
-                class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                <span class="font-medium">Notifications</span>
+                Judge Panel
               </router-link>
-
-              <router-link
-                to="/transactions"
-                @click="mobileMenuOpen = false"
-                class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                </svg>
-                <span class="font-medium">Transactions</span>
-              </router-link>
-
-              <router-link
-                v-if="isPhotographer"
-                to="/verification"
-                @click="mobileMenuOpen = false"
-                class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span class="font-medium">Verification</span>
-              </router-link>
-
               <router-link
                 v-if="isPhotographer"
                 to="/dashboard"
+                class="sb-btn sb-btn--primary w-full"
                 @click="mobileMenuOpen = false"
-                class="flex items-center gap-3 px-4 py-3 rounded-lg bg-burgundy text-white font-medium"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
-                <span>Dashboard</span>
+                Dashboard
               </router-link>
-
               <router-link
                 v-if="isAdmin"
                 to="/admin/dashboard"
+                class="sb-btn sb-btn--admin w-full"
                 @click="mobileMenuOpen = false"
-                class="flex items-center gap-3 px-4 py-3 rounded-lg bg-orange-500 text-white font-medium"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span>Admin Panel</span>
+                Admin Dashboard
               </router-link>
-
               <button
+                class="sb-btn sb-btn--logout w-full"
                 @click="logout"
-                class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 text-red-600 transition-colors font-medium w-full text-left"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                <span>Logout</span>
+                Logout
               </button>
             </div>
           </div>
 
-          <!-- Mobile Login Button (Only show when NOT logged in) -->
-          <router-link
-            v-if="!user"
-            to="/auth"
-            @click="mobileMenuOpen = false"
-            class="flex items-center justify-center gap-2 px-4 py-3 bg-burgundy text-white rounded-lg font-medium"
+          <div
+            v-else
+            class="space-y-2"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-            </svg>
-            Login / Register
-          </router-link>
+            <router-link
+              to="/auth?tab=register"
+              class="sb-btn sb-btn--ghost sb-btn--ghost-sm w-full justify-center"
+              @click="mobileMenuOpen = false"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2m13-11a4 4 0 11-8 0 4 4 0 018 0zm5 3v4m2-2h-4"
+                />
+              </svg>
+              Register
+            </router-link>
+            <router-link
+              to="/auth"
+              class="sb-btn sb-btn--primary w-full justify-center"
+              @click="mobileMenuOpen = false"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 11V7a4 4 0 00-8 0v4m-1 0h10a2 2 0 012 2v6a2 2 0 01-2 2H3a2 2 0 01-2-2v-6a2 2 0 012-2z"
+                />
+              </svg>
+              Login
+            </router-link>
+          </div>
         </div>
       </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="animate-fade-in pb-20 md:pb-0">
+    <main :class="['flex-1 animate-fade-in', !isAdminRoute ? 'pb-20 md:pb-0' : '']">
       <router-view />
     </main>
 
@@ -281,54 +317,135 @@
     <!-- Mobile Bottom Navigation -->
     <MobileBottomNav
       v-if="!isAdminRoute"
-      :isLoggedIn="!!user"
-      :userRole="user?.role"
-      :unreadNotifications="0"
-      :activeCompetitionsCount="0"
+      :is-logged-in="!!user"
+      :user-role="user?.role"
+      :unread-notifications="0"
+      :active-competitions-count="0"
     />
 
     <!-- Marketplace Footer -->
-    <footer class="bg-gray-900 text-white mt-16 sm:mt-20 mb-20 md:mb-0 overflow-x-hidden">
+    <footer class="bg-gray-900 text-white mt-auto pt-16 sm:pt-20 pb-20 md:pb-0 overflow-x-hidden">
       <div class="container mx-auto px-4 md:px-6 py-8 md:py-12">
         <!-- Mobile: Compact Layout -->
         <div class="md:hidden space-y-5">
           <!-- Logo & Social -->
           <div class="text-center">
-            <img src="/images/logo-white.svg" alt="Photographers - Across Somagro Bangladesh" class="h-10 w-auto mx-auto mb-3" />
+            <img
+              src="/images/logo-white.svg"
+              alt="Photographers - Across Somagro Bangladesh"
+              class="h-10 w-auto mx-auto mb-3"
+            >
             <p class="text-gray-400 text-sm mb-4">
               Bangladesh's Photography Marketplace
             </p>
             <div class="flex gap-2 justify-center">
-              <a href="https://www.facebook.com/thephotographersbd" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-lg bg-gray-800 hover:bg-blue-600 flex items-center justify-center transition-colors">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              <a
+                href="https://www.facebook.com/thephotographersbd"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="w-10 h-10 rounded-lg bg-gray-800 hover:bg-blue-600 flex items-center justify-center transition-colors"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                ><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
               </a>
-              <a href="https://www.instagram.com/thephotographersbd" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-lg bg-gray-800 hover:bg-pink-600 flex items-center justify-center transition-colors">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              <a
+                href="https://www.instagram.com/thephotographersbd"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="w-10 h-10 rounded-lg bg-gray-800 hover:bg-pink-600 flex items-center justify-center transition-colors"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                ><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
               </a>
-              <a href="https://wa.me/8801767300900" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-lg bg-gray-800 hover:bg-green-500 flex items-center justify-center transition-colors">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+              <a
+                href="https://wa.me/8801767300900"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="w-10 h-10 rounded-lg bg-gray-800 hover:bg-green-500 flex items-center justify-center transition-colors"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                ><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" /></svg>
               </a>
             </div>
           </div>
 
           <!-- Quick Links Grid - Mobile Optimized -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-center">
-            <router-link to="/" class="text-gray-400 hover:text-white text-sm py-2 rounded transition-colors">Find Photographers</router-link>
-            <router-link to="/events" class="text-gray-400 hover:text-white text-sm py-2 rounded transition-colors">Events</router-link>
-            <router-link to="/competitions" class="text-gray-400 hover:text-white text-sm py-2 rounded transition-colors">Competitions</router-link>
-            <router-link to="/auth" class="text-gray-400 hover:text-white text-sm py-2 rounded transition-colors">Join Us</router-link>
-            <router-link to="/verification" class="text-gray-400 hover:text-white text-sm py-2 rounded transition-colors">Verification</router-link>
-            <router-link to="/help" class="text-gray-400 hover:text-white text-sm py-2 rounded transition-colors">Help</router-link>
-            <router-link to="/contact" class="text-gray-400 hover:text-white text-sm py-2 rounded transition-colors">Contact</router-link>
+            <router-link
+              to="/"
+              class="text-gray-400 hover:text-white text-sm py-2 rounded transition-colors"
+            >
+              Find Photographers
+            </router-link>
+            <router-link
+              to="/events"
+              class="text-gray-400 hover:text-white text-sm py-2 rounded transition-colors"
+            >
+              Events
+            </router-link>
+            <router-link
+              to="/competitions"
+              class="text-gray-400 hover:text-white text-sm py-2 rounded transition-colors"
+            >
+              Competitions
+            </router-link>
+            <router-link
+              to="/auth"
+              class="text-gray-400 hover:text-white text-sm py-2 rounded transition-colors"
+            >
+              Join Us
+            </router-link>
+            <router-link
+              to="/verification"
+              class="text-gray-400 hover:text-white text-sm py-2 rounded transition-colors"
+            >
+              Verification
+            </router-link>
+            <router-link
+              to="/help"
+              class="text-gray-400 hover:text-white text-sm py-2 rounded transition-colors"
+            >
+              Help
+            </router-link>
+            <router-link
+              to="/contact"
+              class="text-gray-400 hover:text-white text-sm py-2 rounded transition-colors"
+            >
+              Contact
+            </router-link>
           </div>
 
           <!-- Legal Links -->
           <div class="flex flex-wrap justify-center gap-4 text-xs text-gray-400 border-t border-gray-800 pt-6">
-            <router-link to="/privacy" class="hover:text-white transition-colors">Privacy</router-link>
+            <router-link
+              to="/privacy"
+              class="hover:text-white transition-colors"
+            >
+              Privacy
+            </router-link>
             <span>•</span>
-            <router-link to="/terms" class="hover:text-white transition-colors">Terms</router-link>
+            <router-link
+              to="/terms"
+              class="hover:text-white transition-colors"
+            >
+              Terms
+            </router-link>
             <span>•</span>
-            <router-link to="/about" class="hover:text-white transition-colors">About</router-link>
+            <router-link
+              to="/about"
+              class="hover:text-white transition-colors"
+            >
+              About
+            </router-link>
           </div>
 
           <p class="text-center text-gray-500 text-xs">
@@ -338,59 +455,243 @@
 
         <!-- Desktop: Original 4-Column Layout -->
         <div class="hidden md:block">
-          <div class="grid grid-cols-4 gap-8 mb-8">
-            <!-- About Column -->
-            <div>
+          <!-- Brand & Social -->
+          <div class="flex justify-between items-start mb-10 pb-8 border-b border-gray-800">
+            <div class="max-w-xs">
               <div class="mb-4">
-                <img src="/images/logo-white.svg" alt="Photographers - Across Somagro Bangladesh" class="h-10 w-auto" />
+                <img
+                  src="/images/logo-white.svg"
+                  alt="Photographers - Across Somagro Bangladesh"
+                  class="h-10 w-auto"
+                >
               </div>
-              <p class="text-gray-400 text-sm leading-relaxed mb-4">
+              <p class="text-gray-400 text-sm leading-relaxed">
                 Connecting Bangladesh's finest photographers with clients nationwide.
               </p>
-              <div class="flex gap-2">
-                <a href="https://www.facebook.com/thephotographersbd" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-lg bg-gray-800 hover:bg-blue-600 flex items-center justify-center transition-colors" title="Follow us on Facebook">
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                </a>
-                <a href="https://www.instagram.com/thephotographersbd" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-lg bg-gray-800 hover:bg-pink-600 flex items-center justify-center transition-colors" title="Follow us on Instagram">
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                </a>
-                <a href="https://wa.me/8801767300900" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-lg bg-gray-800 hover:bg-green-500 flex items-center justify-center transition-colors" title="Chat on WhatsApp">
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                </a>
-              </div>
             </div>
+            <div class="flex gap-2">
+              <a
+                href="https://www.facebook.com/thephotographersbd"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="w-9 h-9 rounded-lg bg-gray-800 hover:bg-blue-600 flex items-center justify-center transition-colors"
+                title="Follow us on Facebook"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                ><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
+              </a>
+              <a
+                href="https://www.instagram.com/thephotographersbd"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="w-9 h-9 rounded-lg bg-gray-800 hover:bg-pink-600 flex items-center justify-center transition-colors"
+                title="Follow us on Instagram"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                ><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
+              </a>
+              <a
+                href="https://wa.me/8801767300900"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="w-9 h-9 rounded-lg bg-gray-800 hover:bg-green-500 flex items-center justify-center transition-colors"
+                title="Chat on WhatsApp"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                ><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" /></svg>
+              </a>
+            </div>
+          </div>
 
-            <!-- Quick Links -->
+          <!-- 4 Column Links Grid -->
+          <div class="grid grid-cols-4 gap-12 mb-8">
             <div>
-              <h4 class="text-base font-bold mb-4">Quick Links</h4>
+              <h4 class="text-base font-bold mb-4">
+                Quick Links
+              </h4>
               <ul class="space-y-2">
-                <li><router-link to="/about" class="text-gray-400 hover:text-white text-sm transition-colors">About Us</router-link></li>
-                <li><router-link to="/how-it-works" class="text-gray-400 hover:text-white text-sm transition-colors">How It Works</router-link></li>
-                <li><router-link to="/about" class="text-gray-400 hover:text-white text-sm transition-colors">Pricing</router-link></li>
-                <li><router-link to="/events" class="text-gray-400 hover:text-white text-sm transition-colors">Blog</router-link></li>
+                <li>
+                  <router-link
+                    to="/about"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    About Us
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/how-it-works"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    How It Works
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/pricing"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Pricing
+                  </router-link>
+                </li>
+                <li>
+                  <a
+                    href="https://blog.photographersb.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Blog
+                  </a>
+                </li>
+                <li>
+                  <router-link
+                    to="/help"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Help Center
+                  </router-link>
+                </li>
               </ul>
             </div>
 
-            <!-- Services -->
+            <!-- Discover -->
             <div>
-              <h4 class="text-base font-bold mb-4">Services</h4>
+              <h4 class="text-base font-bold mb-4">
+                Discover
+              </h4>
               <ul class="space-y-2">
-                <li><router-link to="/" class="text-gray-400 hover:text-white text-sm transition-colors">Find Photographers</router-link></li>
-                <li><router-link to="/events" class="text-gray-400 hover:text-white text-sm transition-colors">Events</router-link></li>
-                <li><router-link to="/competitions" class="text-gray-400 hover:text-white text-sm transition-colors">Competitions</router-link></li>
-                <li><router-link to="/auth" class="text-gray-400 hover:text-white text-sm transition-colors">Join as Photographer</router-link></li>
-                <li><router-link to="/become-sponsor" class="text-gray-400 hover:text-white text-sm transition-colors">Become a Sponsor</router-link></li>
+                <li>
+                  <router-link
+                    to="/"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Find Photographers
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/?section=cities"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Browse Cities
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/?section=categories"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Browse Categories
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/events"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Events
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/competitions"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Competitions
+                  </router-link>
+                </li>
               </ul>
             </div>
 
-            <!-- Support -->
+            <!-- For Photographers -->
             <div>
-              <h4 class="text-base font-bold mb-4">Support</h4>
+              <h4 class="text-base font-bold mb-4">
+                For Photographers
+              </h4>
               <ul class="space-y-2">
-                <li><router-link to="/help" class="text-gray-400 hover:text-white text-sm transition-colors">Help Center</router-link></li>
-                <li><router-link to="/contact" class="text-gray-400 hover:text-white text-sm transition-colors">Contact Us</router-link></li>
-                <li><router-link to="/privacy" class="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</router-link></li>
-                <li><router-link to="/terms" class="text-gray-400 hover:text-white text-sm transition-colors">Terms of Service</router-link></li>
+                <li>
+                  <router-link
+                    to="/auth"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Join as Photographer
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/be-featured"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Be Featured
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/become-sponsor"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Become a Sponsor
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/?section=hashtags"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Trending Topics
+                  </router-link>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Legal & Support -->
+            <div>
+              <h4 class="text-base font-bold mb-4">
+                Legal & Support
+              </h4>
+              <ul class="space-y-2">
+                <li>
+                  <router-link
+                    to="/contact"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Contact Us
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/privacy"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Privacy Policy
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/terms"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Terms of Service
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/cookies"
+                    class="text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Cookie Policy
+                  </router-link>
+                </li>
               </ul>
             </div>
           </div>
@@ -402,9 +703,24 @@
                 &copy; 2026 Photographer SB. All rights reserved.
               </p>
               <div class="flex gap-6 text-sm text-gray-400">
-                <router-link to="/privacy" class="hover:text-white transition-colors">Privacy</router-link>
-                <router-link to="/terms" class="hover:text-white transition-colors">Terms</router-link>
-                <router-link to="/privacy" class="hover:text-white transition-colors">Cookies</router-link>
+                <router-link
+                  to="/privacy"
+                  class="hover:text-white transition-colors"
+                >
+                  Privacy
+                </router-link>
+                <router-link
+                  to="/terms"
+                  class="hover:text-white transition-colors"
+                >
+                  Terms
+                </router-link>
+                <router-link
+                  to="/cookies"
+                  class="hover:text-white transition-colors"
+                >
+                  Cookies
+                </router-link>
               </div>
             </div>
           </div>
@@ -447,16 +763,18 @@ const navLinks = [
   { name: 'Competitions', path: '/competitions', icon: TrophyIcon },
 ]
 
+const normalizeRole = (role) => String(role || '').toLowerCase().replace(/\s+/g, '_')
+
 const isAdmin = computed(() => {
-  return user.value && ['admin', 'super_admin'].includes(user.value.role)
+  return user.value && ['admin', 'super_admin'].includes(normalizeRole(user.value.role))
 })
 
 const isPhotographer = computed(() => {
-  return user.value && ['photographer', 'studio_owner'].includes(user.value.role)
+  return user.value && ['photographer'].includes(normalizeRole(user.value.role))
 })
 
 const isJudge = computed(() => {
-  return user.value && (user.value.role === 'judge' || user.value.is_judge === true)
+  return user.value && (normalizeRole(user.value.role) === 'judge' || user.value.is_judge === true)
 })
 
 const isAdminRoute = computed(() => {
@@ -471,16 +789,38 @@ const logout = async () => {
   } finally {
     localStorage.removeItem('auth_token')
     localStorage.removeItem('user')
+    localStorage.removeItem('user_role')
     user.value = null
     router.push('/')
   }
 }
 
-onMounted(() => {
+const hydrateUser = async () => {
   const storedUser = localStorage.getItem('user')
   if (storedUser) {
     user.value = JSON.parse(storedUser)
   }
+
+  const token = localStorage.getItem('auth_token') || localStorage.getItem('token')
+  if (!token) {
+    return
+  }
+
+  try {
+    const { data } = await api.get('/auth/me')
+    const resolvedUser = data?.data || data?.user || data
+    if (resolvedUser?.role) {
+      user.value = resolvedUser
+      localStorage.setItem('user', JSON.stringify(resolvedUser))
+      localStorage.setItem('user_role', normalizeRole(resolvedUser.role))
+    }
+  } catch (error) {
+    // Ignore hydration failures; user will remain logged out in UI.
+  }
+}
+
+onMounted(() => {
+  hydrateUser()
 })
 
 watch(mobileMenuOpen, (isOpen) => {

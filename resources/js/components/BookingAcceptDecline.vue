@@ -1,8 +1,13 @@
 <template>
   <div class="space-y-4">
     <!-- Pending Booking Cards -->
-    <div v-if="pendingBookings.length > 0" class="space-y-4">
-      <h3 class="text-lg font-bold text-gray-900 mb-4">Pending Booking Requests</h3>
+    <div
+      v-if="pendingBookings.length > 0"
+      class="space-y-4"
+    >
+      <h3 class="text-lg font-bold text-gray-900 mb-4">
+        Pending Booking Requests
+      </h3>
       
       <div 
         v-for="booking in pendingBookings" 
@@ -14,25 +19,37 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <!-- Client Info -->
             <div>
-              <h4 class="text-sm font-semibold text-gray-500 uppercase mb-2">Client</h4>
+              <h4 class="text-sm font-semibold text-gray-500 uppercase mb-2">
+                Client
+              </h4>
               <div class="flex items-center gap-3">
                 <img 
                   :src="booking.client.profile_photo_url || defaultAvatar" 
                   :alt="booking.client.name"
                   class="w-12 h-12 rounded-full object-cover"
-                />
+                >
                 <div>
-                  <p class="font-semibold text-gray-900">{{ booking.client.name }}</p>
-                  <p class="text-sm text-gray-600">{{ booking.client.email }}</p>
-                  <p class="text-sm text-gray-600">{{ booking.client.phone }}</p>
+                  <p class="font-semibold text-gray-900">
+                    {{ booking.client.name }}
+                  </p>
+                  <p class="text-sm text-gray-600">
+                    {{ booking.client.email }}
+                  </p>
+                  <p class="text-sm text-gray-600">
+                    {{ booking.client.phone }}
+                  </p>
                 </div>
               </div>
             </div>
 
             <!-- Event Details -->
             <div>
-              <h4 class="text-sm font-semibold text-gray-500 uppercase mb-2">Event</h4>
-              <p class="font-semibold text-gray-900">{{ booking.event_type }}</p>
+              <h4 class="text-sm font-semibold text-gray-500 uppercase mb-2">
+                Event
+              </h4>
+              <p class="font-semibold text-gray-900">
+                {{ booking.event_type }}
+              </p>
               <p class="text-sm text-gray-600 mt-1">
                 <span class="font-medium">{{ formatDate(booking.event_date) }}</span>
               </p>
@@ -46,24 +63,39 @@
 
             <!-- Price & Package -->
             <div>
-              <h4 class="text-sm font-semibold text-gray-500 uppercase mb-2">Package & Price</h4>
-              <p class="font-semibold text-gray-900">{{ booking.package_name }}</p>
+              <h4 class="text-sm font-semibold text-gray-500 uppercase mb-2">
+                Package & Price
+              </h4>
+              <p class="font-semibold text-gray-900">
+                {{ booking.package_name }}
+              </p>
               <p class="text-2xl font-bold text-burgundy mt-2">
                 {{ formatCurrency(booking.total_amount) }}
               </p>
-              <p class="text-xs text-gray-600 mt-1">Total amount due</p>
+              <p class="text-xs text-gray-600 mt-1">
+                Total amount due
+              </p>
             </div>
           </div>
 
           <!-- Booking Requirements/Notes -->
-          <div v-if="booking.requirements" class="mb-6 p-4 bg-gray-50 rounded-lg">
-            <h4 class="font-semibold text-gray-900 mb-2">Client Requirements</h4>
-            <p class="text-gray-700 text-sm">{{ booking.requirements }}</p>
+          <div
+            v-if="booking.requirements"
+            class="mb-6 p-4 bg-gray-50 rounded-lg"
+          >
+            <h4 class="font-semibold text-gray-900 mb-2">
+              Client Requirements
+            </h4>
+            <p class="text-gray-700 text-sm">
+              {{ booking.requirements }}
+            </p>
           </div>
 
           <!-- Status Timeline -->
           <div class="mb-6 pb-6 border-b">
-            <h4 class="font-semibold text-gray-900 mb-3">Booking Timeline</h4>
+            <h4 class="font-semibold text-gray-900 mb-3">
+              Booking Timeline
+            </h4>
             <div class="space-y-2 text-sm">
               <div class="flex items-center gap-2">
                 <span class="text-gray-500">📅 Requested:</span>
@@ -82,12 +114,23 @@
           <div class="flex flex-col sm:flex-row gap-3">
             <!-- Accept Button -->
             <button
-              @click="showAcceptConfirm(booking)"
               :disabled="processingId === booking.id || isExpired(booking.expires_at)"
               class="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition font-medium flex items-center justify-center gap-2"
+              @click="showAcceptConfirm(booking)"
             >
-              <svg v-if="processingId !== booking.id" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              <svg
+                v-if="processingId !== booking.id"
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
               <span v-if="processingId === booking.id">Processing...</span>
               <span v-else>Accept Booking</span>
@@ -95,12 +138,23 @@
 
             <!-- Decline Button -->
             <button
-              @click="showDeclineConfirm(booking)"
               :disabled="processingId === booking.id"
               class="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition font-medium flex items-center justify-center gap-2"
+              @click="showDeclineConfirm(booking)"
             >
-              <svg v-if="processingId !== booking.id" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              <svg
+                v-if="processingId !== booking.id"
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
               <span v-if="processingId === booking.id">Processing...</span>
               <span v-else>Decline</span>
@@ -111,8 +165,18 @@
               :to="{ name: 'booking-messages', params: { bookingId: booking.id } }"
               class="flex-1 px-6 py-3 border-2 border-burgundy text-burgundy rounded-lg hover:bg-burgundy-light transition font-medium flex items-center justify-center gap-2"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
               </svg>
               Message
             </router-link>
@@ -122,12 +186,29 @@
     </div>
 
     <!-- Empty State -->
-    <div v-else class="text-center py-12 bg-white rounded-lg">
-      <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    <div
+      v-else
+      class="text-center py-12 bg-white rounded-lg"
+    >
+      <svg
+        class="w-16 h-16 text-gray-300 mx-auto mb-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
-      <h3 class="text-lg font-semibold text-gray-900 mb-2">No Pending Bookings</h3>
-      <p class="text-gray-600">All booking requests have been responded to. You're all set!</p>
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">
+        No Pending Bookings
+      </h3>
+      <p class="text-gray-600">
+        All booking requests have been responded to. You're all set!
+      </p>
     </div>
 
     <!-- Confirmation Modal - Accept -->
@@ -166,6 +247,10 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '../../api';
 import BookingActionConfirmation from './BookingActionConfirmation.vue';
+import {
+  formatDate as formatDateValue,
+  formatDateTime as formatDateTimeValue
+} from '../../utils/formatters';
 
 const router = useRouter();
 
@@ -186,7 +271,7 @@ const pendingBookings = computed(() => {
 const loadBookings = async () => {
   loading.value = true;
   try {
-    const { data } = await api.get('/api/v1/photographer/bookings?status=pending');
+    const { data } = await api.get('/photographer/bookings?status=pending');
     if (data.status === 'success') {
       bookings.value = data.data;
     }
@@ -280,22 +365,11 @@ const showToast = (message, type) => {
 };
 
 const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('en-US', { 
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+  return formatDateValue(date);
 };
 
 const formatDateTime = (dateTime) => {
-  return new Date(dateTime).toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  return formatDateTimeValue(dateTime);
 };
 
 const formatCurrency = (amount) => {

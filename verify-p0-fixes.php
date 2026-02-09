@@ -18,6 +18,7 @@ use App\Models\Competition;
 use App\Models\CompetitionPrize;
 use App\Models\CompetitionScore;
 use App\Models\CompetitionSubmission;
+use App\Services\ImageProcessingService;
 use Illuminate\Support\Facades\DB;
 
 echo PHP_EOL;
@@ -80,7 +81,7 @@ echo "      Checking ImageProcessingService for error handling..." . PHP_EOL;
 try {
     $serviceClass = '\App\Services\ImageProcessingService';
     if (class_exists($serviceClass)) {
-        $service = app(ImageProcessingService::class);
+        $service = app($serviceClass);
         $isAvailable = method_exists($service, 'isAvailable');
         $hasProcessAndSave = method_exists($service, 'processAndSave');
         
@@ -207,7 +208,7 @@ try {
         
         if ($hasFix && $hasFilteredIds) {
             echo "      ✓ Dashboard stats sync fix applied" . PHP_EOL;
-            echo "      ✓ Stats now calculated from filtered query ($filteredIds)" . PHP_EOL;
+            echo "      ✓ Stats now calculated from filtered query" . PHP_EOL;
             echo "      ✓ Stats match the actual list being displayed" . PHP_EOL;
             $results['P0-5'] = 'PASS';
         } else {

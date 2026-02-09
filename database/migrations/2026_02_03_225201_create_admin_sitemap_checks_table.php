@@ -11,20 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('admin_sitemap_checks', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('run_by_user_id')->constrained('users')->cascadeOnDelete();
-            $table->timestamp('started_at')->useCurrent();
-            $table->timestamp('finished_at')->nullable();
-            $table->integer('total_links')->default(0);
-            $table->integer('passed')->default(0);
-            $table->integer('failed')->default(0);
-            $table->integer('skipped')->default(0);
-            $table->timestamps();
+        if (!Schema::hasTable('admin_sitemap_checks')) {
+            Schema::create('admin_sitemap_checks', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('run_by_user_id')->constrained('users')->cascadeOnDelete();
+                $table->timestamp('started_at')->useCurrent();
+                $table->timestamp('finished_at')->nullable();
+                $table->integer('total_links')->default(0);
+                $table->integer('passed')->default(0);
+                $table->integer('failed')->default(0);
+                $table->integer('skipped')->default(0);
+                $table->timestamps();
 
-            $table->index('run_by_user_id');
-            $table->index('created_at');
-        });
+                $table->index('run_by_user_id');
+                $table->index('created_at');
+            });
+        }
     }
 
     /**

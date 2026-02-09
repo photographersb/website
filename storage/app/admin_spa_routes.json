@@ -1,0 +1,286 @@
+[
+    {
+        "path":  "/admin/activity-logs",
+        "target":  "AdminActivityLogsIndex"
+    },
+    {
+        "path":  "/admin/analytics",
+        "target":  "AdminAnalytics"
+    },
+    {
+        "path":  "/admin/approvals",
+        "target":  "AdminApprovals"
+    },
+    {
+        "path":  "/admin/audit-logs",
+        "target":  "AdminAuditLogsIndex"
+    },
+    {
+        "path":  "/admin/backups",
+        "target":  "AdminBackups"
+    },
+    {
+        "path":  "/admin/bookings",
+        "target":  "AdminBookingsIndex"
+    },
+    {
+        "path":  "/admin/categories",
+        "target":  "AdminCategoriesIndex"
+    },
+    {
+        "path":  "/admin/certificates",
+        "target":  "AdminCertificatesIndex"
+    },
+    {
+        "path":  "/admin/certificates/manual-issuance",
+        "target":  "AdminCertificatesManualIssuance"
+    },
+    {
+        "path":  "/admin/certificates/templates",
+        "target":  "AdminCertificatesTemplates"
+    },
+    {
+        "path":  "/admin/cities",
+        "target":  "AdminCitiesPage"
+    },
+    {
+        "path":  "/admin/competitions",
+        "target":  "AdminCompetitionsIndex"
+    },
+    {
+        "path":  "/admin/competitions/:id",
+        "target":  "AdminCompetitionsShow"
+    },
+    {
+        "path":  "/admin/competitions/:id/edit",
+        "target":  "AdminCompetitionsEdit"
+    },
+    {
+        "path":  "/admin/competitions/:id/submissions",
+        "target":  "SubmissionModeration"
+    },
+    {
+        "path":  "/admin/competitions/create",
+        "target":  "AdminCompetitionsCreate"
+    },
+    {
+        "path":  "/admin/competitions/submissions",
+        "target":  "SubmissionModeration"
+    },
+    {
+        "path":  "/admin/complaints",
+        "target":  "AdminComplaints"
+    },
+    {
+        "path":  "/admin/contact-messages",
+        "target":  "AdminContactMessagesIndex"
+    },
+    {
+        "path":  "/admin/dashboard",
+        "target":  "AdminDashboard"
+    },
+    {
+        "path":  "/admin/data-hub",
+        "target":  "AdminDataHubPage"
+    },
+    {
+        "path":  "/admin/error-center",
+        "target":  "AdminErrorCenter"
+    },
+    {
+        "path":  "/admin/event-albums",
+        "target":  "AdminEventAlbums"
+    },
+    {
+        "path":  "/admin/events",
+        "target":  "AdminEventsIndex"
+    },
+    {
+        "path":  "/admin/events/:id/check-in",
+        "target":  "AdminEventCheckIn"
+    },
+    {
+        "path":  "/admin/events/attendance",
+        "target":  "AdminEventAttendance"
+    },
+    {
+        "path":  "/admin/events/create",
+        "target":  "AdminEventsCreate"
+    },
+    {
+        "path":  "/admin/events/edit/:id",
+        "target":  "AdminEventsEdit"
+    },
+    {
+        "path":  "/admin/featured-photographers",
+        "target":  "AdminFeaturedPhotographersPage"
+    },
+    {
+        "path":  "/admin/feedback",
+        "target":  "AdminFeedback"
+    },
+    {
+        "path":  "/admin/hashtags",
+        "target":  "AdminHashtagsPage"
+    },
+    {
+        "path":  "/admin/hashtags/featured",
+        "target":  "AdminFeaturedHashtagsPage"
+    },
+    {
+        "path":  "/admin/judges",
+        "target":  "AdminJudgesIndex"
+    },
+    {
+        "path":  "/admin/judges/:id",
+        "target":  "AdminJudgesShow"
+    },
+    {
+        "path":  "/admin/judges/:id/edit",
+        "target":  "AdminJudgesEdit"
+    },
+    {
+        "path":  "/admin/judges/create",
+        "target":  "AdminJudgesCreate"
+    },
+    {
+        "path":  "/admin/login",
+        "target":  "Auth"
+    },
+    {
+        "path":  "/admin/mentors",
+        "target":  "AdminMentorsIndex"
+    },
+    {
+        "path":  "/admin/mentors/:id",
+        "target":  "AdminMentorsShow"
+    },
+    {
+        "path":  "/admin/mentors/:id/edit",
+        "target":  "AdminMentorsEdit"
+    },
+    {
+        "path":  "/admin/mentors/create",
+        "target":  "AdminMentorsCreate"
+    },
+    {
+        "path":  "/admin/notices",
+        "target":  "AdminNoticesIndex"
+    },
+    {
+        "path":  "/admin/notifications",
+        "target":  "AdminNotificationCenter"
+    },
+    {
+        "path":  "/admin/payments",
+        "target":  "AdminPaymentsIndex"
+    },
+    {
+        "path":  "/admin/payouts",
+        "target":  "AdminPayouts"
+    },
+    {
+        "path":  "/admin/pending-users",
+        "target":  "\u0027/admin/approvals\u0027"
+    },
+    {
+        "path":  "/admin/photo-categories",
+        "target":  "AdminPhotoCategoriesPage"
+    },
+    {
+        "path":  "/admin/photographers",
+        "target":  "AdminPhotographersIndex"
+    },
+    {
+        "path":  "/admin/reviews",
+        "target":  "AdminReviewsIndex"
+    },
+    {
+        "path":  "/admin/roles",
+        "target":  "AdminRolesPermissions"
+    },
+    {
+        "path":  "/admin/scoring",
+        "target":  "AdminScoringSystem"
+    },
+    {
+        "path":  "/admin/seo",
+        "target":  "\u0027/admin/settings/seo\u0027"
+    },
+    {
+        "path":  "/admin/settings",
+        "target":  "AdminSettingsIndex"
+    },
+    {
+        "path":  "/admin/settings/changes",
+        "target":  "AdminSettingsChangeTracking"
+    },
+    {
+        "path":  "/admin/settings/email-templates",
+        "target":  "AdminEmailTemplates"
+    },
+    {
+        "path":  "/admin/settings/general",
+        "target":  "AdminSettingsGeneral"
+    },
+    {
+        "path":  "/admin/settings/seo",
+        "target":  "AdminSEOSettings"
+    },
+    {
+        "path":  "/admin/settings/site-links",
+        "target":  "AdminSettingsSiteLinks"
+    },
+    {
+        "path":  "/admin/settings-site-links",
+        "target":  "\u0027/admin/settings/site-links\u0027"
+    },
+    {
+        "path":  "/admin/share-frames",
+        "target":  "AdminShareFrameGenerator"
+    },
+    {
+        "path":  "/admin/sitemap",
+        "target":  "\u0027/admin/system-health/sitemap\u0027"
+    },
+    {
+        "path":  "/admin/sponsors",
+        "target":  "AdminSponsorsPage"
+    },
+    {
+        "path":  "/admin/sponsorships",
+        "target":  "AdminSponsorships"
+    },
+    {
+        "path":  "/admin/submissions",
+        "target":  "AdminSubmissions"
+    },
+    {
+        "path":  "/admin/system-health",
+        "target":  "AdminSystemHealth"
+    },
+    {
+        "path":  "/admin/system-health/sitemap",
+        "target":  "AdminSystemHealthSitemap"
+    },
+    {
+        "path":  "/admin/transactions",
+        "target":  "AdminTransactionsIndex"
+    },
+    {
+        "path":  "/admin/user-approval",
+        "target":  "\u0027/admin/approvals\u0027"
+    },
+    {
+        "path":  "/admin/users",
+        "target":  "AdminUsersIndex"
+    },
+    {
+        "path":  "/admin/verification-documents",
+        "target":  "AdminVerificationDocuments"
+    },
+    {
+        "path":  "/admin/verifications",
+        "target":  "AdminVerificationsIndex"
+    }
+]

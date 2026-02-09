@@ -1,0 +1,476 @@
+[
+    {
+        "method":  "GET|HEAD",
+        "uri":  "@{photographerUsername}/book",
+        "name":  "booking.create",
+        "action":  "App\\Http\\Controllers\\BookingRequestController@create"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "@{username}",
+        "name":  "photographer.profile.public",
+        "action":  "App\\Http\\Controllers\\PublicPhotographerController@showByUsername"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "__clockwork",
+        "name":  null,
+        "action":  "Clockwork\\Support\\Laravel\\ClockworkController@webRedirect"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "__clockwork/app",
+        "name":  null,
+        "action":  "Clockwork\\Support\\Laravel\\ClockworkController@webIndex"
+    },
+    {
+        "method":  "POST",
+        "uri":  "__clockwork/auth",
+        "name":  null,
+        "action":  "Clockwork\\Support\\Laravel\\ClockworkController@authenticate"
+    },
+    {
+        "method":  "PUT",
+        "uri":  "__clockwork/{id}",
+        "name":  null,
+        "action":  "Clockwork\\Support\\Laravel\\ClockworkController@updateData"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "__clockwork/{id}/extended",
+        "name":  null,
+        "action":  "Clockwork\\Support\\Laravel\\ClockworkController@getExtendedData"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "__clockwork/{id}/{direction?}/{count?}",
+        "name":  null,
+        "action":  "Clockwork\\Support\\Laravel\\ClockworkController@getData"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "__clockwork/{path}",
+        "name":  null,
+        "action":  "Clockwork\\Support\\Laravel\\ClockworkController@webAsset"
+    },
+    {
+        "method":  "POST",
+        "uri":  "_ignition/execute-solution",
+        "name":  "ignition.executeSolution",
+        "action":  "Spatie\\LaravelIgnition\\Http\\Controllers\\ExecuteSolutionController"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "_ignition/health-check",
+        "name":  "ignition.healthCheck",
+        "action":  "Spatie\\LaravelIgnition\\Http\\Controllers\\HealthCheckController"
+    },
+    {
+        "method":  "POST",
+        "uri":  "_ignition/update-config",
+        "name":  "ignition.updateConfig",
+        "action":  "Spatie\\LaravelIgnition\\Http\\Controllers\\UpdateConfigController"
+    },
+    {
+        "method":  "POST",
+        "uri":  "bookings",
+        "name":  "booking.store",
+        "action":  "App\\Http\\Controllers\\BookingRequestController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "bookings/{booking}",
+        "name":  "booking.show",
+        "action":  "App\\Http\\Controllers\\BookingRequestController@show"
+    },
+    {
+        "method":  "POST",
+        "uri":  "bookings/{booking}/accept",
+        "name":  "booking.accept",
+        "action":  "App\\Http\\Controllers\\BookingRequestController@accept"
+    },
+    {
+        "method":  "POST",
+        "uri":  "bookings/{booking}/cancel",
+        "name":  "booking.cancel",
+        "action":  "App\\Http\\Controllers\\BookingRequestController@cancel"
+    },
+    {
+        "method":  "POST",
+        "uri":  "bookings/{booking}/complete",
+        "name":  "booking.complete",
+        "action":  "App\\Http\\Controllers\\BookingRequestController@complete"
+    },
+    {
+        "method":  "POST",
+        "uri":  "bookings/{booking}/decline",
+        "name":  "booking.decline",
+        "action":  "App\\Http\\Controllers\\BookingRequestController@decline"
+    },
+    {
+        "method":  "POST",
+        "uri":  "bookings/{booking}/messages",
+        "name":  "booking.message.store",
+        "action":  "App\\Http\\Controllers\\BookingMessageController@store"
+    },
+    {
+        "method":  "POST",
+        "uri":  "bookings/{booking}/messages/read",
+        "name":  "booking.messages.read",
+        "action":  "App\\Http\\Controllers\\BookingMessageController@markAsRead"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "categories",
+        "name":  "categories.index",
+        "action":  "App\\Http\\Controllers\\CategoryController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "categories/{slug}",
+        "name":  "categories.show",
+        "action":  "App\\Http\\Controllers\\CategoryController@show"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "certificate/verify/{certificateCode}",
+        "name":  "certificate.verify",
+        "action":  "App\\Http\\Controllers\\CertificateVerificationController@verify"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "certificate/{certificateCode}/qr",
+        "name":  "certificate.qr",
+        "action":  "App\\Http\\Controllers\\CertificateVerificationController@downloadQR"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "clockwork",
+        "name":  null,
+        "action":  "Clockwork\\Support\\Laravel\\ClockworkController@webRedirect"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "clockwork/app",
+        "name":  null,
+        "action":  "Clockwork\\Support\\Laravel\\ClockworkController@webIndex"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "clockwork/{path}",
+        "name":  null,
+        "action":  "Clockwork\\Support\\Laravel\\ClockworkController@webAsset"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "competitions/{competition}/submissions/{submission}/share-frame",
+        "name":  "competitions.submissions.share-frame.show",
+        "action":  "App\\Http\\Controllers\\SubmissionShareFrameController@show"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "competitions/{competition}/submissions/{submission}/share-frame/download/{format}",
+        "name":  "competitions.submissions.share-frame.download",
+        "action":  "App\\Http\\Controllers\\SubmissionShareFrameController@download"
+    },
+    {
+        "method":  "POST",
+        "uri":  "competitions/{competition}/submissions/{submission}/share-frame/generate",
+        "name":  "competitions.submissions.share-frame.generate",
+        "action":  "App\\Http\\Controllers\\SubmissionShareFrameController@generate"
+    },
+    {
+        "method":  "POST",
+        "uri":  "competitions/{competition}/submissions/{submission}/share-frame/regenerate",
+        "name":  "competitions.submissions.share-frame.regenerate",
+        "action":  "App\\Http\\Controllers\\SubmissionShareFrameController@regenerate"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "events",
+        "name":  "events.index",
+        "action":  "App\\Http\\Controllers\\EventListingController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "events/featured",
+        "name":  "events.featured",
+        "action":  "App\\Http\\Controllers\\EventListingController@featured"
+    },
+    {
+        "method":  "POST",
+        "uri":  "events/payment/webhook/sslcommerz",
+        "name":  "events.payment.webhook.sslcommerz",
+        "action":  "App\\Http\\Controllers\\EventPaymentController@sslcommerzWebhook"
+    },
+    {
+        "method":  "POST",
+        "uri":  "events/payment/webhook/stripe",
+        "name":  "events.payment.webhook.stripe",
+        "action":  "App\\Http\\Controllers\\EventPaymentController@stripeWebhook"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "events/{event}",
+        "name":  "events.show",
+        "action":  "App\\Http\\Controllers\\EventController@show"
+    },
+    {
+        "method":  "POST",
+        "uri":  "events/{event}/register",
+        "name":  "events.register",
+        "action":  "App\\Http\\Controllers\\EventController@register"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "forgot-password",
+        "name":  "password.request",
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "locations",
+        "name":  "locations.index",
+        "action":  "App\\Http\\Controllers\\LocationController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "locations/{slug}",
+        "name":  "locations.show",
+        "action":  "App\\Http\\Controllers\\LocationController@show"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "login",
+        "name":  "login",
+        "action":  "Closure"
+    },
+    {
+        "method":  "DELETE",
+        "uri":  "messages/{message}",
+        "name":  "booking.message.delete",
+        "action":  "App\\Http\\Controllers\\BookingMessageController@delete"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "my-bookings/client",
+        "name":  "booking.client.list",
+        "action":  "App\\Http\\Controllers\\BookingRequestController@clientBookings"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "my-bookings/photographer",
+        "name":  "booking.photographer.list",
+        "action":  "App\\Http\\Controllers\\BookingRequestController@photographerBookings"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "my-registrations",
+        "name":  "events.my-registrations",
+        "action":  "App\\Http\\Controllers\\EventListingController@myRegistrations"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "payment/callback/cancel",
+        "name":  "payment.cancel",
+        "action":  "App\\Http\\Controllers\\Api\\PaymentController@cancelCallback"
+    },
+    {
+        "method":  "POST",
+        "uri":  "payment/callback/cancel",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PaymentController@cancelCallback"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "payment/callback/fail",
+        "name":  "payment.fail",
+        "action":  "App\\Http\\Controllers\\Api\\PaymentController@failCallback"
+    },
+    {
+        "method":  "POST",
+        "uri":  "payment/callback/fail",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PaymentController@failCallback"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "payment/callback/success",
+        "name":  "payment.success",
+        "action":  "App\\Http\\Controllers\\Api\\PaymentController@successCallback"
+    },
+    {
+        "method":  "POST",
+        "uri":  "payment/callback/success",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\Api\\PaymentController@successCallback"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "photographer/{id}",
+        "name":  "photographer.profile.legacy",
+        "action":  "App\\Http\\Controllers\\PublicPhotographerController@showById"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "photographers/category/{slug}",
+        "name":  "photographers.search.category",
+        "action":  "App\\Http\\Controllers\\PhotographerSearchController@byCategory"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "photographers/location/{slug}",
+        "name":  "photographers.search.location",
+        "action":  "App\\Http\\Controllers\\PhotographerSearchController@byLocation"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "photographers/{locationSlug}/{categorySlug}",
+        "name":  "photographers.search.location-category",
+        "action":  "App\\Http\\Controllers\\PhotographerSearchController@byLocationAndCategory"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "register",
+        "name":  "register",
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "registrations/{registration}/confirmation",
+        "name":  "registrations.confirmation",
+        "action":  "App\\Http\\Controllers\\EventController@confirmation"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "registrations/{registration}/payment",
+        "name":  "registrations.payment",
+        "action":  "App\\Http\\Controllers\\EventController@payment"
+    },
+    {
+        "method":  "POST",
+        "uri":  "registrations/{registration}/payment/callback",
+        "name":  "registrations.payment.callback",
+        "action":  "App\\Http\\Controllers\\EventController@paymentCallback"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "registrations/{registration}/ticket",
+        "name":  "registrations.ticket",
+        "action":  "App\\Http\\Controllers\\EventController@downloadTicket"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "sanctum/csrf-cookie",
+        "name":  "sanctum.csrf-cookie",
+        "action":  "Laravel\\Sanctum\\Http\\Controllers\\CsrfCookieController@show"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "sitemap.xml",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\SitemapController@index"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "sitemap/categories.xml",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\SitemapController@categories"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "sitemap/cities.xml",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\SitemapController@cities"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "sitemap/competitions.xml",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\SitemapController@competitions"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "sitemap/events.xml",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\SitemapController@events"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "sitemap/main.xml",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\SitemapController@main"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "sitemap/photographers.xml",
+        "name":  null,
+        "action":  "App\\Http\\Controllers\\SitemapController@photographers"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "test-error",
+        "name":  null,
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "test-error-critical",
+        "name":  null,
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "test-error-query",
+        "name":  null,
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "up",
+        "name":  null,
+        "action":  "Closure"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "verification",
+        "name":  "verification.index",
+        "action":  "App\\Http\\Controllers\\VerificationController@index"
+    },
+    {
+        "method":  "POST",
+        "uri":  "verification",
+        "name":  "verification.store",
+        "action":  "App\\Http\\Controllers\\VerificationController@store"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "verification/create",
+        "name":  "verification.create",
+        "action":  "App\\Http\\Controllers\\VerificationController@create"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "verification/{verificationRequest}",
+        "name":  "verification.show",
+        "action":  "App\\Http\\Controllers\\VerificationController@show"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "verification/{verificationRequest}/download/{type}",
+        "name":  "verification.download",
+        "action":  "App\\Http\\Controllers\\VerificationController@downloadDocument"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "vote/{shortUrl}",
+        "name":  "vote.redirect",
+        "action":  "App\\Http\\Controllers\\SubmissionShareFrameController@voteRedirect"
+    },
+    {
+        "method":  "GET|HEAD",
+        "uri":  "{any?}",
+        "name":  null,
+        "action":  "Closure"
+    }
+]

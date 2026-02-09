@@ -14,16 +14,27 @@ class PaymentService
      */
     public function initiatePayment(Booking $booking, string $method, float $amount): array
     {
+        $booking->loadMissing('photographer');
+        $normalizedMethod = match ($method) {
+            'sslcommerz' => 'card',
+            'bank' => 'bank_transfer',
+            default => $method,
+        };
+
         // Create transaction record
         $transaction = Transaction::create([
             'booking_id' => $booking->id,
+            'photographer_id' => $booking->photographer?->user_id,
             'user_id' => auth()->id(),
-            'transaction_type' => 'booking_payment',
-            'payment_method' => $method,
+            'transaction_type' => 'booking',
+            'payment_method' => $normalizedMethod,
+            'reference_id' => (string) $booking->id,
+            'reference_table' => 'bookings',
             'amount' => $amount,
             'currency' => 'BDT',
             'status' => 'pending',
             'transaction_id' => 'TXN' . strtoupper(Str::random(12)),
+            'net_amount' => $amount,
         ]);
 
         // Route to appropriate payment gateway
@@ -46,6 +57,7 @@ class PaymentService
      */
     private function initiateSslCommerz(Transaction $transaction): array
     {
+        $transaction->loadMissing('user');
         $post_data = [
             'store_id' => config('services.sslcommerz.store_id'),
             'store_passwd' => config('services.sslcommerz.store_password'),
@@ -136,11 +148,12 @@ class PaymentService
 
         $transaction->update([
             'status' => $status,
-            'gateway_response' => json_encode($data),
+            'gateway_response' => $data,
             'completed_at' => $status === 'completed' ? now() : null,
         ]);
 
         // Update booking status and send notifications if payment successful
+        $transaction->loadMissing('booking');
         if ($status === 'completed' && $transaction->booking) {
             $transaction->booking->update([
                 'status' => 'confirmed',

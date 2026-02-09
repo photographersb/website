@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen">
     <!-- Admin Header with Back Button & Notifications -->
     <AdminHeader 
       title="✅ Verification Management" 
@@ -8,302 +8,555 @@
 
     <!-- Main Content -->
     <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      
       <!-- Quick Navigation -->
       <AdminQuickNav />
 
-      <!-- Export Button -->
-      <div class="flex justify-end">
-        <button @click="exportVerifications" class="btn-export-main">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          Export
-        </button>
+      <section class="page-hero">
+        <div class="hero-copy">
+          <p class="hero-kicker">TRUST REVIEW</p>
+          <h1 class="hero-title">Verification flow, zero friction.</h1>
+          <p class="hero-subtitle">
+            Approve, reject, and track identity checks with clarity.
+          </p>
+          <div class="hero-actions">
+            <button
+              class="btn-admin-primary"
+              @click="exportVerifications"
+            >
+              Export
+            </button>
+            <button
+              class="btn-admin-secondary"
+              @click="fetchVerifications"
+            >
+              Refresh List
+            </button>
+          </div>
+        </div>
+        <div class="hero-status">
+          <div class="status-card">
+            <span class="status-label">Pending</span>
+            <span class="status-value">{{ stats.pending || 0 }}</span>
+          </div>
+          <div class="status-card">
+            <span class="status-label">Approved</span>
+            <span class="status-value">{{ stats.approved || 0 }}</span>
+          </div>
+          <div class="status-card">
+            <span class="status-label">Rejected</span>
+            <span class="status-value">{{ stats.rejected || 0 }}</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="page-topbar">
+        <div class="status-chip">
+          Total requests: {{ stats.total || 0 }}
+        </div>
       </div>
 
       <!-- Stats Grid -->
       <div class="stats-grid">
-      <div class="stat-card stat-yellow">
-        <div class="stat-icon">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+        <div class="stat-card stat-yellow">
+          <div class="stat-icon">
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Pending</span>
+            <span class="stat-value">{{ stats.pending }}</span>
+          </div>
         </div>
-        <div class="stat-content">
-          <span class="stat-label">Pending</span>
-          <span class="stat-value">{{ stats.pending }}</span>
+
+        <div class="stat-card stat-green">
+          <div class="stat-icon">
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Approved</span>
+            <span class="stat-value">{{ stats.approved }}</span>
+          </div>
+        </div>
+
+        <div class="stat-card stat-red">
+          <div class="stat-icon">
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Rejected</span>
+            <span class="stat-value">{{ stats.rejected }}</span>
+          </div>
+        </div>
+
+        <div class="stat-card stat-blue">
+          <div class="stat-icon">
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Total Requests</span>
+            <span class="stat-value">{{ stats.total }}</span>
+          </div>
         </div>
       </div>
 
-      <div class="stat-card stat-green">
-        <div class="stat-icon">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <div class="stat-content">
-          <span class="stat-label">Approved</span>
-          <span class="stat-value">{{ stats.approved }}</span>
-        </div>
-      </div>
+      <div class="content-card">
+        <!-- P0 Verification Requests -->
+        <div class="mb-8">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">
+              Pending Verification Requests (P0)
+            </h3>
+            <button
+              class="btn-action"
+              @click="fetchPendingRequests"
+            >
+              Refresh
+            </button>
+          </div>
 
-      <div class="stat-card stat-red">
-        <div class="stat-icon">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <div class="stat-content">
-          <span class="stat-label">Rejected</span>
-          <span class="stat-value">{{ stats.rejected }}</span>
-        </div>
-      </div>
+          <div
+            v-if="pendingLoading"
+            class="loading-state"
+          >
+            <div class="spinner" />
+            <p>Loading pending requests...</p>
+          </div>
 
-      <div class="stat-card stat-blue">
-        <div class="stat-icon">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-        </div>
-        <div class="stat-content">
-          <span class="stat-label">Total Requests</span>
-          <span class="stat-value">{{ stats.total }}</span>
-        </div>
-      </div>
-    </div>
+          <div
+            v-else-if="pendingRequests.length"
+            class="verifications-list"
+          >
+            <div
+              v-for="request in pendingRequests"
+              :key="request.id"
+              class="verification-card"
+            >
+              <div class="verification-header">
+                <div class="photographer-info">
+                  <div class="photographer-avatar">
+                    {{ request.user?.name?.charAt(0).toUpperCase() || 'U' }}
+                  </div>
+                  <div>
+                    <div class="photographer-name">
+                      {{ request.user?.name || 'N/A' }}
+                    </div>
+                    <div class="photographer-email">
+                      {{ request.user?.email || 'N/A' }}
+                    </div>
+                  </div>
+                </div>
+                <span class="badge badge-warning">Pending</span>
+              </div>
 
-    <div class="content-card">
-      <!-- P0 Verification Requests -->
-      <div class="mb-8">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">Pending Verification Requests (P0)</h3>
-          <button @click="fetchPendingRequests" class="btn-action">Refresh</button>
-        </div>
+              <div class="verification-body">
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="info-label">Request Type:</span>
+                    <span class="info-value">{{ capitalizeFirst(request.request_type) }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Submitted:</span>
+                    <span class="info-value">{{ formatDate(request.created_at) }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Documents:</span>
+                    <span class="info-value">{{ request.submitted_documents?.length || 0 }} files</span>
+                  </div>
+                </div>
 
-        <div v-if="pendingLoading" class="loading-state">
-          <div class="spinner"></div>
-          <p>Loading pending requests...</p>
-        </div>
+                <div
+                  v-if="request.submitted_documents?.length"
+                  class="notes-section"
+                >
+                  <strong>Documents:</strong>
+                  <div class="mt-2 space-y-1">
+                    <div
+                      v-for="(doc, idx) in request.submitted_documents"
+                      :key="idx"
+                    >
+                      <a
+                        :href="`/storage/${doc.path}`"
+                        target="_blank"
+                        rel="noopener"
+                        class="text-sm text-burgundy hover:underline"
+                      >
+                        {{ doc.filename || 'Document' }}
+                      </a>
+                    </div>
+                  </div>
+                </div>
 
-        <div v-else-if="pendingRequests.length" class="verifications-list">
-          <div v-for="request in pendingRequests" :key="request.id" class="verification-card">
-            <div class="verification-header">
-              <div class="photographer-info">
-                <div class="photographer-avatar">{{ request.user?.name?.charAt(0).toUpperCase() || 'U' }}</div>
-                <div>
-                  <div class="photographer-name">{{ request.user?.name || 'N/A' }}</div>
-                  <div class="photographer-email">{{ request.user?.email || 'N/A' }}</div>
+                <div class="verification-actions">
+                  <button
+                    class="btn-action btn-success"
+                    @click="approveRequest(request)"
+                  >
+                    <svg
+                      class="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    Approve
+                  </button>
+                  <button
+                    class="btn-action btn-danger"
+                    @click="rejectRequest(request)"
+                  >
+                    <svg
+                      class="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                    Reject
+                  </button>
                 </div>
               </div>
-              <span class="badge badge-warning">Pending</span>
+            </div>
+          </div>
+
+          <div
+            v-else
+            class="empty-state"
+          >
+            <div class="empty-icon">
+              ✅
+            </div>
+            <p class="empty-title">
+              No pending requests
+            </p>
+            <p class="empty-subtitle">
+              All verification requests have been reviewed.
+            </p>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="verification-tabs">
+          <button 
+            :class="['tab-btn', { active: currentTab === 'pending' }]" 
+            @click="currentTab = 'pending'; fetchVerifications()"
+          >
+            Pending ({{ stats.pending }})
+          </button>
+          <button 
+            :class="['tab-btn', { active: currentTab === 'approved' }]" 
+            @click="currentTab = 'approved'; fetchVerifications()"
+          >
+            Approved ({{ stats.approved }})
+          </button>
+          <button 
+            :class="['tab-btn', { active: currentTab === 'rejected' }]" 
+            @click="currentTab = 'rejected'; fetchVerifications()"
+          >
+            Rejected ({{ stats.rejected }})
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div
+          v-if="loading"
+          class="loading-state"
+        >
+          <div class="spinner" />
+          <p>Loading verifications...</p>
+        </div>
+
+        <!-- Verifications List -->
+        <div
+          v-else-if="filteredVerifications.length > 0"
+          class="verifications-list"
+        >
+          <div
+            v-for="verification in filteredVerifications"
+            :key="verification.id"
+            class="verification-card"
+          >
+            <div class="verification-header">
+              <div class="photographer-info">
+                <div class="photographer-avatar">
+                  {{ verification.photographer?.business_name?.charAt(0).toUpperCase() || 'P' }}
+                </div>
+                <div>
+                  <div class="photographer-name">
+                    {{ verification.photographer?.business_name || 'N/A' }}
+                  </div>
+                  <div class="photographer-email">
+                    {{ verification.photographer?.user?.email || 'N/A' }}
+                  </div>
+                </div>
+              </div>
+              <span :class="`badge badge-${getStatusColor(verification.verification_status)}`">
+                {{ capitalizeFirst(verification.verification_status) }}
+              </span>
             </div>
 
             <div class="verification-body">
               <div class="info-grid">
                 <div class="info-item">
-                  <span class="info-label">Request Type:</span>
-                  <span class="info-value">{{ capitalizeFirst(request.request_type) }}</span>
+                  <span class="info-label">Business Name:</span>
+                  <span class="info-value">{{ verification.photographer?.business_name || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Experience:</span>
+                  <span class="info-value">{{ verification.photographer?.years_experience || 0 }} years</span>
                 </div>
                 <div class="info-item">
                   <span class="info-label">Submitted:</span>
-                  <span class="info-value">{{ formatDate(request.created_at) }}</span>
+                  <span class="info-value">{{ formatDate(verification.created_at) }}</span>
                 </div>
                 <div class="info-item">
                   <span class="info-label">Documents:</span>
-                  <span class="info-value">{{ request.submitted_documents?.length || 0 }} files</span>
+                  <span class="info-value">{{ verification.documents?.length || 0 }} files</span>
                 </div>
               </div>
 
-              <div v-if="request.submitted_documents?.length" class="notes-section">
-                <strong>Documents:</strong>
-                <div class="mt-2 space-y-1">
-                  <div v-for="(doc, idx) in request.submitted_documents" :key="idx">
-                    <a
-                      :href="`/storage/${doc.path}`"
-                      target="_blank"
-                      rel="noopener"
-                      class="text-sm text-burgundy hover:underline"
-                    >
-                      {{ doc.filename || 'Document' }}
-                    </a>
-                  </div>
-                </div>
+              <div
+                v-if="verification.notes"
+                class="notes-section"
+              >
+                <strong>Notes:</strong> {{ verification.notes }}
               </div>
 
-              <div class="verification-actions">
-                <button @click="approveRequest(request)" class="btn-action btn-success">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              <div
+                v-if="currentTab === 'pending'"
+                class="verification-actions"
+              >
+                <button
+                  class="btn-action btn-success"
+                  @click="approveVerification(verification)"
+                >
+                  <svg
+                    class="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                   Approve
                 </button>
-                <button @click="rejectRequest(request)" class="btn-action btn-danger">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                <button
+                  class="btn-action"
+                  @click="viewDetails(verification)"
+                >
+                  <svg
+                    class="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
+                  </svg>
+                  View Details
+                </button>
+                <button
+                  class="btn-action btn-danger"
+                  @click="rejectVerification(verification)"
+                >
+                  <svg
+                    class="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                   Reject
                 </button>
               </div>
+              <div
+                v-else
+                class="verification-actions"
+              >
+                <button
+                  class="btn-action"
+                  @click="viewDetails(verification)"
+                >
+                  <svg
+                    class="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
+                  </svg>
+                  View Details
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        <div v-else class="empty-state">
-          <div class="empty-icon">✅</div>
-          <p class="empty-title">No pending requests</p>
-          <p class="empty-subtitle">All verification requests have been reviewed.</p>
+        <!-- Empty State -->
+        <div
+          v-else
+          class="empty-state"
+        >
+          <div class="empty-icon">
+            📋
+          </div>
+          <p class="empty-title">
+            No {{ currentTab }} verifications
+          </p>
+          <p class="empty-subtitle">
+            {{ getEmptyMessage() }}
+          </p>
         </div>
       </div>
 
-      <!-- Tabs -->
-      <div class="verification-tabs">
-        <button 
-          @click="currentTab = 'pending'; fetchVerifications()" 
-          :class="['tab-btn', { active: currentTab === 'pending' }]">
-          Pending ({{ stats.pending }})
-        </button>
-        <button 
-          @click="currentTab = 'approved'; fetchVerifications()" 
-          :class="['tab-btn', { active: currentTab === 'approved' }]">
-          Approved ({{ stats.approved }})
-        </button>
-        <button 
-          @click="currentTab = 'rejected'; fetchVerifications()" 
-          :class="['tab-btn', { active: currentTab === 'rejected' }]">
-          Rejected ({{ stats.rejected }})
-        </button>
-      </div>
-
-      <!-- Loading State -->
-      <div v-if="loading" class="loading-state">
-        <div class="spinner"></div>
-        <p>Loading verifications...</p>
-      </div>
-
-      <!-- Verifications List -->
-      <div v-else-if="filteredVerifications.length > 0" class="verifications-list">
-        <div v-for="verification in filteredVerifications" :key="verification.id" class="verification-card">
-          <div class="verification-header">
-            <div class="photographer-info">
-              <div class="photographer-avatar">{{ verification.photographer?.business_name?.charAt(0).toUpperCase() || 'P' }}</div>
-              <div>
-                <div class="photographer-name">{{ verification.photographer?.business_name || 'N/A' }}</div>
-                <div class="photographer-email">{{ verification.photographer?.user?.email || 'N/A' }}</div>
-              </div>
-            </div>
-            <span :class="`badge badge-${getStatusColor(verification.verification_status)}`">
-              {{ capitalizeFirst(verification.verification_status) }}
-            </span>
+      <!-- View Modal -->
+      <div
+        v-if="showViewModal"
+        class="modal-overlay"
+        @click.self="showViewModal = false"
+      >
+        <div class="modal">
+          <div class="modal-header">
+            <h3>Verification Details</h3>
+            <button
+              class="modal-close"
+              @click="showViewModal = false"
+            >
+              ×
+            </button>
           </div>
-
-          <div class="verification-body">
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="info-label">Business Name:</span>
-                <span class="info-value">{{ verification.photographer?.business_name || 'N/A' }}</span>
+          <div
+            v-if="selectedVerification"
+            class="modal-body"
+          >
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="detail-label">Business Name:</span>
+                <span class="detail-value">{{ selectedVerification.photographer?.business_name }}</span>
               </div>
-              <div class="info-item">
-                <span class="info-label">Experience:</span>
-                <span class="info-value">{{ verification.photographer?.years_experience || 0 }} years</span>
+              <div class="detail-item">
+                <span class="detail-label">Email:</span>
+                <span class="detail-value">{{ selectedVerification.photographer?.user?.email }}</span>
               </div>
-              <div class="info-item">
-                <span class="info-label">Submitted:</span>
-                <span class="info-value">{{ formatDate(verification.created_at) }}</span>
+              <div class="detail-item">
+                <span class="detail-label">Phone:</span>
+                <span class="detail-value">{{ selectedVerification.photographer?.phone }}</span>
               </div>
-              <div class="info-item">
-                <span class="info-label">Documents:</span>
-                <span class="info-value">{{ verification.documents?.length || 0 }} files</span>
+              <div class="detail-item">
+                <span class="detail-label">Experience:</span>
+                <span class="detail-value">{{ selectedVerification.photographer?.years_experience }} years</span>
               </div>
-            </div>
-
-            <div v-if="verification.notes" class="notes-section">
-              <strong>Notes:</strong> {{ verification.notes }}
-            </div>
-
-            <div v-if="currentTab === 'pending'" class="verification-actions">
-              <button @click="approveVerification(verification)" class="btn-action btn-success">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                Approve
-              </button>
-              <button @click="viewDetails(verification)" class="btn-action">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                View Details
-              </button>
-              <button @click="rejectVerification(verification)" class="btn-action btn-danger">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                Reject
-              </button>
-            </div>
-            <div v-else class="verification-actions">
-              <button @click="viewDetails(verification)" class="btn-action">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                View Details
-              </button>
+              <div class="detail-item">
+                <span class="detail-label">Status:</span>
+                <span :class="`badge badge-${getStatusColor(selectedVerification.verification_status)}`">
+                  {{ capitalizeFirst(selectedVerification.verification_status) }}
+                </span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Submitted:</span>
+                <span class="detail-value">{{ formatDate(selectedVerification.created_at) }}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Empty State -->
-      <div v-else class="empty-state">
-        <div class="empty-icon">📋</div>
-        <p class="empty-title">No {{ currentTab }} verifications</p>
-        <p class="empty-subtitle">{{ getEmptyMessage() }}</p>
+      <!-- Toast -->
+      <div
+        v-if="showToast"
+        class="toast"
+      >
+        {{ toastMessage }}
       </div>
-    </div>
-
-    <!-- View Modal -->
-    <div v-if="showViewModal" class="modal-overlay" @click.self="showViewModal = false">
-      <div class="modal">
-        <div class="modal-header">
-          <h3>Verification Details</h3>
-          <button @click="showViewModal = false" class="modal-close">×</button>
-        </div>
-        <div class="modal-body" v-if="selectedVerification">
-          <div class="detail-grid">
-            <div class="detail-item">
-              <span class="detail-label">Business Name:</span>
-              <span class="detail-value">{{ selectedVerification.photographer?.business_name }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Email:</span>
-              <span class="detail-value">{{ selectedVerification.photographer?.user?.email }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Phone:</span>
-              <span class="detail-value">{{ selectedVerification.photographer?.phone }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Experience:</span>
-              <span class="detail-value">{{ selectedVerification.photographer?.years_experience }} years</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Status:</span>
-              <span :class="`badge badge-${getStatusColor(selectedVerification.verification_status)}`">
-                {{ capitalizeFirst(selectedVerification.verification_status) }}
-              </span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Submitted:</span>
-              <span class="detail-value">{{ formatDate(selectedVerification.created_at) }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Toast -->
-    <div v-if="showToast" class="toast">{{ toastMessage }}</div>
     </div>
   </div>
 </template>
@@ -312,6 +565,7 @@
 import { ref, computed, onMounted } from 'vue'
 import AdminHeader from '../../../components/AdminHeader.vue'
 import AdminQuickNav from '../../../components/AdminQuickNav.vue'
+import api from '../../../api'
 
 const verifications = ref([])
 const loading = ref(false)
@@ -339,21 +593,17 @@ const filteredVerifications = computed(() => {
 const fetchVerifications = async () => {
   loading.value = true
   try {
-    const token = localStorage.getItem('auth_token')
     // Send status parameter to get filtered results from backend
-    const response = await fetch(`/api/v1/admin/verifications?status=${currentTab.value}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
+    const { data } = await api.get('/admin/verifications', {
+      params: {
+        status: currentTab.value
       }
     })
-    
-    if (response.ok) {
-      const data = await response.json()
-      verifications.value = data.data || []
-      // Update stats from backend response
-      if (data.stats) {
-        stats.value = data.stats
+
+    if (data.status === 'success') {
+      verifications.value = data.data?.verifications || []
+      if (data.data?.stats) {
+        stats.value = data.data.stats
       }
     }
   } catch (error) {
@@ -367,19 +617,9 @@ const fetchVerifications = async () => {
 const fetchPendingRequests = async () => {
   pendingLoading.value = true
   try {
-    const token = localStorage.getItem('auth_token')
-    const response = await fetch('/api/v1/verifications/pending', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
-      }
-    })
-
-    if (response.ok) {
-      const data = await response.json()
-      const payload = data.data || {}
-      pendingRequests.value = payload.data || payload || []
-    }
+    const { data } = await api.get('/verifications/pending')
+    const payload = data.data || {}
+    pendingRequests.value = payload.data || payload || []
   } catch (error) {
     console.error('Error fetching pending requests:', error)
     showToastMessage('Error loading pending requests')
@@ -392,17 +632,7 @@ const approveVerification = async (verification) => {
   if (!confirm(`Approve verification for ${verification.photographer?.business_name}?`)) return
   
   try {
-    const token = localStorage.getItem('auth_token')
-    const response = await fetch(`/api/v1/admin/verifications/${verification.id}/approve`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    })
-    
-    const data = await response.json()
+    const { data } = await api.post(`/admin/verifications/${verification.id}/approve`)
     
     if (data.status === 'success') {
       showToastMessage(data.message || 'Verification approved successfully')
@@ -421,18 +651,9 @@ const rejectVerification = async (verification) => {
   if (!reason) return
   
   try {
-    const token = localStorage.getItem('auth_token')
-    const response = await fetch(`/api/v1/admin/verifications/${verification.id}/reject`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ notes: reason })
+    const { data } = await api.post(`/admin/verifications/${verification.id}/reject`, {
+      notes: reason
     })
-    
-    const data = await response.json()
     
     if (data.status === 'success') {
       showToastMessage(data.message || 'Verification rejected')
@@ -450,17 +671,7 @@ const approveRequest = async (request) => {
   if (!confirm(`Approve verification request for ${request.user?.name || 'user'}?`)) return
 
   try {
-    const token = localStorage.getItem('auth_token')
-    const response = await fetch(`/api/v1/verifications/${request.id}/approve`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    })
-
-    const data = await response.json()
+    const { data } = await api.post(`/verifications/${request.id}/approve`)
 
     if (data.status === 'success') {
       showToastMessage(data.message || 'Request approved successfully')
@@ -479,18 +690,9 @@ const rejectRequest = async (request) => {
   if (!reason) return
 
   try {
-    const token = localStorage.getItem('auth_token')
-    const response = await fetch(`/api/v1/verifications/${request.id}/reject`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ reason })
+    const { data } = await api.post(`/verifications/${request.id}/reject`, {
+      reason
     })
-
-    const data = await response.json()
 
     if (data.status === 'success') {
       showToastMessage(data.message || 'Request rejected')
@@ -560,6 +762,19 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.page-hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 1.5rem; padding: 1.75rem 2rem; border-radius: 1.5rem; border: 1px solid rgba(142, 14, 63, 0.2); background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(247, 239, 233, 0.82)), linear-gradient(90deg, rgba(142, 14, 63, 0.06), transparent 45%, rgba(109, 72, 56, 0.08)); box-shadow: 0 25px 55px rgba(24, 12, 8, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6); backdrop-filter: blur(6px); }
+.hero-copy { display: flex; flex-direction: column; gap: 0.85rem; }
+.hero-kicker { font-size: 0.7rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--admin-text-secondary); font-weight: 700; }
+.hero-title { font-size: 2rem; line-height: 1.1; color: var(--admin-text-primary); text-shadow: 0 2px 14px rgba(142, 14, 63, 0.18); }
+.hero-subtitle { color: var(--admin-text-secondary); max-width: 480px; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.hero-status { display: grid; gap: 0.8rem; }
+.status-card { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(142, 14, 63, 0.2); border-radius: 1rem; padding: 1rem 1.25rem; box-shadow: 0 16px 35px rgba(22, 12, 8, 0.08); display: flex; flex-direction: column; gap: 0.35rem; }
+.status-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--admin-text-secondary); }
+.status-value { font-size: 1.1rem; font-weight: 700; color: var(--admin-text-primary); }
+.page-topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1.25rem; background: rgba(255, 255, 255, 0.88); border: 1px solid rgba(140, 108, 95, 0.2); border-radius: 1.1rem; box-shadow: 0 18px 35px rgba(18, 9, 6, 0.08); backdrop-filter: blur(8px); }
+.status-chip { background: rgba(142, 14, 63, 0.12); color: var(--admin-text-primary); padding: 0.4rem 0.8rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+@media (max-width: 1024px) { .page-hero { grid-template-columns: 1fr; } }
 .admin-verifications { padding: 2rem; min-height: 100vh; background: var(--admin-bg-page); }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
 .page-title { font-size: 2rem; font-weight: 700; color: #1f2937; margin: 0; }

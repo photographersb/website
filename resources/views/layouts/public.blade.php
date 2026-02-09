@@ -36,7 +36,7 @@
             @endif
             
             <!-- Robots Meta -->
-            <meta name="robots" content="{{ $seoMeta->getRobotsValue() }}">
+            <meta name="robots" content="{{ ($seoMeta->robots_index ?? true) ? 'index' : 'noindex' }}, {{ ($seoMeta->robots_follow ?? true) ? 'follow' : 'nofollow' }}">
             
             <!-- Schema.org JSON-LD -->
             @if($seoMeta->schema_json)

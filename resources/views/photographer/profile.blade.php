@@ -2,7 +2,6 @@
 
 @section('meta')
     @if($seoMeta)
-        {!! \App\Services\SeoService::class !!}
         <!-- Title -->
         <title>{{ $seoMeta->meta_title }}</title>
         
@@ -33,7 +32,7 @@
         @endif
         
         <!-- Robots Meta -->
-        <meta name="robots" content="{{ $seoMeta->getRobotsValue() }}">
+        <meta name="robots" content="{{ $seoMeta->getRobotsMetaTag() }}">
         
         <!-- Schema.org JSON-LD -->
         @if($seoMeta->schema_json)
@@ -157,6 +156,9 @@
             
             <!-- Sidebar -->
             <div class="col-span-1">
+                <!-- Buy Me a Coffee Component -->
+                <buy-me-coffee-button :photographer-id="{{ $photographer->id }}" class="mb-6"></buy-me-coffee-button>
+
                 <!-- Packages -->
                 @if($packages->count() > 0)
                     <div class="bg-white rounded-lg shadow-md p-6 mb-6">

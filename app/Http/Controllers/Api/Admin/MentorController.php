@@ -13,6 +13,22 @@ class MentorController extends Controller
 {
     public function index(Request $request)
     {
+        // Minimal list for dropdowns (e.g., event forms)
+        if ($request->get('minimal') === 'true' || $request->get('minimal') === '1') {
+            $query = Mentor::query()->select('id', 'name', 'email');
+
+            if ($request->filled('status') && $request->status === 'active') {
+                $query->where('is_active', true);
+            }
+
+            $mentors = $query->orderBy('name')->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $mentors,
+            ]);
+        }
+
         // Calculate stats before applying pagination
         $statsQuery = Mentor::query();
         

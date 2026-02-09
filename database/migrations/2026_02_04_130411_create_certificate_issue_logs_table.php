@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('certificate_issue_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('certificate_id')->constrained('certificates')->onDelete('cascade');
+            $table->foreignId('submission_id')->constrained('competition_submissions')->onDelete('cascade');
             $table->enum('action', ['auto_issued', 'manual_issued', 'downloaded', 'emailed', 'revoked', 'reissued', 'verified']);
             $table->foreignId('performed_by_user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->json('meta')->nullable(); // Additional context
             $table->timestamps();
 
-            $table->index('certificate_id');
+            $table->index('submission_id');
             $table->index('action');
             $table->index('created_at');
         });

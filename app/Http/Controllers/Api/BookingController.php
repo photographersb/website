@@ -32,12 +32,26 @@ class BookingController extends Controller
             'photographer_id' => 'required|exists:photographers,id',
             'package_id' => 'nullable|exists:packages,id',
             'event_date' => 'required|date',
-            'event_location' => 'required|string',
+            'event_location' => 'required|string|max:255',
+            'preferred_time_slot' => 'nullable|string|max:255',
+            'event_type_detail' => 'nullable|string|max:255',
+            'indoor_outdoor' => 'nullable|in:indoor,outdoor,both',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
             'guest_count' => 'required|integer|min:1',
-            'budget_min' => 'nullable|numeric',
-            'budget_max' => 'nullable|numeric',
+            'budget_min' => 'nullable|numeric|min:0',
+            'budget_max' => 'nullable|numeric|min:0|gte:budget_min',
             'requirements' => 'nullable|string',
+            'additional_services' => 'nullable|array',
+            'additional_services.*' => 'string|max:100',
         ]);
+
+        $authPhotographer = Auth::user()?->photographer;
+        if ($authPhotographer && (int) $validated['photographer_id'] === (int) $authPhotographer->id) {
+            return $this->validationError([
+                'photographer_id' => ['You cannot create a booking request for your own profile.']
+            ], 'Self booking is not allowed');
+        }
 
         try {
             $result = DB::transaction(function () use ($validated) {

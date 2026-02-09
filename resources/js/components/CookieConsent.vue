@@ -9,10 +9,15 @@
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <!-- Message -->
             <div class="flex-1 pr-4">
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">Cookie Preferences</h3>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                Cookie Preferences
+              </h3>
               <p class="text-sm text-gray-600">
                 We use cookies to enhance your experience, analyze site traffic, and show personalized content. 
-                <router-link to="/privacy" class="text-burgundy hover:text-burgundy-dark underline">
+                <router-link
+                  to="/privacy"
+                  class="text-burgundy hover:text-burgundy-dark underline"
+                >
                   Learn more
                 </router-link>
                 about our cookie policy.
@@ -22,14 +27,14 @@
             <!-- Action Buttons -->
             <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <button 
-                @click="acceptRequired"
                 class="px-6 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm font-medium whitespace-nowrap"
+                @click="acceptRequired"
               >
                 Required Only
               </button>
               <button 
-                @click="acceptAll"
                 class="px-6 py-2 bg-burgundy text-white rounded-lg hover:bg-burgundy-dark transition text-sm font-medium whitespace-nowrap"
+                @click="acceptAll"
               >
                 Accept All Cookies
               </button>
@@ -37,12 +42,22 @@
 
             <!-- Close Button -->
             <button 
-              @click="hidden = true"
               class="text-gray-400 hover:text-gray-600 transition"
               aria-label="Close"
+              @click="hidden = true"
             >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -50,18 +65,32 @@
           <!-- Expandable Details (Optional) -->
           <div class="mt-4 pt-4 border-t border-gray-200">
             <button 
-              @click="showDetails = !showDetails"
               class="text-sm text-burgundy hover:text-burgundy-dark font-medium flex items-center gap-1"
+              @click="showDetails = !showDetails"
             >
               {{ showDetails ? 'Hide' : 'Show' }} cookie details
-              <svg class="w-4 h-4 transition" :class="{ 'rotate-180': showDetails }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+              <svg
+                class="w-4 h-4 transition"
+                :class="{ 'rotate-180': showDetails }"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                />
               </svg>
             </button>
 
             <!-- Cookie Details -->
             <transition name="expand">
-              <div v-if="showDetails" class="mt-4 space-y-3 text-sm">
+              <div
+                v-if="showDetails"
+                class="mt-4 space-y-3 text-sm"
+              >
                 <div class="space-y-2">
                   <div class="flex items-start gap-3">
                     <input 
@@ -69,10 +98,14 @@
                       type="checkbox"
                       disabled
                       class="mt-1"
-                    />
+                    >
                     <div>
-                      <p class="font-medium text-gray-900">Necessary Cookies (Always Active)</p>
-                      <p class="text-gray-600 mt-1">Required for basic site functionality, user authentication, and security. Cannot be disabled.</p>
+                      <p class="font-medium text-gray-900">
+                        Necessary Cookies (Always Active)
+                      </p>
+                      <p class="text-gray-600 mt-1">
+                        Required for basic site functionality, user authentication, and security. Cannot be disabled.
+                      </p>
                     </div>
                   </div>
 
@@ -81,10 +114,14 @@
                       v-model="cookiePreferences.analytics"
                       type="checkbox"
                       class="mt-1"
-                    />
+                    >
                     <div>
-                      <p class="font-medium text-gray-900">Analytics Cookies</p>
-                      <p class="text-gray-600 mt-1">Help us understand how you use our site so we can improve your experience. Includes Google Analytics and similar tools.</p>
+                      <p class="font-medium text-gray-900">
+                        Analytics Cookies
+                      </p>
+                      <p class="text-gray-600 mt-1">
+                        Help us understand how you use our site so we can improve your experience. Includes Google Analytics and similar tools.
+                      </p>
                     </div>
                   </div>
 
@@ -93,10 +130,14 @@
                       v-model="cookiePreferences.marketing"
                       type="checkbox"
                       class="mt-1"
-                    />
+                    >
                     <div>
-                      <p class="font-medium text-gray-900">Marketing Cookies</p>
-                      <p class="text-gray-600 mt-1">Used for personalized ads and remarketing. Helps us show you relevant content and offers.</p>
+                      <p class="font-medium text-gray-900">
+                        Marketing Cookies
+                      </p>
+                      <p class="text-gray-600 mt-1">
+                        Used for personalized ads and remarketing. Helps us show you relevant content and offers.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -104,8 +145,8 @@
                 <!-- Save Preferences Button -->
                 <div class="pt-3 border-t border-gray-200">
                   <button 
-                    @click="savePreferences"
                     class="px-4 py-2 bg-burgundy text-white rounded hover:bg-burgundy-dark transition text-sm font-medium"
+                    @click="savePreferences"
                   >
                     Save Preferences
                   </button>

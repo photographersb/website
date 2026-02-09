@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Photographer;
 use App\Models\Event;
 use App\Models\Competition;
-use App\Models\City;
+use App\Models\Location;
 use App\Models\Category;
 use Illuminate\Http\Response;
 
@@ -116,7 +116,7 @@ class SitemapController extends Controller
 
     public function cities()
     {
-        $cities = City::select('slug')->get();
+        $cities = Location::whereIn('type', ['district', 'upazila'])->select('slug')->get();
 
         $urls = [];
         

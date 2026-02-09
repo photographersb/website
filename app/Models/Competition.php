@@ -24,22 +24,44 @@ class Competition extends Model
         'description',
         'theme',
         'hero_image',
+        'hero_image_credit_name',
+        'hero_image_credit_url',
         'banner_image',
+        'banner_image_credit_name',
+        'banner_image_credit_url',
+        'cover_image',
+        'cover_image_credit_name',
+        'cover_image_credit_url',
         'submission_deadline',
+        'start_date',
+        'end_date',
         'voting_start_at',
         'voting_end_at',
+        'voting_start_date',
+        'voting_end_date',
         'judging_start_at',
         'judging_end_at',
+        'judging_deadline',
         'results_announcement_date',
+        'announcement_date',
         'status',
+        'mode',
+        'entry_type',
+        'series_min_images',
+        'series_max_images',
         'allow_public_voting',
+        'voting_enabled',
         'allow_judge_scoring',
+        'vote_weight',
+        'judge_weight',
+        'show_judge_reactions',
         'allow_watermark',
         'require_watermark',
         'participation_fee',
         'is_paid_competition',
         'max_submissions_per_user',
         'min_submissions_to_proceed',
+        'district_battle_enabled',
         'rules',
         'terms_and_conditions',
         'prizes',
@@ -55,22 +77,33 @@ class Competition extends Model
     ];
 
     protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
         'submission_deadline' => 'datetime',
         'voting_start_at' => 'datetime',
         'voting_end_at' => 'datetime',
+        'voting_start_date' => 'datetime',
+        'voting_end_date' => 'datetime',
         'judging_start_at' => 'datetime',
         'judging_end_at' => 'datetime',
+        'judging_deadline' => 'date',
         'results_announcement_date' => 'date',
+        'announcement_date' => 'date',
         'featured_until' => 'datetime',
         'published_at' => 'datetime',
         'allow_public_voting' => 'boolean',
+        'voting_enabled' => 'boolean',
         'allow_judge_scoring' => 'boolean',
+        'vote_weight' => 'decimal:2',
+        'judge_weight' => 'decimal:2',
+        'show_judge_reactions' => 'boolean',
         'allow_watermark' => 'boolean',
         'require_watermark' => 'boolean',
         'is_paid_competition' => 'boolean',
         'is_public' => 'boolean',
         'is_featured' => 'boolean',
         'results_published' => 'boolean',
+        'district_battle_enabled' => 'boolean',
         'participation_fee' => 'decimal:2',
         'total_prize_pool' => 'decimal:2',
         'prizes' => 'array',
@@ -107,6 +140,16 @@ class Competition extends Model
         return $this->hasMany(CompetitionSubmission::class);
     }
 
+    public function entryFees(): HasMany
+    {
+        return $this->hasMany(CompetitionEntryFee::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(CompetitionPayment::class);
+    }
+
     public function votes(): HasMany
     {
         return $this->hasMany(CompetitionVote::class);
@@ -115,6 +158,11 @@ class Competition extends Model
     public function prizes(): HasMany
     {
         return $this->hasMany(CompetitionPrize::class);
+    }
+
+    public function prizeWinners(): HasMany
+    {
+        return $this->hasMany(CompetitionPrizeWinner::class);
     }
 
     public function shareFrameTemplates(): HasMany

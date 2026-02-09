@@ -4,11 +4,11 @@
     <AdminHeader 
       title="💼 Platform Sponsors" 
       subtitle="Manage sponsor partnerships and sponsorship packages"
+      :show-back="true"
     />
 
     <!-- Main Content -->
     <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      
       <!-- Quick Navigation -->
       <AdminQuickNav />
 
@@ -16,8 +16,18 @@
       <div class="stats-grid">
         <div class="stat-card stat-blue">
           <div class="stat-icon">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+              />
             </svg>
           </div>
           <div class="stat-content">
@@ -28,8 +38,18 @@
 
         <div class="stat-card stat-green">
           <div class="stat-icon">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
           <div class="stat-content">
@@ -40,8 +60,18 @@
 
         <div class="stat-card stat-yellow">
           <div class="stat-icon">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
           <div class="stat-content">
@@ -52,8 +82,18 @@
 
         <div class="stat-card stat-purple">
           <div class="stat-icon">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
           <div class="stat-content">
@@ -67,93 +107,224 @@
       <div class="content-card">
         <div class="filters-bar">
           <div class="search-box">
-            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg
+              class="search-icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
             <input 
               v-model="searchQuery" 
               type="text" 
               placeholder="Search sponsors..." 
               class="search-input"
-            />
+            >
           </div>
 
-          <select v-model="filterStatus" @change="applyFilters" class="filter-select">
-            <option value="">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
+          <select
+            v-model="filterStatus"
+            class="filter-select"
+            @change="applyFilters"
+          >
+            <option value="">
+              All Status
+            </option>
+            <option value="active">
+              Active
+            </option>
+            <option value="inactive">
+              Inactive
+            </option>
           </select>
 
-          <button @click="showCreateModal = true" class="btn-add">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          <button
+            class="btn-add"
+            @click="showCreateModal = true"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             Add Sponsor
           </button>
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="loading-state">
-          <div class="spinner"></div>
+        <div
+          v-if="loading"
+          class="loading-state"
+        >
+          <div class="spinner" />
           <p>Loading sponsors...</p>
         </div>
 
         <!-- Sponsors Grid -->
-        <div v-else-if="filteredSponsors.length > 0" class="sponsors-grid">
-          <div v-for="sponsor in filteredSponsors" :key="sponsor.id" class="sponsor-card">
+        <div
+          v-else-if="filteredSponsors.length > 0"
+          class="sponsors-grid"
+        >
+          <div
+            v-for="sponsor in filteredSponsors"
+            :key="sponsor.id"
+            class="sponsor-card"
+          >
             <div class="sponsor-logo-container">
-              <img v-if="sponsor.logo" :src="sponsor.logo" :alt="sponsor.name" class="sponsor-logo" />
-              <div v-else class="sponsor-logo-placeholder">
-                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              <img
+                v-if="sponsor.logo"
+                :src="sponsor.logo"
+                :alt="sponsor.name"
+                class="sponsor-logo"
+              >
+              <div
+                v-else
+                class="sponsor-logo-placeholder"
+              >
+                <svg
+                  class="w-12 h-12"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
                 </svg>
               </div>
-              <span v-if="sponsor.is_featured" class="featured-badge">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <span
+                v-if="sponsor.is_featured"
+                class="featured-badge"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
               </span>
             </div>
 
-            <h3 class="sponsor-name">{{ sponsor.name }}</h3>
+            <h3 class="sponsor-name">
+              {{ sponsor.name }}
+            </h3>
             
             <div class="sponsor-meta">
-              <span :class="getStatusClass(sponsor.status)" class="status-badge">
+              <span
+                :class="getStatusClass(sponsor.status)"
+                class="status-badge"
+              >
                 {{ sponsor.status }}
               </span>
               <span class="order-badge">Order: {{ sponsor.display_order || 'N/A' }}</span>
             </div>
 
-            <p v-if="sponsor.description" class="sponsor-description">
+            <p
+              v-if="sponsor.description"
+              class="sponsor-description"
+            >
               {{ truncateText(sponsor.description, 100) }}
             </p>
-            <p v-else class="sponsor-description text-gray-400">No description provided</p>
+            <p
+              v-else
+              class="sponsor-description text-gray-400"
+            >
+              No description provided
+            </p>
 
-            <div v-if="sponsor.website" class="sponsor-website">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+            <div
+              v-if="sponsor.website"
+              class="sponsor-website"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+                />
               </svg>
-              <a :href="sponsor.website" target="_blank" class="website-link">
+              <a
+                :href="sponsor.website"
+                target="_blank"
+                class="website-link"
+              >
                 {{ formatWebsite(sponsor.website) }}
               </a>
             </div>
 
             <div class="card-actions">
-              <button @click="editSponsor(sponsor)" class="btn-action btn-edit">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              <button
+                class="btn-action btn-edit"
+                @click="editSponsor(sponsor)"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
                 </svg>
                 Edit
               </button>
-              <button @click="toggleFeatured(sponsor)" class="btn-action btn-feature">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <button
+                class="btn-action btn-feature"
+                @click="toggleFeatured(sponsor)"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
                 {{ sponsor.is_featured ? 'Unfeature' : 'Feature' }}
               </button>
-              <button @click="deleteSponsor(sponsor.id)" class="btn-action btn-delete">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              <button
+                class="btn-action btn-delete"
+                @click="deleteSponsor(sponsor.id)"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
                 </svg>
                 Delete
               </button>
@@ -162,13 +333,35 @@
         </div>
 
         <!-- Empty State -->
-        <div v-else class="empty-state">
-          <div class="empty-icon">💼</div>
-          <p class="empty-title">No sponsors found</p>
-          <p class="empty-subtitle">Add your first sponsor to get started</p>
-          <button @click="showCreateModal = true" class="btn-add-empty">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        <div
+          v-else
+          class="empty-state"
+        >
+          <div class="empty-icon">
+            💼
+          </div>
+          <p class="empty-title">
+            No sponsors found
+          </p>
+          <p class="empty-subtitle">
+            Add your first sponsor to get started
+          </p>
+          <button
+            class="btn-add-empty"
+            @click="showCreateModal = true"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             Add First Sponsor
           </button>
@@ -177,14 +370,26 @@
     </div>
 
     <!-- Create/Edit Modal -->
-    <div v-if="showCreateModal || showEditModal" class="modal-overlay" @click.self="closeModal">
+    <div
+      v-if="showCreateModal || showEditModal"
+      class="modal-overlay"
+      @click.self="closeModal"
+    >
       <div class="modal modal-large">
         <div class="modal-header">
           <h3>{{ editingId ? 'Edit Sponsor' : 'Add New Sponsor' }}</h3>
-          <button @click="closeModal" class="modal-close">&times;</button>
+          <button
+            class="modal-close"
+            @click="closeModal"
+          >
+            &times;
+          </button>
         </div>
         <div class="modal-body">
-          <form @submit.prevent="saveSponsor" class="form-grid">
+          <form
+            class="form-grid"
+            @submit.prevent="saveSponsor"
+          >
             <!-- Name -->
             <div class="form-group">
               <label class="form-label">Sponsor Name *</label>
@@ -194,28 +399,50 @@
                 required 
                 class="form-input"
                 placeholder="Enter sponsor name"
-              />
+              >
             </div>
 
             <!-- Logo Upload -->
             <div class="form-group">
               <label class="form-label">Logo</label>
               <div class="logo-upload-section">
-                <div v-if="formData.logo" class="logo-preview">
-                  <img :src="formData.logo" alt="Logo" />
-                  <button @click="formData.logo = ''" type="button" class="remove-logo-btn">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                <div
+                  v-if="formData.logo"
+                  class="logo-preview"
+                >
+                  <img
+                    :src="formData.logo"
+                    alt="Logo"
+                  >
+                  <button
+                    type="button"
+                    class="remove-logo-btn"
+                    @click="formData.logo = ''"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </div>
                 <input 
                   type="file" 
                   accept="image/*" 
-                  @change="handleLogoUpload" 
-                  class="file-input"
-                />
-                <p class="file-hint">PNG, JPG, GIF up to 2MB. Recommended: 400x200px</p>
+                  class="file-input upload-input" 
+                  @change="handleLogoUpload"
+                >
+                <p class="file-hint">
+                  PNG, JPG up to 5MB. 600x300 px.
+                </p>
               </div>
             </div>
 
@@ -227,7 +454,7 @@
                 type="url" 
                 class="form-input"
                 placeholder="https://example.com"
-              />
+              >
             </div>
 
             <!-- Description -->
@@ -238,15 +465,22 @@
                 rows="4" 
                 class="form-input"
                 placeholder="Enter sponsor description..."
-              ></textarea>
+              />
             </div>
 
             <!-- Status -->
             <div class="form-group">
               <label class="form-label">Status</label>
-              <select v-model="formData.status" class="form-input">
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
+              <select
+                v-model="formData.status"
+                class="form-input"
+              >
+                <option value="active">
+                  Active
+                </option>
+                <option value="inactive">
+                  Inactive
+                </option>
               </select>
             </div>
 
@@ -258,7 +492,7 @@
                 type="number" 
                 class="form-input"
                 placeholder="1, 2, 3..."
-              />
+              >
             </div>
 
             <!-- Is Featured -->
@@ -268,19 +502,38 @@
                   v-model="formData.is_featured" 
                   type="checkbox" 
                   class="checkbox-input"
-                />
+                >
                 <span>Feature this sponsor (show prominently on homepage)</span>
               </label>
             </div>
 
             <!-- Form Actions -->
             <div class="modal-actions full-width">
-              <button type="button" @click="closeModal" class="btn-cancel">
+              <button
+                type="button"
+                class="btn-cancel"
+                @click="closeModal"
+              >
                 Cancel
               </button>
-              <button type="submit" class="btn-save" :disabled="saving">
-                <svg v-if="saving" class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              <button
+                type="submit"
+                class="btn-save"
+                :disabled="saving"
+              >
+                <svg
+                  v-if="saving"
+                  class="w-5 h-5 mr-2 animate-spin"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
                 </svg>
                 <span>{{ saving ? 'Saving...' : (editingId ? 'Update Sponsor' : 'Add Sponsor') }}</span>
               </button>
@@ -291,7 +544,10 @@
     </div>
 
     <!-- Toast -->
-    <div v-if="showToast" class="toast">
+    <div
+      v-if="showToast"
+      class="toast"
+    >
       {{ toastMessage }}
     </div>
   </div>

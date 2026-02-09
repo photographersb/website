@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use App\Services\ErrorLogService;
+use App\Services\ThrottleEventLogger;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -37,6 +38,19 @@ class Handler extends ExceptionHandler
      */
     public function report(Throwable $exception)
     {
+        if ($this->isThrottleException($exception)) {
+            try {
+                $logger = app(ThrottleEventLogger::class);
+                $logger->log(request(), $this->getRetryAfterSeconds($exception));
+            } catch (Throwable $e) {
+                logger()->error('Throttle logging failed', [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            return parent::report($exception);
+        }
+
         // Skip certain exceptions to avoid noise
         if (!$this->shouldReportToErrorCenter($exception)) {
             return parent::report($exception);
@@ -95,10 +109,10 @@ class Handler extends ExceptionHandler
             return false;
         }
 
-        // Skip expected HTTP exceptions (400, 401, 403, 429)
+        // Skip expected HTTP exceptions (400, 401, 403)
         if ($exception instanceof HttpException) {
             $code = $exception->getStatusCode();
-            if (in_array($code, [400, 401, 403, 404, 429])) {
+            if (in_array($code, [400, 401, 403, 404])) {
                 return false;
             }
         }
@@ -114,5 +128,25 @@ class Handler extends ExceptionHandler
 
         // Report everything else
         return true;
+    }
+
+    protected function isThrottleException(Throwable $exception): bool
+    {
+        if (!$exception instanceof HttpException) {
+            return false;
+        }
+
+        return $exception->getStatusCode() === 429;
+    }
+
+    protected function getRetryAfterSeconds(Throwable $exception): ?int
+    {
+        if (!$exception instanceof HttpException) {
+            return null;
+        }
+
+        $headers = method_exists($exception, 'getHeaders') ? $exception->getHeaders() : [];
+        $retryAfter = $headers['Retry-After'] ?? null;
+        return is_numeric($retryAfter) ? (int) $retryAfter : null;
     }
 }

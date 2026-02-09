@@ -2,13 +2,29 @@
   <div class="otp-verification-card">
     <div class="text-center mb-6">
       <div class="mx-auto w-16 h-16 bg-burgundy-100 rounded-full flex items-center justify-center mb-4">
-        <svg class="w-8 h-8 text-burgundy-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+        <svg
+          class="w-8 h-8 text-burgundy-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+          />
         </svg>
       </div>
-      <h2 class="text-2xl font-bold text-gray-800">Verify Your Phone</h2>
-      <p class="text-gray-600 mt-2">Enter the 6-digit code sent to</p>
-      <p class="text-burgundy-600 font-semibold">{{ formattedPhone }}</p>
+      <h2 class="text-2xl font-bold text-gray-800">
+        Verify Your Phone
+      </h2>
+      <p class="text-gray-600 mt-2">
+        Enter the 6-digit code sent to
+      </p>
+      <p class="text-burgundy-600 font-semibold">
+        {{ formattedPhone }}
+      </p>
     </div>
 
     <form @submit.prevent="verifyOTP">
@@ -23,37 +39,50 @@
           inputmode="numeric"
           maxlength="1"
           class="otp-input"
+          :disabled="loading"
           @input="handleInput(index)"
           @keydown="handleKeydown($event, index)"
           @paste="handlePaste"
-          :disabled="loading"
-        />
+        >
       </div>
 
       <!-- Timer & Resend -->
       <div class="text-center mb-6">
-        <p v-if="timeLeft > 0" class="text-sm text-gray-600">
+        <p
+          v-if="timeLeft > 0"
+          class="text-sm text-gray-600"
+        >
           Code expires in <span class="font-semibold text-burgundy-600">{{ formatTime(timeLeft) }}</span>
         </p>
         <button
           v-else
           type="button"
-          @click="resendOTP"
           :disabled="resending"
           class="text-sm text-burgundy-600 hover:text-burgundy-700 font-medium underline disabled:opacity-50"
+          @click="resendOTP"
         >
           {{ resending ? 'Sending...' : 'Resend Code' }}
         </button>
       </div>
 
       <!-- Error Message -->
-      <div v-if="error" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-        <p class="text-sm text-red-700 text-center">{{ error }}</p>
+      <div
+        v-if="error"
+        class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg"
+      >
+        <p class="text-sm text-red-700 text-center">
+          {{ error }}
+        </p>
       </div>
 
       <!-- Success Message -->
-      <div v-if="success" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-        <p class="text-sm text-green-700 text-center">✓ {{ success }}</p>
+      <div
+        v-if="success"
+        class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg"
+      >
+        <p class="text-sm text-green-700 text-center">
+          ✓ {{ success }}
+        </p>
       </div>
 
       <!-- Submit Button -->
@@ -69,8 +98,8 @@
       <!-- Change Number -->
       <button
         type="button"
-        @click="$emit('change-number')"
         class="w-full mt-3 text-sm text-gray-600 hover:text-gray-800"
+        @click="$emit('change-number')"
       >
         Change phone number?
       </button>

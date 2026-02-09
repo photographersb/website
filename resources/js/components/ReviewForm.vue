@@ -1,23 +1,35 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-12">
     <div class="container mx-auto px-4 max-w-2xl">
-      <h1 class="text-3xl font-bold mb-8">Write a Review</h1>
+      <h1 class="text-3xl font-bold mb-8">
+        Write a Review
+      </h1>
 
-      <div v-if="photographer" class="bg-white rounded-lg shadow p-6 mb-6">
+      <div
+        v-if="photographer"
+        class="bg-white rounded-lg shadow p-6 mb-6"
+      >
         <div class="flex items-center gap-4">
           <img
-            :src="photographer.avatar || 'https://via.placeholder.com/80'"
+            :src="photographer.avatar || '/images/placeholder.svg'"
             :alt="photographer.user?.name || 'Photographer'"
             class="w-16 h-16 rounded-full object-cover"
-          />
+          >
           <div>
-            <h2 class="text-xl font-bold">{{ photographer.user?.name || 'Unknown' }}</h2>
-            <p class="text-gray-600 text-sm">{{ photographer.bio }}</p>
+            <h2 class="text-xl font-bold">
+              {{ photographer.user?.name || 'Unknown' }}
+            </h2>
+            <p class="text-gray-600 text-sm">
+              {{ photographer.bio }}
+            </p>
           </div>
         </div>
       </div>
 
-      <form @submit.prevent="submitReview" class="bg-white rounded-lg shadow p-8 space-y-6">
+      <form
+        class="bg-white rounded-lg shadow p-8 space-y-6"
+        @submit.prevent="submitReview"
+      >
         <!-- Rating -->
         <div>
           <label class="block text-sm font-medium mb-2">Overall Rating *</label>
@@ -26,16 +38,24 @@
               v-for="star in 5"
               :key="star"
               type="button"
-              @click="form.rating = star"
               :class="`text-3xl ${star <= form.rating ? 'text-yellow-400' : 'text-gray-300'}`"
+              @click="form.rating = star"
             >
               ★
             </button>
           </div>
-          <p v-if="form.rating" class="text-sm text-gray-600 mt-1">
+          <p
+            v-if="form.rating"
+            class="text-sm text-gray-600 mt-1"
+          >
             {{ getRatingText(form.rating) }}
           </p>
-          <p v-if="errors.rating" class="mt-1 text-sm text-red-600">{{ errors.rating[0] }}</p>
+          <p
+            v-if="errors.rating"
+            class="mt-1 text-sm text-red-600"
+          >
+            {{ errors.rating[0] }}
+          </p>
         </div>
 
         <!-- Review Title -->
@@ -47,8 +67,13 @@
             required
             placeholder="Sum up your experience in one sentence"
             class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-burgundy"
-          />
-          <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title[0] }}</p>
+          >
+          <p
+            v-if="errors.title"
+            class="mt-1 text-sm text-red-600"
+          >
+            {{ errors.title[0] }}
+          </p>
         </div>
 
         <!-- Review Comment -->
@@ -60,14 +85,23 @@
             rows="6"
             placeholder="Share your experience with this photographer..."
             class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-burgundy"
-          ></textarea>
-          <p class="text-xs text-gray-500 mt-1">Minimum 50 characters</p>
-          <p v-if="errors.comment" class="mt-1 text-sm text-red-600">{{ errors.comment[0] }}</p>
+          />
+          <p class="text-xs text-gray-500 mt-1">
+            Minimum 50 characters
+          </p>
+          <p
+            v-if="errors.comment"
+            class="mt-1 text-sm text-red-600"
+          >
+            {{ errors.comment[0] }}
+          </p>
         </div>
 
         <!-- Detailed Ratings -->
         <div class="border-t pt-6">
-          <h3 class="font-bold mb-4">Detailed Ratings</h3>
+          <h3 class="font-bold mb-4">
+            Detailed Ratings
+          </h3>
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium mb-2">Professionalism</label>
@@ -76,8 +110,8 @@
                   v-for="star in 5"
                   :key="star"
                   type="button"
-                  @click="form.professionalism_rating = star"
                   :class="`text-2xl ${star <= form.professionalism_rating ? 'text-yellow-400' : 'text-gray-300'}`"
+                  @click="form.professionalism_rating = star"
                 >
                   ★
                 </button>
@@ -91,8 +125,8 @@
                   v-for="star in 5"
                   :key="star"
                   type="button"
-                  @click="form.quality_rating = star"
                   :class="`text-2xl ${star <= form.quality_rating ? 'text-yellow-400' : 'text-gray-300'}`"
+                  @click="form.quality_rating = star"
                 >
                   ★
                 </button>
@@ -106,8 +140,8 @@
                   v-for="star in 5"
                   :key="star"
                   type="button"
-                  @click="form.communication_rating = star"
                   :class="`text-2xl ${star <= form.communication_rating ? 'text-yellow-400' : 'text-gray-300'}`"
+                  @click="form.communication_rating = star"
                 >
                   ★
                 </button>
@@ -121,8 +155,8 @@
                   v-for="star in 5"
                   :key="star"
                   type="button"
-                  @click="form.value_rating = star"
                   :class="`text-2xl ${star <= form.value_rating ? 'text-yellow-400' : 'text-gray-300'}`"
+                  @click="form.value_rating = star"
                 >
                   ★
                 </button>
@@ -138,7 +172,7 @@
               v-model="form.would_recommend"
               type="checkbox"
               class="w-5 h-5 text-burgundy"
-            />
+            >
             <span class="font-medium">I would recommend this photographer</span>
           </label>
         </div>
@@ -150,7 +184,7 @@
               v-model="form.is_anonymous"
               type="checkbox"
               class="w-5 h-5 text-burgundy mt-1"
-            />
+            >
             <div>
               <span class="font-medium block">Post as Anonymous</span>
               <span class="text-sm text-gray-600">Your name will be hidden from public view, but admin can see it for service improvement.</span>
@@ -169,15 +203,18 @@
           </button>
           <button
             type="button"
-            @click="$router.back()"
             class="px-6 py-3 border rounded-lg hover:bg-gray-50"
+            @click="$router.back()"
           >
             Cancel
           </button>
         </div>
 
         <!-- Message -->
-        <div v-if="message" :class="`p-4 rounded ${error ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`">
+        <div
+          v-if="message"
+          :class="`p-4 rounded ${error ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`"
+        >
           {{ message }}
         </div>
       </form>

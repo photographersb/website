@@ -8,6 +8,8 @@ use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
+use App\Services\ImageProcessingService;
+use App\Services\PhotoMetadataService;
 
 class PhotoController extends Controller
 {
@@ -66,6 +68,85 @@ class PhotoController extends Controller
     }
 
     /**
+     * Upload photo files to album
+     */
+    public function upload(Request $request, $albumId, PhotoMetadataService $metadataService, ImageProcessingService $imageService)
+    {
+        $user = $request->user();
+        $photographer = $user->photographer;
+
+        if (!$photographer) {
+            return $this->notFound('Photographer profile not found');
+        }
+
+        // Verify album ownership
+        $album = Album::where('photographer_id', $photographer->id)->findOrFail($albumId);
+
+        $validated = $request->validate([
+            'photos' => 'required|array|min:1|max:20',
+            'photos.*' => 'required|image|mimes:jpeg,jpg,png,webp|max:10240',
+        ]);
+
+        $createdPhotos = [];
+
+        foreach ($validated['photos'] as $file) {
+            // Extract EXIF metadata
+            $metadata = $metadataService->extractMetadata($file);
+
+            // Store main image
+            $path = 'portfolio/' . $photographer->id . '/albums/' . $album->id;
+            $result = $imageService->processAndSave($file, $path, [
+                'max_width' => 2048,
+                'max_height' => 2048,
+                'quality' => 85,
+                'format' => 'jpg'
+            ]);
+
+            if (!$result['success']) {
+                return $this->error('Failed to upload image: ' . $result['error'], 500);
+            }
+
+            // Create thumbnail
+            $thumbResult = $imageService->processAndSave($file, $path, [
+                'max_width' => 800,
+                'max_height' => 800,
+                'quality' => 80,
+                'format' => 'jpg'
+            ]);
+
+            $imageUrl = $result['url'];
+            $thumbnailUrl = $thumbResult['success'] ? $thumbResult['url'] : $imageUrl;
+
+            $photo = Photo::create([
+                'uuid' => Str::uuid(),
+                'album_id' => $album->id,
+                'photographer_id' => $photographer->id,
+                'image_url' => $imageUrl,
+                'thumbnail_url' => $thumbnailUrl,
+                'title' => pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME),
+                'display_order' => Photo::where('album_id', $album->id)->max('display_order') + 1,
+                'camera_make' => $metadata['camera_make'] ?? null,
+                'camera_model' => $metadata['camera_model'] ?? null,
+                'camera_settings' => $metadata['camera_settings'] ?? null,
+                'location' => $metadata['location'] ?? null,
+                'date_taken' => $metadata['date_taken'] ?? null,
+            ]);
+
+            $createdPhotos[] = $photo;
+        }
+
+        // Update album photo count
+        $album->increment('photo_count', count($createdPhotos));
+
+        // Set first photo as cover if album doesn't have one
+        if (!$album->cover_photo_url && count($createdPhotos) > 0) {
+            $album->update(['cover_photo_url' => $createdPhotos[0]->image_url]);
+        }
+
+        return $this->created($createdPhotos, count($createdPhotos) . ' photo(s) uploaded successfully');
+    }
+
+    /**
      * Get photos from Pexels API
      */
     public function searchPexels(Request $request)
@@ -73,10 +154,12 @@ class PhotoController extends Controller
         $validated = $request->validate([
             'query' => 'required|string|max:100',
             'per_page' => 'nullable|integer|min:1|max:80',
+            'orientation' => 'nullable|in:landscape,portrait,square',
         ]);
 
         $query = $validated['query'];
         $perPage = $validated['per_page'] ?? 15;
+        $orientation = $validated['orientation'] ?? 'landscape';
 
         try {
             // Use Pexels API (you should add PEXELS_API_KEY to .env)
@@ -87,7 +170,7 @@ class PhotoController extends Controller
             ])->get('https://api.pexels.com/v1/search', [
                 'query' => $query,
                 'per_page' => $perPage,
-                'orientation' => 'landscape',
+                'orientation' => $orientation,
             ]);
 
             if ($response->successful()) {
@@ -99,6 +182,8 @@ class PhotoController extends Controller
                         'image_url' => $photo['src']['large2x'],
                         'thumbnail_url' => $photo['src']['medium'],
                         'photographer' => $photo['photographer'],
+                        'photographer_url' => $photo['photographer_url'] ?? null,
+                        'url' => $photo['url'] ?? null,
                         'width' => $photo['width'],
                         'height' => $photo['height'],
                     ];
@@ -107,7 +192,16 @@ class PhotoController extends Controller
                 return $this->success($photos, 'Photos retrieved from Pexels', 200, ['total' => $data['total_results'] ?? 0]);
             }
 
-            return $this->error('Failed to fetch photos from Pexels', 500);
+            $status = $response->status();
+            $payload = $response->json();
+            $errorDetails = $payload['error'] ?? $payload['message'] ?? Str::limit($response->body(), 200);
+
+            \Log::warning('Pexels API request failed', [
+                'status' => $status,
+                'error' => $errorDetails,
+            ]);
+
+            return $this->error('Failed to fetch photos from Pexels (' . $status . '): ' . $errorDetails, 500);
 
         } catch (\Exception $e) {
             return $this->error('Error connecting to Pexels: ' . $e->getMessage(), 500);

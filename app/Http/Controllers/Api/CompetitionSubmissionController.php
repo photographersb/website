@@ -11,19 +11,21 @@ use App\Services\ImageProcessingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 
 class CompetitionSubmissionController extends Controller
 {
+    use ApiResponse;
+
     /**
      * Get all submissions for a competition (public gallery)
      */
-    public function index(Request $request, $competitionId)
+    public function index(Request $request, Competition $competition)
     {
-        $competition = Competition::findOrFail($competitionId);
-        
+        $competitionId = $competition->id;
         $query = CompetitionSubmission::with(['photographer.photographer', 'competition'])
             ->forCompetition($competitionId)
             ->approved();
@@ -51,7 +53,13 @@ class CompetitionSubmissionController extends Controller
             $query->orderBy($sortBy, $sortOrder);
         }
         
-        $submissions = $query->paginate(20);
+        $perPage = (int) $request->get('per_page', 20);
+        if ($perPage < 1) {
+            $perPage = 20;
+        }
+        $perPage = min($perPage, 200);
+
+        $submissions = $query->paginate($perPage);
         
         return $this->paginated($submissions, 'Approved submissions retrieved successfully');
     }
@@ -59,11 +67,34 @@ class CompetitionSubmissionController extends Controller
     /**
      * Get single submission details
      */
-    public function show($competitionId, $submissionId)
+    public function show(Competition $competition, $submissionId)
     {
-        $submission = CompetitionSubmission::with(['photographer.photographer', 'competition'])
+        $competitionId = $competition->id;
+        $submissionQuery = CompetitionSubmission::with(['photographer.photographer', 'competition']);
+
+        if ($competition->show_judge_reactions) {
+            $submissionQuery->with(['scores' => function ($query) {
+                $query->where('status', 'completed')
+                    ->with('judge:id,name,profile_photo_url');
+            }]);
+        }
+
+        $submission = $submissionQuery
             ->forCompetition($competitionId)
             ->findOrFail($submissionId);
+
+        if (!$submission->short_url) {
+            do {
+                $shortCode = Str::random(8);
+                $exists = CompetitionSubmission::where('short_url', $shortCode)->exists();
+            } while ($exists);
+
+            $submission->short_url = $shortCode;
+            if (!$submission->share_token) {
+                $submission->share_token = Str::random(32);
+            }
+            $submission->save();
+        }
         
         // Increment view count
         $submission->incrementViewCount();
@@ -72,12 +103,115 @@ class CompetitionSubmissionController extends Controller
     }
 
     /**
+     * Import an image from Pexels (page or direct image URL)
+     */
+    public function importPexelsImage(Request $request)
+    {
+        $url = $request->query('url') ?: $request->input('url');
+
+        if (!$url) {
+            $json = $request->json()->all();
+            $url = $json['url'] ?? null;
+        }
+
+        if (!$url) {
+            $raw = trim((string) $request->getContent());
+            if (filter_var($raw, FILTER_VALIDATE_URL)) {
+                $url = $raw;
+            }
+        }
+
+        if (!$url || !filter_var($url, FILTER_VALIDATE_URL)) {
+            return $this->error('A valid Pexels URL is required.', 422);
+        }
+        $host = parse_url($url, PHP_URL_HOST);
+
+        if (!$host || !preg_match('/(^|\.)pexels\.com$/i', $host)) {
+            return $this->error('Only Pexels URLs are allowed.', 422);
+        }
+
+        $imageUrl = $url;
+
+        if (!preg_match('/(^|\.)images\.pexels\.com$/i', $host)) {
+            if (preg_match('/\/photo\/(\d+)\/?/i', $url, $matches)) {
+                $photoId = $matches[1];
+                $candidate = "https://images.pexels.com/photos/{$photoId}/pexels-photo-{$photoId}.jpeg";
+                $headResponse = Http::timeout(10)
+                    ->withOptions([
+                        'verify' => false,
+                        'allow_redirects' => true,
+                    ])
+                    ->withHeaders([
+                        'User-Agent' => 'Mozilla/5.0',
+                        'Accept' => 'image/*',
+                        'Referer' => 'https://www.pexels.com/',
+                    ])
+                    ->head($candidate);
+
+                if ($headResponse->ok()) {
+                    $imageUrl = $candidate;
+                }
+            }
+
+            if ($imageUrl === $url) {
+            $pageResponse = Http::timeout(20)
+                ->withOptions([
+                    'verify' => false,
+                    'allow_redirects' => true,
+                ])
+                ->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0',
+                    'Accept' => 'text/html,application/xhtml+xml',
+                ])
+                ->get($url);
+            if (!$pageResponse->ok()) {
+                return $this->error('Unable to fetch the Pexels page. Please paste a direct Pexels image link.', 422);
+            }
+
+            $html = $pageResponse->body();
+            if (preg_match('/property="og:image" content="([^"]+)"/i', $html, $matches)) {
+                $imageUrl = $matches[1];
+            } elseif (preg_match('/name="twitter:image" content="([^"]+)"/i', $html, $matches)) {
+                $imageUrl = $matches[1];
+            } elseif (preg_match('/https:\/\/images\.pexels\.com\/photos\/[^"\s]+/i', $html, $matches)) {
+                $imageUrl = $matches[0];
+            }
+            }
+        }
+
+        $imageHost = parse_url($imageUrl, PHP_URL_HOST);
+        if (!$imageHost || !preg_match('/(^|\.)images\.pexels\.com$/i', $imageHost)) {
+            return $this->error('Please provide a Pexels image link.', 422);
+        }
+
+        $imageResponse = Http::timeout(25)
+            ->withOptions([
+                'verify' => false,
+                'allow_redirects' => true,
+            ])
+            ->withHeaders([
+                'User-Agent' => 'Mozilla/5.0',
+                'Accept' => 'image/*',
+                'Referer' => 'https://www.pexels.com/',
+            ])
+            ->get($imageUrl);
+        if (!$imageResponse->ok()) {
+            return $this->error('Unable to download the Pexels image.', 422);
+        }
+
+        $contentType = $imageResponse->header('Content-Type', 'image/jpeg');
+
+        return response($imageResponse->body(), 200, [
+            'Content-Type' => $contentType,
+        ]);
+    }
+
+    /**
      * Submit a photo to competition (authenticated photographers)
      */
-    public function store(Request $request, $competitionId, PhotoMetadataService $metadataService, ImageProcessingService $imageService)
+    public function store(Request $request, Competition $competition, PhotoMetadataService $metadataService, ImageProcessingService $imageService)
     {
-        $competition = Competition::findOrFail($competitionId);
-        
+        $competitionId = $competition->id;
         // Check if competition accepts submissions
         if ($competition->status !== 'active') {
             return $this->error('Competition is not accepting submissions', 403);
@@ -109,7 +243,8 @@ class CompetitionSubmissionController extends Controller
             'camera_model' => 'nullable|string|max:255',
             'camera_settings' => 'nullable|string|max:500',
             'hashtags' => 'nullable|string|max:255',
-            'is_watermarked' => 'boolean'
+            'is_watermarked' => 'boolean',
+            'agree_to_terms' => 'accepted'
         ]);
         
         // Handle image upload with error handling
@@ -213,20 +348,31 @@ class CompetitionSubmissionController extends Controller
             'date_taken' => $validated['date_taken'] ?? null,
             'camera_make' => $validated['camera_make'] ?? null,
             'camera_model' => $validated['camera_model'] ?? null,
-            'camera_settings' => $validated['camera_settings'] ?? null,
+            'camera_settings' => $this->normalizeCameraSettings($validated['camera_settings'] ?? null),
             'hashtags' => $validated['hashtags'] ?? null,
             'is_watermarked' => $validated['is_watermarked'] ?? false,
-            'status' => 'pending_review'
+            'status' => 'pending_review',
+            'terms_accepted_at' => now(),
         ]);
         
         return $this->created($submission, 'Submission uploaded successfully! It will be reviewed before appearing in the gallery.');
     }
 
+    private function normalizeCameraSettings(?string $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return json_encode(['raw' => $value]);
+    }
+
     /**
      * Get my submissions for a competition
      */
-    public function mySubmissions(Request $request, $competitionId)
+    public function mySubmissions(Request $request, Competition $competition)
     {
+        $competitionId = $competition->id;
         $user = $request->user();
         
         $submissions = CompetitionSubmission::with(['competition'])
@@ -241,8 +387,9 @@ class CompetitionSubmissionController extends Controller
     /**
      * Update submission (before deadline, only if pending)
      */
-    public function update(Request $request, $competitionId, $submissionId)
+    public function update(Request $request, Competition $competition, $submissionId)
     {
+        $competitionId = $competition->id;
         $user = $request->user();
         
         $submission = CompetitionSubmission::forCompetition($competitionId)
@@ -279,8 +426,9 @@ class CompetitionSubmissionController extends Controller
     /**
      * Delete submission (before deadline, only if no votes)
      */
-    public function destroy(Request $request, $competitionId, $submissionId)
+    public function destroy(Request $request, Competition $competition, $submissionId)
     {
+        $competitionId = $competition->id;
         $user = $request->user();
         
         $submission = CompetitionSubmission::forCompetition($competitionId)
@@ -309,8 +457,9 @@ class CompetitionSubmissionController extends Controller
     /**
      * Get all submissions for admin moderation (all statuses)
      */
-    public function adminIndex(Request $request, $competitionId)
+    public function adminIndex(Request $request, Competition $competition)
     {
+        $competitionId = $competition->id;
         $query = CompetitionSubmission::with(['photographer.photographer', 'competition'])
             ->forCompetition($competitionId);
         
@@ -337,7 +486,8 @@ class CompetitionSubmissionController extends Controller
             });
         }
         
-        $submissions = $query->orderBy('created_at', 'desc')->paginate(20);
+        $submissions = $query->orderBy('created_at', 'desc')
+            ->paginate($request->get('per_page', 20));
         
         return $this->paginated($submissions, 'Submissions retrieved successfully');
     }
@@ -345,8 +495,9 @@ class CompetitionSubmissionController extends Controller
     /**
      * Approve a submission
      */
-    public function approve(Request $request, $competitionId, $submissionId)
+    public function approve(Request $request, Competition $competition, $submissionId)
     {
+        $competitionId = $competition->id;
         $submission = CompetitionSubmission::forCompetition($competitionId)
             ->findOrFail($submissionId);
         
@@ -365,8 +516,9 @@ class CompetitionSubmissionController extends Controller
     /**
      * Reject a submission
      */
-    public function reject(Request $request, $competitionId, $submissionId)
+    public function reject(Request $request, Competition $competition, $submissionId)
     {
+        $competitionId = $competition->id;
         $validated = $request->validate([
             'reason' => 'required|string|max:500'
         ]);
@@ -389,8 +541,9 @@ class CompetitionSubmissionController extends Controller
     /**
      * Disqualify a submission
      */
-    public function disqualify(Request $request, $competitionId, $submissionId)
+    public function disqualify(Request $request, Competition $competition, $submissionId)
     {
+        $competitionId = $competition->id;
         $validated = $request->validate([
             'reason' => 'required|string|max:500'
         ]);
@@ -409,8 +562,9 @@ class CompetitionSubmissionController extends Controller
     /**
      * Get moderation statistics
      */
-    public function stats($competitionId)
+    public function stats(Competition $competition)
     {
+        $competitionId = $competition->id;
         $total = CompetitionSubmission::forCompetition($competitionId)->count();
         $pending = CompetitionSubmission::forCompetition($competitionId)->pending()->count();
         $approved = CompetitionSubmission::forCompetition($competitionId)->approved()->count();
@@ -432,6 +586,10 @@ class CompetitionSubmissionController extends Controller
     public function allSubmissions(Request $request)
     {
         $query = CompetitionSubmission::with(['photographer.photographer', 'competition']);
+
+        if ($request->filled('competition_id')) {
+            $query->where('competition_id', $request->get('competition_id'));
+        }
         
         // Filter by status
         if ($request->has('status')) {
@@ -458,8 +616,22 @@ class CompetitionSubmissionController extends Controller
                   });
             });
         }
+
+        if ($request->filled('score_range')) {
+            $range = $request->get('score_range');
+            $scoreExpr = 'COALESCE(final_score, judge_score)';
+
+            if ($range === 'high') {
+                $query->whereRaw("{$scoreExpr} >= ?", [8]);
+            } elseif ($range === 'medium') {
+                $query->whereRaw("{$scoreExpr} >= ? AND {$scoreExpr} < ?", [5, 8]);
+            } elseif ($range === 'low') {
+                $query->whereRaw("{$scoreExpr} < ?", [5]);
+            }
+        }
         
-        $submissions = $query->orderBy('created_at', 'desc')->paginate(20);
+        $submissions = $query->orderBy('created_at', 'desc')
+            ->paginate($request->get('per_page', 20));
         
         return $this->paginated($submissions, 'All submissions retrieved successfully');
     }

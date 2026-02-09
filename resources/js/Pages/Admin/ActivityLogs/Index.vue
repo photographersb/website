@@ -11,28 +11,80 @@
       <div class="content-card">
         <div class="filters-bar">
           <div class="search-box">
-            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg
+              class="search-icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
-            <input v-model="filters.search" @input="debounceSearch" type="text" placeholder="Search activity..." class="search-input" />
+            <input
+              v-model="filters.search"
+              type="text"
+              placeholder="Search activity..."
+              class="search-input"
+              @input="debounceSearch"
+            >
           </div>
 
-          <input v-model="filters.model_type" @input="debounceSearch" type="text" placeholder="Model type" class="filter-input" />
-          <input v-model="filters.action" @input="debounceSearch" type="text" placeholder="Action" class="filter-input" />
-          <input v-model="filters.from_date" @change="fetchLogs" type="date" class="filter-input" />
-          <input v-model="filters.to_date" @change="fetchLogs" type="date" class="filter-input" />
+          <input
+            v-model="filters.model_type"
+            type="text"
+            placeholder="Model type"
+            class="filter-input"
+            @input="debounceSearch"
+          >
+          <input
+            v-model="filters.action"
+            type="text"
+            placeholder="Action"
+            class="filter-input"
+            @input="debounceSearch"
+          >
+          <input
+            v-model="filters.from_date"
+            type="date"
+            class="filter-input"
+            @change="fetchLogs(1)"
+          >
+          <input
+            v-model="filters.to_date"
+            type="date"
+            class="filter-input"
+            @change="fetchLogs(1)"
+          >
         </div>
 
-        <div v-if="loading" class="loading-state">
-          <div class="spinner"></div>
+        <div
+          v-if="loading"
+          class="loading-state"
+        >
+          <div class="spinner" />
           <p>Loading activity logs...</p>
         </div>
 
-        <div v-else-if="logs.length > 0" class="logs-list">
-          <div v-for="log in logs" :key="log.id" class="log-item">
+        <div
+          v-else-if="logs.length > 0"
+          class="logs-list"
+        >
+          <div
+            v-for="log in logs"
+            :key="log.id"
+            class="log-item"
+          >
             <div class="log-main">
-              <div class="log-title">{{ log.action }} • {{ log.model_type || 'N/A' }}</div>
-              <div class="log-description">{{ log.description || '—' }}</div>
+              <div class="log-title">
+                {{ log.action }} • {{ log.model_type || 'N/A' }}
+              </div>
+              <div class="log-description">
+                {{ log.description || '—' }}
+              </div>
             </div>
             <div class="log-meta">
               <span>{{ log.user?.name || 'System' }}</span>
@@ -41,30 +93,72 @@
           </div>
         </div>
 
-        <div v-else class="empty-state">
-          <div class="empty-icon">📊</div>
-          <p class="empty-title">No activity found</p>
+        <div
+          v-else-if="!hasFilters"
+          class="empty-state"
+        >
+          <div class="empty-icon">
+            🔎
+          </div>
+          <p class="empty-title">
+            Apply a filter to view logs
+          </p>
         </div>
 
-        <div v-if="meta.total > 0" class="pagination">
-          <div class="pagination-info">Showing {{ logs.length }} of {{ meta.total }} logs</div>
+        <div
+          v-else
+          class="empty-state"
+        >
+          <div class="empty-icon">
+            📊
+          </div>
+          <p class="empty-title">
+            No activity found
+          </p>
+        </div>
+
+        <div
+          v-if="meta.total > 0"
+          class="pagination"
+        >
+          <div class="pagination-info">
+            Showing {{ logs.length }} of {{ meta.total }} logs
+          </div>
           <div class="pagination-controls">
-            <button @click="changePage(meta.current_page - 1)" :disabled="meta.current_page <= 1" class="pagination-btn">Previous</button>
+            <button
+              :disabled="meta.current_page <= 1"
+              class="pagination-btn"
+              @click="changePage(meta.current_page - 1)"
+            >
+              Previous
+            </button>
             <span class="pagination-current">Page {{ meta.current_page }} of {{ meta.last_page }}</span>
-            <button @click="changePage(meta.current_page + 1)" :disabled="meta.current_page >= meta.last_page" class="pagination-btn">Next</button>
+            <button
+              :disabled="meta.current_page >= meta.last_page"
+              class="pagination-btn"
+              @click="changePage(meta.current_page + 1)"
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <div v-if="showToast" class="toast">{{ toastMessage }}</div>
+    <div
+      v-if="showToast"
+      class="toast"
+    >
+      {{ toastMessage }}
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import AdminHeader from '../../../components/AdminHeader.vue'
 import AdminQuickNav from '../../../components/AdminQuickNav.vue'
+import api from '../../../api'
 
 const logs = ref([])
 const loading = ref(false)
@@ -80,11 +174,21 @@ const filters = ref({
 })
 
 const meta = ref({ total: 0, current_page: 1, last_page: 1 })
+const hasFilters = computed(() => {
+  const current = filters.value
+  return Boolean(
+    current.search
+      || current.model_type
+      || current.action
+      || current.from_date
+      || current.to_date
+  )
+})
 
 let searchTimeout = null
 const debounceSearch = () => {
   clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(() => fetchLogs(), 400)
+  searchTimeout = setTimeout(() => fetchLogs(1), 400)
 }
 
 const showToastMessage = (message) => {
@@ -94,21 +198,23 @@ const showToastMessage = (message) => {
 }
 
 const fetchLogs = async (page = 1) => {
+  if (!hasFilters.value) {
+    logs.value = []
+    meta.value = { total: 0, current_page: 1, last_page: 1 }
+    loading.value = false
+    return
+  }
+
   loading.value = true
   try {
-    const token = localStorage.getItem('auth_token')
-    const params = new URLSearchParams()
-    if (filters.value.search) params.append('search', filters.value.search)
-    if (filters.value.model_type) params.append('model_type', filters.value.model_type)
-    if (filters.value.action) params.append('action', filters.value.action)
-    if (filters.value.from_date) params.append('from_date', filters.value.from_date)
-    if (filters.value.to_date) params.append('to_date', filters.value.to_date)
-    params.append('page', page)
+    const params = { page }
+    if (filters.value.search) params.search = filters.value.search
+    if (filters.value.model_type) params.model_type = filters.value.model_type
+    if (filters.value.action) params.action = filters.value.action
+    if (filters.value.from_date) params.from_date = filters.value.from_date
+    if (filters.value.to_date) params.to_date = filters.value.to_date
 
-    const response = await fetch(`/api/v1/admin/activity-logs?${params}`, {
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-    })
-    const data = await response.json()
+    const { data } = await api.get('/admin/activity-logs', { params })
     if (data.status === 'success') {
       logs.value = data.data
       meta.value = {
@@ -126,6 +232,7 @@ const fetchLogs = async (page = 1) => {
 }
 
 const changePage = (page) => {
+  if (!hasFilters.value) return
   if (page >= 1 && page <= meta.value.last_page) fetchLogs(page)
 }
 

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Competition;
 use App\Models\CompetitionSubmission;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class WinnerCalculationService
 {
@@ -17,9 +18,9 @@ class WinnerCalculationService
      */
     public function calculateWinners(Competition $competition, array $config = [])
     {
-        // Default configuration: 40% public votes, 60% judge scores
-        $voteWeight = $config['vote_weight'] ?? 0.4;
-        $judgeWeight = $config['judge_weight'] ?? 0.6;
+        // Default configuration: use competition weights when available
+        $voteWeight = $config['vote_weight'] ?? $competition->vote_weight ?? 0.4;
+        $judgeWeight = $config['judge_weight'] ?? $competition->judge_weight ?? 0.6;
         $numberOfWinners = $config['number_of_winners'] ?? 3; // 1st, 2nd, 3rd
         $honorableMentions = $config['honorable_mentions'] ?? 5; // Top 5-10
         
@@ -240,14 +241,20 @@ class WinnerCalculationService
         $winners = CompetitionSubmission::with(['photographer', 'competition'])
             ->where('competition_id', $competition->id)
             ->where('is_winner', true)
-            ->orderBy('rank', 'asc')
+            ->orderBy('winner_position', 'asc')
+            ->orderByDesc('vote_count')
             ->get();
         
-        $honorableMentions = CompetitionSubmission::with(['photographer', 'competition'])
-            ->where('competition_id', $competition->id)
-            ->where('award_type', 'Honorable Mention')
-            ->orderBy('rank', 'asc')
-            ->get();
+        if (Schema::hasColumn('competition_submissions', 'award_type')) {
+            $honorableMentions = CompetitionSubmission::with(['photographer', 'competition'])
+                ->where('competition_id', $competition->id)
+                ->where('award_type', 'Honorable Mention')
+                ->orderBy('winner_position', 'asc')
+                ->orderByDesc('vote_count')
+                ->get();
+        } else {
+            $honorableMentions = collect();
+        }
         
         return [
             'winners' => $winners,
@@ -269,9 +276,9 @@ class WinnerCalculationService
         return CompetitionSubmission::with(['photographer'])
             ->where('competition_id', $competition->id)
             ->where('status', 'approved')
-            ->whereNotNull('final_score')
-            ->orderBy('rank', 'asc')
-            ->orderBy('final_score', 'desc')
+            ->orderByDesc('vote_count')
+            ->orderByDesc('judge_score')
+            ->orderBy('id')
             ->limit($limit)
             ->get();
     }

@@ -111,15 +111,46 @@ class AdminEventApiController extends Controller
         try {
             DB::beginTransaction();
             
-            // Extract mentor_ids if provided
+            // Extract mentor_ids / mentors if provided
             $mentorIds = $validated['mentor_ids'] ?? [];
-            unset($validated['mentor_ids']); // Remove from validated data
+            $mentors = $validated['mentors'] ?? [];
+            $sponsors = $validated['sponsors'] ?? [];
+            unset($validated['mentor_ids'], $validated['mentors'], $validated['sponsors']);
             
             $event = Event::create($validated);
             
             // Sync mentors if provided
-            if (!empty($mentorIds)) {
+            if (!empty($mentors)) {
+                $syncData = [];
+                foreach ($mentors as $index => $mentorRow) {
+                    $mentorId = $mentorRow['mentor_id'] ?? null;
+                    if (!$mentorId) {
+                        continue;
+                    }
+                    $syncData[$mentorId] = [
+                        'role' => $mentorRow['role'] ?? 'mentor',
+                        'sort_order' => $mentorRow['sort_order'] ?? $index,
+                    ];
+                }
+                $event->mentors()->sync($syncData);
+            } elseif (!empty($mentorIds)) {
                 $event->mentors()->sync($mentorIds);
+            }
+
+            if (!empty($sponsors)) {
+                $syncSponsors = [];
+                foreach ($sponsors as $index => $sponsorRow) {
+                    $sponsorId = $sponsorRow['sponsor_id'] ?? null;
+                    if (!$sponsorId) {
+                        continue;
+                    }
+                    $syncSponsors[$sponsorId] = [
+                        'tier' => $sponsorRow['tier'] ?? 'bronze',
+                        'sort_order' => $sponsorRow['sort_order'] ?? $index,
+                        'sponsored_amount' => $sponsorRow['sponsored_amount'] ?? null,
+                    ];
+                }
+                $event->sponsors()->sync($syncSponsors);
             }
             
             DB::commit();
@@ -132,7 +163,7 @@ class AdminEventApiController extends Controller
                 'admin_id' => auth()->id(),
             ]);
 
-            return $this->created($event->load(['organizer.user', 'city', 'mentors']), 'Event created successfully');
+            return $this->created($event->load(['organizer.user', 'city', 'mentors', 'sponsors']), 'Event created successfully');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to create event', [
@@ -174,15 +205,46 @@ class AdminEventApiController extends Controller
         try {
             DB::beginTransaction();
             
-            // Extract mentor_ids if provided
+            // Extract mentor_ids / mentors / sponsors if provided
             $mentorIds = $validated['mentor_ids'] ?? null;
-            unset($validated['mentor_ids']); // Remove from validated data
+            $mentors = $validated['mentors'] ?? null;
+            $sponsors = $validated['sponsors'] ?? null;
+            unset($validated['mentor_ids'], $validated['mentors'], $validated['sponsors']);
             
             $event->update($validated);
             
             // Sync mentors if provided (null means don't touch, empty array means clear all)
-            if ($mentorIds !== null) {
+            if ($mentors !== null) {
+                $syncData = [];
+                foreach ($mentors as $index => $mentorRow) {
+                    $mentorId = $mentorRow['mentor_id'] ?? null;
+                    if (!$mentorId) {
+                        continue;
+                    }
+                    $syncData[$mentorId] = [
+                        'role' => $mentorRow['role'] ?? 'mentor',
+                        'sort_order' => $mentorRow['sort_order'] ?? $index,
+                    ];
+                }
+                $event->mentors()->sync($syncData);
+            } elseif ($mentorIds !== null) {
                 $event->mentors()->sync($mentorIds);
+            }
+
+            if ($sponsors !== null) {
+                $syncSponsors = [];
+                foreach ($sponsors as $index => $sponsorRow) {
+                    $sponsorId = $sponsorRow['sponsor_id'] ?? null;
+                    if (!$sponsorId) {
+                        continue;
+                    }
+                    $syncSponsors[$sponsorId] = [
+                        'tier' => $sponsorRow['tier'] ?? 'bronze',
+                        'sort_order' => $sponsorRow['sort_order'] ?? $index,
+                        'sponsored_amount' => $sponsorRow['sponsored_amount'] ?? null,
+                    ];
+                }
+                $event->sponsors()->sync($syncSponsors);
             }
             
             DB::commit();
@@ -196,7 +258,7 @@ class AdminEventApiController extends Controller
             
             // Clear events stats cache
             Cache::forget('events_stats');
-            return $this->success($event->load(['organizer.user', 'city', 'mentors']), 'Event updated successfully');
+            return $this->success($event->load(['organizer.user', 'city', 'mentors', 'sponsors']), 'Event updated successfully');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to update event', [
@@ -256,8 +318,8 @@ class AdminEventApiController extends Controller
     public function bulkUpdateStatus(Request $request)
     {
         $validated = $request->validate([
-            'event_ids' => 'required|array',
-            'event_ids.*' => 'exists:events,id',
+            'event_ids' => 'required|array|min:1|max:100',
+            'event_ids.*' => 'required|integer|exists:events,id',
             'status' => 'required|in:draft,published,cancelled',
         ]);
 

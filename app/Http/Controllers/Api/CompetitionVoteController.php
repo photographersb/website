@@ -13,15 +13,20 @@ use Illuminate\Support\Facades\Cache;
 
 class CompetitionVoteController extends Controller
 {
+    use ApiResponse;
     /**
      * Vote for a submission (with distributed lock to prevent race conditions)
      */
-    public function vote(Request $request, $competitionId, $submissionId)
+    public function vote(Request $request, Competition $competition, CompetitionSubmission $submission)
     {
         $user = $request->user();
+
+        if (!$user) {
+            return $this->error('Login required to vote', 401);
+        }
         
         // Distributed lock to prevent duplicate votes from rapid clicking
-        $lockKey = "vote:lock:{$user->id}:{$submissionId}";
+        $lockKey = "vote:lock:{$user->id}:{$submission->id}";
         $lock = Cache::lock($lockKey, 5);
         
         if (!$lock->get()) {
@@ -29,10 +34,9 @@ class CompetitionVoteController extends Controller
         }
         
         try {
-            // Get competition and submission
-            $competition = Competition::findOrFail($competitionId);
-            $submission = CompetitionSubmission::forCompetition($competitionId)
-                ->findOrFail($submissionId);
+            if ($submission->competition_id !== $competition->id) {
+                return $this->error('Submission does not belong to this competition', 404);
+            }
         
         // Check if submission is approved
         if ($submission->status !== 'approved') {
@@ -43,9 +47,25 @@ class CompetitionVoteController extends Controller
         if ($competition->status !== 'published' && $competition->status !== 'active') {
             return $this->error('Competition is not accepting votes at this time', 403);
         }
+
+        if (!$competition->voting_enabled && !$competition->allow_public_voting) {
+            return $this->error('Public voting is disabled for this competition', 403);
+        }
+
+        $votingStart = $competition->voting_start_date ?? $competition->voting_start_at;
+        $votingEnd = $competition->voting_end_date ?? $competition->voting_end_at;
+
+        if ($votingStart && now()->isBefore($votingStart)) {
+            return $this->error('Voting has not started yet', 403);
+        }
+
+        if ($votingEnd && now()->isAfter($votingEnd)) {
+            return $this->error('Voting deadline has passed', 403);
+        }
         
         // Check voting deadline
-        if ($competition->voting_deadline && now()->isAfter($competition->voting_deadline)) {
+        // Legacy deadline field check (if present)
+        if (!empty($competition->voting_deadline) && now()->isAfter($competition->voting_deadline)) {
             return $this->error('Voting deadline has passed', 403);
         }
         
@@ -55,8 +75,11 @@ class CompetitionVoteController extends Controller
         }
         
         // Check if user already voted
-        $existingVote = CompetitionVote::where('submission_id', $submissionId)
-            ->where('voter_id', $user->id)
+        $existingVote = CompetitionVote::where('submission_id', $submission->id)
+            ->where(function ($query) use ($user) {
+                $query->where('voter_id', $user->id)
+                    ->orWhere('voter_user_id', $user->id);
+            })
             ->first();
         
         if ($existingVote) {
@@ -64,14 +87,17 @@ class CompetitionVoteController extends Controller
         }
         
         // Create vote
-        DB::transaction(function () use ($submission, $user, $competitionId, $submissionId, $request) {
+        DB::transaction(function () use ($submission, $user, $competition, $request) {
             CompetitionVote::create([
-                'submission_id' => $submissionId,
+            'submission_id' => $submission->id,
                 'voter_id' => $user->id,
-                'competition_id' => $competitionId,
+                'voter_user_id' => $user->id,
+            'competition_id' => $competition->id,
                 'vote_value' => 1,
                 'voted_at' => now(),
                 'ip_address' => $request->ip(),
+                'ip' => $request->ip(),
+                'user_agent' => (string) $request->userAgent(),
                 'is_verified' => true,
                 'is_valid' => true
             ]);
@@ -81,7 +107,7 @@ class CompetitionVoteController extends Controller
         });
         
         // Clear cache
-        Cache::forget("competition:{$competitionId}:details");
+        Cache::forget("competition:{$competition->id}:details");
         
         return $this->success([
             'vote_count' => $submission->fresh()->vote_count
@@ -94,19 +120,25 @@ class CompetitionVoteController extends Controller
     /**
      * Remove vote from a submission
      */
-    public function unvote(Request $request, $competitionId, $submissionId)
+    public function unvote(Request $request, Competition $competition, CompetitionSubmission $submission)
     {
         $user = $request->user();
+
+        if (!$user) {
+            return $this->error('Login required to remove vote', 401);
+        }
+
+        if ($submission->competition_id !== $competition->id) {
+            return $this->error('Submission does not belong to this competition', 404);
+        }
         
-        $vote = CompetitionVote::where('submission_id', $submissionId)
+        $vote = CompetitionVote::where('submission_id', $submission->id)
             ->where('voter_id', $user->id)
             ->first();
         
         if (!$vote) {
             return $this->notFound('Vote not found');
         }
-        
-        $submission = CompetitionSubmission::findOrFail($submissionId);
         
         DB::transaction(function () use ($vote, $submission) {
             $vote->delete();
@@ -121,7 +153,7 @@ class CompetitionVoteController extends Controller
     /**
      * Check if user has voted on a submission
      */
-    public function checkVote(Request $request, $competitionId, $submissionId)
+    public function checkVote(Request $request, Competition $competition, CompetitionSubmission $submission)
     {
         $user = $request->user();
         
@@ -131,7 +163,13 @@ class CompetitionVoteController extends Controller
             ], 'Vote check retrieved successfully');
         }
         
-        $hasVoted = CompetitionVote::where('submission_id', $submissionId)
+        if ($submission->competition_id !== $competition->id) {
+            return $this->success([
+                'has_voted' => false
+            ], 'Vote check retrieved successfully');
+        }
+
+        $hasVoted = CompetitionVote::where('submission_id', $submission->id)
             ->where('voter_id', $user->id)
             ->exists();
         

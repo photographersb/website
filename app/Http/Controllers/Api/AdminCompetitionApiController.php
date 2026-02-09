@@ -5,11 +5,38 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
 use App\Models\Competition;
+use App\Models\Judge;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AdminCompetitionApiController extends Controller
 {
     use ApiResponse;
+
+    protected function resolveJudgeUserIds(array $judgeIds): ?array
+    {
+        if (empty($judgeIds)) {
+            return [];
+        }
+
+        $idList = collect($judgeIds)->filter()->values();
+        if ($idList->isEmpty()) {
+            return [];
+        }
+
+        $profileMap = Judge::whereIn('id', $idList)->pluck('user_id', 'id');
+        $mappedIds = $idList->map(function ($id) use ($profileMap) {
+            return $profileMap->get($id, $id);
+        })->unique()->values();
+
+        $validUserIds = User::whereIn('id', $mappedIds)->pluck('id')->all();
+
+        if (count($validUserIds) !== $mappedIds->count()) {
+            return null;
+        }
+
+        return $validUserIds;
+    }
     /**
      * Get all competitions for admin
      */
@@ -93,7 +120,7 @@ class AdminCompetitionApiController extends Controller
             'slug' => 'nullable|string|max:255|unique:competitions,slug',
             'theme' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'category_id' => 'nullable|exists:photography_categories,id',
+            'category_id' => 'nullable|exists:categories,id',
             'hero_image' => 'nullable|url',
             'banner_image' => 'nullable|url',
             'submission_deadline' => 'required|date|after:now',
@@ -124,7 +151,7 @@ class AdminCompetitionApiController extends Controller
             'sponsor_ids' => 'nullable|array',
             'sponsor_ids.*' => 'exists:sponsors,id',
             'judge_ids' => 'nullable|array',
-            'judge_ids.*' => 'exists:users,id',
+            'judge_ids.*' => 'integer',
         ]);
 
         // Auto-generate slug if not provided
@@ -147,6 +174,10 @@ class AdminCompetitionApiController extends Controller
         // Store sponsors and judges for later attachment
         $sponsorIds = $validated['sponsor_ids'] ?? [];
         $judgeIds = $validated['judge_ids'] ?? [];
+        $resolvedJudgeIds = $this->resolveJudgeUserIds($judgeIds);
+        if ($resolvedJudgeIds === null) {
+            return $this->validationError(['judge_ids' => 'Invalid judge selection.'], 'Validation failed');
+        }
         
         // Remove these from validated to avoid mass assignment errors
         unset($validated['sponsor_ids']);
@@ -163,8 +194,8 @@ class AdminCompetitionApiController extends Controller
             }
 
             // Attach judges if provided
-            if (!empty($judgeIds)) {
-                $competition->judgeUsers()->attach($judgeIds);
+            if (!empty($resolvedJudgeIds)) {
+                $competition->judgeUsers()->attach($resolvedJudgeIds);
             }
 
             \DB::commit();
@@ -193,7 +224,7 @@ class AdminCompetitionApiController extends Controller
             'slug' => 'nullable|string|max:255|unique:competitions,slug,' . $id,
             'theme' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
-            'category_id' => 'nullable|exists:photography_categories,id',
+            'category_id' => 'nullable|exists:categories,id',
             'hero_image' => 'nullable|url',
             'banner_image' => 'nullable|url',
             'submission_deadline' => 'sometimes|required|date',
@@ -224,12 +255,19 @@ class AdminCompetitionApiController extends Controller
             'sponsor_ids' => 'nullable|array',
             'sponsor_ids.*' => 'exists:sponsors,id',
             'judge_ids' => 'nullable|array',
-            'judge_ids.*' => 'exists:users,id',
+            'judge_ids.*' => 'integer',
         ]);
 
         // Store sponsors and judges for later attachment
         $sponsorIds = $validated['sponsor_ids'] ?? null;
         $judgeIds = $validated['judge_ids'] ?? null;
+        $resolvedJudgeIds = null;
+        if ($judgeIds !== null) {
+            $resolvedJudgeIds = $this->resolveJudgeUserIds($judgeIds);
+            if ($resolvedJudgeIds === null) {
+                return $this->validationError(['judge_ids' => 'Invalid judge selection.'], 'Validation failed');
+            }
+        }
         
         // Remove these from validated to avoid mass assignment errors
         unset($validated['sponsor_ids']);
@@ -246,8 +284,8 @@ class AdminCompetitionApiController extends Controller
             }
 
             // Update judges if provided
-            if ($judgeIds !== null) {
-                $competition->judgeUsers()->sync($judgeIds);
+            if ($resolvedJudgeIds !== null) {
+                $competition->judgeUsers()->sync($resolvedJudgeIds);
             }
 
             \DB::commit();

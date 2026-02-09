@@ -1,23 +1,42 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-8 md:py-12">
     <div class="container mx-auto px-4 max-w-2xl">
-      <h1 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Create Booking Inquiry</h1>
+      <h1 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8">
+        Create Booking Inquiry
+      </h1>
 
-      <div v-if="photographer" class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
+      <div
+        v-if="photographer"
+        class="bg-white rounded-lg shadow p-4 md:p-6 mb-6"
+      >
         <div class="flex items-center gap-3 md:gap-4">
           <img
-            :src="photographer.profile_picture || 'https://via.placeholder.com/80'"
+            :src="photographer.profile_picture || '/images/placeholder.svg'"
             :alt="photographer.user?.name || 'Photographer'"
             class="w-12 h-12 md:w-16 md:h-16 rounded-full object-cover"
-          />
+          >
           <div>
-            <h2 class="text-lg md:text-xl font-bold">{{ photographer.user?.name || photographer.business_name || 'Unknown' }}</h2>
-            <p class="text-gray-600 text-xs md:text-sm">{{ photographer.bio }}</p>
+            <h2 class="text-lg md:text-xl font-bold">
+              {{ photographer.user?.name || photographer.business_name || 'Unknown' }}
+            </h2>
+            <p class="text-gray-600 text-xs md:text-sm">
+              {{ photographer.bio }}
+            </p>
           </div>
         </div>
       </div>
 
-      <form @submit.prevent="submitInquiry" class="bg-white rounded-lg shadow p-6 md:p-8 space-y-5 md:space-y-6">
+      <div
+        v-if="isSelfBooking"
+        class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700"
+      >
+        You cannot create a booking request for your own profile.
+      </div>
+
+      <form
+        class="bg-white rounded-lg shadow p-6 md:p-8 space-y-5 md:space-y-6"
+        @submit.prevent="submitInquiry"
+      >
         <!-- Event Date -->
         <div>
           <label class="block text-sm font-medium mb-2">Event Date *</label>
@@ -26,8 +45,13 @@
             type="date"
             required
             class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-burgundy"
-          />
-          <p v-if="errors.event_date" class="mt-1 text-sm text-red-600">{{ errors.event_date[0] }}</p>
+          >
+          <p
+            v-if="errors.event_date"
+            class="mt-1 text-sm text-red-600"
+          >
+            {{ errors.event_date[0] }}
+          </p>
         </div>
 
         <!-- Event Location -->
@@ -39,8 +63,75 @@
             placeholder="Enter location"
             required
             class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-burgundy"
-          />
-          <p v-if="errors.event_location" class="mt-1 text-sm text-red-600">{{ errors.event_location[0] }}</p>
+          >
+          <p
+            v-if="errors.event_location"
+            class="mt-1 text-sm text-red-600"
+          >
+            {{ errors.event_location[0] }}
+          </p>
+        </div>
+
+        <!-- Event Type -->
+        <div>
+          <label class="block text-sm font-medium mb-2">Event Type</label>
+          <input
+            v-model="form.event_type_detail"
+            type="text"
+            placeholder="Wedding, birthday, corporate, etc"
+            class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-burgundy"
+          >
+          <p
+            v-if="errors.event_type_detail"
+            class="mt-1 text-sm text-red-600"
+          >
+            {{ errors.event_type_detail[0] }}
+          </p>
+        </div>
+
+        <!-- Indoor / Outdoor -->
+        <div>
+          <label class="block text-sm font-medium mb-2">Indoor / Outdoor</label>
+          <select
+            v-model="form.indoor_outdoor"
+            class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-burgundy"
+          >
+            <option value="">
+              Select
+            </option>
+            <option value="indoor">
+              Indoor
+            </option>
+            <option value="outdoor">
+              Outdoor
+            </option>
+            <option value="both">
+              Both
+            </option>
+          </select>
+          <p
+            v-if="errors.indoor_outdoor"
+            class="mt-1 text-sm text-red-600"
+          >
+            {{ errors.indoor_outdoor[0] }}
+          </p>
+        </div>
+
+        <!-- Preferred Time Slot -->
+        <div>
+          <label class="block text-sm font-medium mb-2">Preferred Time Slot</label>
+          <input
+            v-model="form.preferred_time_slot"
+            type="text"
+            placeholder="Morning, afternoon, evening"
+            class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-burgundy"
+          >
+          <p
+            v-if="errors.preferred_time_slot"
+            class="mt-1 text-sm text-red-600"
+          >
+            {{ errors.preferred_time_slot[0] }}
+          </p>
         </div>
 
         <!-- Guest Count -->
@@ -52,8 +143,30 @@
             min="1"
             required
             class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-burgundy"
-          />
-          <p v-if="errors.guest_count" class="mt-1 text-sm text-red-600">{{ errors.guest_count[0] }}</p>
+          >
+          <p
+            v-if="errors.guest_count"
+            class="mt-1 text-sm text-red-600"
+          >
+            {{ errors.guest_count[0] }}
+          </p>
+        </div>
+
+        <!-- Package ID -->
+        <div>
+          <label class="block text-sm font-medium mb-2">Package ID (Optional)</label>
+          <input
+            v-model.number="form.package_id"
+            type="number"
+            min="1"
+            class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-burgundy"
+          >
+          <p
+            v-if="errors.package_id"
+            class="mt-1 text-sm text-red-600"
+          >
+            {{ errors.package_id[0] }}
+          </p>
         </div>
 
         <!-- Budget Range -->
@@ -64,7 +177,7 @@
               v-model.number="form.budget_min"
               type="number"
               class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-burgundy"
-            />
+            >
           </div>
           <div>
             <label class="block text-sm font-medium mb-2">Budget Max (৳)</label>
@@ -72,7 +185,7 @@
               v-model.number="form.budget_max"
               type="number"
               class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-burgundy"
-            />
+            >
           </div>
         </div>
 
@@ -84,20 +197,74 @@
             placeholder="Any special requests or requirements..."
             rows="4"
             class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-burgundy"
-          ></textarea>
+          />
+        </div>
+
+        <!-- Additional Services -->
+        <div>
+          <label class="block text-sm font-medium mb-2">Additional Services</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <label class="flex items-center gap-2 text-sm text-gray-700">
+              <input v-model="form.additional_services" type="checkbox" value="videography">
+              Videography
+            </label>
+            <label class="flex items-center gap-2 text-sm text-gray-700">
+              <input v-model="form.additional_services" type="checkbox" value="drone">
+              Drone
+            </label>
+            <label class="flex items-center gap-2 text-sm text-gray-700">
+              <input v-model="form.additional_services" type="checkbox" value="album">
+              Album
+            </label>
+            <label class="flex items-center gap-2 text-sm text-gray-700">
+              <input v-model="form.additional_services" type="checkbox" value="photo_booth">
+              Photo booth
+            </label>
+          </div>
+          <p
+            v-if="errors.additional_services"
+            class="mt-1 text-sm text-red-600"
+          >
+            {{ errors.additional_services[0] }}
+          </p>
+        </div>
+
+        <!-- Coordinates -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-2">Latitude (Optional)</label>
+            <input
+              v-model.number="form.latitude"
+              type="number"
+              step="0.000001"
+              class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-burgundy"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2">Longitude (Optional)</label>
+            <input
+              v-model.number="form.longitude"
+              type="number"
+              step="0.000001"
+              class="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-burgundy"
+            >
+          </div>
         </div>
 
         <!-- Submit -->
         <button
           type="submit"
-          :disabled="submitting"
+          :disabled="submitting || isSelfBooking"
           class="w-full bg-burgundy text-white py-3 rounded-lg hover:bg-[#6F112D] disabled:opacity-50"
         >
-          {{ submitting ? 'Sending...' : 'Send Inquiry' }}
+          {{ isSelfBooking ? 'Self Booking Blocked' : (submitting ? 'Sending...' : 'Send Inquiry') }}
         </button>
 
         <!-- Message -->
-        <div v-if="message" :class="`p-4 rounded ${error ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`">
+        <div
+          v-if="message"
+          :class="`p-4 rounded ${error ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`"
+        >
           {{ message }}
         </div>
       </form>
@@ -106,7 +273,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../api';
 
@@ -114,20 +281,32 @@ const route = useRoute();
 const router = useRouter();
 
 const photographer = ref(null);
+const currentUser = ref(null);
 const form = ref({
   photographer_id: route.params.id,
+  package_id: null,
   event_date: '',
   event_location: '',
+  preferred_time_slot: '',
+  event_type_detail: '',
+  indoor_outdoor: '',
+  latitude: null,
+  longitude: null,
   guest_count: 1,
   budget_min: null,
   budget_max: null,
   requirements: '',
+  additional_services: [],
 });
 
 const submitting = ref(false);
 const message = ref('');
 const error = ref(false);
 const errors = ref({});
+
+const isSelfBooking = computed(() => {
+  return !!currentUser.value?.photographer?.id && photographer.value?.id === currentUser.value.photographer.id;
+});
 
 const fetchPhotographer = async () => {
   try {
@@ -143,6 +322,9 @@ const fetchPhotographer = async () => {
 };
 
 const submitInquiry = async () => {
+  if (isSelfBooking.value) {
+    return;
+  }
   submitting.value = true;
   error.value = false;
   message.value = '';
@@ -178,6 +360,14 @@ const submitInquiry = async () => {
 };
 
 onMounted(() => {
+  const storedUser = localStorage.getItem('user');
+  if (storedUser) {
+    try {
+      currentUser.value = JSON.parse(storedUser);
+    } catch (e) {
+      currentUser.value = null;
+    }
+  }
   fetchPhotographer();
 });
 </script>

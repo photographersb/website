@@ -1,57 +1,103 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-12">
     <div class="container mx-auto px-4">
-      <h1 class="text-3xl font-bold mb-8">Photography Competitions</h1>
+      <h1 class="text-3xl font-bold mb-8">
+        Photography Competitions
+      </h1>
 
       <!-- Filters -->
       <div class="bg-white rounded-lg shadow p-6 mb-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label class="block text-sm font-medium mb-2">Status</label>
-            <select v-model="filters.status" class="w-full border rounded px-3 py-2">
-              <option value="">All Competitions</option>
-              <option value="upcoming">Upcoming</option>
-              <option value="active">Active</option>
-              <option value="voting">Voting Phase</option>
-              <option value="completed">Completed</option>
+            <select
+              v-model="filters.status"
+              class="w-full border rounded px-3 py-2"
+            >
+              <option value="">
+                All Competitions
+              </option>
+              <option value="upcoming">
+                Upcoming
+              </option>
+              <option value="active">
+                Active
+              </option>
+              <option value="voting">
+                Voting Phase
+              </option>
+              <option value="completed">
+                Completed
+              </option>
             </select>
           </div>
           <div>
             <label class="block text-sm font-medium mb-2">Category</label>
-            <select v-model="filters.category" class="w-full border rounded px-3 py-2">
-              <option value="">All Categories</option>
-              <option v-for="cat in categories" :key="cat.id" :value="cat.slug">
+            <select
+              v-model="filters.category"
+              class="w-full border rounded px-3 py-2"
+            >
+              <option value="">
+                All Categories
+              </option>
+              <option
+                v-for="cat in categories"
+                :key="cat.id"
+                :value="cat.slug"
+              >
                 {{ cat.name }}
               </option>
             </select>
           </div>
           <div>
             <label class="block text-sm font-medium mb-2">Sort By</label>
-            <select v-model="filters.sort" class="w-full border rounded px-3 py-2">
-              <option value="newest">Newest First</option>
-              <option value="prize">Highest Prize</option>
-              <option value="entries">Most Entries</option>
+            <select
+              v-model="filters.sort"
+              class="w-full border rounded px-3 py-2"
+            >
+              <option value="newest">
+                Newest First
+              </option>
+              <option value="prize">
+                Highest Prize
+              </option>
+              <option value="entries">
+                Most Entries
+              </option>
             </select>
           </div>
         </div>
         <button
-          @click="fetchCompetitions"
           class="mt-4 bg-burgundy text-white px-6 py-2 rounded hover:bg-[#6F112D]"
+          @click="fetchCompetitions"
         >
           Apply Filters
         </button>
       </div>
 
       <!-- Competitions Grid -->
-      <div v-if="loading" class="text-center py-12">
-        <p class="text-gray-600">Loading competitions...</p>
+      <div
+        v-if="loading"
+        class="text-center py-12"
+      >
+        <p class="text-gray-600">
+          Loading competitions...
+        </p>
       </div>
 
-      <div v-else-if="competitions.length === 0" class="text-center py-12">
-        <p class="text-gray-600">No competitions found</p>
+      <div
+        v-else-if="competitions.length === 0"
+        class="text-center py-12"
+      >
+        <p class="text-gray-600">
+          No competitions found
+        </p>
       </div>
 
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        v-else
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
         <div
           v-for="competition in competitions"
           :key="competition.id"
@@ -62,17 +108,21 @@
             :src="competition.cover_image_url || 'https://placehold.co/400x250/8E0E3F/FFFFFF?text=Competition'"
             :alt="competition.title"
             class="w-full h-48 object-cover"
-          />
+          >
           <div class="p-6">
             <div class="flex justify-between items-start mb-2">
-              <h3 class="text-xl font-bold">{{ competition.title }}</h3>
+              <h3 class="text-xl font-bold">
+                {{ competition.title }}
+              </h3>
               <span
                 :class="`px-3 py-1 rounded-full text-xs ${getStatusBadgeClass(competition.status)}`"
               >
                 {{ competition.status }}
               </span>
             </div>
-            <p class="text-gray-600 text-sm mb-4">{{ competition.description }}</p>
+            <p class="text-gray-600 text-sm mb-4">
+              {{ competition.description }}
+            </p>
 
             <div class="space-y-2 mb-4 text-sm">
               <div class="flex justify-between">
@@ -90,9 +140,9 @@
             </div>
 
             <button
-              @click.stop="participateInCompetition(competition)"
               class="w-full bg-burgundy text-white py-2 rounded hover:bg-[#6F112D]"
               :disabled="competition.status === 'completed'"
+              @click.stop="participateInCompetition(competition)"
             >
               {{ competition.status === 'completed' ? 'Ended' : 'View Details' }}
             </button>
@@ -104,16 +154,16 @@
       <div class="flex justify-center gap-2 mt-12">
         <button
           v-if="currentPage > 1"
-          @click="previousPage"
           class="px-4 py-2 border rounded hover:bg-gray-100"
+          @click="previousPage"
         >
           Previous
         </button>
         <span class="px-4 py-2">Page {{ currentPage }} of {{ totalPages }}</span>
         <button
           v-if="currentPage < totalPages"
-          @click="nextPage"
           class="px-4 py-2 border rounded hover:bg-gray-100"
+          @click="nextPage"
         >
           Next
         </button>
@@ -126,6 +176,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '../api';
+import { formatDate as formatDateValue } from '../utils/formatters';
 
 const router = useRouter();
 const competitions = ref([]);
@@ -196,11 +247,7 @@ const getStatusBadgeClass = (status) => {
 };
 
 const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  return formatDateValue(date);
 };
 
 const previousPage = () => {

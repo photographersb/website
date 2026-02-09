@@ -1,6 +1,9 @@
 <template>
-  <div class="skeleton" :class="[`skeleton-${type}`, { 'skeleton-animated': animated }]">
-    <div class="skeleton-loader"></div>
+  <div
+    class="skeleton"
+    :class="[`skeleton-${type}`, { 'skeleton-animated': animated }]"
+  >
+    <div class="skeleton-loader" />
   </div>
 </template>
 

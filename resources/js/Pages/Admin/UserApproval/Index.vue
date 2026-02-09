@@ -10,317 +10,458 @@
 
       <!-- Stats Grid -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <div class="stat-card stat-yellow">
-        <div class="stat-icon">⏳</div>
-        <div class="stat-content">
-          <span class="stat-label">Pending Approval</span>
-          <span class="stat-value">{{ stats.pending }}</span>
-        </div>
-      </div>
-
-      <div class="stat-card stat-green">
-        <div class="stat-icon">✓</div>
-        <div class="stat-content">
-          <span class="stat-label">Approved</span>
-          <span class="stat-value">{{ stats.approved }}</span>
-        </div>
-      </div>
-
-      <div class="stat-card stat-red">
-        <div class="stat-icon">✕</div>
-        <div class="stat-content">
-          <span class="stat-label">Rejected</span>
-          <span class="stat-value">{{ stats.rejected }}</span>
-        </div>
-      </div>
-
-      <div class="stat-card stat-blue">
-        <div class="stat-icon">👥</div>
-        <div class="stat-content">
-          <span class="stat-label">Total Users</span>
-          <span class="stat-value">{{ stats.total }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Filters & Actions -->
-    <div class="content-card">
-      <div class="filters-bar">
-        <div class="search-box">
-          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input 
-            v-model="filters.search" 
-            @input="fetchUsers"
-            type="text" 
-            placeholder="Search by name, email, or phone..." 
-            class="search-input"
-          />
-        </div>
-
-        <select v-model="filters.status" @change="fetchUsers" class="filter-select">
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
-          <option value="">All Status</option>
-        </select>
-
-        <select v-model="filters.role" @change="fetchUsers" class="filter-select">
-          <option value="">All Roles</option>
-          <option value="client">Client</option>
-          <option value="photographer">Photographer</option>
-          <option value="studio_owner">Studio Owner</option>
-        </select>
-
-        <button 
-          v-if="selectedUsers.length > 0" 
-          @click="bulkApprove" 
-          class="btn-approve"
-        >
-          ✓ Approve Selected ({{ selectedUsers.length }})
-        </button>
-      </div>
-
-      <!-- Loading State -->
-      <div v-if="loading" class="loading-state">
-        <div class="spinner"></div>
-        <p>Loading users...</p>
-      </div>
-
-      <!-- Users List -->
-      <div v-else-if="users.length > 0" class="users-container">
-        <div class="table-responsive">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>
-                  <input 
-                    type="checkbox" 
-                    @change="toggleSelectAll"
-                    :checked="selectedUsers.length === users.filter(u => u.approval_status === 'pending').length && users.filter(u => u.approval_status === 'pending').length > 0"
-                  />
-                </th>
-                <th>User</th>
-                <th>Role</th>
-                <th>Contact</th>
-                <th>Email Verified</th>
-                <th>Registered</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="user in users" :key="user.id">
-                <td>
-                  <input 
-                    v-if="user.approval_status === 'pending'"
-                    type="checkbox" 
-                    :value="user.id"
-                    v-model="selectedUsers"
-                  />
-                </td>
-                <td>
-                  <div class="user-cell">
-                    <div class="user-avatar">{{ user.name.charAt(0).toUpperCase() }}</div>
-                    <div>
-                      <div class="user-name">{{ user.name }}</div>
-                      <div class="user-uuid">ID: {{ user.uuid }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span :class="`role-badge role-${user.role}`">
-                    {{ formatRole(user.role) }}
-                  </span>
-                </td>
-                <td>
-                  <div class="contact-cell">
-                    <a :href="`mailto:${user.email}`" class="contact-link">{{ user.email }}</a>
-                    <a v-if="user.phone" :href="`tel:${user.phone}`" class="contact-link">{{ user.phone }}</a>
-                  </div>
-                </td>
-                <td>
-                  <span v-if="user.email_verified_at" class="badge badge-success">✓ Verified</span>
-                  <span v-else class="badge badge-warning">⏳ Pending</span>
-                </td>
-                <td>{{ formatDate(user.created_at) }}</td>
-                <td>
-                  <span :class="`status-badge status-${user.approval_status}`">
-                    {{ user.approval_status.charAt(0).toUpperCase() + user.approval_status.slice(1) }}
-                  </span>
-                </td>
-                <td>
-                  <div class="action-buttons">
-                    <button 
-                      v-if="user.approval_status === 'pending'"
-                      @click="approveUser(user)" 
-                      class="btn-action btn-success" 
-                      title="Approve"
-                    >
-                      ✓
-                    </button>
-                    <button 
-                      v-if="user.approval_status === 'pending'"
-                      @click="openRejectModal(user)" 
-                      class="btn-action btn-danger" 
-                      title="Reject"
-                    >
-                      ✕
-                    </button>
-                    <button 
-                      @click="viewUser(user)" 
-                      class="btn-action" 
-                      title="View Details"
-                    >
-                      👁
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Empty State -->
-      <div v-else class="empty-state">
-        <div class="empty-icon">👥</div>
-        <p class="empty-title">No users found</p>
-        <p class="empty-subtitle">Users awaiting approval will appear here</p>
-      </div>
-    </div>
-
-    <!-- Reject Modal -->
-    <div v-if="showRejectModal" class="modal-overlay" @click.self="showRejectModal = false">
-      <div class="modal modal-sm">
-        <div class="modal-header">
-          <h3>Reject User Registration</h3>
-          <button @click="showRejectModal = false" class="modal-close">×</button>
-        </div>
-        <div class="modal-body">
-          <p class="mb-4">You are about to reject <strong>{{ rejectingUser?.name }}</strong>'s registration.</p>
-          
-          <label class="block text-sm font-medium mb-2">Rejection Reason *</label>
-          <textarea 
-            v-model="rejectReason" 
-            rows="4" 
-            class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-burgundy"
-            placeholder="Please provide a clear reason for rejection..."
-          ></textarea>
-        </div>
-        <div class="modal-footer">
-          <button @click="showRejectModal = false" class="btn-secondary">Cancel</button>
-          <button @click="rejectUser" :disabled="!rejectReason.trim()" class="btn-danger">
-            Reject User
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- View User Modal -->
-    <div v-if="showViewModal" class="modal-overlay" @click.self="showViewModal = false">
-      <div class="modal">
-        <div class="modal-header">
-          <h3>User Details</h3>
-          <button @click="showViewModal = false" class="modal-close">×</button>
-        </div>
-        <div class="modal-body" v-if="selectedUser">
-          <div class="detail-grid">
-            <div class="detail-item">
-              <span class="detail-label">Name:</span>
-              <span class="detail-value">{{ selectedUser.name }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Email:</span>
-              <span class="detail-value">
-                <a :href="`mailto:${selectedUser.email}`" class="text-burgundy hover:underline">
-                  {{ selectedUser.email }}
-                </a>
-              </span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Phone:</span>
-              <span class="detail-value">
-                <a v-if="selectedUser.phone" :href="`tel:${selectedUser.phone}`" class="text-burgundy hover:underline">
-                  {{ selectedUser.phone }}
-                </a>
-                <span v-else class="text-gray-400">Not provided</span>
-              </span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Role:</span>
-              <span class="detail-value">
-                <span :class="`role-badge role-${selectedUser.role}`">
-                  {{ formatRole(selectedUser.role) }}
-                </span>
-              </span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Email Verified:</span>
-              <span class="detail-value">
-                <span v-if="selectedUser.email_verified_at" class="text-success-700">
-                  ✓ {{ formatDate(selectedUser.email_verified_at) }}
-                </span>
-                <span v-else class="text-warning-700">⏳ Pending</span>
-              </span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Registered:</span>
-              <span class="detail-value">{{ formatDate(selectedUser.created_at) }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Approval Status:</span>
-              <span class="detail-value">
-                <span :class="`status-badge status-${selectedUser.approval_status}`">
-                  {{ selectedUser.approval_status.charAt(0).toUpperCase() + selectedUser.approval_status.slice(1) }}
-                </span>
-              </span>
-            </div>
-            <div v-if="selectedUser.rejection_reason" class="detail-item full-width">
-              <span class="detail-label">Rejection Reason:</span>
-              <span class="detail-value">
-                <div class="alert alert-danger mt-2">
-                  {{ selectedUser.rejection_reason }}
-                </div>
-              </span>
-            </div>
-            <div v-if="selectedUser.photographer" class="detail-item full-width">
-              <span class="detail-label">Photographer Profile:</span>
-              <span class="detail-value">
-                <div class="alert alert-info mt-2">
-                  <p><strong>Slug:</strong> {{ selectedUser.photographer.slug }}</p>
-                  <p><strong>Experience:</strong> {{ selectedUser.photographer.experience_years }} years</p>
-                  <p><strong>Verified:</strong> {{ selectedUser.photographer.is_verified ? 'Yes' : 'No' }}</p>
-                </div>
-              </span>
-            </div>
+        <div class="stat-card stat-yellow">
+          <div class="stat-icon">
+            ⏳
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Pending Approval</span>
+            <span class="stat-value">{{ stats.pending }}</span>
           </div>
         </div>
-        <div class="modal-footer">
-          <button @click="showViewModal = false" class="btn-secondary">Close</button>
-          <button 
-            v-if="selectedUser?.approval_status === 'pending'"
-            @click="approveUser(selectedUser)" 
-            class="btn-success"
-          >
-            ✓ Approve
-          </button>
-          <button 
-            v-if="selectedUser?.approval_status === 'pending'"
-            @click="openRejectModal(selectedUser)" 
-            class="btn-danger"
-          >
-            ✕ Reject
-          </button>
+
+        <div class="stat-card stat-green">
+          <div class="stat-icon">
+            ✓
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Approved</span>
+            <span class="stat-value">{{ stats.approved }}</span>
+          </div>
+        </div>
+
+        <div class="stat-card stat-red">
+          <div class="stat-icon">
+            ✕
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Rejected</span>
+            <span class="stat-value">{{ stats.rejected }}</span>
+          </div>
+        </div>
+
+        <div class="stat-card stat-blue">
+          <div class="stat-icon">
+            👥
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Total Users</span>
+            <span class="stat-value">{{ stats.total }}</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Toast Notification -->
-    <div v-if="toast.show" :class="`toast toast-${toast.type}`">
-      {{ toast.message }}
-    </div>
+      <!-- Filters & Actions -->
+      <div class="content-card">
+        <div class="filters-bar">
+          <div class="search-box">
+            <svg
+              class="search-icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <input 
+              v-model="filters.search" 
+              type="text"
+              placeholder="Search by name, email, or phone..." 
+              class="search-input" 
+              @input="fetchUsers"
+            >
+          </div>
+
+          <select
+            v-model="filters.status"
+            class="filter-select"
+            @change="fetchUsers"
+          >
+            <option value="pending">
+              Pending
+            </option>
+            <option value="approved">
+              Approved
+            </option>
+            <option value="rejected">
+              Rejected
+            </option>
+            <option value="">
+              All Status
+            </option>
+          </select>
+
+          <select
+            v-model="filters.role"
+            class="filter-select"
+            @change="fetchUsers"
+          >
+            <option value="">
+              All Roles
+            </option>
+            <option value="client">
+              Client
+            </option>
+            <option value="photographer">
+              Photographer
+            </option>
+            <option value="studio_owner">
+              Studio Owner
+            </option>
+          </select>
+
+          <button 
+            v-if="selectedUsers.length > 0" 
+            class="btn-approve" 
+            @click="bulkApprove"
+          >
+            ✓ Approve Selected ({{ selectedUsers.length }})
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div
+          v-if="loading"
+          class="loading-state"
+        >
+          <div class="spinner" />
+          <p>Loading users...</p>
+        </div>
+
+        <!-- Users List -->
+        <div
+          v-else-if="users.length > 0"
+          class="users-container"
+        >
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>
+                    <input 
+                      type="checkbox" 
+                      :checked="selectedUsers.length === users.filter(u => u.approval_status === 'pending').length && users.filter(u => u.approval_status === 'pending').length > 0"
+                      @change="toggleSelectAll"
+                    >
+                  </th>
+                  <th>User</th>
+                  <th>Role</th>
+                  <th>Contact</th>
+                  <th>Email Verified</th>
+                  <th>Registered</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="user in users"
+                  :key="user.id"
+                >
+                  <td>
+                    <input 
+                      v-if="user.approval_status === 'pending'"
+                      v-model="selectedUsers" 
+                      type="checkbox"
+                      :value="user.id"
+                    >
+                  </td>
+                  <td>
+                    <div class="user-cell">
+                      <div class="user-avatar">
+                        {{ user.name.charAt(0).toUpperCase() }}
+                      </div>
+                      <div>
+                        <div class="user-name">
+                          {{ user.name }}
+                        </div>
+                        <div class="user-uuid">
+                          ID: {{ user.uuid }}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span :class="`role-badge role-${user.role}`">
+                      {{ formatRole(user.role) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="contact-cell">
+                      <a
+                        :href="`mailto:${user.email}`"
+                        class="contact-link"
+                      >{{ user.email }}</a>
+                      <a
+                        v-if="user.phone"
+                        :href="`tel:${user.phone}`"
+                        class="contact-link"
+                      >{{ user.phone }}</a>
+                    </div>
+                  </td>
+                  <td>
+                    <span
+                      v-if="user.email_verified_at"
+                      class="badge badge-success"
+                    >✓ Verified</span>
+                    <span
+                      v-else
+                      class="badge badge-warning"
+                    >⏳ Pending</span>
+                  </td>
+                  <td>{{ formatDate(user.created_at) }}</td>
+                  <td>
+                    <span :class="`status-badge status-${user.approval_status}`">
+                      {{ user.approval_status.charAt(0).toUpperCase() + user.approval_status.slice(1) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button 
+                        v-if="user.approval_status === 'pending'"
+                        class="btn-action btn-success" 
+                        title="Approve" 
+                        @click="approveUser(user)"
+                      >
+                        ✓
+                      </button>
+                      <button 
+                        v-if="user.approval_status === 'pending'"
+                        class="btn-action btn-danger" 
+                        title="Reject" 
+                        @click="openRejectModal(user)"
+                      >
+                        ✕
+                      </button>
+                      <button 
+                        class="btn-action" 
+                        title="View Details" 
+                        @click="viewUser(user)"
+                      >
+                        👁
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div
+          v-else
+          class="empty-state"
+        >
+          <div class="empty-icon">
+            👥
+          </div>
+          <p class="empty-title">
+            No users found
+          </p>
+          <p class="empty-subtitle">
+            Users awaiting approval will appear here
+          </p>
+        </div>
+      </div>
+
+      <!-- Reject Modal -->
+      <div
+        v-if="showRejectModal"
+        class="modal-overlay"
+        @click.self="showRejectModal = false"
+      >
+        <div class="modal modal-sm">
+          <div class="modal-header">
+            <h3>Reject User Registration</h3>
+            <button
+              class="modal-close"
+              @click="showRejectModal = false"
+            >
+              ×
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="mb-4">
+              You are about to reject <strong>{{ rejectingUser?.name }}</strong>'s registration.
+            </p>
+          
+            <label class="block text-sm font-medium mb-2">Rejection Reason *</label>
+            <textarea 
+              v-model="rejectReason" 
+              rows="4" 
+              class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-burgundy"
+              placeholder="Please provide a clear reason for rejection..."
+            />
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn-secondary"
+              @click="showRejectModal = false"
+            >
+              Cancel
+            </button>
+            <button
+              :disabled="!rejectReason.trim()"
+              class="btn-danger"
+              @click="rejectUser"
+            >
+              Reject User
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- View User Modal -->
+      <div
+        v-if="showViewModal"
+        class="modal-overlay"
+        @click.self="showViewModal = false"
+      >
+        <div class="modal">
+          <div class="modal-header">
+            <h3>User Details</h3>
+            <button
+              class="modal-close"
+              @click="showViewModal = false"
+            >
+              ×
+            </button>
+          </div>
+          <div
+            v-if="selectedUser"
+            class="modal-body"
+          >
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="detail-label">Name:</span>
+                <span class="detail-value">{{ selectedUser.name }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Email:</span>
+                <span class="detail-value">
+                  <a
+                    :href="`mailto:${selectedUser.email}`"
+                    class="text-burgundy hover:underline"
+                  >
+                    {{ selectedUser.email }}
+                  </a>
+                </span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Phone:</span>
+                <span class="detail-value">
+                  <a
+                    v-if="selectedUser.phone"
+                    :href="`tel:${selectedUser.phone}`"
+                    class="text-burgundy hover:underline"
+                  >
+                    {{ selectedUser.phone }}
+                  </a>
+                  <span
+                    v-else
+                    class="text-gray-400"
+                  >Not provided</span>
+                </span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Role:</span>
+                <span class="detail-value">
+                  <span :class="`role-badge role-${selectedUser.role}`">
+                    {{ formatRole(selectedUser.role) }}
+                  </span>
+                </span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Email Verified:</span>
+                <span class="detail-value">
+                  <span
+                    v-if="selectedUser.email_verified_at"
+                    class="text-success-700"
+                  >
+                    ✓ {{ formatDate(selectedUser.email_verified_at) }}
+                  </span>
+                  <span
+                    v-else
+                    class="text-warning-700"
+                  >⏳ Pending</span>
+                </span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Registered:</span>
+                <span class="detail-value">{{ formatDate(selectedUser.created_at) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Approval Status:</span>
+                <span class="detail-value">
+                  <span :class="`status-badge status-${selectedUser.approval_status}`">
+                    {{ selectedUser.approval_status.charAt(0).toUpperCase() + selectedUser.approval_status.slice(1) }}
+                  </span>
+                </span>
+              </div>
+              <div
+                v-if="selectedUser.rejection_reason"
+                class="detail-item full-width"
+              >
+                <span class="detail-label">Rejection Reason:</span>
+                <span class="detail-value">
+                  <div class="alert alert-danger mt-2">
+                    {{ selectedUser.rejection_reason }}
+                  </div>
+                </span>
+              </div>
+              <div
+                v-if="selectedUser.photographer"
+                class="detail-item full-width"
+              >
+                <span class="detail-label">Photographer Profile:</span>
+                <span class="detail-value">
+                  <div class="alert alert-info mt-2">
+                    <p><strong>Slug:</strong> {{ selectedUser.photographer.slug }}</p>
+                    <p><strong>Experience:</strong> {{ selectedUser.photographer.experience_years }} years</p>
+                    <p><strong>Verified:</strong> {{ selectedUser.photographer.is_verified ? 'Yes' : 'No' }}</p>
+                  </div>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn-secondary"
+              @click="showViewModal = false"
+            >
+              Close
+            </button>
+            <button 
+              v-if="selectedUser?.approval_status === 'pending'"
+              class="btn-success" 
+              @click="approveUser(selectedUser)"
+            >
+              ✓ Approve
+            </button>
+            <button 
+              v-if="selectedUser?.approval_status === 'pending'"
+              class="btn-danger" 
+              @click="openRejectModal(selectedUser)"
+            >
+              ✕ Reject
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toast Notification -->
+      <div
+        v-if="toast.show"
+        :class="`toast toast-${toast.type}`"
+      >
+        {{ toast.message }}
+      </div>
     </div>
   </div>
 </template>
@@ -328,6 +469,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '../../../api'
+import { formatDateTime as formatDateTimeValue } from '../../../utils/formatters'
 
 const users = ref([])
 const stats = ref({ pending: 0, approved: 0, rejected: 0, total: 0 })
@@ -453,13 +595,7 @@ const formatRole = (role) => {
 
 const formatDate = (date) => {
   if (!date) return 'N/A'
-  return new Date(date).toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  return formatDateTimeValue(date) || 'N/A'
 }
 
 const showToast = (message, type = 'success') => {

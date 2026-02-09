@@ -47,7 +47,9 @@ class CompetitionSponsorController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'logo' => 'nullable|image|max:2048',
+            'logo' => 'nullable|image|max:5120',
+            'logo_credit_name' => 'nullable|string|max:255',
+            'logo_credit_url' => 'nullable|url|max:255',
             'website_url' => 'nullable|url',
             'description' => 'nullable|string',
             'tier' => 'nullable|in:platinum,gold,silver,bronze',
@@ -72,7 +74,9 @@ class CompetitionSponsorController extends Controller
     {
         $request->validate([
             'name' => 'sometimes|string|max:255',
-            'logo' => 'nullable|image|max:2048',
+            'logo' => 'nullable|image|max:5120',
+            'logo_credit_name' => 'nullable|string|max:255',
+            'logo_credit_url' => 'nullable|url|max:255',
             'website_url' => 'nullable|url',
             'description' => 'nullable|string',
             'tier' => 'nullable|in:platinum,gold,silver,bronze',
@@ -113,6 +117,8 @@ class CompetitionSponsorController extends Controller
             'sponsors' => 'required|array',
             'sponsors.*.name' => 'required|string|max:255',
             'sponsors.*.logo_url' => 'nullable|string',
+            'sponsors.*.logo_credit_name' => 'nullable|string|max:255',
+            'sponsors.*.logo_credit_url' => 'nullable|url|max:255',
             'sponsors.*.website_url' => 'nullable|url',
             'sponsors.*.description' => 'nullable|string',
             'sponsors.*.tier' => 'nullable|in:platinum,gold,silver,bronze',

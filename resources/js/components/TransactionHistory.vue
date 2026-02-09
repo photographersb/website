@@ -6,47 +6,79 @@
         <div class="px-6 py-5 border-b border-gray-200">
           <div class="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 class="text-2xl font-bold text-gray-900">Transaction History</h1>
-              <p class="mt-1 text-sm text-gray-600">View all your payment transactions</p>
+              <h1 class="text-2xl font-bold text-gray-900">
+                Transaction History
+              </h1>
+              <p class="mt-1 text-sm text-gray-600">
+                View all your payment transactions
+              </p>
             </div>
 
             <!-- Filters -->
             <div class="mt-4 md:mt-0 flex flex-wrap gap-3">
               <select
                 v-model="filters.status"
-                @change="loadTransactions"
                 class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-burgundy"
+                @change="loadTransactions"
               >
-                <option value="">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
-                <option value="failed">Failed</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="">
+                  All Status
+                </option>
+                <option value="pending">
+                  Pending
+                </option>
+                <option value="completed">
+                  Completed
+                </option>
+                <option value="failed">
+                  Failed
+                </option>
+                <option value="cancelled">
+                  Cancelled
+                </option>
               </select>
 
               <select
                 v-model="filters.paymentMethod"
-                @change="loadTransactions"
                 class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-burgundy"
+                @change="loadTransactions"
               >
-                <option value="">All Methods</option>
-                <option value="card">Card</option>
-                <option value="bkash">bKash</option>
-                <option value="nagad">Nagad</option>
-                <option value="bank_transfer">Bank Transfer</option>
+                <option value="">
+                  All Methods
+                </option>
+                <option value="card">
+                  Card
+                </option>
+                <option value="bkash">
+                  bKash
+                </option>
+                <option value="nagad">
+                  Nagad
+                </option>
+                <option value="bank_transfer">
+                  Bank Transfer
+                </option>
               </select>
             </div>
           </div>
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="py-12 text-center">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-burgundy mx-auto"></div>
-          <p class="text-gray-600 mt-4">Loading transactions...</p>
+        <div
+          v-if="loading"
+          class="py-12 text-center"
+        >
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-burgundy mx-auto" />
+          <p class="text-gray-600 mt-4">
+            Loading transactions...
+          </p>
         </div>
 
         <!-- Transactions List -->
-        <div v-else-if="transactions.length > 0" class="divide-y divide-gray-200">
+        <div
+          v-else-if="transactions.length > 0"
+          class="divide-y divide-gray-200"
+        >
           <div
             v-for="transaction in transactions"
             :key="transaction.id"
@@ -75,7 +107,7 @@
                         stroke-linejoin="round"
                         stroke-width="2"
                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
+                      />
                     </svg>
                   </div>
 
@@ -98,7 +130,10 @@
                       Transaction ID: {{ transaction.reference_id }}
                     </p>
 
-                    <div v-if="transaction.booking" class="text-sm text-gray-500">
+                    <div
+                      v-if="transaction.booking"
+                      class="text-sm text-gray-500"
+                    >
                       Booking with
                       <span class="font-medium text-gray-700">
                         {{ transaction.booking.photographer?.user?.name }}
@@ -118,7 +153,7 @@
               <div class="flex items-center gap-6 lg:flex-shrink-0">
                 <div class="text-right">
                   <p class="text-2xl font-bold text-gray-900">
-                    ৳{{ Number(transaction.amount).toLocaleString() }}
+                    ৳{{ formatNumber(transaction.amount) }}
                   </p>
                   <p class="text-xs text-gray-500 mt-1">
                     {{ transaction.transaction_type }}
@@ -137,7 +172,10 @@
         </div>
 
         <!-- Empty State -->
-        <div v-else class="py-16 text-center">
+        <div
+          v-else
+          class="py-16 text-center"
+        >
           <svg
             class="w-16 h-16 text-gray-400 mx-auto mb-4"
             fill="none"
@@ -149,10 +187,14 @@
               stroke-linejoin="round"
               stroke-width="2"
               d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-            ></path>
+            />
           </svg>
-          <h3 class="text-lg font-medium text-gray-900 mb-1">No transactions found</h3>
-          <p class="text-gray-600">You haven't made any payments yet.</p>
+          <h3 class="text-lg font-medium text-gray-900 mb-1">
+            No transactions found
+          </h3>
+          <p class="text-gray-600">
+            You haven't made any payments yet.
+          </p>
         </div>
 
         <!-- Pagination -->
@@ -166,7 +208,6 @@
 
           <div class="flex gap-2">
             <button
-              @click="changePage(pagination.current_page - 1)"
               :disabled="pagination.current_page === 1"
               :class="[
                 'px-4 py-2 border rounded-lg transition-colors',
@@ -174,12 +215,12 @@
                   ? 'border-gray-200 text-gray-400 cursor-not-allowed'
                   : 'border-burgundy text-burgundy hover:bg-burgundy hover:text-white'
               ]"
+              @click="changePage(pagination.current_page - 1)"
             >
               Previous
             </button>
 
             <button
-              @click="changePage(pagination.current_page + 1)"
               :disabled="pagination.current_page === pagination.last_page"
               :class="[
                 'px-4 py-2 border rounded-lg transition-colors',
@@ -187,6 +228,7 @@
                   ? 'border-gray-200 text-gray-400 cursor-not-allowed'
                   : 'border-burgundy text-burgundy hover:bg-burgundy hover:text-white'
               ]"
+              @click="changePage(pagination.current_page + 1)"
             >
               Next
             </button>
@@ -200,6 +242,11 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue';
 import api from '../api';
+import {
+  formatDate as formatDateValue,
+  formatDateTime as formatDateTimeValue,
+  formatNumber
+} from '../utils/formatters';
 
 const transactions = ref([]);
 const loading = ref(true);
@@ -267,21 +314,11 @@ const formatPaymentMethod = (method) => {
 };
 
 const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+  return formatDateValue(date);
 };
 
 const formatDateTime = (date) => {
-  return new Date(date).toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  return formatDateTimeValue(date);
 };
 
 const getStatusColor = (status) => {

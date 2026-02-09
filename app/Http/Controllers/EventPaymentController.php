@@ -8,31 +8,6 @@ use Illuminate\Http\Request;
 class EventPaymentController extends Controller
 {
     /**
-     * Handle Stripe webhook callback
-     */
-    public function stripeWebhook(Request $request)
-    {
-        // Verify webhook signature
-        // In production: verify with Stripe API
-
-        $event = $request->input('type');
-        $data = $request->input('data.object', []);
-
-        if ($event === 'payment_intent.succeeded') {
-            // Update registration payment status
-            $registrationId = $data['metadata']['registration_id'] ?? null;
-            
-            if ($registrationId) {
-                EventRegistration::find($registrationId)?->update([
-                    'payment_status' => 'paid',
-                ]);
-            }
-        }
-
-        return response()->json(['status' => 'received']);
-    }
-
-    /**
      * Handle SSLCommerz webhook callback
      */
     public function sslcommerzWebhook(Request $request)

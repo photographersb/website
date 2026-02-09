@@ -7,6 +7,7 @@ use App\Models\CompetitionSponsor;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class SponsorshipService
 {
@@ -26,6 +27,8 @@ class SponsorshipService
                 'competition_id' => $competition->id,
                 'name' => $sponsorData['name'],
                 'logo_url' => $logoUrl,
+                'logo_credit_name' => $sponsorData['logo_credit_name'] ?? null,
+                'logo_credit_url' => $sponsorData['logo_credit_url'] ?? null,
                 'website_url' => $sponsorData['website_url'] ?? null,
                 'description' => $sponsorData['description'] ?? null,
                 'tier' => $sponsorData['tier'] ?? 'bronze',
@@ -67,6 +70,8 @@ class SponsorshipService
         try {
             $updateData = [
                 'name' => $sponsorData['name'] ?? $sponsor->name,
+                'logo_credit_name' => $sponsorData['logo_credit_name'] ?? $sponsor->logo_credit_name,
+                'logo_credit_url' => $sponsorData['logo_credit_url'] ?? $sponsor->logo_credit_url,
                 'website_url' => $sponsorData['website_url'] ?? $sponsor->website_url,
                 'description' => $sponsorData['description'] ?? $sponsor->description,
                 'tier' => $sponsorData['tier'] ?? $sponsor->tier,
@@ -78,10 +83,24 @@ class SponsorshipService
             // Handle logo update
             if (isset($sponsorData['logo']) && $sponsorData['logo']) {
                 // Delete old logo if exists
-                if ($sponsor->logo_url) {
-                    Storage::disk('public')->delete($sponsor->logo_url);
+                $rawLogoPath = $sponsor->getRawOriginal('logo_url');
+                if ($rawLogoPath) {
+                    $path = $rawLogoPath;
+                    if (Str::startsWith($rawLogoPath, ['http://', 'https://', '/storage/'])) {
+                        $path = parse_url($rawLogoPath, PHP_URL_PATH) ?: '';
+                        $path = ltrim(str_replace('/storage/', '', $path), '/');
+                    }
+                    if (!empty($path)) {
+                        Storage::disk('public')->delete($path);
+                    }
                 }
                 $updateData['logo_url'] = $sponsorData['logo']->store('sponsors', 'public');
+                if (!isset($sponsorData['logo_credit_name'])) {
+                    $updateData['logo_credit_name'] = null;
+                }
+                if (!isset($sponsorData['logo_credit_url'])) {
+                    $updateData['logo_credit_url'] = null;
+                }
             }
 
             $sponsor->update($updateData);
@@ -116,8 +135,16 @@ class SponsorshipService
     {
         try {
             // Delete logo if exists
-            if ($sponsor->logo_url) {
-                Storage::disk('public')->delete($sponsor->logo_url);
+            $rawLogoPath = $sponsor->getRawOriginal('logo_url');
+            if ($rawLogoPath) {
+                $path = $rawLogoPath;
+                if (Str::startsWith($rawLogoPath, ['http://', 'https://', '/storage/'])) {
+                    $path = parse_url($rawLogoPath, PHP_URL_PATH) ?: '';
+                    $path = ltrim(str_replace('/storage/', '', $path), '/');
+                }
+                if (!empty($path)) {
+                    Storage::disk('public')->delete($path);
+                }
             }
 
             $sponsorName = $sponsor->name;
@@ -250,6 +277,8 @@ class SponsorshipService
                     'competition_id' => $competition->id,
                     'name' => $sponsorData['name'],
                     'logo_url' => $sponsorData['logo_url'] ?? null,
+                    'logo_credit_name' => $sponsorData['logo_credit_name'] ?? null,
+                    'logo_credit_url' => $sponsorData['logo_credit_url'] ?? null,
                     'website_url' => $sponsorData['website_url'] ?? null,
                     'description' => $sponsorData['description'] ?? null,
                     'tier' => $sponsorData['tier'] ?? 'bronze',

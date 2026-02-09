@@ -23,8 +23,16 @@
         v-if="!isUnlocked" 
         class="absolute inset-0 flex items-center justify-center bg-gray-800 bg-opacity-40 rounded-full"
       >
-        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+        <svg
+          class="w-6 h-6 text-white"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+            clip-rule="evenodd"
+          />
         </svg>
       </div>
     </div>
@@ -46,7 +54,10 @@
     </p>
 
     <!-- Progress Bar (for locked achievements) -->
-    <div v-if="!isUnlocked" class="w-full">
+    <div
+      v-if="!isUnlocked"
+      class="w-full"
+    >
       <div class="flex justify-between items-center mb-1">
         <span class="text-xs text-gray-500">Progress</span>
         <span class="text-xs font-medium text-gray-700">{{ progressPercentage }}%</span>
@@ -56,7 +67,7 @@
           class="h-2 rounded-full transition-all duration-500"
           :class="progressBarColorClass"
           :style="{ width: progressPercentage + '%' }"
-        ></div>
+        />
       </div>
       <p class="text-xs text-gray-500 mt-1 text-center">
         {{ achievement.progress }} / {{ achievement.required_count }}
@@ -64,10 +75,21 @@
     </div>
 
     <!-- Unlocked Info -->
-    <div v-else class="w-full">
+    <div
+      v-else
+      class="w-full"
+    >
       <div class="flex items-center justify-center space-x-1 text-xs text-green-600">
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        <svg
+          class="w-4 h-4"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clip-rule="evenodd"
+          />
         </svg>
         <span class="font-medium">Unlocked</span>
       </div>
@@ -88,6 +110,7 @@
 
 <script setup>
 import { computed } from 'vue';
+import { formatDate as formatDateValue } from '../utils/formatters';
 
 const props = defineProps({
   achievement: {
@@ -148,8 +171,7 @@ const pointsBadgeClass = computed(() => {
 
 const formatDate = (dateString) => {
   if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return formatDateValue(dateString);
 };
 </script>
 

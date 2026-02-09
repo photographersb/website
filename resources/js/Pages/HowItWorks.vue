@@ -1,11 +1,30 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-12">
-    <div class="container mx-auto px-4 max-w-4xl">
-      <h1 class="text-4xl font-bold mb-8">How Photographer SB Works</h1>
+  <div class="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <section class="relative overflow-hidden bg-gradient-to-br from-burgundy via-[#8E0E3F] to-[#6F112D] text-white">
+      <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+      </div>
+      <div class="container mx-auto px-4 py-12 md:py-16 relative z-10 text-center">
+        <p class="text-xs uppercase tracking-[0.35em] text-white/70">
+          How It Works
+        </p>
+        <h1 class="text-3xl md:text-5xl font-bold mt-4 tracking-tight">
+          How Photographer SB Works
+        </h1>
+        <p class="text-base md:text-lg text-white/85 max-w-3xl mx-auto mt-4">
+          A clear, step-by-step path for clients and photographers.
+        </p>
+      </div>
+    </section>
+
+    <div class="container mx-auto px-4 max-w-4xl -mt-10 relative z-10 pb-12">
 
       <!-- For Clients -->
       <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
-        <h2 class="text-2xl font-bold mb-6 text-burgundy">For Clients</h2>
+        <h2 class="text-2xl font-bold mb-6 text-burgundy">
+          For Clients
+        </h2>
         
         <div class="space-y-6">
           <!-- Step 1 -->
@@ -16,12 +35,16 @@
               </div>
             </div>
             <div>
-              <h3 class="text-xl font-bold mb-2">Search & Browse</h3>
+              <h3 class="text-xl font-bold mb-2">
+                Search & Browse
+              </h3>
               <p class="text-gray-700 mb-2">
                 Browse our extensive directory of verified photographers. Filter by location, specialty, style, and budget to find photographers that match your needs.
               </p>
               <div class="bg-gray-50 p-4 rounded">
-                <p class="text-sm text-gray-600">💡 <strong>Tip:</strong> Use detailed filters to narrow down your search and check photographer portfolios carefully.</p>
+                <p class="text-sm text-gray-600">
+                  💡 <strong>Tip:</strong> Use detailed filters to narrow down your search and check photographer portfolios carefully.
+                </p>
               </div>
             </div>
           </div>
@@ -34,12 +57,16 @@
               </div>
             </div>
             <div>
-              <h3 class="text-xl font-bold mb-2">Send Inquiry</h3>
+              <h3 class="text-xl font-bold mb-2">
+                Send Inquiry
+              </h3>
               <p class="text-gray-700 mb-2">
                 Found the perfect photographer? Send them a detailed inquiry with your event date, location, requirements, and budget. Our smart inquiry form makes it easy.
               </p>
               <div class="bg-gray-50 p-4 rounded">
-                <p class="text-sm text-gray-600">💡 <strong>Tip:</strong> Be specific about your needs - include event type, duration, and special requirements.</p>
+                <p class="text-sm text-gray-600">
+                  💡 <strong>Tip:</strong> Be specific about your needs - include event type, duration, and special requirements.
+                </p>
               </div>
             </div>
           </div>
@@ -52,12 +79,16 @@
               </div>
             </div>
             <div>
-              <h3 class="text-xl font-bold mb-2">Receive Quotes</h3>
+              <h3 class="text-xl font-bold mb-2">
+                Receive Quotes
+              </h3>
               <p class="text-gray-700 mb-2">
                 Photographers will respond with custom quotes based on your requirements. Compare pricing, packages, and what's included in each offer.
               </p>
               <div class="bg-gray-50 p-4 rounded">
-                <p class="text-sm text-gray-600">💡 <strong>Tip:</strong> Ask questions about deliverables, timelines, and revision policies before booking.</p>
+                <p class="text-sm text-gray-600">
+                  💡 <strong>Tip:</strong> Ask questions about deliverables, timelines, and revision policies before booking.
+                </p>
               </div>
             </div>
           </div>
@@ -70,12 +101,16 @@
               </div>
             </div>
             <div>
-              <h3 class="text-xl font-bold mb-2">Book & Pay Securely</h3>
+              <h3 class="text-xl font-bold mb-2">
+                Book & Pay Securely
+              </h3>
               <p class="text-gray-700 mb-2">
                 Once you've selected a photographer, confirm your booking and make secure payments through our platform. We support multiple payment methods including card, bKash, and Nagad.
               </p>
               <div class="bg-gray-50 p-4 rounded">
-                <p class="text-sm text-gray-600">🔒 <strong>Security:</strong> All payments are processed securely through encrypted gateways.</p>
+                <p class="text-sm text-gray-600">
+                  🔒 <strong>Security:</strong> All payments are processed securely through encrypted gateways.
+                </p>
               </div>
             </div>
           </div>
@@ -88,12 +123,16 @@
               </div>
             </div>
             <div>
-              <h3 class="text-xl font-bold mb-2">Enjoy the Shoot & Receive Photos</h3>
+              <h3 class="text-xl font-bold mb-2">
+                Enjoy the Shoot & Receive Photos
+              </h3>
               <p class="text-gray-700 mb-2">
                 The photographer will arrive on your event date, capture amazing moments, and deliver edited photos as per the agreed timeline. Track your booking status through your dashboard.
               </p>
               <div class="bg-gray-50 p-4 rounded">
-                <p class="text-sm text-gray-600">⭐ <strong>Review:</strong> Don't forget to leave a review after receiving your photos!</p>
+                <p class="text-sm text-gray-600">
+                  ⭐ <strong>Review:</strong> Don't forget to leave a review after receiving your photos!
+                </p>
               </div>
             </div>
           </div>
@@ -102,7 +141,9 @@
 
       <!-- For Photographers -->
       <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
-        <h2 class="text-2xl font-bold mb-6 text-burgundy">For Photographers</h2>
+        <h2 class="text-2xl font-bold mb-6 text-burgundy">
+          For Photographers
+        </h2>
         
         <div class="space-y-6">
           <!-- Step 1 -->
@@ -113,7 +154,9 @@
               </div>
             </div>
             <div>
-              <h3 class="text-xl font-bold mb-2">Create Your Profile</h3>
+              <h3 class="text-xl font-bold mb-2">
+                Create Your Profile
+              </h3>
               <p class="text-gray-700 mb-2">
                 Register as a photographer and create your professional profile. Showcase your best work, list your services, set your pricing, and highlight your expertise.
               </p>
@@ -128,7 +171,9 @@
               </div>
             </div>
             <div>
-              <h3 class="text-xl font-bold mb-2">Get Verified</h3>
+              <h3 class="text-xl font-bold mb-2">
+                Get Verified
+              </h3>
               <p class="text-gray-700 mb-2">
                 Complete our verification process to gain client trust. Submit required documents and samples of your work for review.
               </p>
@@ -143,7 +188,9 @@
               </div>
             </div>
             <div>
-              <h3 class="text-xl font-bold mb-2">Receive Inquiries</h3>
+              <h3 class="text-xl font-bold mb-2">
+                Receive Inquiries
+              </h3>
               <p class="text-gray-700 mb-2">
                 Start receiving booking inquiries from potential clients. Get notified instantly via email and dashboard when clients show interest.
               </p>
@@ -158,7 +205,9 @@
               </div>
             </div>
             <div>
-              <h3 class="text-xl font-bold mb-2">Send Custom Quotes</h3>
+              <h3 class="text-xl font-bold mb-2">
+                Send Custom Quotes
+              </h3>
               <p class="text-gray-700 mb-2">
                 Review inquiry details and send personalized quotes with your packages, pricing, and terms. Communicate directly with clients through our messaging system.
               </p>
@@ -173,7 +222,9 @@
               </div>
             </div>
             <div>
-              <h3 class="text-xl font-bold mb-2">Deliver & Get Paid</h3>
+              <h3 class="text-xl font-bold mb-2">
+                Deliver & Get Paid
+              </h3>
               <p class="text-gray-700 mb-2">
                 Complete the shoot, deliver amazing photos, and receive secure payments directly to your account. Build your reputation through positive reviews.
               </p>
@@ -184,23 +235,41 @@
 
       <!-- Additional Features -->
       <div class="bg-white rounded-lg shadow-lg p-8">
-        <h2 class="text-2xl font-bold mb-6 text-burgundy">Additional Features</h2>
+        <h2 class="text-2xl font-bold mb-6 text-burgundy">
+          Additional Features
+        </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 class="font-bold mb-2">📸 Events & Competitions</h4>
-            <p class="text-gray-600 text-sm">Participate in photography events and competitions to showcase your talent and win prizes.</p>
+            <h4 class="font-bold mb-2">
+              📸 Events & Competitions
+            </h4>
+            <p class="text-gray-600 text-sm">
+              Participate in photography events and competitions to showcase your talent and win prizes.
+            </p>
           </div>
           <div>
-            <h4 class="font-bold mb-2">💬 Direct Messaging</h4>
-            <p class="text-gray-600 text-sm">Communicate directly with photographers or clients through our secure messaging system.</p>
+            <h4 class="font-bold mb-2">
+              💬 Direct Messaging
+            </h4>
+            <p class="text-gray-600 text-sm">
+              Communicate directly with photographers or clients through our secure messaging system.
+            </p>
           </div>
           <div>
-            <h4 class="font-bold mb-2">⭐ Reviews & Ratings</h4>
-            <p class="text-gray-600 text-sm">Build trust through transparent reviews and ratings from real clients.</p>
+            <h4 class="font-bold mb-2">
+              ⭐ Reviews & Ratings
+            </h4>
+            <p class="text-gray-600 text-sm">
+              Build trust through transparent reviews and ratings from real clients.
+            </p>
           </div>
           <div>
-            <h4 class="font-bold mb-2">📊 Dashboard Analytics</h4>
-            <p class="text-gray-600 text-sm">Track bookings, revenue, and performance through comprehensive dashboards.</p>
+            <h4 class="font-bold mb-2">
+              📊 Dashboard Analytics
+            </h4>
+            <p class="text-gray-600 text-sm">
+              Track bookings, revenue, and performance through comprehensive dashboards.
+            </p>
           </div>
         </div>
       </div>

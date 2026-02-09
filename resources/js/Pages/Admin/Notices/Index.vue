@@ -1,66 +1,157 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen">
     <AdminHeader
       title="📢 Admin Notices"
       subtitle="Create and manage platform notices for users"
     />
 
     <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <section class="page-hero">
+        <div class="hero-copy">
+          <p class="hero-kicker">BROADCAST CONTROL</p>
+          <h1 class="hero-title">Notices that land with precision.</h1>
+          <p class="hero-subtitle">
+            Draft, publish, and target announcements with confidence.
+          </p>
+          <div class="hero-actions">
+            <button
+              class="btn-admin-primary"
+              @click="openCreate"
+            >
+              Create Notice
+            </button>
+            <button
+              class="btn-admin-secondary"
+              @click="fetchNotices"
+            >
+              Refresh Board
+            </button>
+          </div>
+        </div>
+        <div class="hero-status">
+          <div class="status-card">
+            <span class="status-label">Total</span>
+            <span class="status-value">{{ meta.total || 0 }}</span>
+          </div>
+          <div class="status-card">
+            <span class="status-label">Showing</span>
+            <span class="status-value">{{ notices.length }}</span>
+          </div>
+          <div class="status-card">
+            <span class="status-label">Page</span>
+            <span class="status-value">{{ meta.current_page || 1 }}</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="page-topbar">
+        <div class="status-chip">
+          Filter by priority and publish status
+        </div>
+      </div>
+
       <AdminQuickNav />
 
       <div class="content-card">
         <div class="filters-bar">
           <div class="search-box">
-            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg
+              class="search-icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
             <input
               v-model="filters.search"
-              @input="debounceSearch"
               type="text"
               placeholder="Search notices..."
               class="search-input"
-            />
+              @input="debounceSearch"
+            >
           </div>
 
-          <select v-model="filters.status" @change="fetchNotices" class="filter-select">
-            <option value="">All Status</option>
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
+          <select
+            v-model="filters.status"
+            class="filter-select"
+            @change="fetchNotices"
+          >
+            <option value="">
+              All Status
+            </option>
+            <option value="draft">
+              Draft
+            </option>
+            <option value="published">
+              Published
+            </option>
           </select>
 
-          <select v-model="filters.priority" @change="fetchNotices" class="filter-select">
-            <option value="">All Priority</option>
-            <option value="low">Low</option>
-            <option value="normal">Normal</option>
-            <option value="high">High</option>
-            <option value="urgent">Urgent</option>
+          <select
+            v-model="filters.priority"
+            class="filter-select"
+            @change="fetchNotices"
+          >
+            <option value="">
+              All Priority
+            </option>
+            <option value="low">
+              Low
+            </option>
+            <option value="normal">
+              Normal
+            </option>
+            <option value="high">
+              High
+            </option>
+            <option value="urgent">
+              Urgent
+            </option>
           </select>
 
-          <button @click="openCreate" class="btn-add">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Create Notice
-          </button>
+          
         </div>
 
-        <div v-if="loading" class="loading-state">
-          <div class="spinner"></div>
+        <div
+          v-if="loading"
+          class="loading-state"
+        >
+          <div class="spinner" />
           <p>Loading notices...</p>
         </div>
 
-        <div v-else-if="notices.length > 0" class="notices-grid">
-          <div v-for="notice in notices" :key="notice.id" class="notice-card">
+        <div
+          v-else-if="notices.length > 0"
+          class="notices-grid"
+        >
+          <div
+            v-for="notice in notices"
+            :key="notice.id"
+            class="notice-card"
+          >
             <div class="notice-header">
               <div class="notice-title">
-                <span class="priority-dot" :class="priorityClass(notice.priority)"></span>
+                <span
+                  class="priority-dot"
+                  :class="priorityClass(notice.priority)"
+                />
                 <h3>{{ notice.title }}</h3>
               </div>
-              <span class="status-badge" :class="statusClass(notice.status)">{{ notice.status }}</span>
+              <span
+                class="status-badge"
+                :class="statusClass(notice.status)"
+              >{{ notice.status }}</span>
             </div>
 
-            <p class="notice-message">{{ notice.message }}</p>
+            <p class="notice-message">
+              {{ notice.message }}
+            </p>
 
             <div class="notice-meta">
               <span>Priority: {{ notice.priority }}</span>
@@ -74,15 +165,41 @@
             </div>
 
             <div class="card-actions">
-              <button @click="openEdit(notice.id)" class="btn-action btn-edit">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              <button
+                class="btn-action btn-edit"
+                @click="openEdit(notice.id)"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
                 </svg>
                 Edit
               </button>
-              <button @click="deleteNotice(notice.id)" class="btn-action btn-delete">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              <button
+                class="btn-action btn-delete"
+                @click="deleteNotice(notice.id)"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
                 </svg>
                 Delete
               </button>
@@ -90,105 +207,212 @@
           </div>
         </div>
 
-        <div v-else class="empty-state">
-          <div class="empty-icon">📢</div>
-          <p class="empty-title">No notices found</p>
-          <p class="empty-subtitle">Create your first notice</p>
+        <div
+          v-else
+          class="empty-state"
+        >
+          <div class="empty-icon">
+            📢
+          </div>
+          <p class="empty-title">
+            No notices found
+          </p>
+          <p class="empty-subtitle">
+            Create your first notice
+          </p>
         </div>
 
-        <div v-if="meta.total > 0" class="pagination">
+        <div
+          v-if="meta.total > 0"
+          class="pagination"
+        >
           <div class="pagination-info">
             Showing {{ notices.length }} of {{ meta.total }} notices
           </div>
           <div class="pagination-controls">
-            <button @click="changePage(meta.current_page - 1)" :disabled="meta.current_page <= 1" class="pagination-btn">Previous</button>
+            <button
+              :disabled="meta.current_page <= 1"
+              class="pagination-btn"
+              @click="changePage(meta.current_page - 1)"
+            >
+              Previous
+            </button>
             <span class="pagination-current">Page {{ meta.current_page }} of {{ meta.last_page }}</span>
-            <button @click="changePage(meta.current_page + 1)" :disabled="meta.current_page >= meta.last_page" class="pagination-btn">Next</button>
+            <button
+              :disabled="meta.current_page >= meta.last_page"
+              class="pagination-btn"
+              @click="changePage(meta.current_page + 1)"
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+    <div
+      v-if="showModal"
+      class="modal-overlay"
+      @click.self="closeModal"
+    >
       <div class="modal modal-large">
         <div class="modal-header">
           <h3>{{ editingId ? 'Edit Notice' : 'Create Notice' }}</h3>
-          <button @click="closeModal" class="modal-close">×</button>
+          <button
+            class="modal-close"
+            @click="closeModal"
+          >
+            ×
+          </button>
         </div>
         <div class="modal-body">
-          <form @submit.prevent="saveNotice" class="edit-form">
+          <form
+            class="edit-form"
+            @submit.prevent="saveNotice"
+          >
             <div class="form-row">
               <div class="form-group">
                 <label>Title *</label>
-                <input v-model="form.title" type="text" class="form-input" required />
+                <input
+                  v-model="form.title"
+                  type="text"
+                  class="form-input"
+                  required
+                >
               </div>
               <div class="form-group">
                 <label>Priority *</label>
-                <select v-model="form.priority" class="form-input" required>
-                  <option value="low">Low</option>
-                  <option value="normal">Normal</option>
-                  <option value="high">High</option>
-                  <option value="urgent">Urgent</option>
+                <select
+                  v-model="form.priority"
+                  class="form-input"
+                  required
+                >
+                  <option value="low">
+                    Low
+                  </option>
+                  <option value="normal">
+                    Normal
+                  </option>
+                  <option value="high">
+                    High
+                  </option>
+                  <option value="urgent">
+                    Urgent
+                  </option>
                 </select>
               </div>
             </div>
 
             <div class="form-group">
               <label>Message *</label>
-              <textarea v-model="form.message" class="form-input" rows="5" required></textarea>
+              <textarea
+                v-model="form.message"
+                class="form-input"
+                rows="5"
+                required
+              />
             </div>
 
             <div class="form-row">
               <div class="form-group">
                 <label>Status</label>
-                <select v-model="form.status" class="form-input">
-                  <option value="draft">Draft</option>
-                  <option value="published">Published</option>
+                <select
+                  v-model="form.status"
+                  class="form-input"
+                >
+                  <option value="draft">
+                    Draft
+                  </option>
+                  <option value="published">
+                    Published
+                  </option>
                 </select>
               </div>
               <div class="form-group">
                 <label>Icon</label>
-                <input v-model="form.icon" type="text" class="form-input" placeholder="e.g. 📢" />
+                <input
+                  v-model="form.icon"
+                  type="text"
+                  class="form-input"
+                  placeholder="e.g. 📢"
+                >
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
                 <label>Publish At</label>
-                <input v-model="form.publish_at" type="datetime-local" class="form-input" />
+                <input
+                  v-model="form.publish_at"
+                  type="datetime-local"
+                  class="form-input"
+                >
               </div>
               <div class="form-group">
                 <label>Expires At</label>
-                <input v-model="form.expires_at" type="datetime-local" class="form-input" />
+                <input
+                  v-model="form.expires_at"
+                  type="datetime-local"
+                  class="form-input"
+                >
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
                 <label>Color</label>
-                <input v-model="form.color" type="text" class="form-input" placeholder="e.g. indigo" />
+                <input
+                  v-model="form.color"
+                  type="text"
+                  class="form-input"
+                  placeholder="e.g. indigo"
+                >
               </div>
               <div class="form-group">
                 <label class="checkbox-label">
-                  <input v-model="form.show_to_all_roles" type="checkbox" />
+                  <input
+                    v-model="form.show_to_all_roles"
+                    type="checkbox"
+                  >
                   <span>Show to all roles</span>
                 </label>
               </div>
             </div>
 
-            <div v-if="!form.show_to_all_roles" class="form-group">
+            <div
+              v-if="!form.show_to_all_roles"
+              class="form-group"
+            >
               <label>Target Roles</label>
               <div class="roles-grid">
-                <label v-for="(label, role) in roles" :key="role" class="checkbox-label">
-                  <input type="checkbox" :value="role" v-model="form.roles" />
+                <label
+                  v-for="(label, role) in roles"
+                  :key="role"
+                  class="checkbox-label"
+                >
+                  <input
+                    v-model="form.roles"
+                    type="checkbox"
+                    :value="role"
+                  >
                   <span>{{ label }}</span>
                 </label>
               </div>
             </div>
 
             <div class="modal-actions">
-              <button type="button" @click="closeModal" class="btn-cancel">Cancel</button>
-              <button type="submit" class="btn-save" :disabled="saving">
+              <button
+                type="button"
+                class="btn-cancel"
+                @click="closeModal"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="btn-save"
+                :disabled="saving"
+              >
                 {{ saving ? 'Saving...' : (editingId ? 'Update' : 'Create') }}
               </button>
             </div>
@@ -197,14 +421,21 @@
       </div>
     </div>
 
-    <div v-if="showToast" class="toast">{{ toastMessage }}</div>
+    <div
+      v-if="showToast"
+      class="toast"
+    >
+      {{ toastMessage }}
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import AdminHeader from '../../../components/AdminHeader.vue'
 import AdminQuickNav from '../../../components/AdminQuickNav.vue'
+import { formatDate as formatDateValue } from '../../../utils/formatters'
+import api from '../../../api'
 
 const notices = ref([])
 const roles = ref({})
@@ -255,11 +486,7 @@ const showToastMessage = (message) => {
 
 const fetchRoles = async () => {
   try {
-    const token = localStorage.getItem('auth_token')
-    const response = await fetch('/api/v1/admin/notices/roles/available', {
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-    })
-    const data = await response.json()
+    const { data } = await api.get('/admin/notices/roles/available')
     if (data.status === 'success') roles.value = data.data
   } catch (error) {
     console.error('Error loading roles', error)
@@ -269,17 +496,12 @@ const fetchRoles = async () => {
 const fetchNotices = async (page = 1) => {
   loading.value = true
   try {
-    const token = localStorage.getItem('auth_token')
-    const params = new URLSearchParams()
-    if (filters.value.search) params.append('search', filters.value.search)
-    if (filters.value.status) params.append('status', filters.value.status)
-    if (filters.value.priority) params.append('priority', filters.value.priority)
-    params.append('page', page)
+    const params = { page }
+    if (filters.value.search) params.search = filters.value.search
+    if (filters.value.status) params.status = filters.value.status
+    if (filters.value.priority) params.priority = filters.value.priority
 
-    const response = await fetch(`/api/v1/admin/notices?${params}`, {
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-    })
-    const data = await response.json()
+    const { data } = await api.get('/admin/notices', { params })
     if (data.status === 'success') {
       notices.value = data.data
       meta.value = {
@@ -315,11 +537,7 @@ const openCreate = () => {
 
 const openEdit = async (id) => {
   try {
-    const token = localStorage.getItem('auth_token')
-    const response = await fetch(`/api/v1/admin/notices/${id}`, {
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-    })
-    const data = await response.json()
+    const { data } = await api.get(`/admin/notices/${id}`)
     if (data.status === 'success') {
       const notice = data.data
       editingId.value = id
@@ -346,27 +564,16 @@ const openEdit = async (id) => {
 const saveNotice = async () => {
   saving.value = true
   try {
-    const token = localStorage.getItem('auth_token')
     const payload = {
       ...form.value,
       publish_at: fromInputDateTime(form.value.publish_at),
       expires_at: fromInputDateTime(form.value.expires_at)
     }
-    const url = editingId.value ? `/api/v1/admin/notices/${editingId.value}` : '/api/v1/admin/notices'
-    const method = editingId.value ? 'PUT' : 'POST'
+    const url = editingId.value ? `/admin/notices/${editingId.value}` : '/admin/notices'
+    const request = editingId.value ? api.put(url, payload) : api.post(url, payload)
 
-    const response = await fetch(url, {
-      method,
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    })
-
-    const data = await response.json()
-    if (response.ok && data.status === 'success') {
+    const { data } = await request
+    if (data.status === 'success') {
       showToastMessage(editingId.value ? 'Notice updated' : 'Notice created')
       showModal.value = false
       fetchNotices(meta.value.current_page)
@@ -384,13 +591,8 @@ const saveNotice = async () => {
 const deleteNotice = async (id) => {
   if (!confirm('Delete this notice?')) return
   try {
-    const token = localStorage.getItem('auth_token')
-    const response = await fetch(`/api/v1/admin/notices/${id}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-    })
-    const data = await response.json()
-    if (response.ok && data.status === 'success') {
+    const { data } = await api.delete(`/admin/notices/${id}`)
+    if (data.status === 'success') {
       showToastMessage('Notice deleted')
       fetchNotices(meta.value.current_page)
     } else {
@@ -412,7 +614,7 @@ const changePage = (page) => {
 
 const formatDate = (date) => {
   if (!date) return 'N/A'
-  return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+  return formatDateValue(date)
 }
 
 const toInputDateTime = (date) => {
@@ -453,6 +655,20 @@ onMounted(() => {
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   padding: 1.5rem;
 }
+
+.page-hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 1.5rem; padding: 1.75rem 2rem; border-radius: 1.5rem; border: 1px solid rgba(142, 14, 63, 0.2); background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(247, 239, 233, 0.82)), linear-gradient(90deg, rgba(142, 14, 63, 0.06), transparent 45%, rgba(109, 72, 56, 0.08)); box-shadow: 0 25px 55px rgba(24, 12, 8, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6); backdrop-filter: blur(6px); }
+.hero-copy { display: flex; flex-direction: column; gap: 0.85rem; }
+.hero-kicker { font-size: 0.7rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--admin-text-secondary); font-weight: 700; }
+.hero-title { font-size: 2rem; line-height: 1.1; color: var(--admin-text-primary); text-shadow: 0 2px 14px rgba(142, 14, 63, 0.18); }
+.hero-subtitle { color: var(--admin-text-secondary); max-width: 480px; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.hero-status { display: grid; gap: 0.8rem; }
+.status-card { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(142, 14, 63, 0.2); border-radius: 1rem; padding: 1rem 1.25rem; box-shadow: 0 16px 35px rgba(22, 12, 8, 0.08); display: flex; flex-direction: column; gap: 0.35rem; }
+.status-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--admin-text-secondary); }
+.status-value { font-size: 1.1rem; font-weight: 700; color: var(--admin-text-primary); }
+.page-topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1.25rem; background: rgba(255, 255, 255, 0.88); border: 1px solid rgba(140, 108, 95, 0.2); border-radius: 1.1rem; box-shadow: 0 18px 35px rgba(18, 9, 6, 0.08); backdrop-filter: blur(8px); }
+.status-chip { background: rgba(142, 14, 63, 0.12); color: var(--admin-text-primary); padding: 0.4rem 0.8rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+@media (max-width: 1024px) { .page-hero { grid-template-columns: 1fr; } }
 
 .filters-bar {
   display: flex;

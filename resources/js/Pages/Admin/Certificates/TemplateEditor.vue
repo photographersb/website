@@ -8,12 +8,14 @@
             {{ template?.id ? 'Edit Template' : 'Create Certificate Template' }}
           </h2>
           <button
-            @click="$emit('cancel')"
             class="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+            @click="$emit('cancel')"
           >
             ×
           </button>
         </div>
+
+        <AdminQuickNav />
 
         <!-- Content -->
         <div class="p-6 grid grid-cols-2 gap-6">
@@ -27,7 +29,7 @@
                 type="text"
                 placeholder="e.g., Main Winner Certificate"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-              />
+              >
             </div>
 
             <div>
@@ -36,7 +38,7 @@
                 v-model="form.description"
                 placeholder="Brief description of this template"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent h-20"
-              ></textarea>
+              />
             </div>
 
             <div>
@@ -45,8 +47,14 @@
                 v-model="form.type"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               >
-                <option value="">Select Type</option>
-                <option v-for="type in availableTypes" :key="type.value" :value="type.value">
+                <option value="">
+                  Select Type
+                </option>
+                <option
+                  v-for="type in availableTypes"
+                  :key="type.value"
+                  :value="type.value"
+                >
                   {{ type.label }}
                 </option>
               </select>
@@ -60,7 +68,7 @@
                   v-model.number="form.width"
                   type="number"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                />
+                >
               </div>
               <div>
                 <label class="block text-sm font-semibold text-gray-900 mb-2">Height (mm)</label>
@@ -68,7 +76,7 @@
                   v-model.number="form.height"
                   type="number"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                />
+                >
               </div>
             </div>
 
@@ -83,13 +91,13 @@
                     v-model="form.background_color"
                     type="color"
                     class="w-12 h-10 border border-gray-300 rounded cursor-pointer"
-                  />
+                  >
                   <input
                     v-model="form.background_color"
                     type="text"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     placeholder="#ffffff"
-                  />
+                  >
                 </div>
 
                 <!-- Accent Color -->
@@ -99,13 +107,13 @@
                     v-model="form.accent_color"
                     type="color"
                     class="w-12 h-10 border border-gray-300 rounded cursor-pointer"
-                  />
+                  >
                   <input
                     v-model="form.accent_color"
                     type="text"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     placeholder="#8B0000"
-                  />
+                  >
                 </div>
 
                 <!-- Text Color -->
@@ -115,13 +123,13 @@
                     v-model="form.text_color"
                     type="color"
                     class="w-12 h-10 border border-gray-300 rounded cursor-pointer"
-                  />
+                  >
                   <input
                     v-model="form.text_color"
                     type="text"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     placeholder="#000000"
-                  />
+                  >
                 </div>
               </div>
             </div>
@@ -133,9 +141,15 @@
                 v-model="form.title_font"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               >
-                <option value="serif">Serif (Elegant)</option>
-                <option value="sans-serif">Sans-Serif (Modern)</option>
-                <option value="monospace">Monospace (Technical)</option>
+                <option value="serif">
+                  Serif (Elegant)
+                </option>
+                <option value="sans-serif">
+                  Sans-Serif (Modern)
+                </option>
+                <option value="monospace">
+                  Monospace (Technical)
+                </option>
               </select>
             </div>
 
@@ -146,8 +160,8 @@
                 <div 
                   v-for="ph in availablePlaceholders"
                   :key="ph.value"
-                  @click="insertPlaceholder(ph.value)"
                   class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded cursor-pointer hover:bg-blue-200 transition"
+                  @click="insertPlaceholder(ph.value)"
                 >
                   {{ ph.label }} <code class="text-xs">{{ ph.value }}</code>
                 </div>
@@ -161,8 +175,11 @@
                 v-model="form.is_default"
                 type="checkbox"
                 class="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-2 focus:ring-orange-500"
-              />
-              <label for="is_default" class="text-sm text-gray-700">Set as default template</label>
+              >
+              <label
+                for="is_default"
+                class="text-sm text-gray-700"
+              >Set as default template</label>
             </div>
           </div>
 
@@ -179,7 +196,10 @@
             >
               <div class="space-y-4">
                 <!-- Decorative Top Border -->
-                <div class="w-3/4 mx-auto" :style="{ borderTop: `3px solid ${form.accent_color}` }"></div>
+                <div
+                  class="w-3/4 mx-auto"
+                  :style="{ borderTop: `3px solid ${form.accent_color}` }"
+                />
 
                 <!-- Title -->
                 <h1 style="font-size: 2.5rem; font-weight: bold;">
@@ -187,11 +207,19 @@
                 </h1>
 
                 <!-- Decorative Line -->
-                <div class="w-1/2 mx-auto my-4" :style="{ height: '2px', backgroundColor: form.accent_color }"></div>
+                <div
+                  class="w-1/2 mx-auto my-4"
+                  :style="{ height: '2px', backgroundColor: form.accent_color }"
+                />
 
                 <!-- Recipient -->
-                <p style="font-size: 1.25rem; font-style: italic;">This certifies that</p>
-                <p class="px-4 pb-1" style="font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid;">
+                <p style="font-size: 1.25rem; font-style: italic;">
+                  This certifies that
+                </p>
+                <p
+                  class="px-4 pb-1"
+                  style="font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid;"
+                >
                   [PHOTOGRAPHER_NAME]
                 </p>
 
@@ -201,7 +229,10 @@
                 </p>
 
                 <!-- Decorative Bottom Border -->
-                <div class="w-3/4 mx-auto" :style="{ borderTop: `3px solid ${form.accent_color}` }"></div>
+                <div
+                  class="w-3/4 mx-auto"
+                  :style="{ borderTop: `3px solid ${form.accent_color}` }"
+                />
 
                 <!-- Date -->
                 <p style="font-size: 0.85rem; margin-top: 1rem;">
@@ -221,15 +252,15 @@
         <!-- Footer -->
         <div class="sticky bottom-0 flex items-center justify-end gap-3 p-6 border-t bg-gray-50">
           <button
-            @click="$emit('cancel')"
             class="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 font-medium"
+            @click="$emit('cancel')"
           >
             Cancel
           </button>
           <button
-            @click="submit"
             :disabled="isSaving || !isFormValid"
             class="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition"
+            @click="submit"
           >
             {{ isSaving ? 'Saving...' : (template?.id ? 'Update Template' : 'Create Template') }}
           </button>
@@ -241,6 +272,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
+import AdminQuickNav from '../../../components/AdminQuickNav.vue';
 
 const props = defineProps({
   template: Object,

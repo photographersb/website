@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Photographer;
-use App\Models\PhotoCategory;
-use App\Models\City;
+use App\Models\Category;
+use App\Models\Location;
 use App\Models\Competition;
 use App\Models\SEOMetadata;
 use Illuminate\Http\Response;
@@ -67,7 +67,7 @@ class SitemapController extends Controller
      */
     public function categories()
     {
-        $categories = PhotoCategory::where('is_active', true)
+        $categories = Category::where('is_active', true)
             ->with('seoMetadata')
             ->get();
 
@@ -88,7 +88,8 @@ class SitemapController extends Controller
      */
     public function cities()
     {
-        $cities = City::where('is_active', true)
+        $cities = Location::where('is_active', true)
+            ->whereIn('type', ['district', 'upazila'])
             ->with('seoMetadata')
             ->get();
 

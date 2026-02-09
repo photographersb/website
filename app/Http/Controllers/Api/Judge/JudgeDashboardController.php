@@ -112,7 +112,7 @@ class JudgeDashboardController extends Controller
         $query = CompetitionSubmission::where('competition_id', $competition->id)
             ->where('status', 'approved')
             ->with([
-                'photographer.user',
+                'photographer',
                 'scores' => function ($q) use ($user) {
                     $q->where('judge_id', $user->id);
                 },
@@ -161,7 +161,11 @@ class JudgeDashboardController extends Controller
         }
 
         $submission->load([
-            'photographer.user',
+            'photographer',
+            'files' => function ($query) {
+                $query->select(['id', 'submission_id', 'exif_json', 'sort_order'])
+                    ->orderBy('sort_order');
+            },
             'scores' => function ($q) use ($user) {
                 $q->where('judge_id', $user->id);
             },

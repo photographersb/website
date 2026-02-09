@@ -17,6 +17,7 @@ class Photographer extends Model
         'user_id',
         'city_id',
         'slug',
+        'share_code',
         'profile_picture',
         'bio',
         'location',
@@ -41,6 +42,16 @@ class Photographer extends Model
         'linkedin_url',
         'youtube_url',
         'website_url',
+        'pexels_url',
+        'bkash_number',
+        'nagad_number',
+        'rocket_number',
+        'phone_number',
+        'accept_tips',
+        'tip_message',
+        'is_available',
+        'response_time_preference',
+        'booking_lead_time',
     ];
 
     protected $casts = [
@@ -51,6 +62,37 @@ class Photographer extends Model
         'average_rating' => 'decimal:2',
         'response_time_avg' => 'decimal:2',
     ];
+
+    /**
+     * Append computed attributes to array/JSON output
+     */
+    protected $appends = ['profile_picture_url'];
+
+    /**
+     * Get profile picture URL with fallback
+     */
+    public function getProfilePictureUrlAttribute(): ?string
+    {
+        return $this->profile_picture;
+    }
+
+    /**
+     * Profile Picture Accessor - Add storage URL prefix
+     */
+    public function getProfilePictureAttribute($value): ?string
+    {
+        if (!$value) {
+            return null;
+        }
+        
+        // If already a full URL, return as is
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, '/storage/')) {
+            return $value;
+        }
+        
+        // Prepend /storage/ for relative paths
+        return '/storage/' . ltrim($value, '/');
+    }
 
     /**
      * Social Media Accessors - Extract usernames from URLs
@@ -111,6 +153,10 @@ class Photographer extends Model
             'website' => [
                 'url' => $this->website_url,
                 'platform' => 'Website',
+            ],
+            'pexels' => [
+                'url' => $this->pexels_url,
+                'platform' => 'Pexels',
             ],
         ];
     }
@@ -179,7 +225,7 @@ class Photographer extends Model
 
     public function city()
     {
-        return $this->belongsTo(City::class);
+        return $this->belongsTo(Location::class);
     }
 
     public function hashtags(): BelongsToMany

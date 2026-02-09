@@ -4,6 +4,25 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Admin\CompetitionController as AdminCompetitionController;
 
+// Authentication Routes
+Route::get('/login', function () {
+    if (auth()->check()) {
+        return redirect()->route('admin.dashboard');
+    }
+    return inertia('Login');
+})->name('login');
+Route::get('/register', function () {
+    if (auth()->check()) {
+        return redirect()->route('admin.dashboard');
+    }
+    return inertia('Register');
+})->name('register');
+Route::get('/forgot-password', fn() => inertia('ForgotPassword'))->name('password.request');
+
+Route::get('/403', function () {
+    return response()->view('errors.403', [], 403);
+})->name('forbidden');
+
 // Payment Gateway Callbacks
 Route::get('/payment/callback/success', [PaymentController::class, 'successCallback'])->name('payment.success');
 Route::post('/payment/callback/success', [PaymentController::class, 'successCallback']);
@@ -45,8 +64,37 @@ Route::get('/admin', [\App\Http\Controllers\Admin\AdminAccessController::class, 
 // Admin Routes are handled by Vue Router + API endpoints
 // See routes/api.php for admin API endpoints (/api/v1/admin/*)
 
+// Admin Management Pages (SPA Routes)
+Route::prefix('admin')->group(function () {
+    Route::get('/login', function () { return view('admin.spa'); })->name('admin.login');
+    // Dashboard
+    Route::get('/dashboard', function () { return view('admin.spa'); })->name('admin.dashboard');
+    Route::get('/analytics', function () { return view('admin.spa'); })->name('admin.analytics');
+    Route::get('/system-health', function () { return view('admin.spa'); })->name('admin.system-health');
+
+    // Profile & Account
+    Route::get('/profile', function () { return view('admin.spa'); })->name('admin.profile');
+    Route::get('/settings/account', function () { return view('admin.spa'); })->name('admin.settings.account');
+    
+    // Management Pages
+    Route::get('/judges', function () { return view('admin.spa'); })->name('admin.judges');
+    Route::get('/sponsors', function () { return view('admin.spa'); })->name('admin.sponsors');
+    Route::get('/reviews', function () { return view('admin.spa'); })->name('admin.reviews');
+    Route::get('/bookings', function () { return view('admin.spa'); })->name('admin.bookings');
+    Route::get('/transactions', function () { return view('admin.spa'); })->name('admin.transactions');
+    Route::get('/activity-logs', function () { return view('admin.spa'); })->name('admin.activity-logs');
+    Route::get('/hashtags', function () { return view('admin.spa'); })->name('admin.hashtags');
+    Route::get('/featured-photographers', function () { return view('admin.spa'); })->name('admin.featured-photographers');
+    
+    // Additional Pages
+    Route::get('/notifications', function () { return view('admin.spa'); })->name('admin.notifications');
+    Route::get('/error-center', function () { return view('admin.spa'); })->name('admin.error-center');
+    Route::get('/share-frames', function () { return view('admin.spa'); })->name('admin.share-frames');
+    Route::get('/seo', function () { return view('admin.spa'); })->name('admin.seo');
+});
+
 // Admin Sitemap (Web-based UI)
-Route::prefix('admin')->middleware('auth')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'role:admin,super_admin,moderator'])->group(function () {
     Route::get('/system-health/sitemap', [\App\Http\Controllers\Admin\AdminSitemapController::class, 'index'])->name('admin.sitemap.index');
     Route::post('/system-health/sitemap/run-test', [\App\Http\Controllers\Admin\AdminSitemapController::class, 'runTest'])->name('admin.sitemap.run-test');
     Route::get('/system-health/sitemap/checks', [\App\Http\Controllers\Admin\AdminSitemapController::class, 'getChecks'])->name('admin.sitemap.checks');
@@ -55,13 +103,27 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::delete('/system-health/sitemap/checks/{check}', [\App\Http\Controllers\Admin\AdminSitemapController::class, 'destroy'])->name('admin.sitemap.destroy');
     
     // Dev Tools (Super Admin Only, Non-Production Only)
-    Route::prefix('dev')->name('admin.dev.')->group(function () {
+    Route::prefix('dev')->name('admin.dev.')->middleware('role:super_admin')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\DevToolsController::class, 'index'])->name('index');
         Route::post('/clear-cache', [\App\Http\Controllers\Admin\DevToolsController::class, 'clearCache'])->name('clear-cache');
         Route::post('/clear-view-cache', [\App\Http\Controllers\Admin\DevToolsController::class, 'clearViewCache'])->name('clear-view-cache');
         Route::post('/clear-config-cache', [\App\Http\Controllers\Admin\DevToolsController::class, 'clearConfigCache'])->name('clear-config-cache');
         Route::post('/clear-route-cache', [\App\Http\Controllers\Admin\DevToolsController::class, 'clearRouteCache'])->name('clear-route-cache');
         Route::post('/assets-info', [\App\Http\Controllers\Admin\DevToolsController::class, 'assetsInfo'])->name('assets-info');
+    });
+
+    // Site Links Management (Admin Settings)
+    Route::prefix('settings/site-links')->name('admin.site-links.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\SiteLinkController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\SiteLinkController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\SiteLinkController::class, 'store'])->name('store');
+        Route::get('/{siteLink}/edit', [\App\Http\Controllers\Admin\SiteLinkController::class, 'edit'])->name('edit');
+        Route::put('/{siteLink}', [\App\Http\Controllers\Admin\SiteLinkController::class, 'update'])->name('update');
+        Route::delete('/{siteLink}', [\App\Http\Controllers\Admin\SiteLinkController::class, 'destroy'])->name('destroy');
+        Route::post('/{siteLink}/toggle-active', [\App\Http\Controllers\Admin\SiteLinkController::class, 'toggleActive'])->name('toggle-active');
+        Route::post('/update-sort-orders', [\App\Http\Controllers\Admin\SiteLinkController::class, 'updateSortOrders'])->name('update-sort-orders');
+        Route::post('/clear-cache', [\App\Http\Controllers\Admin\SiteLinkController::class, 'clearCache'])->name('clear-cache');
+        Route::get('/preview', [\App\Http\Controllers\Admin\SiteLinkController::class, 'preview'])->name('preview');
     });
 
     // Share Frame Template Management (Admin Only)
@@ -113,12 +175,24 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         ->name('admin.events.certificates.regenerate-bulk');
 });
 
+// Admin SPA fallback (keeps deep links on refresh)
+Route::get('/admin/{any}', function () {
+    return view('admin.spa');
+})->where('any', '.*');
+
 // SEO Landing Pages: Categories & Locations
 Route::get('/categories', [\App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
 Route::get('/categories/{slug}', [\App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
 
 Route::get('/locations', [\App\Http\Controllers\LocationController::class, 'index'])->name('locations.index');
 Route::get('/locations/{slug}', [\App\Http\Controllers\LocationController::class, 'show'])->name('locations.show');
+
+// Photographer Search & Filtering (High SEO Value)
+Route::prefix('photographers')->name('photographers.')->group(function () {
+    Route::get('/{locationSlug}/{categorySlug}', [\App\Http\Controllers\PhotographerSearchController::class, 'byLocationAndCategory'])->name('search.location-category');
+    Route::get('/location/{slug}', [\App\Http\Controllers\PhotographerSearchController::class, 'byLocation'])->name('search.location');
+    Route::get('/category/{slug}', [\App\Http\Controllers\PhotographerSearchController::class, 'byCategory'])->name('search.category');
+});
 
 // Public Event Routes
 Route::prefix('events')->name('events.')->group(function () {
@@ -140,7 +214,6 @@ Route::middleware('auth')->prefix('registrations')->name('registrations.')->grou
 });
 
 // Event Payment Routes (Public - for webhook callbacks)
-Route::post('/events/payment/webhook/stripe', [\App\Http\Controllers\EventPaymentController::class, 'stripeWebhook'])->name('events.payment.webhook.stripe');
 Route::post('/events/payment/webhook/sslcommerz', [\App\Http\Controllers\EventPaymentController::class, 'sslcommerzWebhook'])->name('events.payment.webhook.sslcommerz');
 
 
@@ -179,11 +252,11 @@ Route::middleware('auth')->group(function () {
     // Messaging
     Route::post('/bookings/{booking}/messages', [\App\Http\Controllers\BookingMessageController::class, 'store'])->name('booking.message.store');
     Route::delete('/messages/{message}', [\App\Http\Controllers\BookingMessageController::class, 'delete'])->name('booking.message.delete');
-    Route::post('/bookings/{booking}/messages/read', [\App\Http\Controllers\BookingMessageController::class, 'markAsRead'])->name('booking.messages.read');
+    Route::post('/bookings/{booking}/messages/read', [\App\Http\Controllers\BookingMessageController::class, 'markAsRead'])->name('booking.messages.read.web');
 });
 
 // Admin Booking Management Routes
-Route::middleware(['auth', 'super_admin'])->prefix('admin/bookings')->group(function () {
+Route::middleware(['auth', 'role:super_admin'])->prefix('admin/bookings')->group(function () {
     Route::get('/', [\App\Http\Controllers\Admin\BookingController::class, 'index'])->name('admin.booking.index');
     Route::get('/{booking}', [\App\Http\Controllers\Admin\BookingController::class, 'show'])->name('admin.booking.show');
     Route::post('/{booking}/cancel', [\App\Http\Controllers\Admin\BookingController::class, 'cancel'])->name('admin.booking.cancel');
@@ -231,9 +304,10 @@ Route::get('/test-error-query', function () {
 
 // Authentication is handled by Vue Router navigation guards in resources/js/app.js
 
+// Catch-all for SPA - but exclude API routes
 Route::get('/{any?}', function () {
     return view('app');
-})->where('any', '.*');
+})->where('any', '^(?!api).*');
 
 require __DIR__.'/auth.php';
 

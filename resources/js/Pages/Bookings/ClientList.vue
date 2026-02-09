@@ -1,7 +1,9 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-6xl mx-auto">
-      <h1 class="text-3xl font-bold text-gray-900 mb-8">My Booking Requests</h1>
+      <h1 class="text-3xl font-bold text-gray-900 mb-8">
+        My Booking Requests
+      </h1>
 
       <!-- Bookings Table -->
       <div class="bg-white rounded-lg shadow overflow-hidden">
@@ -32,7 +34,11 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="booking in bookings.data" :key="booking.id" class="hover:bg-gray-50">
+            <tr
+              v-for="booking in bookings.data"
+              :key="booking.id"
+              class="hover:bg-gray-50"
+            >
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
                 {{ booking.code }}
               </td>
@@ -46,15 +52,24 @@
                 {{ booking.budget }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span :class="getStatusClass(booking.status)" class="px-3 py-1 text-xs font-medium text-white rounded-full">
+                <span
+                  :class="getStatusClass(booking.status)"
+                  class="px-3 py-1 text-xs font-medium text-white rounded-full"
+                >
                   {{ booking.status }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <span v-if="booking.unread_count > 0" class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                <span
+                  v-if="booking.unread_count > 0"
+                  class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full"
+                >
                   {{ booking.unread_count }}
                 </span>
-                <span v-else class="text-gray-400">—</span>
+                <span
+                  v-else
+                  class="text-gray-400"
+                >—</span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
                 <Link
@@ -70,7 +85,10 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="bookings.links" class="mt-6 flex justify-center gap-2">
+      <div
+        v-if="bookings.links"
+        class="mt-6 flex justify-center gap-2"
+      >
         <Link
           v-for="link in bookings.links"
           :key="link.url"
@@ -80,11 +98,11 @@
             link.active
               ? 'bg-blue-600 text-white'
               : link.url
-              ? 'bg-white text-gray-900 hover:bg-gray-50 border border-gray-300'
-              : 'bg-gray-100 text-gray-400 cursor-not-allowed',
+                ? 'bg-white text-gray-900 hover:bg-gray-50 border border-gray-300'
+                : 'bg-gray-100 text-gray-400 cursor-not-allowed',
           ]"
           v-html="link.label"
-        ></Link>
+        />
       </div>
     </div>
   </div>

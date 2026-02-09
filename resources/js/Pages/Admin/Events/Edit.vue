@@ -62,6 +62,54 @@
             </div>
 
             <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Hero Image URL</label>
+              <input
+                v-model="form.hero_image_url"
+                type="url"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                placeholder="https://example.com/hero-image.jpg"
+              />
+              <input
+                type="file"
+                accept="image/*"
+                class="upload-input mt-2 block text-sm"
+                @change="handleImageUpload('hero_image_url', $event)"
+              />
+              <div class="mt-2 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  class="rounded-full border border-burgundy px-4 py-1 text-xs font-semibold text-burgundy hover:bg-burgundy hover:text-white"
+                  @click="openPexelsPicker('hero_image_url', 1600, 900)"
+                >
+                  Choose from Pexels
+                </button>
+              </div>
+              <p class="mt-1 upload-hint">Max 5 MB. JPG/PNG. 1600x900 px.</p>
+              <p
+                v-if="uploadingImages.hero_image_url"
+                class="mt-1 text-xs text-gray-500"
+              >
+                Uploading...
+              </p>
+              <p
+                v-if="form.hero_image_credit_name"
+                class="mt-1 text-xs text-gray-500"
+              >
+                Pexels credit:
+                <a
+                  :href="form.hero_image_credit_url || 'https://www.pexels.com'"
+                  target="_blank"
+                  rel="noopener"
+                  class="font-semibold text-burgundy underline"
+                >
+                  {{ form.hero_image_credit_name }}
+                </a>
+              </p>
+              <p class="mt-1 text-sm text-gray-500">Optional hero banner image URL</p>
+              <p v-if="errors.hero_image_url" class="mt-1 text-sm text-red-600">{{ errors.hero_image_url }}</p>
+            </div>
+
+            <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Banner Image URL</label>
               <input
                 v-model="form.banner_image"
@@ -70,6 +118,42 @@
                 placeholder="https://example.com/banner.jpg"
               />
               <p class="mt-1 text-sm text-gray-500">Optional banner image URL</p>
+              <input
+                type="file"
+                accept="image/*"
+                class="upload-input mt-2 block text-sm"
+                @change="handleImageUpload('banner_image', $event)"
+              />
+              <div class="mt-2 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  class="rounded-full border border-burgundy px-4 py-1 text-xs font-semibold text-burgundy hover:bg-burgundy hover:text-white"
+                  @click="openPexelsPicker('banner_image', 1920, 600)"
+                >
+                  Choose from Pexels
+                </button>
+              </div>
+              <p class="mt-1 upload-hint">Max 5 MB. JPG/PNG. 1920x600 px.</p>
+              <p
+                v-if="uploadingImages.banner_image"
+                class="mt-1 text-xs text-gray-500"
+              >
+                Uploading...
+              </p>
+              <p
+                v-if="form.banner_image_credit_name"
+                class="mt-1 text-xs text-gray-500"
+              >
+                Pexels credit:
+                <a
+                  :href="form.banner_image_credit_url || 'https://www.pexels.com'"
+                  target="_blank"
+                  rel="noopener"
+                  class="font-semibold text-burgundy underline"
+                >
+                  {{ form.banner_image_credit_name }}
+                </a>
+              </p>
               <p v-if="errors.banner_image" class="mt-1 text-sm text-red-600">{{ errors.banner_image }}</p>
             </div>
           </div>
@@ -106,21 +190,24 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">City *</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Location *</label>
               <select
                 v-model="form.city_id"
                 :required="form.status !== 'draft'"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
               >
-                <option value="">Select city</option>
+                <option value="">Select location</option>
                 <option v-for="city in cities" :key="city.id" :value="city.id">
                   {{ city.name }}
                 </option>
               </select>
-              <router-link to="/admin/cities" class="mt-1 inline-block text-sm text-burgundy hover:text-burgundy-dark">
-                Manage cities →
-              </router-link>
-              <p v-if="cities.length === 0" class="mt-1 text-sm text-warning-700">⚠️ No cities available. Please add cities from Admin → Locations first.</p>
+                <router-link
+                  to="/admin/locations"
+                  class="mt-1 inline-block text-sm text-burgundy hover:text-burgundy-dark"
+                >
+                  Manage Locations →
+                </router-link>
+              <p v-if="cities.length === 0" class="mt-1 text-sm text-warning-700">⚠️ No locations available. Please add locations from Admin → Locations first.</p>
               <p v-if="errors.city_id" class="mt-1 text-sm text-red-600">{{ errors.city_id }}</p>
             </div>
 
@@ -237,9 +324,12 @@
                   {{ photographer.user?.name || `Photographer #${photographer.id}` }}
                 </option>
               </select>
-              <router-link to="/admin/photographers" class="mt-1 inline-block text-sm text-burgundy hover:text-burgundy-dark">
-                Manage photographers →
-              </router-link>
+                <router-link
+                  to="/admin/photographers"
+                  class="mt-1 inline-block text-sm text-burgundy hover:text-burgundy-dark"
+                >
+                  Manage photographers →
+                </router-link>
               <p class="mt-1 text-sm text-gray-500">Select the photographer organizing this event</p>
               <p v-if="errors.organizer_id" class="mt-1 text-sm text-red-600">{{ errors.organizer_id }}</p>
             </div>
@@ -248,7 +338,16 @@
 
         <!-- Status & Settings -->
         <div class="bg-white rounded-lg shadow-card p-6">
-          <h2 class="text-xl font-bold text-gray-900 mb-4">Status & Settings</h2>
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <h2 class="text-xl font-bold text-gray-900">Status & Settings</h2>
+            <span
+              v-if="eventState"
+              class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+              :class="eventState.tone"
+            >
+              {{ eventState.label }}
+            </span>
+          </div>
 
           <div class="space-y-4">
             <div>
@@ -315,30 +414,61 @@
         </div>
       </form>
     </div>
+
+    <PexelsPickerModal
+      :visible="pexelsPickerOpen"
+      :target-width="pexelsTarget.width"
+      :target-height="pexelsTarget.height"
+      @close="closePexelsPicker"
+      @select="handlePexelsSelect"
+    />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import axios from 'axios';
+import { ref, onMounted, watch, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import api from '../../../api';
+import { validateUploadFile } from '../../../utils/imageValidation'
 import AdminHeader from '../../../components/AdminHeader.vue'
 import AdminQuickNav from '../../../components/AdminQuickNav.vue'
-
+import PexelsPickerModal from '../../../components/PexelsPickerModal.vue'
 const router = useRouter();
-const route = useRoute();
 const processing = ref(false);
 const loading = ref(true);
 const cities = ref([]);
 const photographers = ref([]);
 const errors = ref({});
+const allowPrefill = ref(false);
+const eventTiming = ref({
+  start_datetime: null,
+  end_datetime: null,
+  event_date: null,
+  duration_hours: null,
+});
+const uploadingImages = ref({
+  hero_image_url: false,
+  banner_image: false,
+});
+
+const pexelsPickerOpen = ref(false);
+const pexelsTarget = ref({
+  field: 'hero_image_url',
+  width: 1600,
+  height: 900,
+});
 
 const form = ref({
   title: '',
   event_type: '',
   description: '',
+  hero_image_url: '',
+  hero_image_credit_name: '',
+  hero_image_credit_url: '',
   banner_image: '',
+  banner_image_credit_name: '',
+  banner_image_credit_url: '',
   event_date: '',
   duration_hours: null,
   city_id: '',
@@ -355,28 +485,113 @@ const form = ref({
   is_verified: false,
 });
 
+const eventState = computed(() => {
+  if (!form.value.status) {
+    return null;
+  }
+
+  if (form.value.status === 'cancelled') {
+    return { label: 'Cancelled', tone: 'bg-red-100 text-red-800' };
+  }
+
+  const timing = eventTiming.value || {};
+  const now = new Date();
+  let start = timing.start_datetime ? new Date(timing.start_datetime) : null;
+  let end = timing.end_datetime ? new Date(timing.end_datetime) : null;
+
+  if (!start && timing.event_date) {
+    start = new Date(timing.event_date);
+    if (timing.duration_hours) {
+      end = new Date(start.getTime() + Number(timing.duration_hours) * 60 * 60 * 1000);
+    } else {
+      end = new Date(start);
+      end.setHours(23, 59, 59, 999);
+    }
+  }
+
+  if (!start) {
+    return { label: 'Date not set', tone: 'bg-gray-100 text-gray-700' };
+  }
+
+  if (end && now > end) {
+    return { label: 'Ended', tone: 'bg-gray-100 text-gray-700' };
+  }
+
+  if (now < start) {
+    return { label: 'Upcoming', tone: 'bg-blue-100 text-blue-800' };
+  }
+
+  return { label: 'Ongoing', tone: 'bg-green-100 text-green-800' };
+});
+
+const EVENT_TYPE_PRESETS = {
+  workshop: {
+    description: 'Hands-on training focused on techniques, lighting, and workflow. Includes guided practice and live critique sessions.',
+    requirements: 'Bring a camera with a charged battery, at least one lens, and a memory card. A tripod is recommended.',
+  },
+  photowalk: {
+    description: 'A guided outdoor session covering composition, street storytelling, and light hunting across key locations.',
+    requirements: 'Comfortable walking shoes, a camera or phone with a full charge, and weather-appropriate clothing.',
+  },
+  expo: {
+    description: 'A showcase of photography brands, gear demos, and creative showcases with networking opportunities.',
+    requirements: 'Carry a valid ID for entry and prepare any business cards or portfolios for networking.',
+  },
+  exhibition: {
+    description: 'Curated photography exhibition featuring thematic galleries, artist talks, and community engagement.',
+    requirements: 'No special equipment required. Photography inside the venue may be restricted by organizers.',
+  },
+  seminar: {
+    description: 'Expert-led talks on industry trends, business strategy, and creative growth for photographers.',
+    requirements: 'Bring a notebook or device for notes. Arrive 15 minutes early for seating.',
+  },
+  meetup: {
+    description: 'Community gathering for photographers to connect, collaborate, and share experiences.',
+    requirements: 'No equipment required. Optional: bring a portfolio or recent work to share.',
+  },
+  webinar: {
+    description: 'Online session covering photography techniques, post-processing, or business insights.',
+    requirements: 'Stable internet connection, headphones, and a quiet space for participation.',
+  },
+  competition: {
+    description: 'Photography competition with submission guidelines, judging criteria, and award announcements.',
+    requirements: 'Prepare your submissions in the required format and adhere to the deadline and theme.',
+  },
+  other: {
+    description: 'Special event tailored for photographers with unique experiences and learning opportunities.',
+    requirements: 'Follow the organizer instructions shared in the event announcement.',
+  },
+};
+
+const applyEventTypePreset = (eventType) => {
+  const preset = EVENT_TYPE_PRESETS[eventType];
+  if (!preset) return;
+  form.value.description = preset.description;
+  form.value.requirements = preset.requirements;
+};
+
 const formatDateForInput = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
+  return `${year}-${month}-${day}`;
+};
+
+const getEventIdFromPath = () => {
+  const segments = window.location.pathname.split('/').filter(Boolean);
+  const editIndex = segments.indexOf('edit');
+  if (editIndex !== -1 && segments[editIndex + 1]) {
+    return segments[editIndex + 1];
+  }
+  return segments[segments.length - 1];
 };
 
 const fetchEvent = async () => {
   try {
-    const eventId = route.params.id;
-    const token = localStorage.getItem('auth_token');
-    
-    const response = await axios.get(`/api/v1/admin/events/${eventId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
-      }
-    });
+    const eventId = getEventIdFromPath();
+    const response = await api.get(`/admin/events/${eventId}`);
     
     const event = response.data.data || response.data;
     
@@ -385,7 +600,12 @@ const fetchEvent = async () => {
       title: event.title || '',
       event_type: event.event_type || '',
       description: event.description || '',
+      hero_image_url: event.hero_image_url || '',
+      hero_image_credit_name: event.hero_image_credit_name || '',
+      hero_image_credit_url: event.hero_image_credit_url || '',
       banner_image: event.banner_image || '',
+      banner_image_credit_name: event.banner_image_credit_name || '',
+      banner_image_credit_url: event.banner_image_credit_url || '',
       event_date: formatDateForInput(event.event_date),
       duration_hours: event.duration_hours || null,
       city_id: event.city_id || '',
@@ -401,6 +621,13 @@ const fetchEvent = async () => {
       is_featured: event.is_featured || false,
       is_verified: event.is_verified || false,
     };
+    eventTiming.value = {
+      start_datetime: event.start_datetime || null,
+      end_datetime: event.end_datetime || null,
+      event_date: event.event_date || null,
+      duration_hours: event.duration_hours || null,
+    };
+    allowPrefill.value = true;
   } catch (error) {
     console.error('Error fetching event:', error);
     
@@ -416,18 +643,19 @@ const fetchEvent = async () => {
   }
 };
 
+watch(
+  () => form.value.event_type,
+  (value, oldValue) => {
+    if (!allowPrefill.value || !value || value === oldValue) return;
+    applyEventTypePreset(value);
+  }
+);
+
 const fetchCities = async () => {
   try {
-    const token = localStorage.getItem('auth_token');
-    if (!token) {
-      console.warn('No auth token found in localStorage');
-      return;
-    }
-    
-    const response = await axios.get('/api/v1/admin/cities?minimal=1', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
+    const response = await api.get('/locations', {
+      params: {
+        type: 'district'
       }
     });
     
@@ -448,16 +676,10 @@ const fetchCities = async () => {
 
 const fetchPhotographers = async () => {
   try {
-    const token = localStorage.getItem('auth_token');
-    if (!token) {
-      console.warn('No auth token found in localStorage');
-      return;
-    }
-    
-    const response = await axios.get('/api/v1/admin/photographers?status=active&minimal=1', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
+    const response = await api.get('/admin/photographers', {
+      params: {
+        status: 'active',
+        minimal: 1
       }
     });
     
@@ -481,16 +703,8 @@ const submitForm = async () => {
   errors.value = {};
 
   try {
-    const eventId = route.params.id;
-    const token = localStorage.getItem('auth_token');
-    
-    const response = await axios.put(`/api/v1/admin/events/${eventId}`, form.value, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    });
+    const eventId = getEventIdFromPath();
+    const response = await api.put(`/admin/events/${eventId}`, form.value);
     
     if (response.data.status === 'success') {
       alert('Event updated successfully!');
@@ -506,6 +720,110 @@ const submitForm = async () => {
     }
   } finally {
     processing.value = false;
+  }
+};
+
+const handleImageUpload = async (field, event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  if (field === 'hero_image_url') {
+    form.value.hero_image_credit_name = '';
+    form.value.hero_image_credit_url = '';
+  }
+  if (field === 'banner_image') {
+    form.value.banner_image_credit_name = '';
+    form.value.banner_image_credit_url = '';
+  }
+
+  const rules = {
+    hero_image_url: { width: 1600, height: 900 },
+    banner_image: { width: 1920, height: 600 }
+  };
+  const rule = rules[field] || {};
+  const validation = await validateUploadFile(file, {
+    label: 'Image',
+    maxBytes: 5 * 1024 * 1024,
+    allowedTypes: ['image/jpeg', 'image/png'],
+    imageWidth: rule.width,
+    imageHeight: rule.height
+  });
+
+  if (!validation.ok) {
+    errors.value[field] = validation.message;
+    event.target.value = '';
+    return;
+  }
+
+  uploadingImages.value[field] = true;
+  errors.value[field] = '';
+
+  try {
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('folder', 'events');
+
+    const response = await api.post('/admin/media/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+
+    if (response.data?.status === 'success' && response.data.data?.url) {
+      form.value[field] = response.data.data.url;
+    } else {
+      errors.value[field] = response.data?.message || 'Image upload failed.';
+    }
+  } catch (error) {
+    errors.value[field] = error.response?.data?.message || 'Image upload failed.';
+  } finally {
+    uploadingImages.value[field] = false;
+    event.target.value = '';
+  }
+};
+
+const openPexelsPicker = (field, width, height) => {
+  pexelsTarget.value = { field, width, height };
+  pexelsPickerOpen.value = true;
+};
+
+const closePexelsPicker = () => {
+  pexelsPickerOpen.value = false;
+};
+
+const applyPexelsCredit = (field, credit) => {
+  if (field === 'hero_image_url') {
+    form.value.hero_image_credit_name = credit?.name || '';
+    form.value.hero_image_credit_url = credit?.url || '';
+  }
+  if (field === 'banner_image') {
+    form.value.banner_image_credit_name = credit?.name || '';
+    form.value.banner_image_credit_url = credit?.url || '';
+  }
+};
+
+const handlePexelsSelect = async ({ file, credit }) => {
+  const field = pexelsTarget.value.field;
+  uploadingImages.value[field] = true;
+  errors.value[field] = '';
+  try {
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('folder', 'events');
+
+    const response = await api.post('/admin/media/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+
+    if (response.data?.status === 'success' && response.data.data?.url) {
+      form.value[field] = response.data.data.url;
+      applyPexelsCredit(field, credit);
+    } else {
+      errors.value[field] = response.data?.message || 'Image upload failed.';
+    }
+  } catch (error) {
+    errors.value[field] = error.response?.data?.message || 'Image upload failed.';
+  } finally {
+    uploadingImages.value[field] = false;
+    closePexelsPicker();
   }
 };
 

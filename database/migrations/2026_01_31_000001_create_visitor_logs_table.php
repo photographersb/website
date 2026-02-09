@@ -33,7 +33,7 @@ return new class extends Migration
         Schema::create('page_views', function (Blueprint $table) {
             $table->id();
             $table->foreignId('visitor_log_id')->constrained()->onDelete('cascade');
-            $table->string('url', 500);
+            $table->string('url', 191);
             $table->string('page_title', 255)->nullable();
             $table->string('referrer', 500)->nullable();
             $table->integer('time_on_page')->default(0); // seconds

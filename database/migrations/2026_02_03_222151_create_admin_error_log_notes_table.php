@@ -11,27 +11,29 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('admin_error_log_notes', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('error_log_id');
-            $table->text('note');
-            $table->unsignedBigInteger('added_by_user_id');
-            $table->timestamps();
-            
-            // Foreign Keys
-            $table->foreign('error_log_id')
-                ->references('id')
-                ->on('admin_error_logs')
-                ->onDelete('cascade');
+        if (!Schema::hasTable('admin_error_log_notes')) {
+            Schema::create('admin_error_log_notes', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('error_log_id');
+                $table->text('note');
+                $table->unsignedBigInteger('added_by_user_id');
+                $table->timestamps();
                 
-            $table->foreign('added_by_user_id')
-                ->references('id')
-                ->on('users')
-                ->onDelete('cascade');
-                
-            // Index for quick lookups
-            $table->index('error_log_id');
-        });
+                // Foreign Keys
+                $table->foreign('error_log_id')
+                    ->references('id')
+                    ->on('admin_error_logs')
+                    ->onDelete('cascade');
+                    
+                $table->foreign('added_by_user_id')
+                    ->references('id')
+                    ->on('users')
+                    ->onDelete('cascade');
+                    
+                // Index for quick lookups
+                $table->index('error_log_id');
+            });
+        }
     }
 
     /**

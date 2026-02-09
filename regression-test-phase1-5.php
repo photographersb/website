@@ -117,10 +117,9 @@ try {
     test("CompetitionScore has 'competition' relationship", $reflection->hasMethod('competition'));
     
     // Test scopes exist
-    $competition = Competition::query();
-    test("Competition has 'published' scope", method_exists($competition, 'published'));
-    test("Competition has 'active' scope", method_exists($competition, 'active'));
-    test("Competition has 'completed' scope", method_exists($competition, 'completed'));
+    test("Competition has 'published' scope", method_exists(Competition::class, 'scopePublished'));
+    test("Competition has 'active' scope", method_exists(Competition::class, 'scopeActive'));
+    test("Competition has 'completed' scope", method_exists(Competition::class, 'scopeCompleted'));
     
 } catch (\Exception $e) {
     echo RED . "  ✗ Phase 2 Error: " . $e->getMessage() . RESET . PHP_EOL;

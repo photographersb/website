@@ -13,7 +13,7 @@
         minlength="10"
         maxlength="1000"
         required
-      ></textarea>
+      />
       
       <div class="flex justify-between items-center mt-2">
         <span class="text-sm text-gray-500">{{ replyText.length }}/1000 characters</span>
@@ -22,8 +22,8 @@
           <button
             v-if="existingReply"
             type="button"
-            @click="cancelEdit"
             class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+            @click="cancelEdit"
           >
             Cancel
           </button>
@@ -31,9 +31,9 @@
           <button
             v-if="existingReply"
             type="button"
-            @click="deleteReply"
             :disabled="loading"
             class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
+            @click="deleteReply"
           >
             Delete
           </button>
@@ -49,18 +49,26 @@
         </div>
       </div>
 
-      <div v-if="error" class="mt-3 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+      <div
+        v-if="error"
+        class="mt-3 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm"
+      >
         {{ error }}
       </div>
 
-      <div v-if="success" class="mt-3 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
+      <div
+        v-if="success"
+        class="mt-3 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm"
+      >
         {{ success }}
       </div>
     </form>
 
     <!-- Professional Reply Tips -->
     <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-      <p class="text-sm text-blue-800 font-medium mb-2">💡 Tips for a Great Reply:</p>
+      <p class="text-sm text-blue-800 font-medium mb-2">
+        💡 Tips for a Great Reply:
+      </p>
       <ul class="text-xs text-blue-700 space-y-1">
         <li>• Thank the client for their feedback</li>
         <li>• Address any concerns professionally</li>
