@@ -925,6 +925,14 @@ watch(mobileMenuOpen, (isOpen) => {
     mobileUserMenuOpen.value = false
   }
 })
+
+// Watch for route changes and re-hydrate user when navigating to protected routes
+watch(() => route.path, (newPath) => {
+  // Re-hydrate user when navigating to dashboard, admin, or judge areas
+  if (newPath.startsWith('/dashboard') || newPath.startsWith('/admin') || newPath.startsWith('/judge')) {
+    hydrateUser()
+  }
+})
 </script>
 
 <style scoped>
