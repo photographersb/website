@@ -157,6 +157,24 @@
             {{ loginError }}
           </p>
 
+          <!-- Resend Verification Button -->
+          <div
+            v-if="showResendVerification"
+            class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4"
+          >
+            <p class="text-sm text-gray-700 mb-3">
+              📧 <strong>Email not verified?</strong> Check your inbox or spam folder.
+            </p>
+            <button
+              type="button"
+              :disabled="resendingVerification"
+              class="w-full bg-burgundy text-white py-2 rounded-lg hover:bg-[#6F112D] transition-colors disabled:opacity-50 text-sm font-medium"
+              @click="resendVerification"
+            >
+              {{ resendingVerification ? 'Sending...' : 'Resend Verification Email' }}
+            </button>
+          </div>
+
           <!-- Social Login Divider -->
           <div class="relative my-6">
             <div class="absolute inset-0 flex items-center">
@@ -528,6 +546,8 @@ const loginLoading = ref(false);
 const registerLoading = ref(false);
 const loginError = ref('');
 const registerError = ref('');
+const showResendVerification = ref(false);
+const resendingVerification = ref(false);
 
 const syncTabFromRoute = () => {
   const tab = String(route.query?.tab || '').toLowerCase();
@@ -536,6 +556,11 @@ const syncTabFromRoute = () => {
   } else if (tab === 'login') {
     isLogin.value = true;
   }
+  
+  // Clear errors and resend button when switching tabs
+  loginError.value = '';
+  registerError.value = '';
+  showResendVerification.value = false;
 };
 
 const normalizeRole = (role) => String(role || '').toLowerCase().replace(/[\s-]+/g, '_');
@@ -543,6 +568,7 @@ const normalizeRole = (role) => String(role || '').toLowerCase().replace(/[\s-]+
 const login = async () => {
   loginLoading.value = true;
   loginError.value = '';
+  showResendVerification.value = false;
 
   try {
     if (import.meta.env.DEV) {
@@ -589,8 +615,34 @@ const login = async () => {
     const message = error.response?.data?.message || error.response?.data?.errors?.email?.[0] || 'Login failed. Please check your credentials.';
     loginError.value = message;
     notifyError(message, 'Login Failed');
+    
+    // Show resend verification button if email not verified
+    if (message.toLowerCase().includes('verify') || message.toLowerCase().includes('verification')) {
+      showResendVerification.value = true;
+    }
   } finally {
     loginLoading.value = false;
+  }
+};
+
+const resendVerification = async () => {
+  resendingVerification.value = true;
+  
+  try {
+    await ensureCsrfCookie();
+    const { data } = await api.post('/auth/resend-verification', { 
+      email: loginForm.value.email 
+    });
+    
+    if (data.status === 'success') {
+      notifySuccess('Verification email sent! Please check your inbox and spam folder.', 'Email Sent');
+      showResendVerification.value = false;
+    }
+  } catch (error) {
+    const message = error.response?.data?.message || 'Failed to resend verification email. Please try again.';
+    notifyError(message, 'Failed to Send');
+  } finally {
+    resendingVerification.value = false;
   }
 };
 
