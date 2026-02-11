@@ -465,7 +465,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import api from '../api';
+import api, { ensureCsrfCookie } from '../api';
 import { notifySuccess, notifyWarning, notifyError } from '../utils/notifications';
 
 const router = useRouter();
@@ -513,6 +513,7 @@ const login = async () => {
     if (import.meta.env.DEV) {
       console.log('Login attempt:', { email: loginForm.value.email, password: '***' });
     }
+    await ensureCsrfCookie();
     const { data } = await api.post('/auth/login', loginForm.value);
     if (import.meta.env.DEV) {
       console.log('Login response:', data);
@@ -530,7 +531,6 @@ const login = async () => {
         return;
       }
 
-      localStorage.setItem('auth_token', data.data.token);
       localStorage.setItem('user', JSON.stringify(data.data.user));
       localStorage.setItem('user_role', normalizeRole(data.data.user.role));
       localStorage.setItem('user_name', data.data.user.name);
@@ -564,6 +564,7 @@ const register = async () => {
   registerError.value = '';
 
   try {
+    await ensureCsrfCookie();
     const { data } = await api.post('/auth/register', registerForm.value);
 
     if (data.status === 'success') {

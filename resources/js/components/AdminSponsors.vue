@@ -618,10 +618,8 @@ onMounted(() => {
 const fetchSponsors = async () => {
   loading.value = true
   try {
-    const token = localStorage.getItem('auth_token')
     const response = await fetch('/api/v1/admin/platform-sponsors', {
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Accept': 'application/json'
       }
     })
@@ -657,7 +655,6 @@ const editSponsor = (sponsor) => {
 const saveSponsor = async () => {
   saving.value = true
   try {
-    const token = localStorage.getItem('auth_token')
     const url = editingId.value 
       ? `/api/v1/admin/platform-sponsors/${editingId.value}`
       : '/api/v1/admin/platform-sponsors'
@@ -665,7 +662,6 @@ const saveSponsor = async () => {
     const response = await fetch(url, {
       method: editingId.value ? 'PUT' : 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
@@ -691,11 +687,9 @@ const deleteSponsor = async (id) => {
   if (!confirm('Are you sure you want to delete this sponsor?')) return
   
   try {
-    const token = localStorage.getItem('auth_token')
     const response = await fetch(`/api/v1/admin/platform-sponsors/${id}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Accept': 'application/json'
       }
     })
@@ -714,11 +708,9 @@ const deleteSponsor = async (id) => {
 
 const toggleFeatured = async (sponsor) => {
   try {
-    const token = localStorage.getItem('auth_token')
     const response = await fetch(`/api/v1/admin/platform-sponsors/${sponsor.id}`, {
       method: 'PUT',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },

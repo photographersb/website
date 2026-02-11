@@ -189,7 +189,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import api from '../api';
+import api, { ensureCsrfCookie } from '../api';
 
 const router = useRouter();
 const loading = ref(false);
@@ -211,16 +211,14 @@ const login = async () => {
   errors.value = {};
 
   try {
+    await ensureCsrfCookie();
     const { data } = await api.post('/auth/login', form.value);
 
-    if (data?.status === 'success' && data?.data?.token) {
-      const { token, user } = data.data;
+    if (data?.status === 'success' && data?.data?.user) {
+      const { user } = data.data;
 
-      localStorage.setItem('token', token);
-      localStorage.setItem('auth_token', token);
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('user_role', normalizeRole(user?.role));
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       if (user?.role === 'admin' || user?.role === 'super_admin' || user?.role === 'moderator') {
         router.push('/admin/dashboard');
@@ -245,14 +243,8 @@ const login = async () => {
 };
 
 onMounted(async () => {
-  const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
-  if (!token) return;
-
-  localStorage.setItem('token', token);
-  localStorage.setItem('auth_token', token);
-  api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
   try {
+    await ensureCsrfCookie();
     const { data } = await api.get('/auth/me');
     const user = data?.data || data?.user || data;
     if (user?.role) {

@@ -318,7 +318,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import api from '../api';
+import api, { ensureCsrfCookie } from '../api';
 
 const router = useRouter();
 const loading = ref(false);
@@ -353,22 +353,12 @@ const register = async () => {
       accept_terms: acceptTerms.value
     };
 
+    await ensureCsrfCookie();
     const { data } = await api.post('/auth/register', payload);
 
-    if (data.token) {
-      // Store token
-      localStorage.setItem('auth_token', data.token);
-      api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
-      
-      // Show verification message or redirect
-      error.value = ''; // Clear any previous errors
-      
-      // Redirect based on role
-      if (data.user?.role === 'photographer') {
-        router.push('/photographer/onboarding');
-      } else {
-        router.push('/dashboard');
-      }
+    if (data?.status === 'success' || data?.data?.user_id) {
+      error.value = '';
+      router.push('/login');
     }
   } catch (err) {
     if (err.response?.data?.errors) {

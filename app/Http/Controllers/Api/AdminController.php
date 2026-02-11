@@ -102,7 +102,7 @@ class AdminController extends Controller
                     'tips_today' => DB::table('photographer_tips')->where('status', 'completed')->whereDate('created_at', today())->sum('amount') ?? 0,
                     
                     // Featured Photographer Revenue
-                    'featured_revenue' => DB::table('featured_photographer_payments')->where('payment_status', 'completed')->sum('amount') ?? 0,
+                    'featured_revenue' => DB::table('featured_photographer_payments')->where('status', 'completed')->sum('amount') ?? 0,
                     'active_featured_photographers' => DB::table('featured_photographers')->where('is_active', true)->where('expires_at', '>=', now())->count(),
                     
                     // Package Upgrade Revenue

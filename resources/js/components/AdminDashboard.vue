@@ -1554,9 +1554,7 @@ const fetchDashboardData = async () => {
     const response = await fetch(
       `/api/v1/admin/dashboard?range=${timeRange.value}`,
       {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        headers: {}
       }
     );
 
@@ -1605,9 +1603,7 @@ const approveItem = async (item) => {
       `/api/v1/admin/${item.type}/${item.id}/approve`,
       {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        headers: {}
       }
     );
 
@@ -1780,16 +1776,8 @@ onMounted(() => {
         loading.value = true;
         error.value = '';
 
-        const token = localStorage.getItem('auth_token');
-        if (!token) {
-          error.value = 'Authentication token not found. Please login first.';
-          loading.value = false;
-          return;
-        }
-
         const response = await fetch('/api/v1/admin/dashboard', {
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
           },
         });

@@ -302,7 +302,7 @@ export default {
     const unreadCount = ref(0);
 
     const isAuthenticated = computed(() => {
-      return !!localStorage.getItem('auth_token');
+      return !!localStorage.getItem('user');
     });
 
     const user = computed(() => {
@@ -323,14 +323,12 @@ export default {
         await fetch('/api/v1/auth/logout', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
             'Content-Type': 'application/json',
           },
         });
       } catch (error) {
         console.error('Logout error:', error);
       } finally {
-        localStorage.removeItem('auth_token');
         localStorage.removeItem('user');
         showUserMenu.value = false;
         router.push('/');
@@ -342,9 +340,7 @@ export default {
 
       try {
         const response = await fetch('/api/v1/notifications/unread-count', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
-          },
+          headers: {},
         });
         const data = await response.json();
         if (data.status === 'success') {

@@ -875,17 +875,6 @@ export default {
       this.loading = true;
       this.error = null;
 
-      // Check for valid auth token
-      const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
-      if (!token) {
-        this.error = 'Authentication required. Redirecting to login...';
-        this.loading = false;
-        setTimeout(() => {
-          window.location.href = '/admin/login';
-        }, 1500);
-        return;
-      }
-
       api.get('/admin/dashboard')
         .then(response => {
           const data = response.data;

@@ -177,7 +177,7 @@ const fetchActivities = async () => {
   isLoading.value = true;
   try {
     const response = await fetch('/api/v1/admin/activity-logs', {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
     if (response.ok) {
       const data = await response.json();

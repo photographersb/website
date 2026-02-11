@@ -125,7 +125,6 @@ export default {
           method,
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
           },
           body: JSON.stringify({
             reply: replyText.value,
@@ -170,9 +169,7 @@ export default {
       try {
         const response = await fetch(`/api/v1/photographer/reviews/replies/${props.existingReply.id}`, {
           method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
-          },
+          headers: {},
         });
 
         const data = await response.json();

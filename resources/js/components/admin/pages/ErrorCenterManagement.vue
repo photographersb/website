@@ -225,7 +225,7 @@ const fetchErrors = async () => {
   isLoading.value = true;
   try {
     const response = await fetch('/api/v1/admin/errors', {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
     if (response.ok) {
       const data = await response.json();
@@ -245,7 +245,6 @@ const updateErrorStatus = async (error, event) => {
     const response = await fetch(`/api/v1/admin/errors/${error.id}`, {
       method: 'PATCH',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ is_resolved: newStatus })

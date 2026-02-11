@@ -11,35 +11,18 @@
       <!-- Quick Navigation -->
       <AdminQuickNav />
 
-      <!-- Create Competition Button -->
-      <div class="flex justify-end">
-        <router-link
-          to="/admin/competitions/create"
-          class="inline-flex items-center px-6 py-3 bg-burgundy text-white rounded-lg font-semibold hover:bg-burgundy-dark transition-all shadow-lg hover:shadow-xl"
-        >
-          <svg
-            class="w-5 h-5 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+      <AdminSectionHeader
+        title="Competitions"
+        subtitle="Comprehensive overview and management of photography competitions."
+        eyebrow="Admin / Competitions"
+      >
+        <template #actions>
+          <router-link
+            to="/admin/competitions/create"
+            class="inline-flex items-center px-6 py-3 bg-burgundy text-white rounded-lg font-semibold hover:bg-burgundy-dark transition-all shadow-lg hover:shadow-xl"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-          New Competition
-        </router-link>
-      </div>
-
-      <!-- Primary Stats Grid -->
-      <div class="stats-grid">
-        <div class="stat-card stat-blue">
-          <div class="stat-icon">
             <svg
-              class="w-8 h-8"
+              class="w-5 h-5 mr-2"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -48,86 +31,15 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                d="M12 4v16m8-8H4"
               />
             </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Total Competitions</span>
-            <span class="stat-value">{{ stats.total }}</span>
-            <span class="stat-trend">All time</span>
-          </div>
-        </div>
+            New Competition
+          </router-link>
+        </template>
+      </AdminSectionHeader>
 
-        <div class="stat-card stat-green">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Active Now</span>
-            <span class="stat-value">{{ stats.active }}</span>
-            <span class="stat-trend">Accepting submissions</span>
-          </div>
-        </div>
-
-        <div class="stat-card stat-yellow">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Upcoming</span>
-            <span class="stat-value">{{ stats.upcoming }}</span>
-            <span class="stat-trend">Starting soon</span>
-          </div>
-        </div>
-
-        <div class="stat-card stat-purple">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Completed</span>
-            <span class="stat-value">{{ stats.completed }}</span>
-            <span class="stat-trend">Winners announced</span>
-          </div>
-        </div>
-      </div>
+      <AdminStatsStrip :stats="statItems" />
 
       <!-- Secondary Stats -->
       <div class="secondary-stats">
@@ -640,7 +552,7 @@
           </button>
         </div>
 
-        <div class="filters-bar">
+        <AdminFilterBar>
           <div class="search-box">
             <svg
               class="search-icon"
@@ -725,13 +637,15 @@
             </option>
           </select>
 
-          <button
-            class="btn-clear"
-            @click="clearFilters"
-          >
-            Clear Filters
-          </button>
-        </div>
+          <template #actions>
+            <button
+              class="btn-clear"
+              @click="clearFilters"
+            >
+              Clear Filters
+            </button>
+          </template>
+        </AdminFilterBar>
 
         <!-- Competitions Table -->
         <div
@@ -1067,14 +981,53 @@
 </template>
 
 <script>
+import { h } from 'vue';
 import api from '../../../api';
 import AdminHeader from '../../../components/AdminHeader.vue';
 import AdminQuickNav from '../../../components/AdminQuickNav.vue';
+import AdminSectionHeader from '../../../components/admin/ui/AdminSectionHeader.vue';
+import AdminStatsStrip from '../../../components/admin/ui/AdminStatsStrip.vue';
+import AdminFilterBar from '../../../components/admin/ui/AdminFilterBar.vue';
+
+const TotalIcon = {
+  render() {
+    return h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+      h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' })
+    ]);
+  }
+};
+
+const ActiveIcon = {
+  render() {
+    return h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+      h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M13 10V3L4 14h7v7l9-11h-7z' })
+    ]);
+  }
+};
+
+const UpcomingIcon = {
+  render() {
+    return h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+      h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' })
+    ]);
+  }
+};
+
+const CompletedIcon = {
+  render() {
+    return h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+      h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M5 13l4 4L19 7' })
+    ]);
+  }
+};
 
 export default {
   components: {
     AdminHeader,
-    AdminQuickNav
+    AdminQuickNav,
+    AdminSectionHeader,
+    AdminStatsStrip,
+    AdminFilterBar
   },
   data() {
     return {
@@ -1096,6 +1049,38 @@ export default {
   },
 
   computed: {
+    statItems() {
+      return [
+        {
+          label: 'Total Competitions',
+          value: this.stats.total || 0,
+          meta: 'All time',
+          icon: TotalIcon,
+          tone: 'neutral'
+        },
+        {
+          label: 'Active Now',
+          value: this.stats.active || 0,
+          meta: 'Accepting submissions',
+          icon: ActiveIcon,
+          tone: 'success'
+        },
+        {
+          label: 'Upcoming',
+          value: this.stats.upcoming || 0,
+          meta: 'Starting soon',
+          icon: UpcomingIcon,
+          tone: 'warning'
+        },
+        {
+          label: 'Completed',
+          value: this.stats.completed || 0,
+          meta: 'Winners announced',
+          icon: CompletedIcon,
+          tone: 'info'
+        }
+      ];
+    },
     activeCompetitions() {
       return (this.competitions.data || []).filter(c => c.status === 'active').slice(0, 3);
     },

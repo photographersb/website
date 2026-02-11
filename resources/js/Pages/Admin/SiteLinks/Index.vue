@@ -335,10 +335,7 @@ const filterBySection = () => {
 
 const toggleActive = async (link) => {
   try {
-    const token = localStorage.getItem('auth_token')
-    const response = await api.post(`/admin/settings/site-links/${link.id}/toggle-active`, {}, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
+    const response = await api.post(`/admin/settings/site-links/${link.id}/toggle-active`)
     
     if (response.data.success) {
       link.is_active = response.data.is_active
@@ -355,10 +352,7 @@ const deleteLink = async (link) => {
   }
 
   try {
-    const token = localStorage.getItem('auth_token')
-    await api.delete(`/admin/settings/site-links/${link.id}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
+    await api.delete(`/admin/settings/site-links/${link.id}`)
     
     router.visit('/admin/settings/site-links')
   } catch (error) {
@@ -369,10 +363,7 @@ const deleteLink = async (link) => {
 
 const clearCache = async () => {
   try {
-    const token = localStorage.getItem('auth_token')
-    await api.post('/admin/settings/site-links/clear-cache', {}, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
+    await api.post('/admin/settings/site-links/clear-cache')
     
     alert('Cache cleared successfully!')
   } catch (error) {

@@ -651,8 +651,7 @@ const fetchEvent = async () => {
 };
 
 const handleRsvp = async () => {
-  const token = localStorage.getItem('auth_token');
-  if (!token) {
+  if (!localStorage.getItem('user')) {
     router.push('/auth');
     return;
   }

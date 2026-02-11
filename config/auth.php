@@ -1,9 +1,13 @@
 <?php
 
 return [
-    'default' => env('AUTH_GUARD', 'sanctum'),
+    'default' => env('AUTH_GUARD', 'web'),
 
     'guards' => [
+        'web' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
         'api' => [
             'driver' => 'sanctum',
             'provider' => 'users',

@@ -359,24 +359,22 @@ const handleLogout = async () => {
   try {
     await fetch('/api/v1/auth/logout', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
+      headers: {}
     });
   } catch (error) {
     console.error('Logout error:', error);
   }
 
   localStorage.removeItem('token');
-  localStorage.removeItem('auth_token');
+  localStorage.removeItem('user');
+  localStorage.removeItem('user_role');
   router.push('/login');
 };
 
 const fetchBadgeCounts = async () => {
   try {
-    const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
     const response = await fetch('/api/v1/admin/dashboard', {
-      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      headers: {}
     });
 
     if (response.ok) {

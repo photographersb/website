@@ -1321,8 +1321,7 @@ const startBooking = () => {
 };
 
 const writeReview = () => {
-  const token = localStorage.getItem('auth_token');
-  if (!token) {
+  if (!localStorage.getItem('user')) {
     router.push('/auth');
     return;
   }

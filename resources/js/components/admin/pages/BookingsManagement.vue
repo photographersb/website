@@ -205,7 +205,7 @@ const fetchBookings = async () => {
   isLoading.value = true;
   try {
     const response = await fetch('/api/v1/admin/bookings', {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
     if (response.ok) {
       const data = await response.json();
@@ -231,7 +231,6 @@ const handleSaveBooking = async () => {
     const response = await fetch(`/api/v1/admin/bookings/${editingBooking.value.id}`, {
       method: 'PUT',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(formData.value)
@@ -255,7 +254,7 @@ const deleteBooking = async (booking) => {
   try {
     const response = await fetch(`/api/v1/admin/bookings/${booking.id}`, {
       method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
     if (response.ok) {
       bookings.value = bookings.value.filter(b => b.id !== booking.id);

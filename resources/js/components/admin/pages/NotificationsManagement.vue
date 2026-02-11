@@ -166,7 +166,7 @@ const fetchNotifications = async () => {
   isLoading.value = true;
   try {
     const response = await fetch('/api/v1/admin/notifications', {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
     if (response.ok) {
       const data = await response.json();
@@ -186,7 +186,7 @@ const markAsRead = async (notification) => {
   try {
     const response = await fetch(`/api/v1/admin/notifications/${notification.id}/read`, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
     if (response.ok) {
       notification.read_at = new Date().toISOString();

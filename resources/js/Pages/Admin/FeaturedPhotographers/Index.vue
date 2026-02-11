@@ -11,35 +11,18 @@
       <!-- Quick Navigation -->
       <AdminQuickNav />
 
-      <!-- Add Featured Button -->
-      <div class="flex justify-end">
-        <button
-          class="btn-primary"
-          @click="showAddModal = true"
-        >
-          <svg
-            class="w-5 h-5 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+      <AdminSectionHeader
+        title="Featured Photographers"
+        subtitle="Manage featured listings and photographer promotions."
+        eyebrow="Admin / Featured Photographers"
+      >
+        <template #actions>
+          <button
+            class="btn-primary"
+            @click="showAddModal = true"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-          Add Featured Photographer
-        </button>
-      </div>
-
-      <!-- Stats Cards -->
-      <div class="stats-grid">
-        <div class="stat-card stat-blue">
-          <div class="stat-icon">
             <svg
-              class="w-8 h-8"
+              class="w-5 h-5 mr-2"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -48,86 +31,19 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                d="M12 4v16m8-8H4"
               />
             </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Total Featured</span>
-            <span class="stat-value">{{ stats.total }}</span>
-          </div>
-        </div>
+            Add Featured Photographer
+          </button>
+        </template>
+      </AdminSectionHeader>
 
-        <div class="stat-card stat-green">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Active Now</span>
-            <span class="stat-value">{{ stats.active }}</span>
-          </div>
-        </div>
-
-        <div class="stat-card stat-purple">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Total Revenue</span>
-            <span class="stat-value">৳{{ formatNumber(stats.revenue) }}</span>
-          </div>
-        </div>
-
-        <div class="stat-card stat-amber">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Premium Tier</span>
-            <span class="stat-value">{{ stats.premium }}</span>
-          </div>
-        </div>
-      </div>
+      <AdminStatsStrip :stats="statItems" />
 
       <!-- Filters & Search -->
       <div class="content-card">
-        <div class="filters-bar">
+        <AdminFilterBar>
           <div class="search-box">
             <svg
               class="search-icon"
@@ -220,7 +136,7 @@
               </option>
             </select>
           </div>
-        </div>
+        </AdminFilterBar>
 
         <!-- Featured Photographers Table -->
         <div class="table-container">
@@ -602,9 +518,12 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, h } from 'vue'
 import AdminHeader from '@/components/AdminHeader.vue'
 import AdminQuickNav from '@/components/AdminQuickNav.vue'
+import AdminSectionHeader from '@/components/admin/ui/AdminSectionHeader.vue'
+import AdminStatsStrip from '@/components/admin/ui/AdminStatsStrip.vue'
+import AdminFilterBar from '@/components/admin/ui/AdminFilterBar.vue'
 import api from '../../../api'
 import { formatDate, formatNumber } from '@/utils/formatters'
 
@@ -624,6 +543,22 @@ const stats = ref({
   revenue: 0,
   premium: 0
 })
+
+const TotalIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z' })
+])
+
+const ActiveIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' })
+])
+
+const RevenueIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' })
+])
+
+const PremiumIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M13 10V3L4 14h7v7l9-11h-7z' })
+])
 
 const featured = ref([])
 const pagination = ref({
@@ -646,6 +581,37 @@ const formData = ref({
 
 // Computed
 const filteredFeatured = computed(() => featured.value)
+
+const statItems = computed(() => [
+  {
+    label: 'Total Featured',
+    value: stats.value.total,
+    meta: 'All tiers',
+    icon: TotalIcon,
+    tone: 'neutral',
+  },
+  {
+    label: 'Active Now',
+    value: stats.value.active,
+    meta: 'Live listings',
+    icon: ActiveIcon,
+    tone: 'success',
+  },
+  {
+    label: 'Total Revenue',
+    value: `৳${formatNumber(stats.value.revenue)}`,
+    meta: 'Lifetime',
+    icon: RevenueIcon,
+    tone: 'info',
+  },
+  {
+    label: 'Premium Tier',
+    value: stats.value.premium,
+    meta: 'Top package',
+    icon: PremiumIcon,
+    tone: 'warning',
+  }
+])
 
 // Methods
 const fetchData = async () => {
@@ -1038,79 +1004,11 @@ fetchData()
   background: #fecaca;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-}
-
-.stat-card {
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-  color: white;
-}
-
-.stat-blue {
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
-}
-
-.stat-green {
-  background: linear-gradient(135deg, #10b981, #047857);
-}
-
-.stat-purple {
-  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-}
-
-.stat-amber {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-}
-
-.stat-red {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-}
-
-.stat-icon {
-  width: 50px;
-  height: 50px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.stat-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-label {
-  font-size: 0.875rem;
-  opacity: 0.9;
-}
-
-.stat-value {
-  font-size: 1.875rem;
-  font-weight: 700;
-}
-
 .content-card {
   background: white;
   border-radius: 0.5rem;
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.filters-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
 }
 
 .search-box {

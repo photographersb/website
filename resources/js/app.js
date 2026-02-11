@@ -975,21 +975,15 @@ const getElementInfo = (target) => {
 }
 
 const buildClickHeaders = () => {
-    const token = localStorage.getItem('auth_token') || localStorage.getItem('token')
-    const headers = { 'Content-Type': 'application/json' }
-    if (token) {
-        headers.Authorization = `Bearer ${token}`
-    }
-    return headers
+    return { 'Content-Type': 'application/json' }
 }
 
 const sendClickBatch = async (events, useBeacon = false) => {
     if (!events.length) return
 
     const body = JSON.stringify({ events })
-    const token = localStorage.getItem('auth_token') || localStorage.getItem('token')
 
-    if (useBeacon && !token && navigator.sendBeacon) {
+    if (useBeacon && navigator.sendBeacon) {
         try {
             const blob = new Blob([body], { type: 'application/json' })
             navigator.sendBeacon(CLICK_ENDPOINT, blob)
@@ -1080,14 +1074,23 @@ const hydrateUserFromApi = async () => {
 }
 
 router.beforeEach(async (to, from, next) => {
-    const token = localStorage.getItem('auth_token') || localStorage.getItem('token')
     const user = JSON.parse(localStorage.getItem('user') || '{}')
     let userRole = normalizeRole(localStorage.getItem('user_role') || user.role)
     const isAdminRoute = to.path.startsWith('/admin')
+    const shouldHydrate = Boolean(
+        userRole ||
+        to.meta?.requiresAuth ||
+        to.meta?.requiresAdmin ||
+        isAdminRoute ||
+        to.path.startsWith('/dashboard') ||
+        to.path.startsWith('/judge')
+    )
 
-    if (token && !userRole) {
+    if (!userRole && shouldHydrate) {
         userRole = await hydrateUserFromApi()
     }
+
+    const isAuthenticated = Boolean(userRole)
 
     if (to.path === '/bookings' && ['photographer', 'judge', 'admin', 'super_admin', 'moderator'].includes(userRole)) {
         if (userRole === 'judge') {
@@ -1104,7 +1107,7 @@ router.beforeEach(async (to, from, next) => {
     }
 
     // Redirect authenticated users from auth/login pages to their dashboard
-    if (['/auth', '/login', '/admin/login'].includes(to.path) && token) {
+    if (['/auth', '/login', '/admin/login'].includes(to.path) && userRole) {
         if (userRole && ['admin', 'super_admin', 'moderator'].includes(userRole)) {
             return next('/admin/dashboard')
         } else if (userRole === 'photographer') {
@@ -1117,22 +1120,15 @@ router.beforeEach(async (to, from, next) => {
         }
     }
 
-    if (to.meta.requiresAuth && !token) {
+    if (to.meta.requiresAuth && !isAuthenticated) {
         return next(isAdminRoute ? '/admin/login' : '/auth')
     }
 
     const hasAdminRole = ['admin', 'super_admin', 'moderator'].includes(userRole)
     if (to.meta.requiresAdmin && !hasAdminRole) {
-        if (!userRole && token) {
-            const refreshedRole = await hydrateUserFromApi()
-            if (['admin', 'super_admin', 'moderator'].includes(refreshedRole)) {
-                return next()
-            }
-
-            window.location.href = '/403'
-            return
+        if (!userRole) {
+            return next('/admin/login')
         }
-
         window.location.href = '/403'
         return
     }

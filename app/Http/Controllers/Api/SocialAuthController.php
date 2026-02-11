@@ -21,7 +21,7 @@ class SocialAuthController extends Controller
     /**
      * Redirect to the OAuth provider
      */
-    public function redirectToProvider(string $provider): JsonResponse
+    public function redirectToProvider(string $provider)
     {
         try {
             $this->validateProvider($provider);
@@ -30,10 +30,14 @@ class SocialAuthController extends Controller
                 ->stateless()
                 ->redirect()
                 ->getTargetUrl();
-            
-            return $this->success([
-                'redirect_url' => $redirectUrl
-            ], 'Redirect URL generated successfully');
+
+            if (request()->expectsJson()) {
+                return $this->success([
+                    'redirect_url' => $redirectUrl
+                ], 'Redirect URL generated successfully');
+            }
+
+            return redirect()->away($redirectUrl);
             
         } catch (\Exception $e) {
             return $this->error('Failed to redirect to provider', 500);
@@ -43,7 +47,7 @@ class SocialAuthController extends Controller
     /**
      * Handle OAuth provider callback
      */
-    public function handleProviderCallback(string $provider): JsonResponse
+    public function handleProviderCallback(string $provider)
     {
         try {
             $this->validateProvider($provider);
@@ -53,17 +57,43 @@ class SocialAuthController extends Controller
             
             // Find or create user
             $user = $this->findOrCreateUser($providerUser, $provider);
-            
-            // Generate API token
-            $token = $user->createToken('social-auth-token')->plainTextToken;
-            
-            return $this->success([
-                'user' => $user,
-                'token' => $token,
-            ], 'Successfully authenticated with ' . ucfirst($provider));
+
+            Auth::guard('web')->login($user);
+            request()->session()->regenerate();
+
+            if (request()->expectsJson()) {
+                return $this->success([
+                    'user' => $user,
+                ], 'Successfully authenticated with ' . ucfirst($provider));
+            }
+
+            $payload = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+            ];
+
+            return response()
+                ->view('oauth-callback', [
+                    'status' => 'success',
+                    'user' => $payload,
+                    'provider' => $provider,
+                ])
+                ->header('Content-Type', 'text/html');
             
         } catch (\Exception $e) {
-            return $this->error('Authentication failed', 500);
+            if (request()->expectsJson()) {
+                return $this->error('Authentication failed', 500);
+            }
+
+            return response()
+                ->view('oauth-callback', [
+                    'status' => 'error',
+                    'message' => 'Authentication failed',
+                    'provider' => $provider,
+                ])
+                ->header('Content-Type', 'text/html');
         }
     }
 

@@ -558,8 +558,7 @@ const viewEvent = (event) => {
 };
 
 const toggleRsvp = async (event) => {
-  const token = localStorage.getItem('auth_token');
-  if (!token) {
+  if (!localStorage.getItem('user')) {
     router.push('/auth');
     return;
   }

@@ -135,7 +135,10 @@ const loginWith = async (provider) => {
 
     // Get redirect URL from backend
     const response = await api.get(`/auth/${provider}/redirect`);
-    const redirectUrl = response.data.redirect_url;
+    const redirectUrl = response.data?.data?.redirect_url;
+    if (!redirectUrl) {
+      throw new Error('Missing redirect URL from provider');
+    }
 
     // Option 1: Open in popup (better UX)
     const popup = window.open(
@@ -169,14 +172,27 @@ const handleOAuthCallback = (event) => {
     return;
   }
 
-  const { type, token, user, error: callbackError } = event.data;
+  const { type, user, error: callbackError } = event.data || {};
 
-  if (type === 'oauth_success' && token) {
-    // Store token
-    localStorage.setItem('auth_token', token);
-    
-    // Emit success event
-    emit('success', { user, token });
+  if (type === 'oauth_success') {
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('user_role', user?.role ? String(user.role).toLowerCase().replace(/[\s-]+/g, '_') : '');
+      emit('success', { user });
+    } else {
+      api.get('/auth/me')
+        .then(({ data }) => {
+          const resolved = data?.data || data?.user || data;
+          if (resolved) {
+            localStorage.setItem('user', JSON.stringify(resolved));
+            localStorage.setItem('user_role', resolved?.role ? String(resolved.role).toLowerCase().replace(/[\s-]+/g, '_') : '');
+          }
+          emit('success', { user: resolved });
+        })
+        .catch(() => {
+          emit('success', { user: null });
+        });
+    }
 
     // Clean up
     window.removeEventListener('message', handleOAuthCallback);

@@ -404,7 +404,8 @@ const handleLogout = async () => {
   }
 
   localStorage.removeItem('token');
-  localStorage.removeItem('auth_token');
+  localStorage.removeItem('user');
+  localStorage.removeItem('user_role');
   router.push('/login');
 };
 

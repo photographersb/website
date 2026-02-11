@@ -5,6 +5,40 @@
   >
     <MetaTags />
 
+    <div
+      v-if="errorReport"
+      class="sb-error-banner"
+      role="alert"
+    >
+      <div class="sb-error-banner__content">
+        <div>
+          <p class="sb-error-banner__title">Sorry, something went wrong.</p>
+          <p class="sb-error-banner__message">We are on it. You can report this to our admin for a faster fix.</p>
+          <p class="sb-error-banner__detail">{{ errorReport }}</p>
+        </div>
+        <div class="sb-error-banner__actions">
+          <a
+            :href="mailtoUrl"
+            class="sb-error-banner__btn"
+            target="_blank"
+            rel="noopener"
+          >Email Admin</a>
+          <a
+            :href="whatsAppUrl"
+            class="sb-error-banner__btn sb-error-banner__btn--whatsapp"
+            target="_blank"
+            rel="noopener"
+          >WhatsApp Admin</a>
+          <button
+            class="sb-error-banner__dismiss"
+            type="button"
+            @click="clearErrorReport"
+          >Dismiss</button>
+        </div>
+      </div>
+    </div>
+
+
     <!-- Marketplace Navigation (Hidden in Admin Area) -->
     <nav
       v-if="!isAdminRoute"
@@ -22,6 +56,7 @@
               alt="Photographers - Across Somagro Bangladesh"
               class="h-8 md:h-12 w-auto"
             >
+            <span class="sb-nav__beta">Beta</span>
           </router-link>
 
           <button
@@ -731,7 +766,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, h } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, h } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import api from './api'
 import MobileBottomNav from './components/ui/MobileBottomNav.vue'
@@ -743,6 +778,52 @@ const route = useRoute()
 const user = ref(null)
 const mobileMenuOpen = ref(false)
 const mobileUserMenuOpen = ref(false)
+const errorReport = ref('')
+
+const adminEmail = 'dev@photographersb.com'
+const whatsappNumber = '8801767300900'
+
+const buildReportMessage = (message) => {
+  const time = new Date().toISOString()
+  const url = window.location.href
+  return `Error: ${message}\nTime: ${time}\nURL: ${url}`
+}
+
+const mailtoUrl = computed(() => {
+  if (!errorReport.value) return `mailto:${adminEmail}`
+  const subject = encodeURIComponent('Error Report')
+  const body = encodeURIComponent(buildReportMessage(errorReport.value))
+  return `mailto:${adminEmail}?subject=${subject}&body=${body}`
+})
+
+const whatsAppUrl = computed(() => {
+  const text = errorReport.value ? buildReportMessage(errorReport.value) : 'Hello, I encountered an error.'
+  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`
+})
+
+const setErrorReport = (message) => {
+  const cleaned = String(message || '').slice(0, 300)
+  errorReport.value = cleaned || 'An unexpected error occurred.'
+}
+
+const clearErrorReport = () => {
+  errorReport.value = ''
+}
+
+const handleError = (event) => {
+  const message = event?.message || event?.error?.message || 'Unexpected error'
+  setErrorReport(message)
+}
+
+const handleRejection = (event) => {
+  const message = event?.reason?.message || event?.reason || 'Unhandled promise rejection'
+  setErrorReport(message)
+}
+
+const handleApiError = (event) => {
+  const message = event?.detail?.message || 'Request failed'
+  setErrorReport(message)
+}
 
 // Icon components as inline SVGs
 const HomeIcon = () => h('svg', { class: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
@@ -787,7 +868,6 @@ const logout = async () => {
   } catch (error) {
     console.error('Logout error:', error)
   } finally {
-    localStorage.removeItem('auth_token')
     localStorage.removeItem('user')
     localStorage.removeItem('user_role')
     user.value = null
@@ -795,14 +875,21 @@ const logout = async () => {
   }
 }
 
+const shouldHydrateFromApi = (hasStoredUser) => {
+  if (hasStoredUser) return true
+  if (route?.meta?.requiresAuth || route?.meta?.requiresAdmin) return true
+  const path = route?.path || ''
+  return path.startsWith('/admin') || path.startsWith('/dashboard') || path.startsWith('/judge')
+}
+
 const hydrateUser = async () => {
   const storedUser = localStorage.getItem('user')
-  if (storedUser) {
+  const hasStoredUser = Boolean(storedUser)
+  if (hasStoredUser) {
     user.value = JSON.parse(storedUser)
   }
 
-  const token = localStorage.getItem('auth_token') || localStorage.getItem('token')
-  if (!token) {
+  if (!shouldHydrateFromApi(hasStoredUser)) {
     return
   }
 
@@ -821,6 +908,16 @@ const hydrateUser = async () => {
 
 onMounted(() => {
   hydrateUser()
+
+  window.addEventListener('error', handleError)
+  window.addEventListener('unhandledrejection', handleRejection)
+  window.addEventListener('sb-error-report', handleApiError)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('error', handleError)
+  window.removeEventListener('unhandledrejection', handleRejection)
+  window.removeEventListener('sb-error-report', handleApiError)
 })
 
 watch(mobileMenuOpen, (isOpen) => {
@@ -839,5 +936,97 @@ watch(mobileMenuOpen, (isOpen) => {
 
 main {
   flex: 1;
+}
+
+.sb-nav__beta {
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7c2d12;
+  background: #fde68a;
+  border-radius: 999px;
+  border: 1px solid #f59e0b;
+}
+
+.sb-error-banner {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: #fff7ed;
+  border-bottom: 1px solid #fed7aa;
+  padding: 0.75rem 1rem;
+}
+
+.sb-error-banner__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sb-error-banner__title {
+  font-weight: 700;
+  color: #9a3412;
+  margin-bottom: 0.25rem;
+}
+
+.sb-error-banner__message {
+  color: #7c2d12;
+  font-size: 0.9rem;
+}
+
+.sb-error-banner__detail {
+  color: #9a3412;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+
+.sb-error-banner__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.sb-error-banner__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: #111827;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.sb-error-banner__btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.sb-error-banner__btn--whatsapp {
+  background: #16a34a;
+}
+
+.sb-error-banner__dismiss {
+  background: transparent;
+  color: #9a3412;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+  .sb-error-banner__content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 </style>

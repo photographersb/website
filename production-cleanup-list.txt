@@ -1,0 +1,25 @@
+Production cleanup list (remove from server if not needed)
+
+Directories:
+- node_modules/
+- .git/
+- tests/
+- cypress/
+- storage/logs/
+- storage/framework/cache/
+- storage/framework/sessions/
+- storage/framework/views/
+
+Files:
+- *.md (all documentation/audit markdown files)
+- *.txt (documentation text files)
+- check-*.php
+- audit-*.php
+- verify-*.php
+- test-*.php
+- certificate-preview*.html
+- deploy-*.zip
+
+Notes:
+- Keep storage/app/public if you have user uploads.
+- Keep vendor/ and composer.* in production.

@@ -77,13 +77,15 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $validated['email'])->first();
-
-        if (!$user || !Hash::check($validated['password'], $user->password)) {
+        if (!Auth::attempt($validated)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
+
+        $request->session()->regenerate();
+
+        $user = $request->user();
 
         // Check if email is verified
         if (!$user->hasVerifiedEmail()) {
@@ -127,15 +129,11 @@ class AuthController extends Controller
             $user->load('photographer');
         }
 
-        // Create token
-        $token = $user->createToken('auth_token')->plainTextToken;
-
         // Check if user is also a judge
         $isJudge = $user->isJudge();
 
         return $this->success([
             'user' => array_merge($user->toArray(), ['is_judge' => $isJudge]),
-            'token' => $token,
         ], 'Login successful');
     }
 
@@ -144,7 +142,10 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return $this->success([], 'Logged out successfully');
     }

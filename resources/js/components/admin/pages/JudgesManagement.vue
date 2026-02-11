@@ -450,7 +450,7 @@ const fetchJudges = async () => {
   isLoading.value = true;
   try {
     const response = await fetch('/api/v1/admin/judges', {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
 
     if (response.ok) {
@@ -469,7 +469,7 @@ const fetchJudges = async () => {
 const fetchCompetitions = async () => {
   try {
     const response = await fetch('/api/v1/admin/competitions', {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
 
     if (response.ok) {
@@ -527,7 +527,6 @@ const handleSaveJudge = async () => {
     const response = await fetch(url, {
       method,
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -568,7 +567,6 @@ const toggleStatus = async (judge) => {
     const response = await fetch(`/api/v1/admin/judges/${judge.id}/status`, {
       method: 'PATCH',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ status: newStatus })
@@ -590,7 +588,7 @@ const deleteJudge = async (judge) => {
   try {
     const response = await fetch(`/api/v1/admin/judges/${judge.id}`, {
       method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
 
     if (response.ok) {

@@ -213,7 +213,7 @@ const fetchFrames = async () => {
   isLoading.value = true;
   try {
     const response = await fetch('/api/v1/admin/share-frames', {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
     if (response.ok) {
       const data = await response.json();
@@ -230,7 +230,7 @@ const fetchFrames = async () => {
 const fetchCompetitions = async () => {
   try {
     const response = await fetch('/api/v1/admin/competitions', {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
     if (response.ok) {
       const data = await response.json();
@@ -265,7 +265,6 @@ const handleSaveFrame = async () => {
     const response = await fetch(url, {
       method,
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(formData.value)
@@ -296,7 +295,7 @@ const deleteFrame = async (frame) => {
   try {
     const response = await fetch(`/api/v1/admin/share-frames/${frame.id}`, {
       method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
     if (response.ok) {
       frames.value = frames.value.filter(f => f.id !== frame.id);

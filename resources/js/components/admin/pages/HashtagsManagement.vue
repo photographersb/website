@@ -158,7 +158,7 @@ const fetchHashtags = async () => {
   isLoading.value = true;
   try {
     const response = await fetch('/api/v1/admin/hashtags', {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
     if (response.ok) {
       const data = await response.json();
@@ -196,7 +196,6 @@ const handleSaveHashtag = async () => {
     const response = await fetch(url, {
       method,
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(formData.value)
@@ -226,7 +225,7 @@ const deleteHashtag = async (hashtag) => {
   try {
     const response = await fetch(`/api/v1/admin/hashtags/${hashtag.id}`, {
       method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
     if (response.ok) {
       hashtags.value = hashtags.value.filter(h => h.id !== hashtag.id);

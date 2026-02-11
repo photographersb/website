@@ -192,10 +192,7 @@ const form = ref({
 
 const submitForm = async () => {
   try {
-    const token = localStorage.getItem('auth_token')
-    await api.put(`/admin/settings/site-links/${props.link.id}`, form.value, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
+    await api.put(`/admin/settings/site-links/${props.link.id}`, form.value)
     
     router.visit('/admin/settings/site-links')
   } catch (error) {

@@ -11,144 +11,32 @@
       <!-- Quick Navigation -->
       <AdminQuickNav />
 
-      <section class="page-hero">
-        <div class="hero-copy">
-          <p class="hero-kicker">USER REGISTRY</p>
-          <h1 class="hero-title">Every account, always visible.</h1>
-          <p class="hero-subtitle">
-            Manage roles, access, and growth signals across the platform.
-          </p>
-          <div class="hero-actions">
-            <button
-              class="btn-admin-primary"
-              @click="showAddModal = true"
-            >
-              Add User
-            </button>
-            <button
-              class="btn-admin-secondary"
-              @click="fetchUsers"
-            >
-              Refresh List
-            </button>
-          </div>
-        </div>
-        <div class="hero-status">
-          <div class="status-card">
-            <span class="status-label">Total Users</span>
-            <span class="status-value">{{ stats.total || 0 }}</span>
-          </div>
-          <div class="status-card">
-            <span class="status-label">Active</span>
-            <span class="status-value">{{ stats.active || 0 }}</span>
-          </div>
-          <div class="status-card">
-            <span class="status-label">Suspended</span>
-            <span class="status-value">{{ stats.suspended || 0 }}</span>
-          </div>
-        </div>
-      </section>
+      <AdminSectionHeader
+        title="User Management"
+        subtitle="Manage roles, access, and growth signals across the platform."
+        eyebrow="Admin / Users"
+      >
+        <template #actions>
+          <button
+            class="btn-admin-primary"
+            @click="showAddModal = true"
+          >
+            Add User
+          </button>
+          <button
+            class="btn-admin-secondary"
+            @click="fetchUsers"
+          >
+            Refresh List
+          </button>
+        </template>
+      </AdminSectionHeader>
 
-      <div class="page-topbar">
-        <div class="status-chip">
-          Photographers: {{ stats.photographers || 0 }}
-        </div>
-      </div>
-
-      <!-- Stats Cards -->
-      <div class="stats-grid">
-        <div class="stat-card stat-blue">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Total Users</span>
-            <span class="stat-value">{{ stats.total }}</span>
-          </div>
-        </div>
-
-        <div class="stat-card stat-green">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Active Users</span>
-            <span class="stat-value">{{ stats.active }}</span>
-          </div>
-        </div>
-
-        <div class="stat-card stat-purple">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Photographers</span>
-            <span class="stat-value">{{ stats.photographers }}</span>
-          </div>
-        </div>
-
-        <div class="stat-card stat-red">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Suspended</span>
-            <span class="stat-value">{{ stats.suspended }}</span>
-          </div>
-        </div>
-      </div>
+      <AdminStatsStrip :stats="statItems" />
 
       <!-- Filters & Search -->
       <div class="content-card">
-        <div class="filters-bar">
+        <AdminFilterBar>
           <div class="search-box">
             <svg
               class="search-icon"
@@ -194,26 +82,28 @@
             </option>
           </select>
 
-          <button
-            class="btn-export"
-            @click="exportUsers"
-          >
-            <svg
-              class="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          <template #actions>
+            <button
+              class="btn-export"
+              @click="exportUsers"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            Export
-          </button>
-        </div>
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              Export
+            </button>
+          </template>
+        </AdminFilterBar>
 
         <!-- Loading State -->
         <div
@@ -1574,7 +1464,10 @@
 <script setup>
 import AdminHeader from '../../../components/AdminHeader.vue'
 import AdminQuickNav from '../../../components/AdminQuickNav.vue'
-import { ref, computed, onMounted } from 'vue'
+import AdminSectionHeader from '../../../components/admin/ui/AdminSectionHeader.vue'
+import AdminStatsStrip from '../../../components/admin/ui/AdminStatsStrip.vue'
+import AdminFilterBar from '../../../components/admin/ui/AdminFilterBar.vue'
+import { ref, computed, onMounted, h } from 'vue'
 import api from '../../../api'
 
 const users = ref([])
@@ -1632,11 +1525,58 @@ const stats = ref({
   suspended: 0
 })
 
+const UsersIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' })
+])
+
+const ActiveIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' })
+])
+
+const PhotographerIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z' })
+])
+
+const SuspendedIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' })
+])
+
 const pagination = ref({
   currentPage: 1,
   perPage: 30,
   totalPages: 1
 })
+
+const statItems = computed(() => [
+  {
+    label: 'Total Users',
+    value: stats.value.total || 0,
+    meta: `${stats.value.active || 0} active`,
+    icon: UsersIcon,
+    tone: 'neutral',
+  },
+  {
+    label: 'Active Users',
+    value: stats.value.active || 0,
+    meta: 'Currently active',
+    icon: ActiveIcon,
+    tone: 'success',
+  },
+  {
+    label: 'Photographers',
+    value: stats.value.photographers || 0,
+    meta: 'Creator accounts',
+    icon: PhotographerIcon,
+    tone: 'info',
+  },
+  {
+    label: 'Suspended',
+    value: stats.value.suspended || 0,
+    meta: 'Blocked access',
+    icon: SuspendedIcon,
+    tone: 'warning',
+  }
+])
 
 let searchTimeout = null
 

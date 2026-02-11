@@ -11,100 +11,17 @@
       <!-- Quick Navigation -->
       <AdminQuickNav />
 
-      <!-- Stats Cards -->
-      <div class="stats-grid">
-        <div class="stat-card stat-blue">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Total Photographers</span>
-            <span class="stat-value">{{ stats.total }}</span>
-          </div>
-        </div>
+      <AdminSectionHeader
+        title="Photographer Management"
+        subtitle="Manage photographer profiles, verifications, and portfolios in one place."
+        eyebrow="Admin / Photographers"
+      />
 
-        <div class="stat-card stat-green">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Verified</span>
-            <span class="stat-value">{{ stats.verified }}</span>
-          </div>
-        </div>
-
-        <div class="stat-card stat-yellow">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Pending</span>
-            <span class="stat-value">{{ stats.pending }}</span>
-          </div>
-        </div>
-
-        <div class="stat-card stat-purple">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Avg Rating</span>
-            <span class="stat-value">{{ stats.avgRating }}</span>
-          </div>
-        </div>
-      </div>
+      <AdminStatsStrip :stats="statItems" />
 
       <!-- Filters & Search -->
       <div class="content-card">
-        <div class="filters-bar">
+        <AdminFilterBar>
           <div class="search-box">
             <svg
               class="search-icon"
@@ -183,26 +100,28 @@
             </option>
           </select>
 
-          <button
-            class="btn-export"
-            @click="exportPhotographers"
-          >
-            <svg
-              class="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          <template #actions>
+            <button
+              class="btn-export"
+              @click="exportPhotographers"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            Export
-          </button>
-        </div>
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              Export
+            </button>
+          </template>
+        </AdminFilterBar>
 
         <!-- Loading State -->
         <div
@@ -213,178 +132,149 @@
           <p>Loading photographers...</p>
         </div>
 
-        <!-- Photographers Grid -->
         <div
           v-else-if="photographers.length > 0"
-          class="photographers-grid"
+          class="photographers-table"
         >
-          <div
-            v-for="photographer in photographers"
-            :key="photographer.id"
-            class="photographer-card"
-          >
-            <div class="card-header-section">
-              <div class="photographer-avatar">
-                <img
-                  v-if="photographer.profile_picture"
-                  :src="photographer.profile_picture"
-                  :alt="photographer.business_name"
-                >
-                <span v-else>{{ photographer.business_name?.charAt(0).toUpperCase() || '📷' }}</span>
-              </div>
-              <span
-                v-if="photographer.is_verified"
-                class="verified-badge"
+          <div class="bulk-actions">
+            <div class="bulk-left">
+              <input
+                type="checkbox"
+                :checked="allSelected"
+                :indeterminate.prop="someSelected"
+                @change="toggleSelectAll"
               >
-                <svg
-                  class="w-4 h-4"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </span>
+              <span>{{ selectedCount }} selected</span>
             </div>
-
-            <h3 class="photographer-name">
-              {{ photographer.business_name }}
-            </h3>
-            <p class="photographer-user">
-              {{ photographer.user?.name }}
-            </p>
-          
-            <div class="photographer-categories">
-              <span
-                v-for="category in photographer.categories?.slice(0, 2)"
-                :key="category.id"
-                class="category-tag"
-              >
-                {{ category.name }}
-              </span>
-            </div>
-
-            <div class="photographer-stats">
-              <div class="stat-item">
-                <svg
-                  class="w-4 h-4"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <span>{{ photographer.average_rating || 'N/A' }}</span>
-              </div>
-              <div class="stat-item">
-                <svg
-                  class="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-                  />
-                </svg>
-                <span>{{ photographer.total_reviews || 0 }} reviews</span>
-              </div>
-            </div>
-
-            <div class="photographer-location">
-              <svg
-                class="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              <span>{{ photographer.city?.name || 'Not specified' }}</span>
-            </div>
-
-            <div class="card-actions">
+            <div class="bulk-right">
               <button
-                class="btn-action btn-view"
-                @click="viewPhotographer(photographer)"
-              >
-                <svg
-                  class="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                  />
-                </svg>
-                View Profile
-              </button>
-              <button
-                v-if="!photographer.is_verified"
                 class="btn-action btn-verify"
-                @click="verifyPhotographer(photographer)"
+                :disabled="!selectedCount || bulkVerifying"
+                @click="bulkVerifySelected"
               >
-                <svg
-                  class="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                Verify
+                <span v-if="bulkVerifying" class="spinner-mini" aria-hidden="true" />
+                {{ bulkVerifying ? 'Verifying...' : 'Verify Selected' }}
               </button>
               <button
-                class="btn-action btn-edit"
-                @click="editPhotographer(photographer)"
+                class="btn-export"
+                :disabled="!selectedCount || bulkVerifying"
+                @click="exportPhotographers"
               >
-                <svg
-                  class="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-                Edit
+                Export Selected
               </button>
             </div>
+          </div>
+
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>
+                    <input
+                      type="checkbox"
+                      :checked="allSelected"
+                      :indeterminate.prop="someSelected"
+                      @change="toggleSelectAll"
+                    >
+                  </th>
+                  <th>Photographer</th>
+                  <th>Contact</th>
+                  <th>Status</th>
+                  <th>Rating</th>
+                  <th>City</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="photographer in photographers"
+                  :key="photographer.id"
+                >
+                  <td>
+                    <input
+                      type="checkbox"
+                      :checked="isSelected(photographer.id)"
+                      @change="toggleSelect(photographer.id)"
+                    >
+                  </td>
+                  <td>
+                    <div class="user-cell">
+                      <div class="photographer-avatar">
+                        <img
+                          v-if="photographer.profile_picture"
+                          :src="photographer.profile_picture"
+                          :alt="photographer.business_name"
+                        >
+                        <span v-else>{{ photographer.business_name?.charAt(0).toUpperCase() || '📷' }}</span>
+                      </div>
+                      <div>
+                        <div class="user-name">
+                          {{ photographer.business_name || 'N/A' }}
+                        </div>
+                        <div class="user-subtitle">
+                          {{ photographer.user?.name || 'N/A' }}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="user-subtitle">
+                      {{ photographer.user?.email || 'N/A' }}
+                    </div>
+                  </td>
+                  <td>
+                    <span
+                      v-if="photographer.is_verified"
+                      class="status-pill status-pill--verified"
+                    >
+                      Verified
+                    </span>
+                    <span
+                      v-else
+                      class="status-pill status-pill--pending"
+                    >
+                      Pending
+                    </span>
+                  </td>
+                  <td>
+                    <span class="rating-pill">
+                      ⭐ {{ photographer.average_rating || 'N/A' }}
+                    </span>
+                    <div class="user-subtitle">
+                      {{ photographer.total_reviews || 0 }} reviews
+                    </div>
+                  </td>
+                  <td>
+                    <span class="user-subtitle">
+                      {{ photographer.city?.name || 'Not specified' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button
+                        class="btn-action btn-view"
+                        @click="viewPhotographer(photographer)"
+                      >
+                        View
+                      </button>
+                      <button
+                        v-if="!photographer.is_verified"
+                        class="btn-action btn-verify"
+                        @click="verifyPhotographer(photographer)"
+                      >
+                        Verify
+                      </button>
+                      <button
+                        class="btn-action btn-edit"
+                        @click="editPhotographer(photographer)"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -784,9 +674,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, h } from 'vue'
 import AdminHeader from '../../../components/AdminHeader.vue'
 import AdminQuickNav from '../../../components/AdminQuickNav.vue'
+import AdminSectionHeader from '../../../components/admin/ui/AdminSectionHeader.vue'
+import AdminStatsStrip from '../../../components/admin/ui/AdminStatsStrip.vue'
+import AdminFilterBar from '../../../components/admin/ui/AdminFilterBar.vue'
 import api from '../../../api'
 
 const photographers = ref([])
@@ -801,6 +694,8 @@ const editForm = ref({})
 const saving = ref(false)
 const generatedBios = ref([])
 const specializations = ref('')
+const selectedIds = ref([])
+const bulkVerifying = ref(false)
 
 const filters = ref({
   search: '',
@@ -823,6 +718,22 @@ const stats = ref({
   avgRating: '0.0'
 })
 
+const CameraIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z' })
+])
+
+const VerifiedIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' })
+])
+
+const PendingIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' })
+])
+
+const RatingIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z' })
+])
+
 let searchTimeout = null
 
 // Computed property for location name
@@ -832,11 +743,70 @@ const getLocationName = computed(() => {
   return city ? city.name : ''
 })
 
+const statItems = computed(() => [
+  {
+    label: 'Total Photographers',
+    value: stats.value.total,
+    meta: `${stats.value.verified} verified`,
+    icon: CameraIcon,
+    tone: 'neutral',
+  },
+  {
+    label: 'Verified',
+    value: stats.value.verified,
+    meta: 'Approved profiles',
+    icon: VerifiedIcon,
+    tone: 'success',
+  },
+  {
+    label: 'Pending',
+    value: stats.value.pending,
+    meta: 'Awaiting review',
+    icon: PendingIcon,
+    tone: 'warning',
+  },
+  {
+    label: 'Avg Rating',
+    value: stats.value.avgRating,
+    meta: 'Across all reviews',
+    icon: RatingIcon,
+    tone: 'info',
+  }
+])
+
 const debounceSearch = () => {
   clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => {
     fetchPhotographers()
   }, 500)
+}
+
+const selectedCount = computed(() => selectedIds.value.length)
+
+const allSelected = computed(() => {
+  return photographers.value.length > 0 && selectedIds.value.length === photographers.value.length
+})
+
+const someSelected = computed(() => {
+  return selectedIds.value.length > 0 && !allSelected.value
+})
+
+const isSelected = (id) => selectedIds.value.includes(id)
+
+const toggleSelect = (id) => {
+  if (isSelected(id)) {
+    selectedIds.value = selectedIds.value.filter(item => item !== id)
+  } else {
+    selectedIds.value = [...selectedIds.value, id]
+  }
+}
+
+const toggleSelectAll = () => {
+  if (allSelected.value) {
+    selectedIds.value = []
+    return
+  }
+  selectedIds.value = photographers.value.map((photographer) => photographer.id)
 }
 
 const fetchPhotographers = async (page = 1) => {
@@ -856,6 +826,7 @@ const fetchPhotographers = async (page = 1) => {
     
     if (data.status === 'success') {
       photographers.value = data.data.photographers
+      selectedIds.value = []
       
       // Update meta from backend - safely handle meta structure
       if (data.meta) {
@@ -904,11 +875,53 @@ const viewPhotographer = (photographer) => {
   showViewModal.value = true
 }
 
-const verifyPhotographer = (photographer) => {
-  if (confirm(`Verify ${photographer.business_name}?`)) {
-    photographer.is_verified = true
-    showToastMessage(`${photographer.business_name} verified successfully`)
+const verifyPhotographer = async (photographer) => {
+  if (!confirm(`Verify ${photographer.business_name}?`)) return
+
+  try {
+    const { data } = await api.post(`/admin/photographers/${photographer.id}/verify`)
+    if (data.status === 'success') {
+      photographer.is_verified = true
+      showToastMessage(data.message || `${photographer.business_name} verified successfully`)
+    } else {
+      showToastMessage(data.message || 'Error verifying photographer')
+    }
+  } catch (error) {
+    console.error('Error verifying photographer:', error)
+    showToastMessage('Error verifying photographer')
   }
+}
+
+const bulkVerifySelected = async () => {
+  if (!selectedIds.value.length) return
+  if (!confirm(`Verify ${selectedIds.value.length} photographers?`)) return
+
+  const selectedPhotographers = photographers.value.filter((photographer) => selectedIds.value.includes(photographer.id))
+  let successCount = 0
+
+  bulkVerifying.value = true
+
+  for (const photographer of selectedPhotographers) {
+    if (photographer.is_verified) continue
+    try {
+      const { data } = await api.post(`/admin/photographers/${photographer.id}/verify`)
+      if (data.status === 'success') {
+        photographer.is_verified = true
+        successCount += 1
+      }
+    } catch (error) {
+      console.error('Error verifying photographer:', error)
+    }
+  }
+
+  bulkVerifying.value = false
+
+  if (successCount) {
+    showToastMessage(`Verified ${successCount} photographers`)
+  } else {
+    showToastMessage('No photographers were verified')
+  }
+  selectedIds.value = []
 }
 
 const editPhotographer = (photographer) => {
@@ -1421,6 +1434,122 @@ onMounted(() => {
 .card-actions {
   display: flex;
   gap: 0.5rem;
+}
+
+.photographers-table {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  gap: 1rem;
+}
+
+.bulk-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.bulk-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 0.9rem;
+  background: #f9fafb;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.data-table td {
+  padding: 0.9rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.user-subtitle {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-pill--verified {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-pill--pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.rating-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spinner-mini {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  display: inline-block;
+  margin-right: 0.4rem;
+  animation: spin 0.8s linear infinite;
 }
 
 .btn-action {

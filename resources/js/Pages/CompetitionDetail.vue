@@ -1239,8 +1239,7 @@ const fetchTopSubmissions = async (slug) => {
 };
 
 const checkAuth = () => {
-  const token = localStorage.getItem('auth_token');
-  isAuthenticated.value = !!token;
+  isAuthenticated.value = !!localStorage.getItem('user');
 };
 
 const refreshVoteResumeId = () => {

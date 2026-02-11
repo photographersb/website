@@ -207,7 +207,7 @@ const fetchSponsors = async () => {
   isLoading.value = true;
   try {
     const response = await fetch('/api/v1/admin/sponsors', {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
     if (response.ok) {
       const data = await response.json();
@@ -245,7 +245,6 @@ const handleSaveSponsor = async () => {
     const response = await fetch(url, {
       method,
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(formData.value)
@@ -276,7 +275,7 @@ const deleteSponsor = async (sponsor) => {
   try {
     const response = await fetch(`/api/v1/admin/sponsors/${sponsor.id}`, {
       method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
     if (response.ok) {
       sponsors.value = sponsors.value.filter(s => s.id !== sponsor.id);

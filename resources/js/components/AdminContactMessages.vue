@@ -521,11 +521,8 @@ export default {
       try {
         loading.value = true;
         error.value = '';
-
-        const token = localStorage.getItem('auth_token');
         const response = await fetch('/api/v1/admin/contact-messages', {
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
           },
         });
@@ -543,11 +540,9 @@ export default {
 
     const updateStatus = async (messageId, newStatus) => {
       try {
-        const token = localStorage.getItem('auth_token');
         const response = await fetch(`/api/v1/admin/contact-messages/${messageId}`, {
           method: 'PATCH',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
             'Accept': 'application/json',
           },
@@ -568,11 +563,9 @@ export default {
       if (!confirm('Are you sure you want to delete this message?')) return;
 
       try {
-        const token = localStorage.getItem('auth_token');
         const response = await fetch(`/api/v1/admin/contact-messages/${messageId}`, {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
           },
         });
@@ -607,13 +600,11 @@ export default {
 
       try {
         sendingReply.value = true;
-        const token = localStorage.getItem('auth_token');
 
         // Send email reply via your mail service
         const response = await fetch('/api/v1/admin/send-reply', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
             'Accept': 'application/json',
           },

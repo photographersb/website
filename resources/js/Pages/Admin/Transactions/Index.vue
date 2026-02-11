@@ -11,49 +11,28 @@
       <!-- Quick Navigation -->
       <AdminQuickNav />
 
-      <section class="page-hero">
-        <div class="hero-copy">
-          <p class="hero-kicker">TRANSACTION FLOW</p>
-          <h1 class="hero-title">Revenue, refunds, and status in one grid.</h1>
-          <p class="hero-subtitle">
-            Track financial health, pending volume, and active gateways.
-          </p>
-          <div class="hero-actions">
-            <button
-              class="btn-admin-primary"
-              @click="exportTransactions"
-            >
-              Export
-            </button>
-            <button
-              class="btn-admin-secondary"
-              @click="fetchTransactions"
-            >
-              Refresh List
-            </button>
-          </div>
-        </div>
-        <div class="hero-status">
-          <div class="status-card">
-            <span class="status-label">Total Revenue</span>
-            <span class="status-value">৳{{ formatNumber(stats.totalRevenue || 0) }}</span>
-          </div>
-          <div class="status-card">
-            <span class="status-label">This Month</span>
-            <span class="status-value">৳{{ formatNumber(stats.monthlyRevenue || 0) }}</span>
-          </div>
-          <div class="status-card">
-            <span class="status-label">Pending</span>
-            <span class="status-value">৳{{ formatNumber(stats.pendingRevenue || 0) }}</span>
-          </div>
-        </div>
-      </section>
+      <AdminSectionHeader
+        title="Transaction Management"
+        subtitle="Monitor revenue, refunds, and payment flow health in one place."
+        eyebrow="Admin / Transactions"
+      >
+        <template #actions>
+          <button
+            class="btn-admin-primary"
+            @click="exportTransactions"
+          >
+            Export
+          </button>
+          <button
+            class="btn-admin-secondary"
+            @click="fetchTransactions"
+          >
+            Refresh List
+          </button>
+        </template>
+      </AdminSectionHeader>
 
-      <div class="page-topbar">
-        <div class="status-chip">
-          Pending count: {{ stats.pendingCount || 0 }}
-        </div>
-      </div>
+      <AdminStatsStrip :stats="statItems" />
 
       <!-- Revenue Summary Cards -->
       <div class="revenue-grid">
@@ -135,7 +114,7 @@
 
       <!-- Filters & Search -->
       <div class="content-card">
-        <div class="filters-bar">
+        <AdminFilterBar>
           <div class="search-box">
             <svg
               class="search-icon"
@@ -206,7 +185,7 @@
             class="filter-input"
             @change="fetchTransactions"
           >
-        </div>
+        </AdminFilterBar>
 
         <!-- Loading State -->
         <div
@@ -415,9 +394,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, h } from 'vue'
 import AdminHeader from '../../../components/AdminHeader.vue'
 import AdminQuickNav from '../../../components/AdminQuickNav.vue'
+import AdminSectionHeader from '../../../components/admin/ui/AdminSectionHeader.vue'
+import AdminStatsStrip from '../../../components/admin/ui/AdminStatsStrip.vue'
+import AdminFilterBar from '../../../components/admin/ui/AdminFilterBar.vue'
 import api from '../../../api'
 
 const transactions = ref([])
@@ -450,6 +432,53 @@ const stats = ref({
   today_revenue: 0,
   yearly_revenue: 0
 })
+
+const RevenueIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' })
+])
+
+const CalendarIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' })
+])
+
+const PendingIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' })
+])
+
+const PendingCountIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' })
+])
+
+const statItems = computed(() => [
+  {
+    label: 'Total Revenue',
+    value: `৳${formatNumber(stats.value.totalRevenue || 0)}`,
+    meta: `+${stats.value.growth || 0}% from last month`,
+    icon: RevenueIcon,
+    tone: 'neutral',
+  },
+  {
+    label: 'This Month',
+    value: `৳${formatNumber(stats.value.monthlyRevenue || 0)}`,
+    meta: `${transactions.value.filter(t => isThisMonth(t.created_at)).length} transactions`,
+    icon: CalendarIcon,
+    tone: 'info',
+  },
+  {
+    label: 'Pending Revenue',
+    value: `৳${formatNumber(stats.value.pendingRevenue || 0)}`,
+    meta: 'Awaiting settlement',
+    icon: PendingIcon,
+    tone: 'warning',
+  },
+  {
+    label: 'Pending Count',
+    value: stats.value.pendingCount || 0,
+    meta: 'Transactions in queue',
+    icon: PendingCountIcon,
+    tone: 'success',
+  }
+])
 
 let searchTimeout = null
 
@@ -558,19 +587,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.page-hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 1.5rem; padding: 1.75rem 2rem; border-radius: 1.5rem; border: 1px solid rgba(142, 14, 63, 0.2); background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(247, 239, 233, 0.82)), linear-gradient(90deg, rgba(142, 14, 63, 0.06), transparent 45%, rgba(109, 72, 56, 0.08)); box-shadow: 0 25px 55px rgba(24, 12, 8, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6); backdrop-filter: blur(6px); }
-.hero-copy { display: flex; flex-direction: column; gap: 0.85rem; }
-.hero-kicker { font-size: 0.7rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--admin-text-secondary); font-weight: 700; }
-.hero-title { font-size: 2rem; line-height: 1.1; color: var(--admin-text-primary); text-shadow: 0 2px 14px rgba(142, 14, 63, 0.18); }
-.hero-subtitle { color: var(--admin-text-secondary); max-width: 480px; }
-.hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-.hero-status { display: grid; gap: 0.8rem; }
-.status-card { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(142, 14, 63, 0.2); border-radius: 1rem; padding: 1rem 1.25rem; box-shadow: 0 16px 35px rgba(22, 12, 8, 0.08); display: flex; flex-direction: column; gap: 0.35rem; }
-.status-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--admin-text-secondary); }
-.status-value { font-size: 1.1rem; font-weight: 700; color: var(--admin-text-primary); }
-.page-topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1.25rem; background: rgba(255, 255, 255, 0.88); border: 1px solid rgba(140, 108, 95, 0.2); border-radius: 1.1rem; box-shadow: 0 18px 35px rgba(18, 9, 6, 0.08); backdrop-filter: blur(8px); }
-.status-chip { background: rgba(142, 14, 63, 0.12); color: var(--admin-text-primary); padding: 0.4rem 0.8rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-@media (max-width: 1024px) { .page-hero { grid-template-columns: 1fr; } }
 .admin-transactions { padding: 2rem; min-height: 100vh; background: var(--admin-bg-page); }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
 .page-title { font-size: 2rem; font-weight: 700; color: #1f2937; margin: 0; }

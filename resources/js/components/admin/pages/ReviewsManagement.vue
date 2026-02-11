@@ -144,7 +144,7 @@ const fetchReviews = async () => {
   isLoading.value = true;
   try {
     const response = await fetch('/api/v1/admin/reviews', {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
     if (response.ok) {
       const data = await response.json();
@@ -168,7 +168,7 @@ const handleApproveReview = async () => {
   try {
     const response = await fetch(`/api/v1/admin/reviews/${selectedReview.value.id}/approve`, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
     if (response.ok) {
       const index = reviews.value.findIndex(r => r.id === selectedReview.value.id);
@@ -188,7 +188,7 @@ const deleteReview = async (review) => {
   try {
     const response = await fetch(`/api/v1/admin/reviews/${review.id}`, {
       method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      headers: {}
     });
     if (response.ok) {
       reviews.value = reviews.value.filter(r => r.id !== review.id);

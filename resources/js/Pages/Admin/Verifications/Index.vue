@@ -11,144 +11,62 @@
       <!-- Quick Navigation -->
       <AdminQuickNav />
 
-      <section class="page-hero">
-        <div class="hero-copy">
-          <p class="hero-kicker">TRUST REVIEW</p>
-          <h1 class="hero-title">Verification flow, zero friction.</h1>
-          <p class="hero-subtitle">
-            Approve, reject, and track identity checks with clarity.
-          </p>
-          <div class="hero-actions">
-            <button
-              class="btn-admin-primary"
-              @click="exportVerifications"
-            >
-              Export
-            </button>
-            <button
-              class="btn-admin-secondary"
-              @click="fetchVerifications"
-            >
-              Refresh List
-            </button>
-          </div>
-        </div>
-        <div class="hero-status">
-          <div class="status-card">
-            <span class="status-label">Pending</span>
-            <span class="status-value">{{ stats.pending || 0 }}</span>
-          </div>
-          <div class="status-card">
-            <span class="status-label">Approved</span>
-            <span class="status-value">{{ stats.approved || 0 }}</span>
-          </div>
-          <div class="status-card">
-            <span class="status-label">Rejected</span>
-            <span class="status-value">{{ stats.rejected || 0 }}</span>
-          </div>
-        </div>
-      </section>
+      <AdminSectionHeader
+        title="Verification Management"
+        subtitle="Review and approve photographer verification requests."
+        eyebrow="Admin / Verifications"
+      >
+        <template #actions>
+          <button
+            class="btn-admin-primary"
+            @click="exportVerifications"
+          >
+            Export
+          </button>
+          <button
+            class="btn-admin-secondary"
+            @click="fetchVerifications"
+          >
+            Refresh List
+          </button>
+        </template>
+      </AdminSectionHeader>
 
-      <div class="page-topbar">
-        <div class="status-chip">
-          Total requests: {{ stats.total || 0 }}
-        </div>
-      </div>
-
-      <!-- Stats Grid -->
-      <div class="stats-grid">
-        <div class="stat-card stat-yellow">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Pending</span>
-            <span class="stat-value">{{ stats.pending }}</span>
-          </div>
-        </div>
-
-        <div class="stat-card stat-green">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Approved</span>
-            <span class="stat-value">{{ stats.approved }}</span>
-          </div>
-        </div>
-
-        <div class="stat-card stat-red">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Rejected</span>
-            <span class="stat-value">{{ stats.rejected }}</span>
-          </div>
-        </div>
-
-        <div class="stat-card stat-blue">
-          <div class="stat-icon">
-            <svg
-              class="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Total Requests</span>
-            <span class="stat-value">{{ stats.total }}</span>
-          </div>
-        </div>
-      </div>
+      <AdminStatsStrip :stats="statItems" />
 
       <div class="content-card">
+        <AdminFilterBar>
+          <div class="verification-tabs">
+            <button
+              :class="['tab-btn', { active: currentTab === 'pending' }]"
+              @click="currentTab = 'pending'; fetchVerifications()"
+            >
+              Pending ({{ stats.pending }})
+            </button>
+            <button
+              :class="['tab-btn', { active: currentTab === 'approved' }]"
+              @click="currentTab = 'approved'; fetchVerifications()"
+            >
+              Approved ({{ stats.approved }})
+            </button>
+            <button
+              :class="['tab-btn', { active: currentTab === 'rejected' }]"
+              @click="currentTab = 'rejected'; fetchVerifications()"
+            >
+              Rejected ({{ stats.rejected }})
+            </button>
+          </div>
+          <template #actions>
+            <button
+              class="btn-action"
+              @click="fetchVerifications"
+            >
+              Refresh
+            </button>
+          </template>
+        </AdminFilterBar>
         <!-- P0 Verification Requests -->
-        <div class="mb-8">
+        <div v-if="currentTab !== 'pending'" class="mb-8">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold text-gray-900">
               Pending Verification Requests (P0)
@@ -291,28 +209,6 @@
               All verification requests have been reviewed.
             </p>
           </div>
-        </div>
-
-        <!-- Tabs -->
-        <div class="verification-tabs">
-          <button 
-            :class="['tab-btn', { active: currentTab === 'pending' }]" 
-            @click="currentTab = 'pending'; fetchVerifications()"
-          >
-            Pending ({{ stats.pending }})
-          </button>
-          <button 
-            :class="['tab-btn', { active: currentTab === 'approved' }]" 
-            @click="currentTab = 'approved'; fetchVerifications()"
-          >
-            Approved ({{ stats.approved }})
-          </button>
-          <button 
-            :class="['tab-btn', { active: currentTab === 'rejected' }]" 
-            @click="currentTab = 'rejected'; fetchVerifications()"
-          >
-            Rejected ({{ stats.rejected }})
-          </button>
         </div>
 
         <!-- Loading State -->
@@ -562,9 +458,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, h } from 'vue'
 import AdminHeader from '../../../components/AdminHeader.vue'
 import AdminQuickNav from '../../../components/AdminQuickNav.vue'
+import AdminSectionHeader from '../../../components/admin/ui/AdminSectionHeader.vue'
+import AdminStatsStrip from '../../../components/admin/ui/AdminStatsStrip.vue'
+import AdminFilterBar from '../../../components/admin/ui/AdminFilterBar.vue'
 import api from '../../../api'
 
 const verifications = ref([])
@@ -585,9 +484,76 @@ const stats = ref({
   total: 0
 })
 
+const PendingIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' })
+])
+
+const ApprovedIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' })
+])
+
+const RejectedIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z' })
+])
+
+const TotalIcon = () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' })
+])
+
+const statItems = computed(() => [
+  {
+    label: 'Pending',
+    value: stats.value.pending || 0,
+    meta: 'Awaiting review',
+    icon: PendingIcon,
+    tone: 'warning',
+  },
+  {
+    label: 'Approved',
+    value: stats.value.approved || 0,
+    meta: 'Verified photographers',
+    icon: ApprovedIcon,
+    tone: 'success',
+  },
+  {
+    label: 'Rejected',
+    value: stats.value.rejected || 0,
+    meta: 'Needs resubmission',
+    icon: RejectedIcon,
+    tone: 'neutral',
+  },
+  {
+    label: 'Total Requests',
+    value: stats.value.total || 0,
+    meta: 'All time',
+    icon: TotalIcon,
+    tone: 'info',
+  }
+])
+
 // Use all verifications from backend (already filtered by status parameter)
 const filteredVerifications = computed(() => {
-  return verifications.value
+  if (currentTab.value !== 'pending') {
+    return verifications.value
+  }
+
+  if (!pendingRequests.value.length) {
+    return verifications.value
+  }
+
+  const pendingIds = new Set(pendingRequests.value.map((request) => request.id))
+  const pendingPhotographerIds = new Set(
+    pendingRequests.value
+      .map((request) => request.photographer_id || request.photographer?.id)
+      .filter(Boolean)
+  )
+
+  return verifications.value.filter((verification) => {
+    if (pendingIds.has(verification.id)) return false
+    const photographerId = verification.photographer_id || verification.photographer?.id
+    if (photographerId && pendingPhotographerIds.has(photographerId)) return false
+    return true
+  })
 })
 
 const fetchVerifications = async () => {
@@ -762,19 +728,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.page-hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 1.5rem; padding: 1.75rem 2rem; border-radius: 1.5rem; border: 1px solid rgba(142, 14, 63, 0.2); background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(247, 239, 233, 0.82)), linear-gradient(90deg, rgba(142, 14, 63, 0.06), transparent 45%, rgba(109, 72, 56, 0.08)); box-shadow: 0 25px 55px rgba(24, 12, 8, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6); backdrop-filter: blur(6px); }
-.hero-copy { display: flex; flex-direction: column; gap: 0.85rem; }
-.hero-kicker { font-size: 0.7rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--admin-text-secondary); font-weight: 700; }
-.hero-title { font-size: 2rem; line-height: 1.1; color: var(--admin-text-primary); text-shadow: 0 2px 14px rgba(142, 14, 63, 0.18); }
-.hero-subtitle { color: var(--admin-text-secondary); max-width: 480px; }
-.hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-.hero-status { display: grid; gap: 0.8rem; }
-.status-card { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(142, 14, 63, 0.2); border-radius: 1rem; padding: 1rem 1.25rem; box-shadow: 0 16px 35px rgba(22, 12, 8, 0.08); display: flex; flex-direction: column; gap: 0.35rem; }
-.status-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--admin-text-secondary); }
-.status-value { font-size: 1.1rem; font-weight: 700; color: var(--admin-text-primary); }
-.page-topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1.25rem; background: rgba(255, 255, 255, 0.88); border: 1px solid rgba(140, 108, 95, 0.2); border-radius: 1.1rem; box-shadow: 0 18px 35px rgba(18, 9, 6, 0.08); backdrop-filter: blur(8px); }
-.status-chip { background: rgba(142, 14, 63, 0.12); color: var(--admin-text-primary); padding: 0.4rem 0.8rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-@media (max-width: 1024px) { .page-hero { grid-template-columns: 1fr; } }
 .admin-verifications { padding: 2rem; min-height: 100vh; background: var(--admin-bg-page); }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
 .page-title { font-size: 2rem; font-weight: 700; color: #1f2937; margin: 0; }
@@ -782,21 +735,6 @@ onMounted(() => {
 
 .btn-export-main { display: flex; align-items: center; background: var(--admin-brand-primary); color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: background 0.2s; }
 .btn-export-main:hover { background: var(--admin-brand-primary-dark); }
-
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-.stat-card { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 1rem; border-left: 4px solid; }
-.stat-blue { border-color: var(--admin-brand-primary); }
-.stat-yellow { border-color: var(--admin-brand-primary); }
-.stat-green { border-color: var(--admin-brand-primary); }
-.stat-red { border-color: var(--admin-brand-primary); }
-.stat-icon { width: 3rem; height: 3rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; }
-.stat-blue .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
-.stat-yellow .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
-.stat-green .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
-.stat-red .stat-icon { background: var(--admin-brand-primary-soft); color: var(--admin-brand-primary); }
-.stat-content { flex: 1; }
-.stat-label { display: block; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem; }
-.stat-value { display: block; font-size: 2rem; font-weight: 700; color: #1f2937; }
 
 .content-card { background: white; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem; }
 .verification-tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 2px solid #e5e7eb; }
