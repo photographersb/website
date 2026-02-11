@@ -66,7 +66,7 @@
               v-model="form.bio"
               placeholder="Tell clients about your photography style and experience..."
               rows="4"
-              class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+              class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
             />
             <p class="text-xs text-gray-500 mt-1">
               {{ form.bio.length }}/500 characters
@@ -80,7 +80,7 @@
               v-model="form.profile_picture"
               type="url"
               placeholder="https://..."
-              class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+              class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
             >
           </div>
 
@@ -90,7 +90,7 @@
               <label class="block text-sm font-semibold text-gray-700 mb-2">Service Location</label>
               <select
                 v-model="form.location"
-                class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                class="w-full px-4 py-2.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
                 <option value="">Select location</option>
                 <option
@@ -108,7 +108,7 @@
               <label class="block text-sm font-semibold text-gray-700 mb-2">City</label>
               <select
                 v-model="form.city_id"
-                class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                class="w-full px-4 py-2.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
                 <option :value="null">
                   Select city
@@ -131,7 +131,7 @@
                 type="number"
                 min="0"
                 max="60"
-                class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
             </div>
           </div>
@@ -166,7 +166,7 @@
               v-model="form.specializations"
               type="text"
               placeholder="Portrait, Wedding, Fashion"
-              class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+              class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
             >
             <p class="text-xs text-gray-500 mt-1">
               Comma-separated
@@ -180,7 +180,7 @@
               v-model="form.favorite_hashtags"
               type="text"
               placeholder="#portrait, #wedding"
-              class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+              class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
             >
             <p class="text-xs text-gray-500 mt-1">
               Comma-separated
@@ -195,7 +195,7 @@
               type="number"
               min="0"
               max="500"
-              class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+              class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
             >
             <p class="text-xs text-gray-500 mt-1">
               How far are you willing to travel for bookings?
@@ -255,7 +255,7 @@
                 v-model="form.bkash_number"
                 type="text"
                 placeholder="+880xxxxxxxxxx"
-                class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                class="w-full pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
             </div>
             <p class="text-xs text-gray-500 mt-1">
@@ -272,7 +272,7 @@
                 v-model="form.nagad_number"
                 type="text"
                 placeholder="+880xxxxxxxxxx"
-                class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                class="w-full pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
             </div>
           </div>
@@ -286,7 +286,7 @@
                 v-model="form.rocket_number"
                 type="text"
                 placeholder="+880xxxxxxxxxx"
-                class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                class="w-full pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
             </div>
           </div>
@@ -300,7 +300,7 @@
                 v-model="form.phone_number"
                 type="text"
                 placeholder="+880xxxxxxxxxx"
-                class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                class="w-full pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
             </div>
           </div>
@@ -312,7 +312,7 @@
               v-model="form.tip_message"
               placeholder="e.g., Support my photography and help me grow! ☕"
               rows="3"
-              class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+              class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
             />
             <p class="text-xs text-gray-500 mt-1">
               This message appears on your profile's tip section
@@ -371,7 +371,7 @@
                 v-model="form.facebook_url"
                 type="url"
                 placeholder="https://facebook.com/yourprofile"
-                class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
             </div>
 
@@ -382,7 +382,7 @@
                 v-model="form.instagram_url"
                 type="url"
                 placeholder="https://instagram.com/yourprofile"
-                class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
             </div>
 
@@ -393,7 +393,7 @@
                 v-model="form.twitter_url"
                 type="url"
                 placeholder="https://twitter.com/yourprofile"
-                class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
             </div>
 
@@ -404,7 +404,7 @@
                 v-model="form.linkedin_url"
                 type="url"
                 placeholder="https://linkedin.com/in/yourprofile"
-                class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
             </div>
 
@@ -415,7 +415,7 @@
                 v-model="form.youtube_url"
                 type="url"
                 placeholder="https://youtube.com/yourprofile"
-                class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
             </div>
 
@@ -434,7 +434,7 @@
                 v-model="form.pexels_url"
                 type="url"
                 placeholder="https://www.pexels.com/@yourprofile"
-                class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
             </div>
 
@@ -445,7 +445,7 @@
                 v-model="form.website_url"
                 type="url"
                 placeholder="https://yourwebsite.com"
-                class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
             </div>
           </div>
@@ -500,7 +500,7 @@
               <label class="block text-sm font-semibold text-gray-700 mb-2">Average Response Time</label>
               <select
                 v-model="form.response_time_preference"
-                class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                class="w-full px-4 py-2.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
                 <option value="">
                   Select response time
@@ -529,7 +529,7 @@
                 min="0"
                 max="365"
                 placeholder="e.g., 7"
-                class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
               <p class="text-xs text-gray-500 mt-1">
                 How many days advance notice do you need for bookings?
@@ -787,5 +787,33 @@ textarea:focus,
 input:focus,
 select:focus {
   box-shadow: 0 0 0 3px rgba(128, 0, 32, 0.1);
+}
+
+/* Ensure proper text visibility on mobile */
+input,
+textarea,
+select {
+  color: #111827 !important;
+  background-color: #ffffff !important;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Override iOS input styling */
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="number"],
+input[type="tel"],
+textarea,
+select {
+  font-size: 16px;
+  font-family: inherit;
 }
 </style>
