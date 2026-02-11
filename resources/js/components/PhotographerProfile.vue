@@ -533,157 +533,76 @@
 
         <!-- Main Content -->
         <div class="lg:col-span-2 space-y-6">
-          <!-- Short Bio Section -->
-          <div class="bg-gradient-to-br from-white/95 to-white/80 rounded-2xl border border-[#eadfd7] shadow-lg p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <h2 class="text-3xl font-serif font-bold text-[#1b0b12] mb-3">
-              About This Photographer
-            </h2>
-            <p class="text-lg text-gray-700 leading-relaxed font-light mb-6 border-l-4 border-[#7a1f2b] pl-4">
-              {{ shortBio }}
-            </p>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-              <div class="bg-[#7a1f2b]/5 rounded-lg p-4">
-                <p class="text-xs uppercase tracking-widest text-[#7a1f2b] font-semibold mb-1">Experience</p>
-                <p class="text-2xl font-bold text-[#1b0b12]">{{ photographer.experience_years || 0 }}</p>
-                <p class="text-xs text-gray-600 mt-1">Years in Photography</p>
-              </div>
-              <div class="bg-amber-50/70 rounded-lg p-4 border border-amber-200/50">
-                <p class="text-xs uppercase tracking-widest text-amber-700 font-semibold mb-1">Success Rate</p>
-                <p class="text-2xl font-bold text-amber-800">{{ (photographer.average_rating || 0) }}</p>
-                <p class="text-xs text-amber-600 mt-1">Avg Rating</p>
-              </div>
-              <div class="bg-emerald-50/70 rounded-lg p-4 border border-emerald-200/50">
-                <p class="text-xs uppercase tracking-widest text-emerald-700 font-semibold mb-1">Track Record</p>
-                <p class="text-2xl font-bold text-emerald-700">{{ formatNumber(photographer.completed_bookings || 0) }}</p>
-                <p class="text-xs text-emerald-600 mt-1">Bookings Completed</p>
-              </div>
-              <div class="bg-blue-50/70 rounded-lg p-4 border border-blue-200/50">
-                <p class="text-xs uppercase tracking-widest text-blue-700 font-semibold mb-1">Recognition</p>
-                <p class="text-2xl font-bold text-blue-700">{{ formatNumber(photographer.awards_won || 0) }}</p>
-                <p class="text-xs text-blue-600 mt-1">Awards Earned</p>
-              </div>
-            </div>
-
-            <div class="flex flex-col sm:flex-row gap-3 sm:gap-2 w-full flex-wrap items-start justify-between mt-6 pt-6 border-t border-[#eadfd7]">
-              <div class="flex flex-wrap gap-2 text-sm">
-                <span
-                  v-if="photographer.completed_bookings"
-                  class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 font-medium"
-                >
-                  ✓ {{ formatNumber(photographer.completed_bookings) }} Completed
-                </span>
-                <span
-                  v-if="photographer.awards_won"
-                  class="px-3 py-1 rounded-full bg-amber-100 text-amber-700 font-medium"
-                >
-                  🏆 {{ formatNumber(photographer.awards_won) }} Awards
-                </span>
-                <span
-                  v-if="photographer.is_verified"
-                  class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-medium"
-                >
-                  ✔ Verified
-                </span>
-              </div>
-              <button
-                :disabled="isSelfBooking"
-                :class="[
-                  'px-6 py-2.5 rounded-full font-semibold shadow-md whitespace-nowrap transition-all duration-200',
-                  isSelfBooking
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-[#7a1f2b] text-white hover:bg-[#5f1421] hover:shadow-lg'
-                ]"
-                @click="startBooking"
-              >
-                🎯 Request Booking
-              </button>
-            </div>
-
-            <div class="flex flex-wrap gap-3 mt-4">
-              <button
-                class="px-6 py-2.5 rounded-full border border-[#7a1f2b] text-[#7a1f2b] font-semibold hover:bg-[#7a1f2b] hover:text-white transition-all duration-200"
-                @click="activeTab = 'portfolio'"
-              >
-                📸 View Portfolio
-              </button>
-              <button
-                class="px-6 py-2.5 rounded-full border border-[#eadfd7] text-gray-700 hover:border-[#7a1f2b] hover:text-[#7a1f2b] transition-all duration-200"
-                @click="activeTab = 'packages'"
-              >
-                📋 Packages
-              </button>
-              <button
-                class="px-6 py-2.5 rounded-full border border-[#eadfd7] text-gray-700 hover:border-[#7a1f2b] hover:text-[#7a1f2b] transition-all duration-200"
-                @click="activeTab = 'reviews'"
-              >
-                ⭐ Reviews
-              </button>
-            </div>
-          </div>
-
-          <BuyMeCoffeeButton
-            v-if="photographer?.id"
-            :photographerId="photographer.id"
-          />
-
-          <!-- Detailed About Section -->
+          <!-- About Section - Consolidated -->
           <div class="bg-white/90 rounded-2xl border border-[#eadfd7] shadow-lg overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <!-- Header -->
             <div class="bg-gradient-to-r from-[#7a1f2b] to-[#c75d5d] px-8 py-6">
-              <h2 class="text-2xl font-serif font-bold text-white">
-                Get to Know Me
-              </h2>
-              <p class="text-white/80 text-sm mt-1">Professional background and specializations</p>
+              <h2 class="text-2xl font-serif font-bold text-white">About {{ photographer.business_name || photographer.user?.name }}</h2>
+              <p class="text-white/80 text-sm mt-1">Professional photography & specializations</p>
             </div>
 
-            <div class="p-8">
+            <div class="p-8 space-y-6">
+              <!-- Short Introduction -->
+              <div>
+                <p class="text-lg text-gray-700 leading-relaxed font-light border-l-4 border-[#7a1f2b] pl-4">
+                  {{ shortBio }}
+                </p>
+              </div>
+
+              <!-- Key Stats Grid -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="bg-[#7a1f2b]/5 rounded-lg p-4 text-center">
+                  <p class="text-2xl font-bold text-[#7a1f2b]">{{ photographer.experience_years || 0 }}</p>
+                  <p class="text-xs uppercase text-gray-600 font-medium mt-1">Yrs Exp</p>
+                </div>
+                <div class="bg-amber-50/70 rounded-lg p-4 text-center border border-amber-200/50">
+                  <p class="text-2xl font-bold text-amber-700">{{ (photographer.average_rating || 0) }}</p>
+                  <p class="text-xs uppercase text-gray-600 font-medium mt-1">Rating</p>
+                </div>
+                <div class="bg-emerald-50/70 rounded-lg p-4 text-center border border-emerald-200/50">
+                  <p class="text-2xl font-bold text-emerald-700">{{ formatNumber(photographer.completed_bookings || 0) }}</p>
+                  <p class="text-xs uppercase text-gray-600 font-medium mt-1">Bookings</p>
+                </div>
+                <div class="bg-blue-50/70 rounded-lg p-4 text-center border border-blue-200/50">
+                  <p class="text-2xl font-bold text-blue-700">{{ photographer.is_verified ? '✓' : '–' }}</p>
+                  <p class="text-xs uppercase text-gray-600 font-medium mt-1">{{ photographer.is_verified ? 'Verified' : 'Not Verified' }}</p>
+                </div>
+              </div>
+
               <!-- Full Bio -->
-              <div class="mb-8">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <div v-if="hasLongBio" class="py-6 border-y border-[#eadfd7]">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <span class="inline-block w-1 h-6 bg-[#7a1f2b] rounded-full" />
-                  Biography
+                  Background
                 </h3>
-                <div class="prose prose-sm max-w-none text-gray-700 leading-relaxed space-y-3">
-                  <p v-if="hasLongBio" class="text-base text-gray-700 leading-relaxed whitespace-pre-wrap">
-                    {{ photographer.bio }}
+                <p class="text-gray-700 leading-relaxed whitespace-pre-wrap">{{ photographer.bio }}</p>
+              </div>
+
+              <!-- Location & Service Area -->
+              <div v-if="locationLabel || serviceRadiusLabel" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div v-if="locationLabel" class="bg-blue-50/70 rounded-lg p-4 border border-blue-200/50">
+                  <p class="flex items-center gap-2 text-blue-900 font-semibold text-sm">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M5.05 3.05a7 7 0 019.9 9.9L10 18l-4.95-5.05a7 7 0 010-9.9z" />
+                    </svg>
+                    Location
                   </p>
-                  <p v-else class="text-gray-500 italic py-4 bg-gray-50 px-4 rounded-lg">
-                    No detailed bio available yet. Check back soon!
+                  <p class="text-blue-700 mt-2 font-medium">{{ locationLabel }}</p>
+                </div>
+                <div v-if="serviceRadiusLabel" class="bg-amber-50/70 rounded-lg p-4 border border-amber-200/50">
+                  <p class="flex items-center gap-2 text-amber-900 font-semibold text-sm">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 8.414l2.95 2.95-1.414 1.414-3.536-3.536V5h2v5.414z" />
+                    </svg>
+                    Service Radius
                   </p>
+                  <p class="text-amber-700 mt-2 font-medium">{{ serviceRadiusLabel }}</p>
                 </div>
               </div>
 
-              <!-- Location & Service Info -->
-              <div v-if="locationLabel || serviceRadiusLabel" class="mb-8 pb-8 border-b border-[#eadfd7]">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <span class="inline-block w-1 h-6 bg-amber-500 rounded-full" />
-                  Service Area
-                </h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div v-if="locationLabel" class="bg-blue-50/70 rounded-lg p-4 border border-blue-200/50">
-                    <p class="flex items-center gap-2 text-blue-900 font-semibold">
-                      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M5.05 3.05a7 7 0 019.9 9.9L10 18l-4.95-5.05a7 7 0 010-9.9z" />
-                      </svg>
-                      Location
-                    </p>
-                    <p class="text-blue-700 mt-2 font-medium">{{ locationLabel }}</p>
-                  </div>
-                  <div v-if="serviceRadiusLabel" class="bg-amber-50/70 rounded-lg p-4 border border-amber-200/50">
-                    <p class="flex items-center gap-2 text-amber-900 font-semibold">
-                      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 8.414l2.95 2.95-1.414 1.414-3.536-3.536V5h2v5.414z" />
-                      </svg>
-                      Service Radius
-                    </p>
-                    <p class="text-amber-700 mt-2 font-medium">{{ serviceRadiusLabel }}</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Categories -->
-              <div v-if="photographer.categories && photographer.categories.length > 0" class="mb-8 pb-8 border-b border-[#eadfd7]">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <!-- Specializations -->
+              <div v-if="photographer.categories && photographer.categories.length > 0">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <span class="inline-block w-1 h-6 bg-purple-500 rounded-full" />
                   Specializations
                 </h3>
@@ -691,30 +610,53 @@
                   <span
                     v-for="category in photographer.categories"
                     :key="category.id"
-                    class="px-4 py-2.5 rounded-full bg-gradient-to-r from-[#7a1f2b]/10 to-[#c75d5d]/10 border border-[#7a1f2b]/20 text-[#7a1f2b] font-semibold text-sm"
+                    class="px-4 py-2 rounded-full bg-gradient-to-r from-[#7a1f2b]/10 to-[#c75d5d]/10 border border-[#7a1f2b]/20 text-[#7a1f2b] font-semibold text-sm"
                   >
                     📷 {{ category.name }}
                   </span>
                 </div>
               </div>
 
-              <!-- Key Highlights -->
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="text-center p-4 bg-gradient-to-br from-[#7a1f2b]/5 to-transparent rounded-lg border border-[#7a1f2b]/10">
-                  <p class="text-3xl font-bold text-[#7a1f2b]">{{ photographer.is_verified ? '✓' : '–' }}</p>
-                  <p class="text-xs uppercase tracking-wider text-gray-600 font-medium mt-2">{{ photographer.is_verified ? 'Verified' : 'Not Verified' }}</p>
-                </div>
-                <div class="text-center p-4 bg-gradient-to-br from-emerald-500/5 to-transparent rounded-lg border border-emerald-500/10">
-                  <p class="text-3xl font-bold text-emerald-600">{{ photographer.response_rate || 0 }}%</p>
-                  <p class="text-xs uppercase tracking-wider text-gray-600 font-medium mt-2">Response Rate</p>
-                </div>
-                <div class="text-center p-4 bg-gradient-to-br from-blue-500/5 to-transparent rounded-lg border border-blue-500/10">
-                  <p class="text-3xl font-bold text-blue-600">{{ photographer.average_response_time || 0 }}h</p>
-                  <p class="text-xs uppercase tracking-wider text-gray-600 font-medium mt-2">Avg Response</p>
-                </div>
+              <!-- Action Buttons -->
+              <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#eadfd7]">
+                <button
+                  :disabled="isSelfBooking"
+                  :class="[
+                    'px-6 py-2.5 rounded-full font-semibold whitespace-nowrap transition-all duration-200 flex-1 sm:flex-initial',
+                    isSelfBooking
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-[#7a1f2b] text-white hover:bg-[#5f1421]'
+                  ]"
+                  @click="startBooking"
+                >
+                  🎯 Request Booking
+                </button>
+                <button
+                  class="px-6 py-2.5 rounded-full border border-[#7a1f2b] text-[#7a1f2b] font-semibold hover:bg-[#7a1f2b] hover:text-white transition-all duration-200 flex-1 sm:flex-initial"
+                  @click="activeTab = 'portfolio'"
+                >
+                  📸 Portfolio
+                </button>
+                <button
+                  class="px-6 py-2.5 rounded-full border border-[#eadfd7] text-gray-700 hover:border-[#7a1f2b] hover:text-[#7a1f2b] transition-all duration-200 flex-1 sm:flex-initial"
+                  @click="activeTab = 'packages'"
+                >
+                  📋 Packages
+                </button>
+                <button
+                  class="px-6 py-2.5 rounded-full border border-[#eadfd7] text-gray-700 hover:border-[#7a1f2b] hover:text-[#7a1f2b] transition-all duration-200 flex-1 sm:flex-initial"
+                  @click="activeTab = 'reviews'"
+                >
+                  ⭐ Reviews
+                </button>
               </div>
             </div>
           </div>
+
+          <BuyMeCoffeeButton
+            v-if="photographer?.id"
+            :photographerId="photographer.id"
+          />
 
           <!-- Tab Navigation -->
           <div class="bg-white/90 rounded-2xl border border-[#eadfd7] shadow-lg transition-transform duration-300 hover:-translate-y-1">
