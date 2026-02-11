@@ -12,7 +12,7 @@
       <div class="container mx-auto px-4 py-16 md:py-24 relative z-10">
         <!-- Logo/Brand Section -->
         <div class="text-center mb-8">
-          <div class="inline-block mb-4 px-6 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
+          <div class="inline-block mb-4 px-6 py-2 bg-white bg-opacity-10 backdrop-blur-sm rounded-full border border-white border-opacity-20">
             <p class="text-sm md:text-base font-medium flex items-center gap-2 justify-center">
               <svg
                 class="w-5 h-5"
@@ -40,7 +40,7 @@
 
         <!-- Stats Bar -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-10 animate-fade-in-delay-2">
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white/20 hover:bg-white/15 transition-all">
+          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
             <div class="text-3xl md:text-4xl font-bold">
               {{ stats.active_competitions }}
             </div>
@@ -48,7 +48,7 @@
               Active
             </div>
           </div>
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white/20 hover:bg-white/15 transition-all">
+          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
             <div class="text-3xl md:text-4xl font-bold">
               ৳{{ stats.total_prize_pool }}
             </div>
@@ -56,7 +56,7 @@
               Prize Pool
             </div>
           </div>
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white/20 hover:bg-white/15 transition-all">
+          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
             <div class="text-3xl md:text-4xl font-bold">
               {{ stats.total_submissions }}
             </div>
@@ -64,7 +64,7 @@
               Submissions
             </div>
           </div>
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white/20 hover:bg-white/15 transition-all">
+          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
             <div class="text-3xl md:text-4xl font-bold">
               {{ stats.total_participants }}
             </div>
@@ -407,7 +407,10 @@
           <button
             v-for="page in visiblePages"
             :key="page"
-            :class="`px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base ${page === currentPage ? 'bg-[#7a1f2b] text-white' : 'border hover:bg-gray-100'}`"
+            :class="[
+              'px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base',
+              page === currentPage ? 'bg-burgundy text-white' : 'border hover:bg-gray-100'
+            ]"
             @click="goToPage(page)"
           >
             {{ page }}

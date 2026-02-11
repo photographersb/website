@@ -104,10 +104,10 @@
                   v-if="isVoteMode"
                   class="absolute left-3 top-3 sm:hidden flex flex-col gap-1"
                 >
-                  <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 text-gray-900 text-xs font-semibold">
+                  <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white bg-opacity-90 text-gray-900 text-xs font-semibold">
                     Vote Mode
                   </span>
-                  <span class="inline-flex items-center px-3 py-1 rounded-full bg-black/70 text-white text-[11px]">
+                  <span class="inline-flex items-center px-3 py-1 rounded-full bg-black bg-opacity-70 text-white text-[11px]">
                     Swipe to skip
                   </span>
                 </div>
@@ -127,7 +127,7 @@
                   class="absolute inset-0 flex items-center justify-between px-4 pointer-events-none"
                 >
                   <button
-                    class="pointer-events-auto w-10 h-10 rounded-full bg-white/90 text-gray-900 shadow-md hover:bg-white transition"
+                    class="pointer-events-auto w-10 h-10 rounded-full bg-white bg-opacity-90 text-gray-900 shadow-md hover:bg-white transition"
                     title="Previous submission"
                     @click="goPrev"
                   >
@@ -136,7 +136,7 @@
                     </svg>
                   </button>
                   <button
-                    class="pointer-events-auto w-10 h-10 rounded-full bg-white/90 text-gray-900 shadow-md hover:bg-white transition"
+                    class="pointer-events-auto w-10 h-10 rounded-full bg-white bg-opacity-90 text-gray-900 shadow-md hover:bg-white transition"
                     title="Next submission"
                     @click="goNext"
                   >
@@ -148,7 +148,7 @@
                 <div
                   v-if="canSlide"
                   :class="[
-                    'absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/60 text-white text-xs tracking-wide',
+                    'absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black bg-opacity-60 text-white text-xs tracking-wide',
                     isVoteMode ? 'hidden sm:flex' : ''
                   ]"
                 >
@@ -158,11 +158,11 @@
                   v-if="isVoteMode && canSlide"
                   class="absolute bottom-3 left-3 right-3 sm:hidden"
                 >
-                  <div class="flex items-center justify-between text-[11px] text-white/90 mb-1">
+                  <div class="flex items-center justify-between text-[11px] text-white text-opacity-90 mb-1">
                     <span>Progress</span>
                     <span>{{ voteProgressLabel }}</span>
                   </div>
-                  <div class="h-1.5 rounded-full bg-white/30 overflow-hidden">
+                  <div class="h-1.5 rounded-full bg-white bg-opacity-30 overflow-hidden">
                     <div
                       class="h-full bg-gradient-to-r from-rose-400 to-red-500"
                       :style="{ width: `${voteProgressPercent}%` }"
@@ -683,7 +683,7 @@
         v-if="submission"
         class="sm:hidden fixed bottom-0 inset-x-0 z-30"
       >
-        <div class="bg-white/95 backdrop-blur border-t border-gray-200 px-4 pt-3 pb-4">
+        <div class="bg-white bg-opacity-95 backdrop-blur border-t border-gray-200 px-4 pt-3 pb-4">
           <div
             v-if="isVoteMode"
             class="flex items-center gap-3"

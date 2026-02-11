@@ -2,17 +2,17 @@
   <div class="min-h-screen bg-gradient-to-b from-gray-50 to-white">
     <section class="relative overflow-hidden bg-gradient-to-br from-burgundy via-[#8E0E3F] to-[#6F112D] text-white">
       <div class="absolute inset-0 overflow-hidden">
-        <div class="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-        <div class="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+        <div class="absolute top-0 left-0 w-96 h-96 bg-white bg-opacity-5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-white bg-opacity-5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
       </div>
       <div class="container mx-auto px-4 py-12 md:py-16 relative z-10 text-center">
-        <p class="text-xs uppercase tracking-[0.35em] text-white/70">
+        <p class="text-xs uppercase tracking-[0.35em] text-white text-opacity-70">
           How It Works
         </p>
         <h1 class="text-3xl md:text-5xl font-bold mt-4 tracking-tight">
           How Photographer SB Works
         </h1>
-        <p class="text-base md:text-lg text-white/85 max-w-3xl mx-auto mt-4">
+        <p class="text-base md:text-lg text-white text-opacity-85 max-w-3xl mx-auto mt-4">
           A clear, step-by-step path for clients and photographers.
         </p>
       </div>

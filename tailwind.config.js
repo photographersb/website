@@ -7,6 +7,12 @@ export default {
   theme: {
     extend: {
       colors: {
+        brand: {
+          primary: '#8B1538',
+          secondary: '#1F2937',
+          accent: '#F59E0B',
+          muted: '#FDF2F5',
+        },
         primary: {
           DEFAULT: '#8B1538',
           50: '#FDF2F5',
@@ -95,5 +101,25 @@ export default {
       },
     },
   },
+  safelist: [
+    'bg-burgundy',
+    'bg-rose-800',
+    'bg-green-600',
+    'bg-green-700',
+    'bg-gray-300',
+    'text-gray-500',
+    'bg-emerald-100',
+    'text-emerald-800',
+    'bg-amber-100',
+    'text-amber-800',
+    'bg-blue-100',
+    'text-blue-800',
+    'bg-rose-100',
+    'text-rose-800',
+    'bg-gray-100',
+    'text-gray-800',
+    'bg-primary-700',
+    'text-primary-700',
+  ],
   plugins: [],
 }

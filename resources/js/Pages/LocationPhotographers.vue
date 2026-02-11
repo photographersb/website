@@ -145,7 +145,7 @@
               </label>
               <select
                 v-model="sortBy"
-                class="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-medium focus:outline-none focus:border-primary-700 focus:ring-2 focus:ring-primary-600/30 transition-all"
+                class="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-3 text-gray-900 font-medium focus:outline-none focus:border-primary-700 focus:ring-2 focus:ring-primary-600 focus:ring-opacity-30 transition-all"
               >
                 <option value="recent">
                   Most Recent
@@ -182,7 +182,7 @@
             <div class="flex-1 sm:flex-none">
               <select
                 v-model="sortBy"
-                class="w-full sm:w-56 bg-white border-2 border-gray-200 rounded-lg px-4 py-2 text-gray-900 font-medium focus:outline-none focus:border-primary-700 focus:ring-2 focus:ring-primary-600/30 transition-all"
+                class="w-full sm:w-56 bg-white border-2 border-gray-200 rounded-lg px-4 py-2 text-gray-900 font-medium focus:outline-none focus:border-primary-700 focus:ring-2 focus:ring-primary-600 focus:ring-opacity-30 transition-all"
               >
                 <option value="recent">
                   Most Recent
@@ -238,7 +238,7 @@
           <!-- Empty State -->
           <div
             v-if="!loading && filteredPhotographers.length === 0"
-            class="bg-gradient-to-br from-white via-primary-50/30 to-purple-50/40 rounded-2xl shadow-xl p-8 sm:p-16 border-2 border-primary-100 text-center"
+            class="bg-gradient-to-br from-white via-primary-50 via-opacity-30 to-purple-50 to-opacity-40 rounded-2xl shadow-xl p-8 sm:p-16 border-2 border-primary-100 text-center"
           >
             <div class="max-w-md mx-auto">
               <!-- Icon -->

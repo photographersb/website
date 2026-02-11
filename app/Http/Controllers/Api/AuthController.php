@@ -73,11 +73,19 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validated = $request->validate([
-            'email' => 'required|email',
+            'email' => 'required|string',
             'password' => 'required',
         ]);
 
-        if (!Auth::attempt($validated)) {
+        $loginValue = $validated['email'];
+        $password = $validated['password'];
+        $isEmail = filter_var($loginValue, FILTER_VALIDATE_EMAIL) !== false;
+
+        $credentials = $isEmail
+            ? ['email' => $loginValue, 'password' => $password]
+            : ['username' => $loginValue, 'password' => $password];
+
+        if (!Auth::attempt($credentials)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);

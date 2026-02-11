@@ -7,7 +7,7 @@
       <div class="absolute -bottom-28 -left-24 h-80 w-80 rounded-full bg-[#c46b7a]/20 blur-3xl" />
       <div class="container mx-auto px-4 relative pt-8 pb-24">
         <button
-          class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white/90 transition hover:bg-white/20"
+          class="inline-flex items-center gap-2 rounded-full border border-white border-opacity-20 bg-white bg-opacity-10 px-4 py-2 text-sm font-medium text-white text-opacity-90 transition hover:bg-opacity-20"
           @click="$router.back()"
         >
           <svg
@@ -27,17 +27,17 @@
         </button>
 
         <div class="mt-10 max-w-4xl text-white">
-          <p class="text-xs uppercase tracking-[0.35em] text-white/70">
+          <p class="text-xs uppercase tracking-[0.35em] text-white text-opacity-70">
             {{ photographer?.is_featured ? 'Featured Photographer' : 'Photographer' }}
           </p>
           <h1 class="mt-4 text-4xl md:text-5xl font-semibold font-serif tracking-tight">
             {{ photographer?.user?.name || photographer?.business_name || 'Photographer' }}
           </h1>
-          <p class="mt-3 text-base text-white/80">
+          <p class="mt-3 text-base text-white text-opacity-80">
             {{ shortBio }}
           </p>
           <div class="mt-6 flex flex-wrap gap-3 text-sm">
-            <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-white/90">
+            <span class="inline-flex items-center gap-2 rounded-full bg-white bg-opacity-10 px-4 py-2 text-white text-opacity-90">
               <svg class="w-4 h-4 text-amber-300" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
               </svg>
@@ -45,19 +45,19 @@
             </span>
             <span
               v-if="photographer?.is_verified"
-              class="inline-flex items-center gap-2 rounded-full bg-emerald-400/20 px-4 py-2 text-emerald-200"
+              class="inline-flex items-center gap-2 rounded-full bg-emerald-400 bg-opacity-20 px-4 py-2 text-emerald-200"
             >
               Verified
             </span>
             <span
               v-if="photographer?.response_rate"
-              class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-white/80"
+              class="inline-flex items-center gap-2 rounded-full bg-white bg-opacity-10 px-4 py-2 text-white text-opacity-80"
             >
               {{ photographer.response_rate }}% response rate
             </span>
             <span
               v-if="photographer?.completed_bookings"
-              class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-white/80"
+              class="inline-flex items-center gap-2 rounded-full bg-white bg-opacity-10 px-4 py-2 text-white text-opacity-80"
             >
               {{ formatNumber(photographer.completed_bookings) }} completed
             </span>
@@ -112,7 +112,7 @@
         <!-- Left Sidebar -->
         <div class="lg:col-span-1">
           <!-- Profile Card -->
-          <div class="bg-white/90 backdrop-blur rounded-2xl shadow-xl border border-[#eadfd7] overflow-hidden sticky top-6 transition-transform duration-300 hover:-translate-y-1">
+          <div class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-xl border border-[#eadfd7] overflow-hidden sticky top-6 transition-transform duration-300 hover:-translate-y-1">
             <div class="p-6 text-center">
               <p class="text-[11px] uppercase tracking-[0.4em] text-[#7a1f2b] mb-4">
                 Profile Snapshot
@@ -132,7 +132,7 @@
               <div class="flex flex-wrap items-center justify-center gap-2 mb-3">
                 <span
                   v-if="locationLabel"
-                  class="inline-flex items-center gap-1 bg-[#1b0b12]/10 text-[#1b0b12] px-3 py-1 rounded-full text-xs font-semibold"
+                  class="inline-flex items-center gap-1 bg-[#1b0b12] bg-opacity-10 text-[#1b0b12] px-3 py-1 rounded-full text-xs font-semibold"
                 >
                   <svg
                     class="w-3.5 h-3.5"
@@ -145,7 +145,7 @@
                 </span>
                 <span
                   v-if="photographer.categories && photographer.categories.length > 0"
-                  class="inline-flex items-center gap-1 bg-[#7a1f2b]/10 text-[#7a1f2b] px-3 py-1 rounded-full text-xs font-bold"
+                  class="inline-flex items-center gap-1 bg-[#7a1f2b] bg-opacity-10 text-[#7a1f2b] px-3 py-1 rounded-full text-xs font-bold"
                 >
                   <svg
                     class="w-3.5 h-3.5"

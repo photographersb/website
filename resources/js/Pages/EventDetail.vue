@@ -350,7 +350,8 @@
 
             <button
               :disabled="isEventFull || isPaid"
-              :class="`w-full py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg transition-colors ${
+              :class="[
+                'w-full py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg transition-colors',
                 isRsvped
                   ? 'bg-green-600 text-white hover:bg-green-700'
                   : isEventFull
@@ -358,7 +359,7 @@
                     : isPaid
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-burgundy text-white hover:bg-rose-800'
-              }`"
+              ]"
               @click="handleRsvp"
             >
               {{

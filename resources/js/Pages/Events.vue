@@ -10,15 +10,15 @@
     <section class="relative overflow-hidden bg-gradient-to-br from-burgundy via-[#8E0E3F] to-[#6F112D] text-white">
       <!-- Decorative Background Elements -->
       <div class="absolute inset-0 overflow-hidden">
-        <div class="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-        <div class="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
-        <div class="absolute top-1/2 left-1/2 w-64 h-64 bg-white/3 rounded-full blur-2xl" />
+        <div class="absolute top-0 left-0 w-96 h-96 bg-white bg-opacity-5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-white bg-opacity-5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+        <div class="absolute top-1/2 left-1/2 w-64 h-64 bg-white bg-opacity-5 rounded-full blur-2xl" />
       </div>
 
       <div class="container mx-auto px-4 py-16 md:py-24 relative z-10">
         <!-- Logo/Brand Section -->
         <div class="text-center mb-8">
-          <div class="inline-block mb-4 px-6 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
+          <div class="inline-block mb-4 px-6 py-2 bg-white bg-opacity-10 backdrop-blur-sm rounded-full border border-white border-opacity-20">
             <p class="text-sm md:text-base font-medium flex items-center gap-2 justify-center">
               <svg
                 class="w-5 h-5"
@@ -46,7 +46,7 @@
 
         <!-- Stats Bar -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-10 animate-fade-in-delay-2">
-          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center border border-white/20 hover:bg-white/15 transition-all">
+          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
             <div class="text-3xl md:text-4xl font-bold">
               {{ stats.total_events || 0 }}
             </div>
@@ -54,7 +54,7 @@
               Total Events
             </div>
           </div>
-          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center border border-white/20 hover:bg-white/15 transition-all">
+          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
             <div class="text-3xl md:text-4xl font-bold">
               {{ stats.upcoming_events || 0 }}
             </div>
@@ -62,7 +62,7 @@
               Upcoming
             </div>
           </div>
-          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center border border-white/20 hover:bg-white/15 transition-all">
+          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
             <div class="text-3xl md:text-4xl font-bold">
               {{ stats.total_cities || 0 }}
             </div>
@@ -70,7 +70,7 @@
               Locations
             </div>
           </div>
-          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center border border-white/20 hover:bg-white/15 transition-all">
+          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
             <div class="text-3xl md:text-4xl font-bold">
               {{ stats.total_rsvps || 0 }}
             </div>
@@ -407,11 +407,12 @@
                   {{ event.rsvp_count || 0 }} Registrations
                 </div>
                 <button
-                  :class="`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                  :class="[
+                    'px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors',
                     isRsvped(event)
                       ? 'bg-green-600 text-white hover:bg-green-700'
                       : 'bg-burgundy text-white hover:bg-rose-800'
-                  }`"
+                  ]"
                   @click.stop="toggleRsvp(event)"
                 >
                   {{ isRsvped(event) ? '✓ Registered' : 'Register' }}

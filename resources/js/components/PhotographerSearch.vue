@@ -4,22 +4,22 @@
     <section class="relative overflow-hidden bg-gradient-to-br from-burgundy via-[#8E0E3F] to-[#6F112D] text-white">
       <!-- Decorative Background Elements (Hidden on Mobile, Visible on Desktop) -->
       <div class="absolute inset-0 overflow-hidden hidden sm:block">
-        <div class="absolute top-0 left-0 w-48 h-48 sm:w-64 sm:h-64 md:w-96 md:h-96 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-        <div class="absolute bottom-0 right-0 w-48 h-48 sm:w-64 sm:h-64 md:w-96 md:h-96 bg-white/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
-        <div class="absolute top-1/2 left-1/2 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 bg-white/3 rounded-full blur-2xl -translate-x-1/2 -translate-y-1/2" />
+        <div class="absolute top-0 left-0 w-48 h-48 sm:w-64 sm:h-64 md:w-96 md:h-96 bg-white bg-opacity-5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+        <div class="absolute bottom-0 right-0 w-48 h-48 sm:w-64 sm:h-64 md:w-96 md:h-96 bg-white bg-opacity-5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+        <div class="absolute top-1/2 left-1/2 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 bg-white bg-opacity-5 rounded-full blur-2xl -translate-x-1/2 -translate-y-1/2" />
       </div>
 
       <!-- Mobile Background Gradient for Visibility -->
       <div class="absolute inset-0 sm:hidden opacity-40">
-        <div class="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-        <div class="absolute bottom-10 right-5 w-24 h-24 bg-white/5 rounded-full blur-xl" />
+        <div class="absolute top-10 left-10 w-32 h-32 bg-white bg-opacity-10 rounded-full blur-2xl" />
+        <div class="absolute bottom-10 right-5 w-24 h-24 bg-white bg-opacity-5 rounded-full blur-xl" />
       </div>
 
       <div class="relative z-10 w-full px-4 sm:px-6 md:px-8 lg:px-4 py-6 sm:py-8 md:py-12 lg:py-16">
         <div class="max-w-5xl mx-auto">
           <!-- Logo/Brand Section - Responsive Text -->
           <div class="text-center mb-4 sm:mb-5 md:mb-6 lg:mb-8">
-            <div class="inline-flex mb-2 sm:mb-3 px-3 sm:px-4 py-1 sm:py-1.5 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 hover:bg-white/15 transition-colors">
+            <div class="inline-flex mb-2 sm:mb-3 px-3 sm:px-4 py-1 sm:py-1.5 bg-white bg-opacity-10 backdrop-blur-sm rounded-full border border-white border-opacity-20 hover:bg-opacity-20 transition-colors">
               <p class="text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2 justify-center">
                 <svg
                   class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0"
@@ -62,7 +62,7 @@
           <!-- Search Bar - Fully Responsive -->
           <div class="max-w-3xl mx-auto animate-fade-in-delay-3">
             <!-- Search Container -->
-            <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-lg sm:rounded-xl md:rounded-2xl p-2.5 sm:p-3 md:p-4 shadow-2xl">
+            <div class="bg-white bg-opacity-10 backdrop-blur-md border border-white border-opacity-20 rounded-lg sm:rounded-xl md:rounded-2xl p-2.5 sm:p-3 md:p-4 shadow-2xl">
               <div class="flex flex-col gap-2.5 sm:gap-3 md:gap-3">
                 <!-- Search Input Row -->
                 <div class="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
@@ -115,7 +115,7 @@
                   <button
                     v-for="category in popularCategories"
                     :key="category.slug"
-                    class="px-2.5 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full text-xs sm:text-sm border border-white/20 transition-all hover:scale-105 whitespace-nowrap font-medium"
+                    class="px-2.5 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 bg-white bg-opacity-10 hover:bg-opacity-20 backdrop-blur-sm rounded-full text-xs sm:text-sm border border-white border-opacity-20 transition-all hover:scale-105 whitespace-nowrap font-medium"
                     @click="quickFilter(category.slug)"
                   >
                     <span class="mr-1">{{ category.icon }}</span>{{ category.name }}
@@ -144,7 +144,7 @@
                   Photographers
                 </div>
               </div>
-              <div class="text-center px-1 sm:px-2 border-x border-white/40">
+              <div class="text-center px-1 sm:px-2 border-x border-white border-opacity-40">
                 <div
                   class="font-bold mb-3 sm:mb-3 md:mb-4 leading-tight text-white"
                   style="font-size: clamp(1.75rem, 5vw, 3.5rem);"

@@ -3,12 +3,12 @@
     <!-- Hero Section with Branding -->
     <section class="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 text-white">
       <div class="absolute inset-0 overflow-hidden">
-        <div class="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-        <div class="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+        <div class="absolute top-0 left-0 w-96 h-96 bg-white bg-opacity-5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-white bg-opacity-5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
       </div>
 
       <div class="container mx-auto px-4 py-12 md:py-16 relative z-10 text-center">
-        <div class="inline-block mb-4 px-6 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
+        <div class="inline-block mb-4 px-6 py-2 bg-white bg-opacity-10 backdrop-blur-sm rounded-full border border-white border-opacity-20">
           <p class="text-sm md:text-base font-medium flex items-center gap-2 justify-center">
             <svg
               class="w-5 h-5"
@@ -21,7 +21,7 @@
               href="https://somogrobangladesh.com/"
               target="_blank"
               rel="noopener"
-              class="underline hover:text-white/80 transition-colors"
+              class="underline hover:text-white hover:text-opacity-80 transition-colors"
             >Somogro Bangladesh</a>
           </p>
         </div>

@@ -19,8 +19,8 @@
       <!-- Hero Banner -->
       <div class="relative h-80 sm:h-96 md:h-[34rem] bg-[#1b0b12] overflow-hidden">
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(245,158,11,0.28)_0,_transparent_55%)]" />
-        <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-[#f3b35a]/30 blur-3xl" />
-        <div class="absolute -bottom-28 -left-24 h-80 w-80 rounded-full bg-[#c46b7a]/20 blur-3xl" />
+        <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-[#f3b35a] bg-opacity-30 blur-3xl" />
+        <div class="absolute -bottom-28 -left-24 h-80 w-80 rounded-full bg-[#c46b7a] bg-opacity-20 blur-3xl" />
         <img
           v-if="competition.hero_image || competition.banner_image"
           :src="competition.hero_image || competition.banner_image"
@@ -28,16 +28,35 @@
           class="w-full h-full object-cover opacity-35"
           decoding="async"
         >
-        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black from-opacity-80 via-black via-opacity-40 to-transparent" />
         
         <div class="absolute inset-0 container mx-auto px-4 flex flex-col justify-end py-8 sm:py-12 md:py-16">
           <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-            <span :class="`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-semibold ${getStatusBadgeClass(competition.status)} shadow-lg`">
+            <span
+              :class="[
+                'px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-semibold shadow-lg',
+                {
+                  'bg-[#efe5dc] text-[#7a1f2b]': competition.status === 'draft',
+                  'bg-emerald-100 text-emerald-800': competition.status === 'active',
+                  'bg-amber-100 text-amber-800': competition.status === 'judging',
+                  'bg-blue-100 text-blue-800': competition.status === 'completed',
+                  'bg-rose-100 text-rose-800': competition.status === 'cancelled',
+                  'bg-gray-100 text-gray-800': !competition.status,
+                }
+              ]"
+            >
               {{ formatStatus(competition.status) }}
             </span>
             <span
               v-if="votingCountdownLabel"
-              :class="`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-semibold ${votingCountdownClass} shadow-lg`"
+              :class="[
+                'px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-semibold shadow-lg',
+                {
+                  'bg-amber-100 text-amber-800': isVotingActive,
+                  'bg-slate-100 text-slate-700': isVotingUpcoming,
+                  'bg-gray-200 text-gray-600': isVotingEnded || (!isVotingActive && !isVotingUpcoming && !isVotingEnded),
+                }
+              ]"
             >
               {{ votingCountdownLabel }}
             </span>
@@ -56,13 +75,13 @@
             </span>
             <span
               v-if="competition.status === 'active'"
-              class="px-4 sm:px-5 py-2 sm:py-2.5 bg-white/15 backdrop-blur-sm text-white rounded-full text-sm sm:text-base font-semibold"
+              class="px-4 sm:px-5 py-2 sm:py-2.5 bg-white bg-opacity-[0.15] backdrop-blur-sm text-white rounded-full text-sm sm:text-base font-semibold"
             >
               ⏰ {{ getTimeRemaining(competition.submission_deadline) }}
             </span>
             <button
               v-if="showWinnersQuickLink"
-              class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white text-[#1b0b12] text-sm sm:text-base font-semibold shadow-lg hover:bg-white/90 transition"
+              class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white text-[#1b0b12] text-sm sm:text-base font-semibold shadow-lg hover:bg-white hover:bg-opacity-90 transition"
               @click="viewWinners"
             >
               View Winners
@@ -79,7 +98,7 @@
           </p>
           <p
             v-if="heroCredit"
-            class="text-xs text-white/80"
+            class="text-xs text-white text-opacity-80"
           >
             Photo by
             <a
@@ -101,7 +120,7 @@
           <div class="lg:col-span-2 space-y-8">
             <!-- Stats Cards -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-              <div class="bg-white/85 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8 text-center transition-transform hover:-translate-y-1">
+              <div class="bg-white bg-opacity-[0.85] backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8 text-center transition-transform hover:-translate-y-1">
                 <div class="text-2xl md:text-3xl lg:text-4xl font-semibold text-[#7a1f2b] mb-2">
                   {{ Number.isFinite(Number(competition.total_prize_pool)) ? formatNumber(Math.floor(competition.total_prize_pool)) : 'TBD' }}
                 </div>
@@ -109,7 +128,7 @@
                   Prize Pool
                 </div>
               </div>
-              <div class="bg-white/85 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8 text-center transition-transform hover:-translate-y-1">
+              <div class="bg-white bg-opacity-[0.85] backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8 text-center transition-transform hover:-translate-y-1">
                 <div class="text-2xl md:text-3xl lg:text-3xl font-semibold text-[#1b0b12] mb-2">
                   {{ submissionCountDisplay }}
                 </div>
@@ -117,7 +136,7 @@
                   Submissions
                 </div>
               </div>
-              <div class="bg-white/85 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8 text-center transition-transform hover:-translate-y-1">
+              <div class="bg-white bg-opacity-[0.85] backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8 text-center transition-transform hover:-translate-y-1">
                 <div class="text-2xl md:text-3xl lg:text-3xl font-semibold text-[#7a1f2b] mb-2">
                   {{ voteCountDisplay }}
                 </div>
@@ -125,7 +144,7 @@
                   Votes
                 </div>
               </div>
-              <div class="bg-white/85 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8 text-center transition-transform hover:-translate-y-1">
+              <div class="bg-white bg-opacity-[0.85] backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8 text-center transition-transform hover:-translate-y-1">
                 <div class="text-2xl md:text-3xl lg:text-3xl font-semibold text-[#1b0b12] mb-2">
                   {{ competition.number_of_winners }}
                 </div>
@@ -137,7 +156,7 @@
 
             <div
               v-if="showVoteCta"
-              class="bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-5 md:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+              class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-5 md:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
             >
               <div>
                 <p class="text-sm font-semibold text-[#1b0b12]">Public voting is live</p>
@@ -152,7 +171,7 @@
                 </button>
                 <button
                   v-if="showVoteModeCta"
-                  class="px-5 py-2.5 rounded-full border border-[#7a1f2b] text-[#7a1f2b] text-sm font-semibold hover:bg-[#7a1f2b]/10 transition"
+                  class="px-5 py-2.5 rounded-full border border-[#7a1f2b] text-[#7a1f2b] text-sm font-semibold hover:bg-[#7a1f2b] hover:bg-opacity-10 transition"
                   @click="handleVoteModeCta"
                 >
                   {{ voteModeCtaLabel }}
@@ -163,7 +182,7 @@
 
             <div
               v-if="showResultsCta"
-              class="bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-5 md:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+              class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-5 md:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
             >
               <div>
                 <p class="text-sm font-semibold text-[#1b0b12]">See the results</p>
@@ -197,7 +216,7 @@
             <!-- Judge Reactions -->
             <div
               v-if="competition.judge_reactions && competition.judge_reactions.score_count > 0"
-              class="bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8"
+              class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8"
             >
               <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <h2 class="text-2xl md:text-3xl font-semibold font-serif text-[#1b0b12] flex items-center gap-3">
@@ -233,7 +252,7 @@
             </div>
 
             <!-- Description -->
-            <div class="bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8">
+            <div class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8">
               <h2 class="text-2xl md:text-3xl font-semibold font-serif mb-4 text-[#1b0b12] flex items-center gap-3">
                 <span class="w-1.5 h-8 bg-[#7a1f2b] rounded-full" />
                 About This Competition
@@ -246,14 +265,21 @@
             </div>
 
             <!-- Timeline -->
-            <div class="bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8">
+            <div class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8">
               <h2 class="text-2xl md:text-3xl font-semibold font-serif mb-6 text-[#1b0b12] flex items-center gap-3">
                 <span class="w-1.5 h-8 bg-[#7a1f2b] rounded-full" />
                 Competition Timeline
               </h2>
               <div class="space-y-4 sm:space-y-5">
                 <div class="flex items-start gap-4">
-                  <div :class="`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg ${isDatePassed(competition.submission_deadline) ? 'bg-gray-400' : 'bg-gradient-to-br from-[#7a1f2b] to-[#c75d5d]'}`">
+                  <div
+                    :class="[
+                      'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg',
+                      isDatePassed(competition.submission_deadline)
+                        ? 'bg-gray-400'
+                        : 'bg-gradient-to-br from-[#7a1f2b] to-[#c75d5d]'
+                    ]"
+                  >
                     <svg
                       class="w-6 h-6 text-white"
                       fill="none"
@@ -288,7 +314,14 @@
                   v-if="competition.voting_start_at"
                   class="flex items-start gap-4"
                 >
-                  <div :class="`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg ${isDatePassed(competition.voting_end_at) ? 'bg-gray-400' : isVotingActive ? 'bg-gradient-to-br from-amber-500 to-amber-700' : 'bg-gray-400'}`">
+                  <div
+                    :class="[
+                      'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg',
+                      isVotingActive && !isDatePassed(competition.voting_end_at)
+                        ? 'bg-gradient-to-br from-amber-500 to-amber-700'
+                        : 'bg-gray-400'
+                    ]"
+                  >
                     <svg
                       class="w-6 h-6 text-white"
                       fill="none"
@@ -335,7 +368,14 @@
                   v-if="competition.results_announcement_date"
                   class="flex items-start gap-4"
                 >
-                  <div :class="`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg ${competition.results_published ? 'bg-gradient-to-br from-green-500 to-green-700' : 'bg-gray-400'}`">
+                  <div
+                    :class="[
+                      'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg',
+                      competition.results_published
+                        ? 'bg-gradient-to-br from-green-500 to-green-700'
+                        : 'bg-gray-400'
+                    ]"
+                  >
                     <svg
                       class="w-6 h-6 text-white"
                       fill="none"
@@ -371,7 +411,7 @@
             <!-- Judges Section -->
             <div
               v-if="judgeProfilesList.length > 0"
-              class="bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8"
+              class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8"
             >
               <h2 class="text-2xl md:text-3xl font-semibold font-serif mb-6 text-[#1b0b12] flex items-center gap-3">
                 <span class="w-1.5 h-8 bg-[#7a1f2b] rounded-full" />
@@ -424,7 +464,7 @@
             </div>
 
             <!-- Rules & Eligibility Section -->
-            <div class="bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8">
+            <div class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8">
               <button
                 class="w-full flex items-center justify-between mb-6 hover:opacity-80 transition-opacity"
                 @click="showRules = !showRules"
@@ -488,7 +528,7 @@
             <!-- Sponsors Section -->
             <div
               v-if="sponsorList.length > 0"
-              class="bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8"
+              class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8"
             >
               <h2 class="text-2xl md:text-3xl font-semibold font-serif mb-6 text-[#1b0b12] flex items-center gap-3">
                 <span class="w-1.5 h-8 bg-[#7a1f2b] rounded-full" />
@@ -529,7 +569,7 @@
             <!-- Mentors Section -->
             <div
               v-if="competition.mentors && competition.mentors.length > 0"
-              class="bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8"
+              class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8"
             >
               <h2 class="text-2xl md:text-3xl font-semibold font-serif mb-6 text-[#1b0b12] flex items-center gap-3">
                 <span class="w-1.5 h-8 bg-[#7a1f2b] rounded-full" />
@@ -580,7 +620,7 @@
             </div>
 
             <!-- Submissions / Leaderboard -->
-            <div class="bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8">
+            <div class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8">
               <div class="flex items-center justify-between mb-6">
                 <h2 class="text-2xl md:text-3xl font-semibold font-serif text-[#1b0b12] flex items-center gap-3">
                   <span class="w-1.5 h-8 bg-[#7a1f2b] rounded-full" />
@@ -628,16 +668,16 @@
                     :alt="submission.title"
                     class="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-300"
                   >
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-100 transition-opacity">
+                  <div class="absolute inset-0 bg-gradient-to-t from-black from-opacity-90 via-black via-opacity-30 to-transparent opacity-100 transition-opacity">
                     <div class="absolute bottom-0 left-0 right-0 p-5 text-white">
                       <div class="flex items-center justify-between mb-3">
                         <span class="text-2xl md:text-3xl font-black">#{{ index + 1 }}</span>
-                        <span class="bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-semibold">
+                        <span class="bg-white bg-opacity-20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-semibold">
                           {{ submission.vote_count }} votes
                         </span>
                         <span
                           v-if="showJudgeScores && submission.judge_score !== null"
-                          class="bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-semibold"
+                          class="bg-white bg-opacity-20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-semibold"
                         >
                           Judge {{ formatScore(submission.judge_score) }}/50
                         </span>
@@ -682,7 +722,7 @@
           <!-- Sidebar -->
           <div class="lg:col-span-1 space-y-8">
             <!-- Action Card -->
-            <div class="bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 lg:sticky lg:top-6">
+            <div class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 lg:sticky lg:top-6">
               <div class="space-y-5">
                 <!-- Status Info -->
                 <div class="p-5 bg-[#f7f2ee] rounded-xl border-l-4 border-[#7a1f2b]">
@@ -814,7 +854,7 @@
                   v-if="competition"
                   class="sm:hidden fixed bottom-0 inset-x-0 z-30"
                 >
-                  <div class="bg-white/95 backdrop-blur border-t border-[#eadfd7] px-4 pt-3 pb-4">
+                  <div class="bg-white bg-opacity-95 backdrop-blur border-t border-[#eadfd7] px-4 pt-3 pb-4">
                     <div class="flex items-center gap-3">
                       <button
                         v-if="mobileSecondary"
@@ -846,7 +886,7 @@
             </div>
 
             <!-- Share Card -->
-            <div class="bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8">
+            <div class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 md:p-8">
               <h3 class="font-semibold mb-3 text-sm sm:text-base">
                 Share Competition
               </h3>
@@ -996,12 +1036,6 @@ const votingCountdownLabel = computed(() => {
   return '';
 });
 
-const votingCountdownClass = computed(() => {
-  if (isVotingActive.value) return 'bg-amber-100 text-amber-800';
-  if (isVotingUpcoming.value) return 'bg-slate-100 text-slate-700';
-  if (isVotingEnded.value) return 'bg-gray-200 text-gray-600';
-  return 'bg-gray-200 text-gray-600';
-});
 
 const showLeaderboardCta = computed(() => {
   if (!competition.value) return false;
@@ -1289,16 +1323,6 @@ const viewSubmission = (submission) => {
   router.push(`/competitions/${competition.value.slug}/submissions/${submission.id}`);
 };
 
-const getStatusBadgeClass = (status) => {
-  const classes = {
-    draft: 'bg-[#efe5dc] text-[#7a1f2b]',
-    active: 'bg-emerald-100 text-emerald-800',
-    judging: 'bg-amber-100 text-amber-800',
-    completed: 'bg-blue-100 text-blue-800',
-    cancelled: 'bg-rose-100 text-rose-800',
-  };
-  return classes[status] || 'bg-gray-100 text-gray-800';
-};
 
 const formatStatus = (status) => {
   return status.charAt(0).toUpperCase() + status.slice(1);

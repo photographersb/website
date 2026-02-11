@@ -1082,6 +1082,15 @@
               >
             </div>
             <div class="form-group">
+              <label>Username</label>
+              <input
+                v-model="userForm.username"
+                type="text"
+                class="form-input"
+                placeholder="e.g. tanzim.photo"
+              >
+            </div>
+            <div class="form-group">
               <label>Email *</label>
               <input
                 v-model="userForm.email"
@@ -1486,6 +1495,7 @@ const loadingUserDetails = ref(false)
 
 const userForm = ref({
   name: '',
+  username: '',
   email: '',
   phone: '',
   password: '',
@@ -1656,6 +1666,7 @@ const editUser = (user) => {
   selectedUser.value = user
   userForm.value = {
     name: user.name,
+    username: user.username || '',
     email: user.email,
     phone: user.phone || '',
     password: '',
@@ -1670,6 +1681,7 @@ const closeEditModal = () => {
   selectedUser.value = null
   userForm.value = {
     name: '',
+    username: '',
     email: '',
     phone: '',
     password: '',

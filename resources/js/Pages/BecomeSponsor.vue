@@ -45,7 +45,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div class="text-center p-6">
-            <div class="bg-burgundy/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div class="bg-burgundy bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 class="w-8 h-8 text-burgundy"
                 fill="none"
@@ -75,7 +75,7 @@
           </div>
 
           <div class="text-center p-6">
-            <div class="bg-burgundy/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div class="bg-burgundy bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 class="w-8 h-8 text-burgundy"
                 fill="none"
@@ -99,7 +99,7 @@
           </div>
 
           <div class="text-center p-6">
-            <div class="bg-burgundy/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div class="bg-burgundy bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 class="w-8 h-8 text-burgundy"
                 fill="none"

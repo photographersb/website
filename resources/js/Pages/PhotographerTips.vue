@@ -4,7 +4,7 @@
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(245,158,11,0.28)_0,_transparent_55%)]" />
       <div class="container mx-auto px-4 relative pt-10 pb-16">
         <button
-          class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white/90 transition hover:bg-white/20"
+          class="inline-flex items-center gap-2 rounded-full border border-white border-opacity-20 bg-white bg-opacity-10 px-4 py-2 text-sm font-medium text-white text-opacity-90 transition hover:bg-white hover:bg-opacity-20"
           @click="goBack"
         >
           <svg
@@ -24,13 +24,13 @@
         </button>
 
         <div class="mt-10 max-w-3xl text-white">
-          <p class="text-xs uppercase tracking-[0.35em] text-white/70">
+          <p class="text-xs uppercase tracking-[0.35em] text-white text-opacity-70">
             Tip the photographer
           </p>
           <h1 class="mt-4 text-3xl md:text-4xl font-semibold font-serif tracking-tight">
             {{ photographerName || 'Support this photographer' }}
           </h1>
-          <p class="mt-3 text-base text-white/80">
+          <p class="mt-3 text-base text-white text-opacity-80">
             Send a tip securely and support the creator behind the work.
           </p>
         </div>
@@ -38,7 +38,7 @@
     </div>
 
     <div class="container mx-auto px-4 max-w-5xl -mt-10 relative z-10 pb-12">
-      <div class="bg-white/90 rounded-2xl border border-[#eadfd7] shadow-lg p-6">
+      <div class="bg-white bg-opacity-90 rounded-2xl border border-[#eadfd7] shadow-lg p-6">
         <div
           v-if="loading"
           class="text-sm text-[#7a1f2b]"

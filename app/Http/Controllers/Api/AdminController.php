@@ -686,8 +686,9 @@ class AdminController extends Controller
         // Search filter - MUST use closure for correct SQL precedence
         if ($request->has('search')) {
             $query->where(function($q) use ($request) {
-                $q->where('name', 'LIKE', "%{$request->search}%")
-                  ->orWhere('email', 'LIKE', "%{$request->search}%");
+                                $q->where('name', 'LIKE', "%{$request->search}%")
+                                    ->orWhere('email', 'LIKE', "%{$request->search}%")
+                                    ->orWhere('username', 'LIKE', "%{$request->search}%");
             });
         }
 
@@ -737,6 +738,7 @@ class AdminController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'username' => ['nullable', 'string', 'min:3', 'max:30', 'regex:/^[a-z0-9_.-]+$/i', 'unique:users,username'],
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
             'phone' => 'nullable|string|max:20',
@@ -745,6 +747,10 @@ class AdminController extends Controller
             'city_id' => 'nullable|exists:locations,id',
             'create_photographer_profile' => 'boolean',
         ]);
+
+        if (array_key_exists('username', $validated) && $validated['username'] === '') {
+            $validated['username'] = null;
+        }
 
         DB::beginTransaction();
         try {
@@ -793,11 +799,16 @@ class AdminController extends Controller
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
+            'username' => ['nullable', 'string', 'min:3', 'max:30', 'regex:/^[a-z0-9_.-]+$/i', 'unique:users,username,' . $user->id],
             'email' => 'sometimes|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8',
             'phone' => 'nullable|string|max:20',
             'role' => ['sometimes', Rule::in($this->getAssignableRoles())],
         ]);
+
+        if (array_key_exists('username', $validated) && $validated['username'] === '') {
+            $validated['username'] = null;
+        }
 
         if (isset($validated['password'])) {
             $validated['password'] = bcrypt($validated['password']);
