@@ -89,7 +89,8 @@ class PhotographerSettingsController extends Controller
         if ($request->hasFile('profile_picture')) {
             $file = $request->file('profile_picture');
             $path = $file->store('profile-pictures/' . $photographer->id, 'public');
-            $request->merge(['profile_picture' => '/storage/' . $path]);
+            // Store relative path - accessor will add /storage/ prefix
+            $request->merge(['profile_picture' => $path]);
         }
 
         $photographer->update($request->only([
