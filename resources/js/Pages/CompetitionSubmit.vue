@@ -350,13 +350,13 @@
           </div>
 
           <!-- Terms Checkbox - REQUIRED -->
-          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div class="bg-red-50 border-2 border-red-300 rounded-lg p-4">
             <div class="flex items-start gap-3">
               <input 
                 id="terms"
                 v-model="agreeToTerms" 
                 type="checkbox"
-                class="mt-1 w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-2 focus:ring-red-500 cursor-pointer"
+                class="mt-1 w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-2 focus:ring-red-500 cursor-pointer flex-shrink-0"
                 required
               >
               <div class="flex-1">

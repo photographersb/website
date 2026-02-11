@@ -259,7 +259,7 @@
           </div>
 
           <!-- Terms Agreement - REQUIRED -->
-          <div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4">
+          <div class="bg-red-50 border-2 border-red-300 rounded-lg p-4 mt-4">
             <div class="flex items-start gap-3">
               <input
                 id="terms"
