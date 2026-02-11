@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Models\Photographer;
 use App\Models\PhotographerTip;
 use App\Notifications\TipReceivedNotification;
+use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 
 class PhotographerTipController extends Controller
 {
+    use ApiResponse;
+
     /**
      * Get photographer tip info (including bKash number if available)
      */
