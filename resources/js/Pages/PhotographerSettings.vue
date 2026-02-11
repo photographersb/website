@@ -257,127 +257,83 @@
               ☕ Tip Settings
             </h2>
             <p class="text-sm text-gray-600 mt-1">
-              Give supporters an easy way to show appreciation.
+              Set up manual tip collection via mobile payment (bKash, Nagad, Rocket).
             </p>
           </div>
 
-          <!-- Enable Tips Toggle -->
-          <div class="flex items-center justify-between p-4 bg-amber-50/70 border border-amber-200/70 rounded-xl">
-            <div>
-              <p class="font-semibold text-gray-900">
-                Allow Tips
-              </p>
-              <p class="text-sm text-gray-600">
-                Let clients send you tips and support
-              </p>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input
-                v-model="form.accept_tips"
-                type="checkbox"
-                class="sr-only peer"
-              >
-              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-burgundy rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-burgundy" />
-            </label>
+          <!-- How It Works Info -->
+          <div class="bg-blue-50 border border-blue-200/70 rounded-xl p-4">
+            <p class="text-sm font-semibold text-gray-900 mb-2">How Manual Tips Work:</p>
+            <ul class="text-xs text-gray-700 space-y-1.5 list-disc list-inside">
+              <li>Add your payment phone number below</li>
+              <li>Clients see "Send Tip" button and your number</li>
+              <li>They send money via bKash/Nagad/Rocket to your number</li>
+              <li>They submit the transaction ID and their phone number</li>
+              <li>You keep all the money they send - platform records only transaction data</li>
+            </ul>
           </div>
 
-          <!-- bKash Number -->
+          <!-- Payment Phone Number -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">bKash Number</label>
-            <div class="relative">
-              <span class="absolute left-3 top-3 text-gray-500">📱</span>
-              <input
-                v-model="form.bkash_number"
-                type="text"
-                placeholder="+880xxxxxxxxxx"
-                class="w-full pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
-              >
-            </div>
-            <p class="text-xs text-gray-500 mt-1">
-              Format: +880XXXXXXXXXX (include country code)
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Payment Phone Number</label>
+            <p class="text-xs text-gray-500 mb-2">
+              Enter the phone number where you receive tips via bKash, Nagad, or Rocket
             </p>
-          </div>
-
-          <!-- Nagad Number -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Nagad Number</label>
             <div class="relative">
               <span class="absolute left-3 top-3 text-gray-500">📱</span>
               <input
-                v-model="form.nagad_number"
+                v-model="form.tip_phone_number"
                 type="text"
                 placeholder="+880xxxxxxxxxx"
                 class="w-full pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
               >
             </div>
-          </div>
-
-          <!-- Rocket Number -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Rocket Number</label>
-            <div class="relative">
-              <span class="absolute left-3 top-3 text-gray-500">📱</span>
-              <input
-                v-model="form.rocket_number"
-                type="text"
-                placeholder="+880xxxxxxxxxx"
-                class="w-full pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
-              >
-            </div>
-          </div>
-
-          <!-- Alternative Phone -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Alternative Phone (Optional)</label>
-            <div class="relative">
-              <span class="absolute left-3 top-3 text-gray-500">📞</span>
-              <input
-                v-model="form.phone_number"
-                type="text"
-                placeholder="+880xxxxxxxxxx"
-                class="w-full pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
-              >
-            </div>
+            <p class="text-xs text-gray-500 mt-2">
+              Format: +880XXXXXXXXXX (include country code) - Only one number shown to clients
+            </p>
           </div>
 
           <!-- Tip Message -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">Tip Message</label>
+            <p class="text-xs text-gray-500 mb-2">
+              Optional message shown to clients offering tip option
+            </p>
             <textarea
               v-model="form.tip_message"
-              placeholder="e.g., Support my photography and help me grow! ☕"
+              placeholder="e.g., Support my work and help me create amazing content! ☕"
               rows="3"
               class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
             />
-            <p class="text-xs text-gray-500 mt-1">
-              This message appears on your profile's tip section
-            </p>
           </div>
 
           <!-- Preview Card -->
           <div class="bg-amber-50 border border-amber-200/70 rounded-xl p-4">
-            <p class="text-sm font-semibold text-gray-700 mb-3">
-              Preview:
-            </p>
-            <div class="bg-white rounded-lg p-3">
-              <p class="text-sm text-gray-600">
-                {{ form.tip_message || 'Support my photography!' }}
-              </p>
-              <p class="text-xs text-gray-500 mt-2">
-                bKash: {{ form.bkash_number || 'Not set' }}
-              </p>
-              <p class="text-xs text-gray-500 mt-1">
-                Nagad: {{ form.nagad_number || 'Not set' }}
-              </p>
-              <p class="text-xs text-gray-500 mt-1">
-                Rocket: {{ form.rocket_number || 'Not set' }}
-              </p>
+            <p class="text-sm font-semibold text-gray-700 mb-3">Preview (Client View):</p>
+            <div class="bg-white rounded-lg p-4 space-y-3">
+              <div v-if="form.tip_message" class="text-sm text-gray-700">
+                <strong>{{ form.tip_message }}</strong>
+              </div>
+              <div v-if="form.tip_phone_number" class="text-center">
+                <p class="text-xs text-gray-600 mb-2">Send tip to:</p>
+                <p class="font-mono text-lg text-burgundy font-bold">{{ form.tip_phone_number }}</p>
+                <button
+                  type="button"
+                  disabled
+                  class="mt-3 w-full py-2 px-4 bg-burgundy/10 text-burgundy font-semibold rounded-lg cursor-not-allowed"
+                >
+                  💳 Send Tip (Clients click here)
+                </button>
+              </div>
+              <div v-else class="text-xs text-gray-500 text-center py-4">
+                Add a phone number above to show tip button to clients
+              </div>
             </div>
           </div>
 
           <!-- Save Button -->
           <button
-            :disabled="savingTips"
+            :disabled="savingTips || !form.tip_phone_number"
             class="w-full py-3 px-6 bg-burgundy text-white font-bold rounded-lg hover:bg-opacity-90 transition-all disabled:opacity-50"
             @click="saveTipSettings"
           >
@@ -596,10 +552,7 @@ const defaultForm = () => ({
   category_ids: [],
   service_area_radius: 0,
   accept_tips: true,
-  bkash_number: '',
-  nagad_number: '',
-  rocket_number: '',
-  phone_number: '',
+  tip_phone_number: '',
   tip_message: '',
   facebook_url: '',
   instagram_url: '',
@@ -689,10 +642,7 @@ export default {
           experience_years: Number.isFinite(Number(data.experience_years)) ? Number(data.experience_years) : 0,
           service_area_radius: Number.isFinite(Number(data.service_area_radius)) ? Number(data.service_area_radius) : 0,
           accept_tips: typeof data.accept_tips === 'boolean' ? data.accept_tips : true,
-          bkash_number: data.bkash_number || '',
-          nagad_number: data.nagad_number || '',
-          rocket_number: data.rocket_number || '',
-          phone_number: data.phone_number || '',
+          tip_phone_number: data.tip_phone_number || '',
           tip_message: data.tip_message || '',
           facebook_url: data.facebook_url || '',
           instagram_url: data.instagram_url || '',
@@ -759,11 +709,7 @@ export default {
       this.clearMessages();
       try {
         await api.put('/photographer/settings/tips', {
-          accept_tips: this.form.accept_tips,
-          bkash_number: this.form.bkash_number,
-          nagad_number: this.form.nagad_number,
-          rocket_number: this.form.rocket_number,
-          phone_number: this.form.phone_number,
+          tip_phone_number: this.form.tip_phone_number,
           tip_message: this.form.tip_message,
         });
         this.showSuccess('Tip settings updated successfully!');
