@@ -34,6 +34,7 @@ class PhotographerSettingsController extends Controller
 
         return $this->success([
             'bio' => $photographer->bio,
+            'short_bio' => $photographer->short_bio,
             'location' => $locationName,
             'city_id' => $photographer->city_id,
             'profile_picture' => $photographer->profile_picture,

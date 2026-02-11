@@ -276,6 +276,21 @@
             </p>
           </div>
 
+          <div class="flex items-center justify-between rounded-xl border border-amber-200/70 bg-amber-50 p-4">
+            <div>
+              <p class="text-sm font-semibold text-gray-900">Enable tips on your profile</p>
+              <p class="text-xs text-gray-600">Turn this on to show the tip panel publicly.</p>
+            </div>
+            <label class="inline-flex items-center gap-2 text-sm font-semibold text-gray-700">
+              <input
+                v-model="form.accept_tips"
+                type="checkbox"
+                class="h-5 w-5 rounded border-gray-300 text-burgundy focus:ring-burgundy/20"
+              >
+              <span>{{ form.accept_tips ? 'Enabled' : 'Disabled' }}</span>
+            </label>
+          </div>
+
           <!-- How It Works Info -->
           <div class="bg-blue-50 border border-blue-200/70 rounded-xl p-4">
             <p class="text-sm font-semibold text-gray-900 mb-2">How Manual Tips Work:</p>
@@ -326,10 +341,13 @@
           <div class="bg-amber-50 border border-amber-200/70 rounded-xl p-4">
             <p class="text-sm font-semibold text-gray-700 mb-3">Preview (Client View):</p>
             <div class="bg-white rounded-lg p-4 space-y-3">
-              <div v-if="form.tip_message" class="text-sm text-gray-700">
+              <div v-if="!form.accept_tips" class="text-xs text-gray-500 text-center py-2">
+                Tips are currently disabled for this photographer.
+              </div>
+              <div v-else-if="form.tip_message" class="text-sm text-gray-700">
                 <strong>{{ form.tip_message }}</strong>
               </div>
-              <div v-if="form.tip_phone_number" class="text-center">
+              <div v-if="form.accept_tips && form.tip_phone_number" class="text-center">
                 <p class="text-xs text-gray-600 mb-2">Send tip to:</p>
                 <p class="font-mono text-lg text-burgundy font-bold">{{ form.tip_phone_number }}</p>
                 <button
@@ -340,7 +358,7 @@
                   💳 Send Tip (Clients click here)
                 </button>
               </div>
-              <div v-else class="text-xs text-gray-500 text-center py-4">
+              <div v-else-if="form.accept_tips" class="text-xs text-gray-500 text-center py-4">
                 Add a phone number above to show tip button to clients
               </div>
             </div>
@@ -348,7 +366,7 @@
 
           <!-- Save Button -->
           <button
-            :disabled="savingTips || !form.tip_phone_number"
+            :disabled="savingTips || (form.accept_tips && !form.tip_phone_number)"
             class="w-full py-3 px-6 bg-burgundy text-white font-bold rounded-lg hover:bg-opacity-90 transition-all disabled:opacity-50"
             @click="saveTipSettings"
           >
@@ -745,6 +763,7 @@ export default {
       this.clearMessages();
       try {
         await api.put('/photographer/settings/tips', {
+          accept_tips: this.form.accept_tips,
           tip_phone_number: this.form.tip_phone_number,
           tip_message: this.form.tip_message,
         });

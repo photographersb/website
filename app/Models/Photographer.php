@@ -20,6 +20,7 @@ class Photographer extends Model
         'share_code',
         'profile_picture',
         'bio',
+        'short_bio',
         'location',
         'experience_years',
         'specializations',

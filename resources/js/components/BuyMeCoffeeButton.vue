@@ -16,7 +16,7 @@
             Support me if you love my work.
           </h3>
           <p class="text-sm text-gray-600">
-            Your tip helps me keep creating, learning, and improving for you.
+            {{ tipInfo.tip_message || 'Your tip helps me keep creating, learning, and improving for you.' }}
           </p>
         </div>
       </div>
