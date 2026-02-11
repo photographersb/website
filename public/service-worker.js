@@ -1,6 +1,6 @@
 // Service Worker for Photographer SB PWA
-const CACHE_NAME = 'photographer-sb-v3';
-const RUNTIME_CACHE = 'photographer-sb-runtime-v3';
+const CACHE_NAME = 'photographer-sb-v4';
+const RUNTIME_CACHE = 'photographer-sb-runtime-v4';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
