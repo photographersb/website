@@ -60,6 +60,12 @@
       class="relative z-10 mt-6 rounded-2xl border border-amber-200/70 bg-white/90 p-5 sm:p-6 shadow-lg"
     >
       <div
+        v-if="confirmSuccess"
+        class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
+      >
+        {{ confirmSuccess }}
+      </div>
+      <div
         v-if="loadingTipInfo"
         class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"
       >
@@ -200,6 +206,12 @@
             class="mt-2 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-amber-200"
           >
         </div>
+        <p
+          v-if="confirmError"
+          class="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700"
+        >
+          {{ confirmError }}
+        </p>
 
         <div class="mt-6 flex gap-3">
           <button
@@ -261,6 +273,8 @@ export default {
       },
       activeTipId: null,
       processingTip: false,
+      confirmError: '',
+      confirmSuccess: '',
       paymentMethods: [
         { id: 'bkash', name: 'bKash' },
         { id: 'nagad', name: 'Nagad' },
@@ -310,6 +324,8 @@ export default {
     },
 
     async showPaymentDetails() {
+      this.confirmError = ''
+      this.confirmSuccess = ''
       if (!this.tipInfo?.accept_tips) {
         this.$toast?.error?.('Tips are currently disabled for this photographer');
         return;
@@ -350,6 +366,8 @@ export default {
     },
 
     async confirmTip() {
+      this.confirmError = ''
+      this.confirmSuccess = ''
       if (!this.trxId || !this.activeTipId) {
         this.$toast?.error?.('Please enter a valid transaction ID');
         return;
@@ -361,12 +379,14 @@ export default {
           transaction_id: this.trxId,
         });
         this.$toast?.success?.('Tip confirmed successfully! Thank you!');
+        this.confirmSuccess = 'Tip confirmed successfully! Thank you!'
         this.resetForm();
-        this.fetchTipInfo();
+        await this.fetchTipInfo();
         this.closeTrxModal();
       } catch (error) {
         console.error('Error confirming tip:', error);
-        this.$toast?.error?.(error.response?.data?.message || 'Failed to confirm tip');
+        this.confirmError = error.response?.data?.message || 'Failed to confirm tip'
+        this.$toast?.error?.(this.confirmError);
       } finally {
         this.processingTip = false;
       }
@@ -383,6 +403,8 @@ export default {
       this.selectedPaymentMethod = 'bkash';
       this.trxId = '';
       this.activeTipId = null;
+      this.confirmError = '';
+      this.confirmSuccess = '';
     },
 
     paymentButtonClass(methodId) {

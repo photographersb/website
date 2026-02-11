@@ -147,7 +147,14 @@ class PhotographerTipController extends Controller
         $tip->markAsCompleted($request->transaction_id);
 
         // Notify photographer
-        $tip->photographer->user->notify(new TipReceivedNotification($tip));
+        try {
+            $tip->photographer->user->notify(new TipReceivedNotification($tip));
+        } catch (\Throwable $e) {
+            \Log::warning('Tip notification failed', [
+                'tip_id' => $tip->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return $this->success([
             'tip_id' => $tip->id,
