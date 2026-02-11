@@ -975,7 +975,17 @@ const getElementInfo = (target) => {
 }
 
 const buildClickHeaders = () => {
-    return { 'Content-Type': 'application/json' }
+    const headers = { 'Content-Type': 'application/json' }
+    
+    // Extract CSRF token from cookie for stateful API requests
+    if (typeof document !== 'undefined' && document.cookie) {
+        const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/)
+        if (match && match[1]) {
+            headers['X-XSRF-TOKEN'] = decodeURIComponent(match[1])
+        }
+    }
+    
+    return headers
 }
 
 const sendClickBatch = async (events, useBeacon = false) => {
@@ -998,6 +1008,7 @@ const sendClickBatch = async (events, useBeacon = false) => {
             method: 'POST',
             headers: buildClickHeaders(),
             body,
+            credentials: 'include',
             keepalive: true,
         })
     } catch (error) {
