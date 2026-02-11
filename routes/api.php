@@ -303,6 +303,7 @@ Route::prefix('v1')->group(function () {
         Route::prefix('photographer/settings')->group(function () {
             Route::get('/', [PhotographerSettingsController::class, 'getSettings']);
             Route::put('/profile', [PhotographerSettingsController::class, 'updateProfile']);
+            Route::post('/profile', [PhotographerSettingsController::class, 'updateProfile']);
             Route::put('/tips', [PhotographerSettingsController::class, 'updateTips']);
             Route::put('/social', [PhotographerSettingsController::class, 'updateSocial']);
             Route::put('/availability', [PhotographerSettingsController::class, 'updateAvailability']);

@@ -756,6 +756,7 @@ export default {
         if (this.form.profile_picture instanceof File) {
           // Use FormData for file upload
           const formData = new FormData();
+          formData.append('_method', 'PUT');
           formData.append('bio', this.form.bio || '');
           formData.append('short_bio', this.form.short_bio || '');
           formData.append('location', this.form.location || '');
@@ -783,7 +784,7 @@ export default {
             formData.append('remove_profile_picture', '1');
           }
 
-          await api.put('/photographer/settings/profile', formData, {
+          await api.post('/photographer/settings/profile', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
