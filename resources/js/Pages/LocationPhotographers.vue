@@ -298,7 +298,7 @@
             <router-link
               v-for="photographer in displayedPhotographers"
               :key="photographer.id"
-              :to="`/photographer/${photographer.slug}`"
+              :to="photographer.user?.username ? `/@${photographer.user.username}` : `/photographer/${photographer.slug}`"
               class="bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all border border-gray-100"
             >
               <!-- Image -->
@@ -398,7 +398,7 @@
             <router-link
               v-for="photographer in displayedPhotographers"
               :key="photographer.id"
-              :to="`/photographer/${photographer.slug}`"
+              :to="photographer.user?.username ? `/@${photographer.user.username}` : `/photographer/${photographer.slug}`"
               class="bg-white rounded-xl sm:rounded-2xl shadow-lg p-3 sm:p-4 md:p-6 border border-gray-100 hover:shadow-xl hover:border-primary-300 transition-all flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 hover:-translate-y-1"
             >
               <!-- Photo -->

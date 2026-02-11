@@ -34,7 +34,7 @@ class PhotographerController extends Controller
         $page = $request->get('page', 1);
 
         $query = Photographer::where('is_verified', true)
-            ->with(['user:id,name', 'city:id,name,slug', 'trustScore', 'categories:id,name,slug,icon'])
+            ->with(['user:id,name,username', 'city:id,name,slug', 'trustScore', 'categories:id,name,slug,icon'])
             ->select('photographers.*');
 
         // Search by name, username, location, or category

@@ -247,7 +247,7 @@
                 Messages
               </router-link>
               <router-link
-                :to="`/photographer/${booking.photographer?.slug || booking.photographer_id}`"
+                :to="booking.photographer?.user?.username ? `/@${booking.photographer.user.username}` : `/photographer/${booking.photographer?.slug || booking.photographer_id}`"
                 class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium text-center"
               >
                 View Photographer

@@ -1840,11 +1840,17 @@ const formatHashtagCount = (count) => {
 };
 
 const getPublicSlug = (photographer) => {
-  return photographer?.slug || photographer?.user?.username || photographer?.username || '';
+  // Prefer username over slug for clean URLs
+  return photographer?.user?.username || photographer?.username || photographer?.slug || '';
 };
 
 const getPublicProfilePath = (photographer) => {
-  const slug = getPublicSlug(photographer);
+  const username = photographer?.user?.username || photographer?.username;
+  if (username) {
+    return `/@${username}`;
+  }
+  // Fallback to slug if no username
+  const slug = photographer?.slug;
   return slug ? `/photographer/${slug}` : '/photographers';
 };
 

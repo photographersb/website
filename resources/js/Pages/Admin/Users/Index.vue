@@ -2013,11 +2013,13 @@ const deletePhotographerProfile = async () => {
 }
 
 const viewPhotographerDetails = (user) => {
-  if (user.photographer && user.photographer.slug) {
-    // Open in new tab
-    window.open(`/photographer/${user.photographer.slug}`, '_blank')
+  const username = user.username || user.photographer?.user?.username;
+  if (username) {
+    window.open(`/@${username}`, '_blank');
+  } else if (user.photographer && user.photographer.slug) {
+    window.open(`/photographer/${user.photographer.slug}`, '_blank');
   } else {
-    showToastMessage('Photographer profile not available', 'error')
+    showToastMessage('Photographer profile not available', 'error');
   }
 }
 

@@ -204,8 +204,8 @@
                   <span class="text-gray-600 text-sm">({{ photographer.rating_count || 0 }})</span>
                 </div>
                 <router-link
-                  v-if="photographer.is_verified && photographer.slug"
-                  :to="`/verify/${photographer.slug}`"
+                  v-if="photographer.is_verified && (photographer.user?.username || photographer.slug)"
+                  :to="photographer.user?.username ? `/verify/@${photographer.user.username}` : `/verify/${photographer.slug}`"
                   class="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium hover:bg-green-200 transition-colors"
                 >
                   <svg

@@ -295,7 +295,12 @@ const submitReview = async () => {
       message.value = 'Review submitted successfully! Thank you for your feedback.';
       error.value = false;
       setTimeout(() => {
-        router.push(`/photographer/${photographer.value.slug}`);
+        const username = photographer.value.user?.username || photographer.value.username;
+        if (username) {
+          router.push(`/@${username}`);
+        } else {
+          router.push(`/photographer/${photographer.value.slug}`);
+        }
       }, 2000);
     }
   } catch (err) {

@@ -595,7 +595,7 @@
                           {{ leader.user?.name || 'Unknown' }}
                         </p>
                         <p class="text-xs text-gray-500">
-                          /photographer/{{ leader.slug || 'profile' }}
+                          {{ leader.user?.username ? `/@${leader.user.username}` : `/photographer/${leader.slug || 'profile'}` }}
                         </p>
                       </div>
                     </div>

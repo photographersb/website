@@ -46,8 +46,8 @@
         </div>
 
         <div class="mt-6 space-y-2 text-sm text-gray-700">
-          <div v-if="photographer?.slug">
-            <span class="text-gray-500">Profile:</span> /photographer/{{ photographer.slug }}
+          <div v-if="photographer?.user?.username || photographer?.slug">
+            <span class="text-gray-500">Profile:</span> {{ photographer.user?.username ? `/@${photographer.user.username}` : `/photographer/${photographer.slug}` }}
           </div>
           <div v-if="photographer?.city">
             <span class="text-gray-500">Location:</span> {{ photographer.city?.name || photographer.city }}

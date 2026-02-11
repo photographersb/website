@@ -2722,16 +2722,16 @@ const profileForm = ref({
 });
 
 const profileUrl = computed(() => {
-  const slug = photographer.value?.slug || user.value?.photographer?.slug;
+  const username = user.value?.username;
   const shareCode = photographer.value?.share_code || user.value?.photographer?.share_code;
   let baseUrl = '';
 
-  if (slug) {
-    baseUrl = window.location.origin + '/photographer/' + slug;
-  } else if (user.value?.username) {
-    baseUrl = window.location.origin + '/@' + user.value.username;
+  if (username) {
+    baseUrl = window.location.origin + '/@' + username;
   } else {
-    baseUrl = window.location.origin + '/photographer/your-profile';
+    // Fallback to slug if no username (shouldn't happen in production)
+    const slug = photographer.value?.slug || user.value?.photographer?.slug;
+    baseUrl = slug ? window.location.origin + '/photographer/' + slug : window.location.origin + '/@your-username';
   }
 
   if (shareCode) {

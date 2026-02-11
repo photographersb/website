@@ -75,7 +75,15 @@ const loading = ref(true)
 const error = ref(false)
 
 const goBack = () => {
-  router.push(`/photographer/${route.params.slug}`)
+  // Try to use username from route params if available, otherwise use slug
+  const identifier = route.params.username || route.params.slug;
+  if (identifier && identifier.startsWith('@')) {
+    router.push(`/${identifier}`);
+  } else if (identifier) {
+    router.push(`/@${identifier}`);
+  } else {
+    router.push('/photographers');
+  }
 }
 
 const fetchPhotographer = async () => {
