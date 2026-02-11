@@ -13,7 +13,7 @@ class PhotographerTipController extends Controller
     use ApiResponse;
 
     /**
-     * Get photographer tip info (including bKash number if available)
+     * Get photographer tip info (including tip phone number if available)
      */
     public function getTipInfo($photographerId)
     {
@@ -24,9 +24,7 @@ class PhotographerTipController extends Controller
                 'photographer_id' => $photographer->id,
                 'photographer_name' => $photographer->user->name,
                 'accept_tips' => false,
-                'bkash_number' => null,
-                'nagad_number' => null,
-                'rocket_number' => null,
+                'tip_phone_number' => null,
                 'tip_message' => $photographer->tip_message ?? 'Support your favorite photographer!',
                 'total_tips' => 0,
                 'tip_count' => 0,
@@ -41,9 +39,7 @@ class PhotographerTipController extends Controller
             'photographer_id' => $photographer->id,
             'photographer_name' => $photographer->user->name,
             'accept_tips' => true,
-            'bkash_number' => $photographer->bkash_number,
-            'nagad_number' => $photographer->nagad_number,
-            'rocket_number' => $photographer->rocket_number,
+            'tip_phone_number' => $photographer->tip_phone_number,
             'tip_message' => $photographer->tip_message ?? 'Support your favorite photographer!',
             'total_tips' => $totalTips,
             'tip_count' => PhotographerTip::where('photographer_id', $photographerId)->completed()->count(),
@@ -104,12 +100,9 @@ class PhotographerTipController extends Controller
 
     private function resolveTipNumber(Photographer $photographer, string $method): ?string
     {
-        return match ($method) {
-            'bkash' => $photographer->bkash_number,
-            'nagad' => $photographer->nagad_number,
-            'rocket' => $photographer->rocket_number,
-            default => null,
-        };
+        // Return the unified tip phone number regardless of payment method
+        // The photographer has set one phone number that works with any mobile payment system
+        return $photographer->tip_phone_number;
     }
 
     private function paymentMethodLabel(string $method): string

@@ -48,6 +48,7 @@ class Photographer extends Model
         'rocket_number',
         'phone_number',
         'accept_tips',
+        'tip_phone_number',
         'tip_message',
         'is_available',
         'response_time_preference',

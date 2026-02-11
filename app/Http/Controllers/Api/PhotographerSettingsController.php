@@ -43,10 +43,7 @@ class PhotographerSettingsController extends Controller
             'category_ids' => $categoryIds,
             'service_area_radius' => $photographer->service_area_radius,
             'accept_tips' => $photographer->accept_tips,
-            'bkash_number' => $photographer->bkash_number,
-            'nagad_number' => $photographer->nagad_number,
-            'rocket_number' => $photographer->rocket_number,
-            'phone_number' => $photographer->phone_number,
+            'tip_phone_number' => $photographer->tip_phone_number,
             'tip_message' => $photographer->tip_message,
             'facebook_url' => $photographer->facebook_url,
             'instagram_url' => $photographer->instagram_url,
@@ -116,10 +113,7 @@ class PhotographerSettingsController extends Controller
     {
         $request->validate([
             'accept_tips' => 'nullable|boolean',
-            'bkash_number' => 'nullable|string|max:20',
-            'nagad_number' => 'nullable|string|max:20',
-            'rocket_number' => 'nullable|string|max:20',
-            'phone_number' => 'nullable|string|max:20',
+            'tip_phone_number' => 'nullable|string|max:20',
             'tip_message' => 'nullable|string|max:255',
         ]);
 
@@ -130,31 +124,16 @@ class PhotographerSettingsController extends Controller
             return $this->error('You are not a photographer', 403);
         }
 
-        // Validate bKash number format if provided
-        if ($request->filled('bkash_number')) {
-            if (!preg_match('/^(\+880|880|0)[0-9]{9,10}$/', str_replace([' ', '-'], '', $request->bkash_number))) {
-                return $this->error('Invalid bKash number format', 422);
-            }
-        }
-
-        if ($request->filled('nagad_number')) {
-            if (!preg_match('/^(\+880|880|0)[0-9]{9,10}$/', str_replace([' ', '-'], '', $request->nagad_number))) {
-                return $this->error('Invalid Nagad number format', 422);
-            }
-        }
-
-        if ($request->filled('rocket_number')) {
-            if (!preg_match('/^(\+880|880|0)[0-9]{9,10}$/', str_replace([' ', '-'], '', $request->rocket_number))) {
-                return $this->error('Invalid Rocket number format', 422);
+        // Validate tip phone number format if provided
+        if ($request->filled('tip_phone_number')) {
+            if (!preg_match('/^(\+880|880|0)[0-9]{9,10}$/', str_replace([' ', '-'], '', $request->tip_phone_number))) {
+                return $this->error('Invalid phone number format. Please use Bangladesh format (e.g., +880xxxxxxxxxx)', 422);
             }
         }
 
         $photographer->update($request->only([
             'accept_tips',
-            'bkash_number',
-            'nagad_number',
-            'rocket_number',
-            'phone_number',
+            'tip_phone_number',
             'tip_message',
         ]));
 
