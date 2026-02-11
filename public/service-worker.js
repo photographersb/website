@@ -5,13 +5,9 @@ const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/images/logo.svg',
-  '/images/og-image.jpg',
-  '/apple-touch-icon.png',
-  '/favicon-32x32.png',
-  '/favicon-16x16.png',
   '/placeholder-photographer.jpg'
 ];
+
 
 // Install event: Cache essential assets
 self.addEventListener('install', event => {
@@ -78,12 +74,17 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(request)
       .then(response => {
-        // Cache successful responses
+        // Clone immediately to avoid "body already used" errors
+        const responseToReturn = response.clone();
+        
+        // Cache the original response if successful
         if (response.ok) {
-          const cache = caches.open(RUNTIME_CACHE);
-          cache.then(c => c.put(request, response.clone()));
+          caches.open(RUNTIME_CACHE).then(cache => {
+            cache.put(request, response);
+          });
         }
-        return response;
+        
+        return responseToReturn;
       })
       .catch(() => {
         // Fall back to cache on network error
