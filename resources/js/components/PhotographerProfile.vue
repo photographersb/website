@@ -296,13 +296,6 @@
                 </a>
               </div>
 
-              <p
-                v-if="photographer.bio"
-                class="text-gray-600 text-sm mb-4 line-clamp-3"
-              >
-                {{ photographer.bio }}
-              </p>
-
               <!-- Starting Price -->
               <div
                 v-if="photographer.starting_price"
