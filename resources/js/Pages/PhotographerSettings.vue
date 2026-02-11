@@ -59,6 +59,19 @@
             </p>
           </div>
 
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Username</label>
+            <input
+              v-model="form.username"
+              type="text"
+              placeholder="e.g. tanzim.photo"
+              class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+            >
+            <p class="text-xs text-gray-500 mt-1">
+              This updates your public profile URL: /@username
+            </p>
+          </div>
+
           <!-- Bio -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">Professional Bio</label>
@@ -615,6 +628,7 @@
 <script>
 import api from '../api'
 const defaultForm = () => ({
+  username: '',
   bio: '',
   short_bio: '',
   location: '',
@@ -723,6 +737,7 @@ export default {
         this.form = {
           ...defaultForm(),
           ...data,
+          username: data.username || '',
           bio: data.bio || '',
           short_bio: data.short_bio || '',
           location: data.location || '',
@@ -765,6 +780,7 @@ export default {
           // Use FormData for file upload
           const formData = new FormData();
           formData.append('_method', 'PUT');
+          formData.append('username', this.form.username || '');
           formData.append('bio', this.form.bio || '');
           formData.append('short_bio', this.form.short_bio || '');
           formData.append('location', this.form.location || '');
@@ -800,6 +816,7 @@ export default {
         } else {
           // Regular JSON request
           await api.put('/photographer/settings/profile', {
+            username: this.form.username,
             bio: this.form.bio,
             short_bio: this.form.short_bio,
             location: this.form.location,

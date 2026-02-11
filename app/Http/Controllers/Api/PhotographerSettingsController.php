@@ -44,6 +44,7 @@ class PhotographerSettingsController extends Controller
         }
 
         return $this->success([
+            'username' => $user->username,
             'bio' => $photographer->bio,
             'short_bio' => $photographer->short_bio,
             'location' => $locationName,
@@ -79,6 +80,7 @@ class PhotographerSettingsController extends Controller
     public function updateProfile(Request $request)
     {
         $rules = [
+            'username' => ['nullable', 'string', 'min:3', 'max:30', 'regex:/^[a-z0-9_.-]+$/i', 'unique:users,username,' . auth()->id()],
             'bio' => 'nullable|string|max:500',
             'short_bio' => 'nullable|string|max:200',
             'location' => 'nullable|string|max:255',
@@ -105,6 +107,11 @@ class PhotographerSettingsController extends Controller
 
         if (!$photographer) {
             return $this->error('You are not a photographer', 403);
+        }
+
+        $username = $request->input('username');
+        if ($username && $username !== $user->username) {
+            $user->update(['username' => $username]);
         }
 
         $updateData = $request->only([
