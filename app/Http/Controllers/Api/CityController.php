@@ -61,7 +61,7 @@ class CityController extends Controller
         }
 
         // Pagination for admin list view
-        $perPage = $request->get('per_page', 15);
+        $perPage = $request->get('per_page', 100);
         $locations = $query->paginate($perPage);
 
         return $this->paginated($locations, 'Locations retrieved successfully');
