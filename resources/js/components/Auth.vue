@@ -637,6 +637,17 @@ const register = async () => {
 
 onMounted(() => {
   syncTabFromRoute();
+  
+  // Check for email verification status
+  if (route.query.verified === 'success') {
+    isLogin.value = true;
+    notifySuccess('Email verified successfully! You can now login.', 'Verification Complete');
+  } else if (route.query.verified === 'already') {
+    isLogin.value = true;
+    notifyWarning('Email already verified. You can login now.', 'Already Verified');
+  } else if (route.query.error === 'invalid_verification_link') {
+    notifyError('Invalid or expired verification link. Please request a new one.', 'Verification Failed');
+  }
 });
 
 watch(

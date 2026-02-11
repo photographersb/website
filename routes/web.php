@@ -19,6 +19,23 @@ Route::get('/register', function () {
 })->name('register');
 Route::get('/forgot-password', fn() => inertia('ForgotPassword'))->name('password.request');
 
+// Email Verification Route
+Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
+    $user = \App\Models\User::findOrFail($id);
+    
+    if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+        return redirect('/auth?error=invalid_verification_link');
+    }
+    
+    if ($user->hasVerifiedEmail()) {
+        return redirect('/auth?verified=already');
+    }
+    
+    $user->markEmailAsVerified();
+    
+    return redirect('/auth?verified=success');
+})->middleware('signed')->name('verification.verify');
+
 Route::get('/403', function () {
     return response()->view('errors.403', [], 403);
 })->name('forbidden');
