@@ -48,6 +48,11 @@ class Location extends Model
         return $this->hasMany(Competition::class, 'city_id');
     }
 
+    public function competitionSubmissions(): HasMany
+    {
+        return $this->hasMany(CompetitionSubmission::class, 'district_id');
+    }
+
     public function getRouteKeyName(): string
     {
         return 'slug';

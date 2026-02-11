@@ -331,12 +331,15 @@ const form = ref({
 
 const parentOptions = ref([])
 
+const normalizeType = (value) => (value || '').toString().trim().toLowerCase()
+
 const availableParents = computed(() => {
-  if (form.value.type === 'district') {
-    return parentOptions.value.filter(parent => parent.type === 'division')
+  const type = normalizeType(form.value.type)
+  if (type === 'district') {
+    return parentOptions.value.filter(parent => normalizeType(parent.type) === 'division')
   }
-  if (form.value.type === 'upazila') {
-    return parentOptions.value.filter(parent => parent.type === 'district')
+  if (type === 'upazila') {
+    return parentOptions.value.filter(parent => normalizeType(parent.type) === 'district')
   }
   return []
 })
@@ -394,11 +397,12 @@ const openEdit = async (id) => {
     const { data } = await api.get(`/admin/locations/${id}`)
     if (data.status === 'success') {
       const city = data.data
+      const normalizedType = normalizeType(city.type) || 'district'
       editingId.value = id
       form.value = {
         name: city.name,
         slug: city.slug,
-        type: city.type || 'district',
+        type: normalizedType,
         parent_id: city.parent_id || null,
         sort_order: city.sort_order ?? 0,
         is_active: city.is_active ?? true
@@ -417,6 +421,7 @@ const saveCity = async () => {
     const url = editingId.value ? `/admin/locations/${editingId.value}` : '/admin/locations'
     const payload = {
       ...form.value,
+      type: normalizeType(form.value.type) || 'district',
       parent_id: form.value.parent_id || null
     }
     const request = editingId.value ? api.put(url, payload) : api.post(url, payload)

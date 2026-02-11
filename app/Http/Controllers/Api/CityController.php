@@ -123,8 +123,8 @@ class CityController extends Controller
             return $this->error('Cannot delete location with associated events', 422);
         }
 
-        if ($location->competitions()->count() > 0) {
-            return $this->error('Cannot delete location with associated competitions', 422);
+        if ($location->competitionSubmissions()->count() > 0) {
+            return $this->error('Cannot delete location with associated competition submissions', 422);
         }
 
         $location->delete();
