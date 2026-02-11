@@ -61,6 +61,16 @@ class PhotographyCategorySeeder extends Seeder
             ['name' => 'Cinematography', 'icon' => '🎥'],
             ['name' => 'Wedding Videography', 'icon' => '🎬'],
             ['name' => 'Timelapses & Animation', 'icon' => '⏱️'],
+            
+            // Media & Journalism
+            ['name' => 'News Photography', 'icon' => '📺'],
+            ['name' => 'Press Photography', 'icon' => '📹'],
+            ['name' => 'Broadcast Media', 'icon' => '📡'],
+            ['name' => 'Feature Photography', 'icon' => '🎯'],
+            ['name' => 'Wire Service Photography', 'icon' => '📻'],
+            ['name' => 'Investigative Photography', 'icon' => '🔍'],
+            ['name' => 'Social Media Content', 'icon' => '📱'],
+            ['name' => 'Digital Media Production', 'icon' => '💻'],
         ];
 
         // Disable foreign key checks to allow truncate
