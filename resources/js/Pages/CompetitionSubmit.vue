@@ -349,21 +349,34 @@
             </label>
           </div>
 
-          <!-- Terms Checkbox -->
-          <div class="flex items-start gap-3">
-            <input 
-              id="terms"
-              v-model="agreeToTerms" 
-              type="checkbox"
-              class="mt-1 w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
-              required
+          <!-- Terms Checkbox - REQUIRED -->
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div class="flex items-start gap-3">
+              <input 
+                id="terms"
+                v-model="agreeToTerms" 
+                type="checkbox"
+                class="mt-1 w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-2 focus:ring-red-500 cursor-pointer"
+                required
+              >
+              <div class="flex-1">
+                <label
+                  for="terms"
+                  class="text-sm font-medium text-gray-900 cursor-pointer block"
+                >
+                  I confirm that this is my original work and I have the rights to submit it. I agree to the competition rules and terms. <span class="text-red-600 font-bold">*</span>
+                </label>
+                <p class="text-xs text-gray-600 mt-1">
+                  This checkbox must be checked before you can submit your photo.
+                </p>
+              </div>
+            </div>
+            <p
+              v-if="errors.agree_to_terms"
+              class="text-red-600 text-sm mt-3 font-semibold"
             >
-            <label
-              for="terms"
-              class="text-sm text-gray-700"
-            >
-              I confirm that this is my original work and I have the rights to submit it. I agree to the competition rules and terms. <span class="text-red-500">*</span>
-            </label>
+              ⚠️ {{ errors.agree_to_terms }}
+            </p>
           </div>
 
           <!-- Submit Buttons -->
@@ -653,7 +666,8 @@ const submitForm = async () => {
   }
   
   if (!agreeToTerms.value) {
-    alert('Please agree to the terms and conditions');
+    errors.value.agree_to_terms = 'You must agree to the terms and conditions by checking the box above';
+    alert('⚠️ Please check the "I agree to the terms" box to continue');
     return;
   }
   
@@ -686,10 +700,15 @@ const submitForm = async () => {
     console.error('Error submitting:', error);
     if (error.response?.data?.errors) {
       errors.value = error.response.data.errors;
+      // Check specifically for terms acceptance errors
+      if (errors.value.agree_to_terms) {
+        alert('⚠️ TERMS ACCEPTANCE REQUIRED\n\nPlease check the box above that says "I confirm that this is my original work..." to accept the competition terms and conditions before submitting.');
+      }
+      console.error('Validation errors:', errors.value);
     } else if (error.response?.data?.message) {
-      alert(error.response.data.message);
+      alert('❌ Error: ' + error.response.data.message);
     } else {
-      alert('Failed to submit. Please try again.');
+      alert('❌ Failed to submit. Please try again.');
     }
   } finally {
     submitting.value = false;
