@@ -235,7 +235,7 @@ export default {
     return {
       tipInfo: {
         accept_tips: false,
-        tip_message: 'Support your favorite photographer!',
+        tip_message: 'Your tip helps me keep creating, learning, and improving for you.',
         total_tips: 0,
         tip_count: 0,
         recent_tips: [],

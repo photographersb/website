@@ -535,13 +535,6 @@
             </div>
 
             <div class="p-8 space-y-6">
-              <!-- Short Introduction -->
-              <div>
-                <p class="text-lg text-gray-700 leading-relaxed font-light border-l-4 border-[#7a1f2b] pl-4">
-                  {{ shortBio }}
-                </p>
-              </div>
-
               <!-- Key Stats Grid -->
               <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div class="bg-[#7a1f2b]/5 rounded-lg p-4 text-center">

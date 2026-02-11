@@ -25,7 +25,7 @@ class PhotographerTipController extends Controller
                 'photographer_name' => $photographer->user->name,
                 'accept_tips' => false,
                 'tip_phone_number' => null,
-                'tip_message' => $photographer->tip_message ?? 'Support your favorite photographer!',
+                'tip_message' => $photographer->tip_message ?? 'Your tip helps me keep creating, learning, and improving for you.',
                 'total_tips' => 0,
                 'tip_count' => 0,
                 'recent_tips' => [],
@@ -40,7 +40,7 @@ class PhotographerTipController extends Controller
             'photographer_name' => $photographer->user->name,
             'accept_tips' => true,
             'tip_phone_number' => $photographer->tip_phone_number,
-            'tip_message' => $photographer->tip_message ?? 'Support your favorite photographer!',
+            'tip_message' => $photographer->tip_message ?? 'Your tip helps me keep creating, learning, and improving for you.',
             'total_tips' => $totalTips,
             'tip_count' => PhotographerTip::where('photographer_id', $photographerId)->completed()->count(),
             'recent_tips' => $recentTips->map(function ($tip) {
