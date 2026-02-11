@@ -33,12 +33,22 @@ class PhotographerSettingsController extends Controller
             $locationName = City::find($photographer->city_id)?->name;
         }
 
+        $rawProfilePath = $photographer->getRawOriginal('profile_picture');
+        $profilePictureUrl = null;
+        if ($rawProfilePath) {
+            if (str_starts_with($rawProfilePath, 'http') || str_starts_with($rawProfilePath, '/storage/')) {
+                $profilePictureUrl = $rawProfilePath;
+            } else {
+                $profilePictureUrl = Storage::url($rawProfilePath);
+            }
+        }
+
         return $this->success([
             'bio' => $photographer->bio,
             'short_bio' => $photographer->short_bio,
             'location' => $locationName,
             'city_id' => $photographer->city_id,
-            'profile_picture' => $photographer->profile_picture,
+            'profile_picture' => $profilePictureUrl,
             'experience_years' => $photographer->experience_years,
             'specializations' => $photographer->specializations,
             'favorite_hashtags' => $photographer->favorite_hashtags,

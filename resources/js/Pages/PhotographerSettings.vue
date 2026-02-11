@@ -98,7 +98,7 @@
                 class="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 bg-gray-50"
               >
                 <img
-                  :src="profilePicturePreview || form.profile_picture"
+                  :src="profilePicturePreview || profilePictureSrc"
                   alt="Profile preview"
                   class="w-full h-full object-cover"
                 >
@@ -672,6 +672,14 @@ export default {
     },
     tipPreviewMessage() {
       return this.form.tip_message || this.defaultTipMessage
+    },
+    profilePictureSrc() {
+      const value = this.form.profile_picture
+      if (!value || typeof value !== 'string') return ''
+      if (value.startsWith('data:') || value.startsWith('http') || value.startsWith('/storage/')) {
+        return value
+      }
+      return `/storage/${value.replace(/^\/+/, '')}`
     },
   },
 
