@@ -146,7 +146,7 @@ class PhotographerController extends Controller
                 $q->where('is_public', true)->orderBy('display_order');
             },
             'albums.photos' => function ($q) {
-                $q->where('is_featured', true)->orWhere('is_featured', false)->orderBy('is_featured', 'desc')->orderBy('created_at', 'desc');
+                $q->orderBy('is_featured', 'desc')->orderBy('created_at', 'desc');
             },
             'packages' => function ($q) {
                 $q->where('is_active', true)->orderBy('display_order');

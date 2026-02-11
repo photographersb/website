@@ -24,7 +24,7 @@ class SeoService
     {
         $photographer = $user->photographer;
         $profileUrl = $this->usernameService->getProfileUrl($user);
-        $city = $photographer?->city ?? 'Bangladesh';
+        $city = $photographer?->city?->name ?? 'Bangladesh';
         $avgRating = $photographer?->averageRating ?? 0;
         $reviewCount = $photographer?->reviews()->count() ?? 0;
 

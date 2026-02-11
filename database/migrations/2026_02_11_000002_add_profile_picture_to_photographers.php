@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::table('photographers', function (Blueprint $table) {
             // Add profile picture column after bio
-            $table->string('profile_picture')->nullable()->after('bio');
+            if (!Schema::hasColumn('photographers', 'profile_picture')) {
+                $table->string('profile_picture')->nullable()->after('bio');
+            }
         });
     }
 
@@ -23,7 +25,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('photographers', function (Blueprint $table) {
-            $table->dropColumn('profile_picture');
+            if (Schema::hasColumn('photographers', 'profile_picture')) {
+                $table->dropColumn('profile_picture');
+            }
         });
     }
 };

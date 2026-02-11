@@ -107,7 +107,8 @@ export default {
         'photographer-profile': {
           title: `${params.slug} - Professional Photographer | Photographer SB`,
           description: `View portfolio, packages, and reviews for ${params.slug}. Book verified professional photographer in Bangladesh.`,
-          type: 'profile'
+          type: 'profile',
+          canonical: currentUrl
         },
         'photographers-by-category': {
           title: query.category
@@ -223,7 +224,7 @@ export default {
           canonical: currentUrl
         },
         'auth': {
-          title: 'Login / Register | Photographar SB',
+          title: 'Login / Register | Photographer SB',
           description: 'Sign in to your account or create a new one. Join Bangladesh\'s leading photography marketplace.',
           robots: 'noindex, nofollow',
           canonical: currentUrl

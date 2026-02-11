@@ -53,8 +53,8 @@
                 <div class="flex-shrink-0">
                     <div class="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-burgundy shadow-lg">
                         <img 
-                            :src="user.profile_photo_url || '/placeholder-photographer.jpg'" 
-                            :alt="user.name"
+                            src="{{ $user->profile_photo_url ?? '/placeholder-photographer.jpg' }}" 
+                            alt="{{ $user->name }}"
                             class="w-full h-full object-cover"
                         >
                     </div>
@@ -71,7 +71,7 @@
                         @endif
                     </div>
                     
-                    <p class="text-gray-600 mb-2">@{{ user.username }}</p>
+                    <p class="text-gray-600 mb-2">{{ '@' . $user->username }}</p>
                     
                     <!-- Rating -->
                     <div class="flex items-center gap-2 mb-3">
@@ -131,8 +131,8 @@
                     @forelse($portfolios as $portfolio)
                         <div class="relative group overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-all">
                             <img 
-                                :src="portfolio.image_url" 
-                                :alt="portfolio.title"
+                                src="{{ $portfolio->image_url ?? '/images/placeholder.svg' }}" 
+                                alt="{{ $portfolio->title ?? 'Portfolio image' }}"
                                 class="w-full h-48 object-cover group-hover:scale-105 transition-transform"
                             >
                             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
@@ -212,8 +212,8 @@
                         <div class="border-b border-gray-100 pb-6">
                             <div class="flex items-start gap-4">
                                 <img 
-                                    :src="review.reviewer.profile_photo_url || '/placeholder.jpg'" 
-                                    :alt="review.reviewer.name"
+                                    src="{{ $review->reviewer->profile_photo_url ?? '/placeholder.jpg' }}" 
+                                    alt="{{ $review->reviewer->name ?? 'Reviewer' }}"
                                     class="w-12 h-12 rounded-full object-cover"
                                 >
                                 <div class="flex-1">
