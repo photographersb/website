@@ -669,17 +669,34 @@ export default {
         if (this.form.profile_picture instanceof File) {
           // Use FormData for file upload
           const formData = new FormData();
-          formData.append('bio', this.form.bio);
-          formData.append('location', this.form.location);
-          formData.append('city_id', this.form.city_id);
+          formData.append('bio', this.form.bio || '');
+          formData.append('location', this.form.location || '');
+          formData.append('city_id', this.form.city_id || '');
           formData.append('profile_picture', this.form.profile_picture);
-          formData.append('experience_years', this.form.experience_years);
-          formData.append('specializations', JSON.stringify(this.normalizeList(this.form.specializations)));
-          formData.append('favorite_hashtags', JSON.stringify(this.normalizeList(this.form.favorite_hashtags)));
-          formData.append('category_ids', JSON.stringify(this.form.category_ids));
-          formData.append('service_area_radius', this.form.service_area_radius);
+          formData.append('experience_years', this.form.experience_years || 0);
+          
+          // Append array fields properly for FormData
+          const specializations = this.normalizeList(this.form.specializations);
+          specializations.forEach((spec, index) => {
+            formData.append(`specializations[${index}]`, spec);
+          });
+          
+          const hashtags = this.normalizeList(this.form.favorite_hashtags);
+          hashtags.forEach((tag, index) => {
+            formData.append(`favorite_hashtags[${index}]`, tag);
+          });
+          
+          this.form.category_ids.forEach((id, index) => {
+            formData.append(`category_ids[${index}]`, id);
+          });
+          
+          formData.append('service_area_radius', this.form.service_area_radius || 0);
 
-          await api.put('/photographer/settings/profile', formData);
+          await api.put('/photographer/settings/profile', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
         } else {
           // Regular JSON request
           await api.put('/photographer/settings/profile', {

@@ -67,7 +67,7 @@ class PhotographerSettingsController extends Controller
             'bio' => 'nullable|string|max:500',
             'location' => 'nullable|string|max:255',
             'city_id' => 'nullable|exists:locations,id',
-            'profile_picture' => 'nullable|string|max:2048',
+            'profile_picture' => 'nullable|file|mimes:jpeg,png,webp,jpg|max:5120',
             'experience_years' => 'nullable|integer|min:0|max:60',
             'specializations' => 'nullable|array',
             'specializations.*' => 'string|max:100',
@@ -83,6 +83,13 @@ class PhotographerSettingsController extends Controller
 
         if (!$photographer) {
             return $this->error('You are not a photographer', 403);
+        }
+
+        // Handle profile picture upload
+        if ($request->hasFile('profile_picture')) {
+            $file = $request->file('profile_picture');
+            $path = $file->store('profile-pictures/' . $photographer->id, 'public');
+            $request->merge(['profile_picture' => '/storage/' . $path]);
         }
 
         $photographer->update($request->only([
