@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class PhotographyCategorySeeder extends Seeder
@@ -62,7 +63,10 @@ class PhotographyCategorySeeder extends Seeder
             ['name' => 'Timelapses & Animation', 'icon' => '⏱️'],
         ];
 
+        // Disable foreign key checks to allow truncate
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         Category::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $displayOrder = 1;
         foreach ($categories as $categoryData) {
