@@ -652,6 +652,7 @@ export default {
       errorMessage: null,
       profilePicturePreview: null,
       uploadingProfilePicture: false,
+      removeProfilePictureFlag: false,
       defaultTipMessage: 'Your tip helps me keep creating, learning, and improving for you.',
       tabs: [
         { id: 'profile', label: 'Profile Info' },
@@ -740,6 +741,7 @@ export default {
           response_time_preference: data.response_time_preference || '',
           booking_lead_time: Number.isFinite(Number(data.booking_lead_time)) ? Number(data.booking_lead_time) : 0,
         };
+        this.removeProfilePictureFlag = false;
       } catch (error) {
         console.error('Error fetching photographer data:', error);
         this.notifyError('Failed to load settings');
@@ -777,6 +779,9 @@ export default {
           });
           
           formData.append('service_area_radius', this.form.service_area_radius || 0);
+          if (this.removeProfilePictureFlag) {
+            formData.append('remove_profile_picture', '1');
+          }
 
           await api.put('/photographer/settings/profile', formData, {
             headers: {
@@ -790,15 +795,16 @@ export default {
             short_bio: this.form.short_bio,
             location: this.form.location,
             city_id: this.form.city_id,
-            profile_picture: this.form.profile_picture,
             experience_years: this.form.experience_years,
             specializations: this.normalizeList(this.form.specializations),
             favorite_hashtags: this.normalizeList(this.form.favorite_hashtags),
             category_ids: this.form.category_ids,
             service_area_radius: this.form.service_area_radius,
+            remove_profile_picture: this.removeProfilePictureFlag,
           });
         }
         this.profilePicturePreview = null;
+        this.removeProfilePictureFlag = false;
         this.showSuccess('Profile updated successfully!');
         await this.fetchPhotographerData();
       } catch (error) {
@@ -905,11 +911,13 @@ export default {
 
       // Store the file in form
       this.form.profile_picture = file;
+      this.removeProfilePictureFlag = false;
     },
 
     removeProfilePicture() {
       this.profilePicturePreview = null;
       this.form.profile_picture = null;
+      this.removeProfilePictureFlag = true;
       if (this.$refs.fileInput) {
         this.$refs.fileInput.value = '';
       }

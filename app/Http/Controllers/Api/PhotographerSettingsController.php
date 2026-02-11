@@ -6,6 +6,7 @@ use App\Http\Traits\ApiResponse;
 use App\Models\City;
 use App\Models\Photographer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PhotographerSettingsController extends Controller
 {
@@ -67,12 +68,11 @@ class PhotographerSettingsController extends Controller
      */
     public function updateProfile(Request $request)
     {
-        $request->validate([
+        $rules = [
             'bio' => 'nullable|string|max:500',
             'short_bio' => 'nullable|string|max:200',
             'location' => 'nullable|string|max:255',
             'city_id' => 'nullable|exists:locations,id',
-            'profile_picture' => 'nullable|file|mimes:jpeg,png,webp,jpg|max:5120',
             'experience_years' => 'nullable|integer|min:0|max:60',
             'specializations' => 'nullable|array',
             'specializations.*' => 'string|max:100',
@@ -81,7 +81,14 @@ class PhotographerSettingsController extends Controller
             'category_ids' => 'nullable|array',
             'category_ids.*' => 'integer|exists:categories,id',
             'service_area_radius' => 'nullable|numeric|min:0|max:500',
-        ]);
+            'remove_profile_picture' => 'nullable|boolean',
+        ];
+
+        if ($request->hasFile('profile_picture')) {
+            $rules['profile_picture'] = 'file|mimes:jpeg,png,webp,jpg|max:5120';
+        }
+
+        $request->validate($rules);
 
         $user = auth()->user();
         $photographer = $user->photographer;
@@ -90,25 +97,34 @@ class PhotographerSettingsController extends Controller
             return $this->error('You are not a photographer', 403);
         }
 
-        // Handle profile picture upload
-        if ($request->hasFile('profile_picture')) {
-            $file = $request->file('profile_picture');
-            $path = $file->store('profile-pictures/' . $photographer->id, 'public');
-            // Store relative path - accessor will add /storage/ prefix
-            $request->merge(['profile_picture' => $path]);
-        }
-
-        $photographer->update($request->only([
+        $updateData = $request->only([
             'bio',
             'short_bio',
             'location',
             'city_id',
-            'profile_picture',
             'experience_years',
             'specializations',
             'favorite_hashtags',
             'service_area_radius',
-        ]));
+        ]);
+
+        $removeProfilePicture = $request->boolean('remove_profile_picture');
+        if ($removeProfilePicture) {
+            $rawPath = $photographer->getRawOriginal('profile_picture');
+            if ($rawPath && !str_starts_with($rawPath, 'http') && Storage::disk('public')->exists($rawPath)) {
+                Storage::disk('public')->delete($rawPath);
+            }
+            $updateData['profile_picture'] = null;
+        }
+
+        if ($request->hasFile('profile_picture')) {
+            $file = $request->file('profile_picture');
+            $path = $file->store('profile-pictures/' . $photographer->id, 'public');
+            // Store relative path - accessor will add /storage/ prefix
+            $updateData['profile_picture'] = $path;
+        }
+
+        $photographer->update($updateData);
 
         if ($request->has('category_ids')) {
             $photographer->categories()->sync($request->category_ids);
