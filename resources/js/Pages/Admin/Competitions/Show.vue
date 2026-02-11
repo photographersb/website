@@ -479,8 +479,8 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '../../../api';
-import AdminHeader from '../../../Components/AdminHeader.vue';
-import AdminQuickNav from '../../../Components/AdminQuickNav.vue';
+import AdminHeader from '../../../components/AdminHeader.vue';
+import AdminQuickNav from '../../../components/AdminQuickNav.vue';
 import { formatDate as formatDateValue } from '../../../utils/formatters';
 
 export default {
