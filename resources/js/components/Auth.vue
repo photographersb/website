@@ -388,6 +388,40 @@
             </div>
           </div>
 
+          <!-- Terms Agreement - REQUIRED -->
+          <div class="bg-red-50 border-2 border-red-300 rounded-lg p-4 mt-4">
+            <div class="flex items-start gap-3">
+              <input
+                id="register-terms"
+                v-model="registerForm.accept_terms"
+                type="checkbox"
+                required
+                class="w-5 h-5 rounded border-gray-300 text-red-600 focus:ring-2 focus:ring-red-500 mt-1 cursor-pointer flex-shrink-0"
+              >
+              <div class="flex-1">
+                <label
+                  for="register-terms"
+                  class="text-sm font-semibold text-gray-900 cursor-pointer block leading-relaxed"
+                >
+                  I agree to the
+                  <router-link
+                    to="/terms"
+                    class="text-red-600 hover:text-red-700 font-bold underline transition-colors"
+                  >Terms of Service</router-link>
+                  and
+                  <router-link
+                    to="/privacy"
+                    class="text-red-600 hover:text-red-700 font-bold underline transition-colors"
+                  >Privacy Policy</router-link>
+                  <span class="text-red-600 font-bold ml-1">*</span>
+                </label>
+                <p class="text-xs text-gray-600 mt-2">
+                  You must check this box to create an account.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <button
             type="submit"
             :disabled="registerLoading"
@@ -487,6 +521,7 @@ const registerForm = ref({
   role: 'client',
   password: '',
   password_confirmation: '',
+  accept_terms: false,
 });
 
 const loginLoading = ref(false);
@@ -562,6 +597,13 @@ const login = async () => {
 const register = async () => {
   registerLoading.value = true;
   registerError.value = '';
+
+  // Client-side validation for terms
+  if (!registerForm.value.accept_terms) {
+    registerError.value = 'You must agree to the Terms of Service and Privacy Policy to create an account.';
+    registerLoading.value = false;
+    return;
+  }
 
   try {
     await ensureCsrfCookie();
