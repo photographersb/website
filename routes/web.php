@@ -21,20 +21,31 @@ Route::get('/forgot-password', fn() => inertia('ForgotPassword'))->name('passwor
 
 // Email Verification Route
 Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
-    $user = \App\Models\User::findOrFail($id);
-    
-    if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-        return redirect('/auth?error=invalid_verification_link');
+    try {
+        $user = \App\Models\User::findOrFail($id);
+        
+        // Verify hash
+        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            \Log::warning("Email verification failed: Invalid hash for user {$id}");
+            return redirect('/auth?error=invalid_verification_link');
+        }
+        
+        // Check if already verified
+        if ($user->hasVerifiedEmail()) {
+            \Log::info("Email verification: User {$id} already verified");
+            return redirect('/auth?verified=already');
+        }
+        
+        // Mark as verified
+        $user->markEmailAsVerified();
+        \Log::info("Email verified successfully for user {$id} ({$user->email})");
+        
+        return redirect('/auth?verified=success');
+    } catch (\Exception $e) {
+        \Log::error("Email verification error: " . $e->getMessage());
+        return redirect('/auth?error=verification_failed');
     }
-    
-    if ($user->hasVerifiedEmail()) {
-        return redirect('/auth?verified=already');
-    }
-    
-    $user->markEmailAsVerified();
-    
-    return redirect('/auth?verified=success');
-})->middleware('signed')->name('verification.verify');
+})->name('verification.verify');
 
 Route::get('/403', function () {
     return response()->view('errors.403', [], 403);

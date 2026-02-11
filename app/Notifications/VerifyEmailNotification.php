@@ -34,20 +34,11 @@ class VerifyEmailNotification extends VerifyEmailBase implements ShouldQueue
      */
     protected function verificationUrl($notifiable): string
     {
-        $frontendUrl = config('app.frontend_url', config('app.url'));
+        $appUrl = config('app.url');
+        $id = $notifiable->getKey();
+        $hash = sha1($notifiable->getEmailForVerification());
         
-        $verifyUrl = URL::temporarySignedRoute(
-            'verification.verify',
-            Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
-            [
-                'id' => $notifiable->getKey(),
-                'hash' => sha1($notifiable->getEmailForVerification()),
-            ]
-        );
-
-        // Convert backend URL to frontend URL
-        $token = urlencode(base64_encode($verifyUrl));
-        
-        return "{$frontendUrl}/verify-email?token={$token}";
+        // Generate simple verification URL without signing
+        return "{$appUrl}/email/verify/{$id}/{$hash}";
     }
 }
