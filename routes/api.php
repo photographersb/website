@@ -71,8 +71,8 @@ Route::model('photographer', Photographer::class);
 
 Route::prefix('v1')->group(function () {
     // Public routes
-    Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
-    Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+    Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:20,1');
+    Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:20,1');
     Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:3,60');
     Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:3,60');
     Route::post('/auth/verify-email', [AuthController::class, 'verifyEmail'])->middleware('throttle:10,60');

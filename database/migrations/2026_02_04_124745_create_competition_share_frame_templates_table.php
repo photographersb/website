@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('font_family')->default('DM Sans');
             
             // Text Configuration
-            $table->text('cta_message')->default('Vote for me ❤️\nSupport my photo on Photographer SB');
+            $table->string('cta_message', 255)->default('Vote for me ❤️\nSupport my photo on Photographer SB');
             $table->boolean('show_competition_name')->default(true);
             $table->boolean('show_photographer_name')->default(true);
             $table->boolean('show_submission_title')->default(true);
