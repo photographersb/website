@@ -65,6 +65,7 @@ class PhotographerSettingsController extends Controller
     {
         $request->validate([
             'bio' => 'nullable|string|max:500',
+            'short_bio' => 'nullable|string|max:200',
             'location' => 'nullable|string|max:255',
             'city_id' => 'nullable|exists:locations,id',
             'profile_picture' => 'nullable|file|mimes:jpeg,png,webp,jpg|max:5120',
@@ -95,6 +96,7 @@ class PhotographerSettingsController extends Controller
 
         $photographer->update($request->only([
             'bio',
+            'short_bio',
             'location',
             'city_id',
             'profile_picture',

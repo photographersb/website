@@ -73,6 +73,21 @@
             </p>
           </div>
 
+          <!-- Short Bio (Hero Section) -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Short Bio (Hero Section)</label>
+            <textarea
+              v-model="form.short_bio"
+              placeholder="Brief summary shown in header (auto-truncates long bio if empty)..."
+              rows="2"
+              maxlength="200"
+              class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+            />
+            <p class="text-xs text-gray-500 mt-1">
+              {{ form.short_bio.length }}/200 characters
+            </p>
+          </div>
+
           <!-- Profile Picture Upload -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">Profile Picture</label>
@@ -547,6 +562,7 @@
 import api from '../api'
 const defaultForm = () => ({
   bio: '',
+  short_bio: '',
   location: '',
   experience_years: 0,
   category_ids: [],
@@ -633,6 +649,7 @@ export default {
           ...defaultForm(),
           ...data,
           bio: data.bio || '',
+          short_bio: data.short_bio || '',
           location: data.location || '',
           city_id: data.city_id ?? null,
           profile_picture: data.profile_picture || '',
@@ -670,6 +687,7 @@ export default {
           // Use FormData for file upload
           const formData = new FormData();
           formData.append('bio', this.form.bio || '');
+          formData.append('short_bio', this.form.short_bio || '');
           formData.append('location', this.form.location || '');
           formData.append('city_id', this.form.city_id || '');
           formData.append('profile_picture', this.form.profile_picture);
@@ -701,6 +719,7 @@ export default {
           // Regular JSON request
           await api.put('/photographer/settings/profile', {
             bio: this.form.bio,
+            short_bio: this.form.short_bio,
             location: this.form.location,
             city_id: this.form.city_id,
             profile_picture: this.form.profile_picture,

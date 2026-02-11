@@ -1221,6 +1221,10 @@ const selectedPhoto = ref(null);
 const currentUser = ref(null);
 
 const shortBio = computed(() => {
+  // Use custom short_bio if set, otherwise auto-truncate from bio
+  if (photographer.value?.short_bio) {
+    return photographer.value.short_bio
+  }
   const bio = photographer.value?.bio || ''
   if (!bio) return 'Experienced photographer available for bookings and collaborations.'
   return bio.length > 180 ? `${bio.slice(0, 177).trim()}...` : bio
