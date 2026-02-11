@@ -73,15 +73,50 @@
             </p>
           </div>
 
-          <!-- Profile Picture URL -->
+          <!-- Profile Picture Upload -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Profile Picture URL</label>
-            <input
-              v-model="form.profile_picture"
-              type="url"
-              placeholder="https://..."
-              class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
-            >
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Profile Picture</label>
+            <div class="space-y-3">
+              <!-- Image Preview -->
+              <div
+                v-if="profilePicturePreview || form.profile_picture"
+                class="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 bg-gray-50"
+              >
+                <img
+                  :src="profilePicturePreview || form.profile_picture"
+                  alt="Profile preview"
+                  class="w-full h-full object-cover"
+                >
+                <button
+                  type="button"
+                  class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                  @click="removeProfilePicture"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <!-- File Input -->
+              <div class="relative">
+                <input
+                  ref="fileInput"
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                  @change="onProfilePictureChange"
+                >
+                <button
+                  type="button"
+                  class="w-full px-4 py-2.5 text-sm font-medium text-burgundy bg-burgundy/10 border border-burgundy/30 rounded-lg hover:bg-burgundy/20 transition-colors"
+                  @click="$refs.fileInput.click()"
+                >
+                  📷 Choose Image
+                </button>
+              </div>
+              <p class="text-xs text-gray-500">
+                JPG, PNG or WebP. Max 5MB.
+              </p>
+            </div>
           </div>
 
           <div class="grid gap-4 sm:grid-cols-2">
@@ -590,6 +625,8 @@ export default {
       savingAvailability: false,
       successMessage: null,
       errorMessage: null,
+      profilePicturePreview: null,
+      uploadingProfilePicture: false,
       tabs: [
         { id: 'profile', label: 'Profile Info' },
         { id: 'tips', label: '☕ Tip Settings' },
@@ -678,17 +715,36 @@ export default {
       this.savingProfile = true;
       this.clearMessages();
       try {
-        await api.put('/photographer/settings/profile', {
-          bio: this.form.bio,
-          location: this.form.location,
-          city_id: this.form.city_id,
-          profile_picture: this.form.profile_picture,
-          experience_years: this.form.experience_years,
-          specializations: this.normalizeList(this.form.specializations),
-          favorite_hashtags: this.normalizeList(this.form.favorite_hashtags),
-          category_ids: this.form.category_ids,
-          service_area_radius: this.form.service_area_radius,
-        });
+        // Check if a file is being uploaded
+        if (this.form.profile_picture instanceof File) {
+          // Use FormData for file upload
+          const formData = new FormData();
+          formData.append('bio', this.form.bio);
+          formData.append('location', this.form.location);
+          formData.append('city_id', this.form.city_id);
+          formData.append('profile_picture', this.form.profile_picture);
+          formData.append('experience_years', this.form.experience_years);
+          formData.append('specializations', JSON.stringify(this.normalizeList(this.form.specializations)));
+          formData.append('favorite_hashtags', JSON.stringify(this.normalizeList(this.form.favorite_hashtags)));
+          formData.append('category_ids', JSON.stringify(this.form.category_ids));
+          formData.append('service_area_radius', this.form.service_area_radius);
+
+          await api.put('/photographer/settings/profile', formData);
+        } else {
+          // Regular JSON request
+          await api.put('/photographer/settings/profile', {
+            bio: this.form.bio,
+            location: this.form.location,
+            city_id: this.form.city_id,
+            profile_picture: this.form.profile_picture,
+            experience_years: this.form.experience_years,
+            specializations: this.normalizeList(this.form.specializations),
+            favorite_hashtags: this.normalizeList(this.form.favorite_hashtags),
+            category_ids: this.form.category_ids,
+            service_area_radius: this.form.service_area_radius,
+          });
+        }
+        this.profilePicturePreview = null;
         this.showSuccess('Profile updated successfully!');
         await this.fetchPhotographerData();
       } catch (error) {
@@ -766,6 +822,46 @@ export default {
         this.successMessage = null;
       }, 5000);
     },
+
+    onProfilePictureChange(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      // Validate file size (5MB max)
+      const maxSize = 5242880; // 5MB in bytes
+      if (file.size > maxSize) {
+        this.notifyError('File size must be less than 5MB');
+        this.$refs.fileInput.value = '';
+        return;
+      }
+
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        this.notifyError('Only JPG, PNG, and WebP images are allowed');
+        this.$refs.fileInput.value = '';
+        return;
+      }
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.profilePicturePreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+
+      // Store the file in form
+      this.form.profile_picture = file;
+    },
+
+    removeProfilePicture() {
+      this.profilePicturePreview = null;
+      this.form.profile_picture = null;
+      if (this.$refs.fileInput) {
+        this.$refs.fileInput.value = '';
+      }
+    },
+
     normalizeList(value) {
       if (Array.isArray(value)) {
         return value.map(item => String(item).trim()).filter(Boolean);
