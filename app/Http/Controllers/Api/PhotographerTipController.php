@@ -25,6 +25,9 @@ class PhotographerTipController extends Controller
                 'photographer_name' => $photographer->user->name,
                 'accept_tips' => false,
                 'tip_phone_number' => null,
+                'bkash_number' => $photographer->bkash_number,
+                'nagad_number' => $photographer->nagad_number,
+                'rocket_number' => $photographer->rocket_number,
                 'tip_message' => $photographer->tip_message ?? 'Your tip helps me keep creating, learning, and improving for you.',
                 'total_tips' => 0,
                 'tip_count' => 0,
@@ -40,6 +43,9 @@ class PhotographerTipController extends Controller
             'photographer_name' => $photographer->user->name,
             'accept_tips' => true,
             'tip_phone_number' => $photographer->tip_phone_number,
+            'bkash_number' => $photographer->bkash_number,
+            'nagad_number' => $photographer->nagad_number,
+            'rocket_number' => $photographer->rocket_number,
             'tip_message' => $photographer->tip_message ?? 'Your tip helps me keep creating, learning, and improving for you.',
             'total_tips' => $totalTips,
             'tip_count' => PhotographerTip::where('photographer_id', $photographerId)->completed()->count(),
@@ -100,9 +106,21 @@ class PhotographerTipController extends Controller
 
     private function resolveTipNumber(Photographer $photographer, string $method): ?string
     {
-        // Return the unified tip phone number regardless of payment method
-        // The photographer has set one phone number that works with any mobile payment system
-        return $photographer->tip_phone_number;
+        $number = match ($method) {
+            'bkash' => $photographer->bkash_number,
+            'nagad' => $photographer->nagad_number,
+            'rocket' => $photographer->rocket_number,
+            default => null,
+        };
+
+        if (!empty($number)) {
+            return $number;
+        }
+
+        return $photographer->bkash_number
+            ?: ($photographer->nagad_number
+                ?: ($photographer->rocket_number
+                    ?: $photographer->tip_phone_number));
     }
 
     private function paymentMethodLabel(string $method): string

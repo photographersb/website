@@ -45,6 +45,9 @@ class PhotographerSettingsController extends Controller
             'service_area_radius' => $photographer->service_area_radius,
             'accept_tips' => $photographer->accept_tips,
             'tip_phone_number' => $photographer->tip_phone_number,
+            'bkash_number' => $photographer->bkash_number,
+            'nagad_number' => $photographer->nagad_number,
+            'rocket_number' => $photographer->rocket_number,
             'tip_message' => $photographer->tip_message,
             'facebook_url' => $photographer->facebook_url,
             'instagram_url' => $photographer->instagram_url,
@@ -125,6 +128,9 @@ class PhotographerSettingsController extends Controller
         $request->validate([
             'accept_tips' => 'nullable|boolean',
             'tip_phone_number' => 'nullable|string|max:20',
+            'bkash_number' => 'nullable|string|max:20',
+            'nagad_number' => 'nullable|string|max:20',
+            'rocket_number' => 'nullable|string|max:20',
             'tip_message' => 'nullable|string|max:255',
         ]);
 
@@ -135,18 +141,42 @@ class PhotographerSettingsController extends Controller
             return $this->error('You are not a photographer', 403);
         }
 
-        // Validate tip phone number format if provided
-        if ($request->filled('tip_phone_number')) {
-            if (!preg_match('/^(\+880|880|0)[0-9]{9,10}$/', str_replace([' ', '-'], '', $request->tip_phone_number))) {
-                return $this->error('Invalid phone number format. Please use Bangladesh format (e.g., +880xxxxxxxxxx)', 422);
+        $acceptTips = $request->boolean('accept_tips');
+        $legacyNumber = $request->input('tip_phone_number');
+
+        $bkashNumber = $request->input('bkash_number') ?: $legacyNumber;
+        $nagadNumber = $request->input('nagad_number');
+        $rocketNumber = $request->input('rocket_number');
+
+        $hasNumber = !empty($bkashNumber) || !empty($nagadNumber) || !empty($rocketNumber)
+            || !empty($photographer->bkash_number) || !empty($photographer->nagad_number) || !empty($photographer->rocket_number);
+
+        if ($acceptTips && !$hasNumber) {
+            return $this->error('Please add at least one payment number for tips.', 422);
+        }
+
+        $numbersToValidate = [
+            'bKash' => $bkashNumber,
+            'Nagad' => $nagadNumber,
+            'Rocket' => $rocketNumber,
+        ];
+
+        foreach ($numbersToValidate as $label => $number) {
+            if (!empty($number) && !preg_match('/^(\+880|880|0)[0-9]{9,10}$/', str_replace([' ', '-'], '', $number))) {
+                return $this->error('Invalid ' . $label . ' number format. Please use Bangladesh format (e.g., +880xxxxxxxxxx)', 422);
             }
         }
 
-        $photographer->update($request->only([
-            'accept_tips',
-            'tip_phone_number',
-            'tip_message',
-        ]));
+        $primaryNumber = $bkashNumber ?: ($nagadNumber ?: ($rocketNumber ?: null));
+
+        $photographer->update([
+            'accept_tips' => $acceptTips,
+            'bkash_number' => $bkashNumber,
+            'nagad_number' => $nagadNumber,
+            'rocket_number' => $rocketNumber,
+            'tip_phone_number' => $primaryNumber,
+            'tip_message' => $request->input('tip_message'),
+        ]);
 
         return $this->success([
             'message' => 'Tip settings updated successfully',

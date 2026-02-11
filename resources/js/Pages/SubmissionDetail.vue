@@ -341,7 +341,11 @@
               <div class="border-t pt-4">
                 <div class="flex items-center gap-4 mb-4">
                   <img 
-                    :src="submission.photographer?.profile_image || '/images/default-avatar.png'" 
+                    :src="submission.photographer?.profile_image
+                      || submission.photographer?.profile_picture_url
+                      || submission.photographer?.profile_picture
+                      || submission.photographer?.avatar_url
+                      || '/images/default-avatar.png'" 
                     :alt="submission.photographer?.name"
                     class="w-12 h-12 rounded-full object-cover"
                   >

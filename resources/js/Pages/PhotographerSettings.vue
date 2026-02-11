@@ -295,31 +295,54 @@
           <div class="bg-blue-50 border border-blue-200/70 rounded-xl p-4">
             <p class="text-sm font-semibold text-gray-900 mb-2">How Manual Tips Work:</p>
             <ul class="text-xs text-gray-700 space-y-1.5 list-disc list-inside">
-              <li>Add your payment phone number below</li>
-              <li>Clients see "Send Tip" button and your number</li>
-              <li>They send money via bKash/Nagad/Rocket to your number</li>
+              <li>Add your bKash, Nagad, or Rocket numbers below</li>
+              <li>Clients see the tip panel and choose a payment method</li>
+              <li>They send money using the selected number</li>
               <li>They submit the transaction ID and their phone number</li>
               <li>You keep all the money they send - platform records only transaction data</li>
             </ul>
           </div>
 
-          <!-- Payment Phone Number -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Payment Phone Number</label>
-            <p class="text-xs text-gray-500 mb-2">
-              Enter the phone number where you receive tips via bKash, Nagad, or Rocket
-            </p>
-            <div class="relative">
-              <span class="absolute left-3 top-3 text-gray-500">📱</span>
-              <input
-                v-model="form.tip_phone_number"
-                type="text"
-                placeholder="+880xxxxxxxxxx"
-                class="w-full pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
-              >
+          <!-- Payment Numbers -->
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">bKash Number</label>
+              <div class="relative">
+                <span class="absolute left-3 top-3 text-gray-500">💳</span>
+                <input
+                  v-model="form.bkash_number"
+                  type="text"
+                  placeholder="+880xxxxxxxxxx"
+                  class="w-full pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                >
+              </div>
             </div>
-            <p class="text-xs text-gray-500 mt-2">
-              Format: +880XXXXXXXXXX (include country code) - Only one number shown to clients
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Nagad Number</label>
+              <div class="relative">
+                <span class="absolute left-3 top-3 text-gray-500">📱</span>
+                <input
+                  v-model="form.nagad_number"
+                  type="text"
+                  placeholder="+880xxxxxxxxxx"
+                  class="w-full pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                >
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Rocket Number</label>
+              <div class="relative">
+                <span class="absolute left-3 top-3 text-gray-500">🚀</span>
+                <input
+                  v-model="form.rocket_number"
+                  type="text"
+                  placeholder="+880xxxxxxxxxx"
+                  class="w-full pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
+                >
+              </div>
+            </div>
+            <p class="text-xs text-gray-500">
+              Format: +880XXXXXXXXXX (include country code) - Add one or more numbers
             </p>
           </div>
 
@@ -331,7 +354,7 @@
             </p>
             <textarea
               v-model="form.tip_message"
-              placeholder="e.g., Support my work and help me create amazing content! ☕"
+              placeholder="Your tip helps me keep creating, learning, and improving for you."
               rows="3"
               class="w-full px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-burgundy/10 focus:border-burgundy"
             />
@@ -344,12 +367,25 @@
               <div v-if="!form.accept_tips" class="text-xs text-gray-500 text-center py-2">
                 Tips are currently disabled for this photographer.
               </div>
-              <div v-else-if="form.tip_message" class="text-sm text-gray-700">
-                <strong>{{ form.tip_message }}</strong>
+              <div v-else class="text-sm text-gray-700">
+                <strong>{{ tipPreviewMessage }}</strong>
               </div>
-              <div v-if="form.accept_tips && form.tip_phone_number" class="text-center">
+              <div v-if="form.accept_tips && hasAnyTipNumber" class="space-y-3 text-center">
                 <p class="text-xs text-gray-600 mb-2">Send tip to:</p>
-                <p class="font-mono text-lg text-burgundy font-bold">{{ form.tip_phone_number }}</p>
+                <div class="grid gap-2 sm:grid-cols-3">
+                  <div v-if="form.bkash_number" class="rounded-lg border border-burgundy/10 bg-burgundy/5 px-3 py-2">
+                    <p class="text-[11px] uppercase tracking-wide text-gray-500">bKash</p>
+                    <p class="font-mono text-sm text-burgundy font-bold">{{ form.bkash_number }}</p>
+                  </div>
+                  <div v-if="form.nagad_number" class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+                    <p class="text-[11px] uppercase tracking-wide text-gray-500">Nagad</p>
+                    <p class="font-mono text-sm text-amber-700 font-bold">{{ form.nagad_number }}</p>
+                  </div>
+                  <div v-if="form.rocket_number" class="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2">
+                    <p class="text-[11px] uppercase tracking-wide text-gray-500">Rocket</p>
+                    <p class="font-mono text-sm text-blue-700 font-bold">{{ form.rocket_number }}</p>
+                  </div>
+                </div>
                 <button
                   type="button"
                   disabled
@@ -359,14 +395,14 @@
                 </button>
               </div>
               <div v-else-if="form.accept_tips" class="text-xs text-gray-500 text-center py-4">
-                Add a phone number above to show tip button to clients
+                Add at least one payment number above to show tip options to clients
               </div>
             </div>
           </div>
 
           <!-- Save Button -->
           <button
-            :disabled="savingTips || (form.accept_tips && !form.tip_phone_number)"
+            :disabled="savingTips || (form.accept_tips && !hasAnyTipNumber)"
             class="w-full py-3 px-6 bg-burgundy text-white font-bold rounded-lg hover:bg-opacity-90 transition-all disabled:opacity-50"
             @click="saveTipSettings"
           >
@@ -586,7 +622,9 @@ const defaultForm = () => ({
   category_ids: [],
   service_area_radius: 0,
   accept_tips: true,
-  tip_phone_number: '',
+  bkash_number: '',
+  nagad_number: '',
+  rocket_number: '',
   tip_message: '',
   facebook_url: '',
   instagram_url: '',
@@ -614,6 +652,7 @@ export default {
       errorMessage: null,
       profilePicturePreview: null,
       uploadingProfilePicture: false,
+      defaultTipMessage: 'Your tip helps me keep creating, learning, and improving for you.',
       tabs: [
         { id: 'profile', label: 'Profile Info' },
         { id: 'tips', label: '☕ Tip Settings' },
@@ -624,6 +663,15 @@ export default {
       locations: [],
       form: defaultForm(),
     };
+  },
+
+  computed: {
+    hasAnyTipNumber() {
+      return Boolean(this.form.bkash_number || this.form.nagad_number || this.form.rocket_number)
+    },
+    tipPreviewMessage() {
+      return this.form.tip_message || this.defaultTipMessage
+    },
   },
 
   mounted() {
@@ -677,7 +725,9 @@ export default {
           experience_years: Number.isFinite(Number(data.experience_years)) ? Number(data.experience_years) : 0,
           service_area_radius: Number.isFinite(Number(data.service_area_radius)) ? Number(data.service_area_radius) : 0,
           accept_tips: typeof data.accept_tips === 'boolean' ? data.accept_tips : true,
-          tip_phone_number: data.tip_phone_number || '',
+          bkash_number: data.bkash_number || data.tip_phone_number || '',
+          nagad_number: data.nagad_number || '',
+          rocket_number: data.rocket_number || '',
           tip_message: data.tip_message || '',
           facebook_url: data.facebook_url || '',
           instagram_url: data.instagram_url || '',
@@ -764,7 +814,9 @@ export default {
       try {
         await api.put('/photographer/settings/tips', {
           accept_tips: this.form.accept_tips,
-          tip_phone_number: this.form.tip_phone_number,
+          bkash_number: this.form.bkash_number,
+          nagad_number: this.form.nagad_number,
+          rocket_number: this.form.rocket_number,
           tip_message: this.form.tip_message,
         });
         this.showSuccess('Tip settings updated successfully!');
