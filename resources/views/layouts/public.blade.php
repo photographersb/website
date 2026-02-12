@@ -17,23 +17,21 @@
             <link rel="canonical" href="{{ $seoMeta->canonical_url }}">
             
             <!-- OpenGraph Tags -->
-            <meta property="og:type" content="profile">
+            <meta property="og:type" content="website">
             <meta property="og:title" content="{{ $seoMeta->meta_title }}">
             <meta property="og:description" content="{{ $seoMeta->meta_description }}">
             <meta property="og:url" content="{{ $seoMeta->canonical_url }}">
-            @if($seoMeta->og_image)
-                <meta property="og:image" content="{{ $seoMeta->og_image }}">
-                <meta property="og:image:alt" content="{{ $seoMeta->meta_title }}">
-            @endif
+            <meta property="og:image" content="{{ $seoMeta->og_image ?: 'https://photographersb.com/images/og-cover.jpg' }}">
+            <meta property="og:image:alt" content="{{ $seoMeta->meta_title }}">
             <meta property="og:site_name" content="Photographer SB">
             
             <!-- Twitter Card Tags -->
             <meta name="twitter:card" content="summary_large_image">
+            <meta name="twitter:url" content="{{ $seoMeta->canonical_url }}">
             <meta name="twitter:title" content="{{ $seoMeta->meta_title }}">
             <meta name="twitter:description" content="{{ $seoMeta->meta_description }}">
-            @if($seoMeta->og_image)
-                <meta name="twitter:image" content="{{ $seoMeta->og_image }}">
-            @endif
+            <meta name="twitter:image" content="{{ $seoMeta->og_image ?: 'https://photographersb.com/images/twitter-card.jpg' }}">
+            <meta name="twitter:creator" content="@photographersb">
             
             <!-- Robots Meta -->
             <meta name="robots" content="{{ ($seoMeta->robots_index ?? true) ? 'index' : 'noindex' }}, {{ ($seoMeta->robots_follow ?? true) ? 'follow' : 'nofollow' }}">
@@ -44,6 +42,32 @@
                     {!! json_encode($seoMeta->schema_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) !!}
                 </script>
             @endif
+        @else
+            <!-- Title -->
+            <title>PhotographersB | Professional Photographers & Booking Platform in Bangladesh</title>
+            
+            <!-- Meta Description -->
+            <meta name="description" content="Discover and book verified professional photographers across Bangladesh for weddings, events, corporate, commercial, and portrait photography.">
+            
+            <!-- Canonical URL -->
+            <link rel="canonical" href="https://photographersb.com/">
+            
+            <!-- OpenGraph Tags -->
+            <meta property="og:type" content="website">
+            <meta property="og:title" content="PhotographersB | Professional Photographers & Booking Platform in Bangladesh">
+            <meta property="og:description" content="Discover and book verified professional photographers across Bangladesh for weddings, events, corporate, commercial, and portrait photography.">
+            <meta property="og:url" content="https://photographersb.com/">
+            <meta property="og:image" content="https://photographersb.com/images/og-cover.jpg">
+            <meta property="og:image:alt" content="PhotographersB">
+            <meta property="og:site_name" content="Photographer SB">
+            
+            <!-- Twitter Card Tags -->
+            <meta name="twitter:card" content="summary_large_image">
+            <meta name="twitter:url" content="https://photographersb.com/">
+            <meta name="twitter:title" content="PhotographersB | Book Professional Photographers in Bangladesh">
+            <meta name="twitter:description" content="Explore portfolios and hire trusted photographers for weddings, events, corporate, and commercial projects across Bangladesh.">
+            <meta name="twitter:image" content="https://photographersb.com/images/twitter-card.jpg">
+            <meta name="twitter:creator" content="@photographersb">
         @endif
     @show
     

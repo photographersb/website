@@ -6,9 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
     <!-- Primary Meta Tags -->
-    <title>Photographer SB - Find Professional Photographers in Bangladesh | A Somogro Bangladesh Project</title>
-    <meta name="title" content="Photographer SB - Find Professional Photographers in Bangladesh | A Somogro Bangladesh Project">
-    <meta name="description" content="Bangladesh's premier photography marketplace by Somogro Bangladesh. Connect with 500+ verified professional photographers for weddings, events, portraits & more. Book now with secure payments.">
+    <title>PhotographersB | Professional Photographers & Booking Platform in Bangladesh</title>
+    <meta name="title" content="PhotographersB | Professional Photographers & Booking Platform in Bangladesh">
+    <meta name="description" content="Discover and book verified professional photographers across Bangladesh for weddings, events, corporate, commercial, and portrait photography.">
     <meta name="keywords" content="photographers in bangladesh, wedding photographer dhaka, professional photography, event photography, portrait photographer, photography competition, hire photographer bangladesh, somogro bangladesh">
     <meta name="author" content="Somogro Bangladesh">
     @if(strpos(request()->path(), 'admin') === 0)
@@ -44,9 +44,9 @@
     <!-- Open Graph / Facebook Meta Tags -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://photographersb.com/">
-    <meta property="og:title" content="Photographer SB - Professional Photographers Across Bangladesh">
-    <meta property="og:description" content="A Somogro Bangladesh project connecting you with 500+ verified professional photographers for weddings, events, portraits & more.">
-    <meta property="og:image" content="https://photographersb.com/images/og-image.jpg">
+    <meta property="og:title" content="PhotographersB | Professional Photographers & Booking Platform in Bangladesh">
+    <meta property="og:description" content="Discover and book verified professional photographers across Bangladesh for weddings, events, corporate, commercial, and portrait photography.">
+    <meta property="og:image" content="https://photographersb.com/images/og-cover.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:site_name" content="Photographer SB - A Somogro Bangladesh Project">
@@ -55,8 +55,8 @@
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://photographersb.com/">
-    <meta name="twitter:title" content="Photographer SB - Find Professional Photographers in Bangladesh">
-    <meta name="twitter:description" content="Bangladesh's premier photography marketplace. Connect with 500+ verified professional photographers.">
+    <meta name="twitter:title" content="PhotographersB | Book Professional Photographers in Bangladesh">
+    <meta name="twitter:description" content="Explore portfolios and hire trusted photographers for weddings, events, corporate, and commercial projects across Bangladesh.">
     <meta name="twitter:image" content="https://photographersb.com/images/twitter-card.jpg">
     <meta name="twitter:creator" content="@photographersb">
     
