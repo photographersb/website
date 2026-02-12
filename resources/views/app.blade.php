@@ -30,7 +30,7 @@
                 ->toArray();
         });
         $trackingEnabled = filter_var($trackingSettings['tracking.enable'] ?? env('ANALYTICS_ENABLED', true), FILTER_VALIDATE_BOOLEAN);
-        $ga4Id = $trackingSettings['tracking.ga4_measurement_id'] ?? env('GA4_MEASUREMENT_ID');
+        $ga4Id = $trackingSettings['tracking.ga4_measurement_id'] ?? env('GA4_MEASUREMENT_ID', 'G-PYWLWNZR5K');
         $gtmId = $trackingSettings['tracking.gtm_id'] ?? env('GTM_ID');
         $fbPixelId = $trackingSettings['tracking.fb_pixel_id'] ?? env('FB_PIXEL_ID');
         $gscVerification = $trackingSettings['tracking.gsc_verification'] ?? env('GSC_VERIFICATION');

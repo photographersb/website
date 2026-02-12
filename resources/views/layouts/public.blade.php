@@ -86,6 +86,15 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYWLWNZR5K"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-PYWLWNZR5K');
+    </script>
+    
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
