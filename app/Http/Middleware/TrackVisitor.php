@@ -14,8 +14,11 @@ class TrackVisitor
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Only track web routes (not API or admin)
-        if (!$request->is('api/*') && !$request->is('admin/*') && !str_starts_with($request->path(), '_')) {
+        // Skip tracking for static assets to avoid rate limiting issues with social crawlers
+        $staticAssetPattern = '/\.(css|js|jpg|jpeg|gif|png|ico|gz|svg|svgz|ttf|otf|woff|woff2|eot|mp4|ogg|ogv|webm|webp|zip|swf|map)$/i';
+        
+        // Only track web routes (not API, admin, or static assets)
+        if (!$request->is('api/*') && !$request->is('admin/*') && !str_starts_with($request->path(), '_') && !preg_match($staticAssetPattern, $request->path())) {
             $this->trackVisitor($request);
         }
         
