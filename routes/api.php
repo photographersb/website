@@ -490,6 +490,7 @@ Route::prefix('v1')->group(function () {
             // Dashboard
             Route::get('/dashboard', [AdminController::class, 'dashboard']);
             Route::get('/analytics', [AdminController::class, 'analytics']);
+            Route::get('/health', [AdminController::class, 'health']);
             Route::get('/system-health', [AdminController::class, 'systemHealth']);
             Route::get('/health', [\App\Http\Controllers\Api\HealthController::class, 'admin']);
             Route::get('/sitemaps/health', [\App\Http\Controllers\Api\Admin\SitemapHealthController::class, 'index']);

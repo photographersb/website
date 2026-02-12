@@ -102,8 +102,8 @@ class AdminController extends Controller
                     'tips_today' => DB::table('photographer_tips')->where('status', 'completed')->whereDate('created_at', today())->sum('amount') ?? 0,
                     
                     // Featured Photographer Revenue
-                    'featured_revenue' => DB::table('featured_photographer_payments')->where('status', 'completed')->sum('amount') ?? 0,
-                    'active_featured_photographers' => DB::table('featured_photographers')->where('is_active', true)->where('expires_at', '>=', now())->count(),
+                    'featured_revenue' => $this->safeDashboardQuery(fn() => DB::table('featured_photographer_payments')->where('status', 'completed')->sum('amount')) ?? 0,
+                    'active_featured_photographers' => $this->safeDashboardQuery(fn() => DB::table('featured_photographers')->where('active', true)->where('end_date', '>=', now()->toDateString())->count()),
                     
                     // Package Upgrade Revenue
                     'upgrade_revenue' => DB::table('featured_photographer_upgrades')->where('payment_status', 'completed')->sum('total_amount') ?? 0,
@@ -347,6 +347,30 @@ class AdminController extends Controller
                 'profile_share_leaderboard' => [],
             ], 'Dashboard data retrieved (minimal)');
         }
+    }
+
+    /**
+     * Check API health status
+     */
+    public function health()
+    {
+        try {
+            // Check database connectivity
+            DB::connection()->getPdo();
+            $dbStatus = 'healthy';
+            $dbLatency = 0;
+        } catch (\Throwable $e) {
+            $dbStatus = 'unhealthy';
+            $dbLatency = 0;
+            \Log::error('Database health check failed: ' . $e->getMessage());
+        }
+
+        return $this->success([
+            'status' => $dbStatus === 'healthy' ? 'healthy' : 'unhealthy',
+            'timestamp' => now()->toIso8601String(),
+            'database' => $dbStatus,
+            'uptime' => php_uname(),
+        ]);
     }
 
     /**
@@ -1663,4 +1687,16 @@ class AdminController extends Controller
         
         return round($bytes, $precision) . ' ' . $units[$i];
     }
-}
+
+    /**
+     * Safe database query that returns 0 on error
+     */
+    private function safeDashboardQuery($callback)
+    {
+        try {
+            return $callback() ?? 0;
+        } catch (\Throwable $e) {
+            \Log::warning('Dashboard query failed: ' . $e->getMessage());
+            return 0;
+        }
+    }
