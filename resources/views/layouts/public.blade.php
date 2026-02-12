@@ -86,14 +86,26 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Google Analytics 4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYWLWNZR5K"></script>
+    <!-- Google Analytics 4 with Consent Management -->
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
+        
+        // Set default consent to 'denied' for all categories
+        gtag('consent', 'default', {
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'ad_storage': 'denied',
+            'analytics_storage': 'denied',
+            'wait_for_update': 500,
+        });
+        
         gtag('js', new Date());
-        gtag('config', 'G-PYWLWNZR5K');
+        gtag('config', 'G-PYWLWNZR5K', {
+            'anonymize_ip': true,
+        });
     </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYWLWNZR5K"></script>
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -101,5 +113,8 @@
     <div id="app">
         @yield('content')
     </div>
+    
+    <!-- Cookie Consent Banner Component -->
+    <cookie-consent-banner></cookie-consent-banner>
 </body>
 </html>

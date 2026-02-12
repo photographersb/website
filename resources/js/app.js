@@ -10,6 +10,7 @@ const PhotographerSearch = () => import('./components/PhotographerSearch.vue')
 const PhotographerProfile = () => import('./components/PhotographerProfile.vue')
 const BookingForm = () => import('./components/BookingForm.vue')
 const Auth = () => import('./components/Auth.vue')
+const CookieConsentBanner = () => import('./Components/CookieConsentBanner.vue')
 const AdminDashboard = () => import('./Pages/Admin/Dashboard.vue')
 const AdminNotificationCenter = () => import('./Pages/Admin/NotificationCenter.vue')
 const AdminAnalytics = () => import('./Pages/Admin/Analytics.vue')
@@ -1214,6 +1215,9 @@ const app = createApp(App)
 
 // Register lazy loading directive
 app.directive('lazy', lazyload)
+
+// Register global components
+app.component('CookieConsentBanner', CookieConsentBanner)
 
 app.use(router)
 
