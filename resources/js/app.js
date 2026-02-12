@@ -118,6 +118,7 @@ const FeaturedPhotographerPayment = () => import('./Pages/FeaturedPhotographerPa
 const FeaturedPhotographerAnalytics = () => import('./Pages/FeaturedPhotographerAnalytics.vue')
 const FeaturedPhotographerUpgrade = () => import('./Pages/FeaturedPhotographerUpgrade.vue')
 const Bookings = () => import('./Pages/Bookings.vue')
+const ClientDashboard = () => import('./Pages/Client/Dashboard.vue')
 const ForgotPassword = () => import('./Pages/ForgotPassword.vue')
 const BookingMessages = () => import('./Pages/BookingMessages.vue')
 const VerificationCenter = () => import('./Pages/VerificationCenter.vue')
@@ -346,6 +347,12 @@ const routes = [
         path: '/competitions/:slug/winners',
         component: WinnerAnnouncement,
         name: 'winner-announcement',
+    },
+    {
+        path: '/client/dashboard',
+        component: ClientDashboard,
+        name: 'client-dashboard',
+        meta: { requiresAuth: true, requiresClient: true },
     },
     {
         path: '/admin/competitions/:slug/winners',
@@ -1094,7 +1101,8 @@ router.beforeEach(async (to, from, next) => {
         to.meta?.requiresAdmin ||
         isAdminRoute ||
         to.path.startsWith('/dashboard') ||
-        to.path.startsWith('/judge')
+        to.path.startsWith('/judge') ||
+        to.path.startsWith('/client')
     )
 
     if (!userRole && shouldHydrate) {
@@ -1123,6 +1131,8 @@ router.beforeEach(async (to, from, next) => {
             return next('/admin/dashboard')
         } else if (userRole === 'photographer') {
             return next('/dashboard')
+        } else if (userRole === 'client') {
+            return next('/client/dashboard')
         } else if (userRole) {
             return next('/')
         } else if (isAdminRoute) {
@@ -1142,6 +1152,22 @@ router.beforeEach(async (to, from, next) => {
         }
         window.location.href = '/403'
         return
+    }
+
+    if (to.meta.requiresClient && userRole !== 'client') {
+        if (!userRole) {
+            return next('/auth')
+        }
+        if (userRole === 'photographer') {
+            return next('/dashboard')
+        }
+        if (userRole === 'judge') {
+            return next('/judge/dashboard')
+        }
+        if (hasAdminRole) {
+            return next('/admin/dashboard')
+        }
+        return next('/')
     }
 
     return next()

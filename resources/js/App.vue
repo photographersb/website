@@ -130,6 +130,13 @@
                 Judge Panel
               </router-link>
               <router-link
+                v-if="isClient"
+                to="/client/dashboard"
+                class="sb-btn sb-btn--primary"
+              >
+                Client Dashboard
+              </router-link>
+              <router-link
                 v-if="isPhotographer"
                 to="/dashboard"
                 class="sb-btn sb-btn--primary"
@@ -266,6 +273,14 @@
                 @click="mobileMenuOpen = false"
               >
                 Judge Panel
+              </router-link>
+              <router-link
+                v-if="isClient"
+                to="/client/dashboard"
+                class="sb-btn sb-btn--primary w-full"
+                @click="mobileMenuOpen = false"
+              >
+                Client Dashboard
               </router-link>
               <router-link
                 v-if="isPhotographer"
@@ -858,6 +873,10 @@ const isJudge = computed(() => {
   return user.value && (normalizeRole(user.value.role) === 'judge' || user.value.is_judge === true)
 })
 
+const isClient = computed(() => {
+  return user.value && normalizeRole(user.value.role) === 'client'
+})
+
 const isAdminRoute = computed(() => {
   return route.path.startsWith('/admin')
 })
@@ -879,7 +898,7 @@ const shouldHydrateFromApi = (hasStoredUser) => {
   if (hasStoredUser) return true
   if (route?.meta?.requiresAuth || route?.meta?.requiresAdmin) return true
   const path = route?.path || ''
-  return path.startsWith('/admin') || path.startsWith('/dashboard') || path.startsWith('/judge')
+  return path.startsWith('/admin') || path.startsWith('/dashboard') || path.startsWith('/judge') || path.startsWith('/client')
 }
 
 const hydrateUser = async () => {
@@ -929,7 +948,7 @@ watch(mobileMenuOpen, (isOpen) => {
 // Watch for route changes and re-hydrate user when navigating to protected routes
 watch(() => route.path, (newPath) => {
   // Re-hydrate user when navigating to dashboard, admin, or judge areas
-  if (newPath.startsWith('/dashboard') || newPath.startsWith('/admin') || newPath.startsWith('/judge')) {
+  if (newPath.startsWith('/dashboard') || newPath.startsWith('/admin') || newPath.startsWith('/judge') || newPath.startsWith('/client')) {
     hydrateUser()
   }
 })
