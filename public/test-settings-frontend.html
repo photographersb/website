@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings Frontend Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #8E0E3F 0%, #5A0628 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .content { padding: 30px; }
+        .test-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-section h3 {
+            color: #8E0E3F;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .field-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .field-item {
+            padding: 8px 12px;
+            background: white;
+            border-radius: 4px;
+            font-size: 13px;
+            border-left: 3px solid #8E0E3F;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card .number { font-size: 32px; font-weight: bold; margin-bottom: 5px; }
+        .stat-card .label { font-size: 14px; opacity: 0.9; }
+        button {
+            background: #8E0E3F;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        button:hover { background: #5A0628; transform: translateY(-2px); }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        .status.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .status.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .status.warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+        .status.info { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
+        #testResults {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .result-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .result-item.pass {
+            background: #d4edda;
+            color: #155724;
+            border-left: 3px solid #28a745;
+        }
+        .result-item.fail {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 3px solid #dc3545;
+        }
+        .instructions {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0066cc;
+        }
+        .instructions h3 { color: #0066cc; margin-bottom: 10px; }
+        .instructions ol { margin-left: 20px; }
+        .instructions li { margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Settings Storage Comprehensive Scan</h1>
+            <p>Automated test for all 67 fields in Admin Settings</p>
+        </div>
+        
+        <div class="content">
+            <div class="instructions">
+                <h3>📋 Test Instructions:</h3>
+                <ol>
+                    <li>Make sure you're logged in as admin at <code>http://127.0.0.1:8000/admin</code></li>
+                    <li>Open browser DevTools (F12) → Console tab</li>
+                    <li>Click "Run Comprehensive Test" below</li>
+                    <li>Watch the real-time field testing progress</li>
+                    <li>Check the final report for any failures</li>
+                </ol>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="number" id="totalFields">67</div>
+                    <div class="label">Total Fields</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="passedCount">0</div>
+                    <div class="label">Passed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="failedCount">0</div>
+                    <div class="label">Failed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="successRate">0%</div>
+                    <div class="label">Success Rate</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 20px 0;">
+                <button onclick="runComprehensiveTest()" id="testBtn">
+                    🚀 Run Comprehensive Test
+                </button>
+            </div>
+
+            <div id="statusMessage"></div>
+            <div id="testResults"></div>
+
+            <div class="test-section">
+                <h3>📦 Test Coverage (8 Sections, 67 Fields)</h3>
+                <div class="field-list">
+                    <div class="field-item">General (8 fields)</div>
+                    <div class="field-item">Branding (12 fields)</div>
+                    <div class="field-item">Email (6 fields)</div>
+                    <div class="field-item">Payments (6 fields)</div>
+                    <div class="field-item">Bookings (5 fields)</div>
+                    <div class="field-item">Security (5 fields)</div>
+                    <div class="field-item">Notifications (5 fields)</div>
+                    <div class="field-item">SEO (5 fields)</div>
+                    <div class="field-item">Tracking (5 fields)</div>
+<div class="field-item">System (4 fields)</div>
+                    <div class="field-item">Storage (6 fields)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin + '/api/v1';
+        
+        const allFields = {
+            'site.name': 'Test Platform ' + Date.now(),
+            'site.email': 'test' + Date.now() + '@example.com',
+            'site.support_email': 'support' + Date.now() + '@example.com',
+            'site.phone': '+880 1700 ' + Math.floor(Math.random() * 999999),
+            'site.address': 'Test Address ' + Date.now(),
+            'site.currency': 'USD',
+            'site.timezone': 'UTC',
+            'site.date_format': 'Y-m-d',
+            
+            'branding.logo_url': 'https://example.com/logo' + Date.now() + '.png',
+            'branding.logo_credit_name': 'Test ' + Date.now(),
+            'branding.logo_credit_url': 'https://example.com/' + Date.now(),
+            'branding.favicon_url': 'https://example.com/favicon.ico',
+            'branding.favicon_credit_name': 'Tester',
+            'branding.favicon_credit_url': 'https://example.com',
+            'branding.og_image': 'https://example.com/og.jpg',
+            'branding.og_image_credit_name': 'OG Tester',
+            'branding.og_image_credit_url': 'https://example.com',
+            'branding.tagline': 'Test Tagline ' + Date.now(),
+            'branding.primary_color': '#FF5733',
+            'branding.secondary_color': '#003366',
+            
+            'email.smtp_host': 'smtp.test.com',
+            'email.smtp_port': '587',
+            'email.smtp_username': 'testuser',
+            'email.smtp_password': 'testpass',
+            'email.mail_from_name': 'Test Sender',
+            'email.mail_from_address': 'sender@test.com',
+            
+            'payment.card_enabled': 'true',
+            'payment.bkash_enabled': 'true',
+            'payment.bkash_merchant': '01700123456',
+            'payment.nagad_enabled': 'false',
+            'payment.ssl_enabled': 'true',
+            'payment.commission_rate': '15',
+            
+            'booking.auto_confirm': 'false',
+            'booking.cancellation_window_hours': '48',
+            'booking.deposit_required': 'true',
+            'review.auto_publish': 'true',
+            'review.min_stars_to_display': '3',
+            
+            'security.two_factor_enabled': 'false',
+            'security.session_timeout': '120',
+            'security.password_min_length': '8',
+            'security.recaptcha_site_key': 'test_site_key',
+            'security.recaptcha_secret_key': 'test_secret_key',
+            
+            'notification.email_notifications': 'true',
+            'notification.booking_notifications': 'true',
+            'notification.review_notifications': 'false',
+            'notification.sms_enabled': 'true',
+            'notification.admin_alerts_email': 'admin@test.com',
+            
+            'seo.site_title': 'Test SEO Title',
+            'seo.site_description': 'Test SEO description',
+            'seo.robots': 'index,follow',
+            'seo.og_title': 'Test OG Title',
+            'seo.og_description': 'Test OG desc',
+            
+            'tracking.enable': 'true',
+            'tracking.ga4_measurement_id': 'G-TEST123',
+            'tracking.gtm_id': 'GTM-TEST',
+            'tracking.fb_pixel_id': 'FB123456',
+            'tracking.gsc_verification': 'gsc_verify_token',
+            
+            'system.maintenance_mode': '0',
+            'system.maintenance_message': 'Test maintenance message',
+            'system.debug_mode': '0',
+            'system.cache_duration': '60',
+            
+            'storage.driver': 'local',
+            'storage.s3_bucket': 'test-bucket',
+            'storage.s3_region': 'us-east-1',
+            'storage.s3_url': 'https://s3.test.com',
+            'media.max_upload_mb': '20',
+            'media.image_quality': '80'
+        };
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function addResult(field, passed, message = '') {
+            const resultsDiv = document.getElementById('testResults');
+            const resultClass = passed ? 'pass' : 'fail';
+            const icon = passed ? '✅' : '❌';
+            resultsDiv.innerHTML += `<div class="result-item ${resultClass}">${icon} ${field} ${message ? '- ' + message : ''}</div>`;
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+
+        async function getCsrfToken() {
+            try {
+                const response = await fetch(window.location.origin + '/sanctum/csrf-cookie', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                // Wait a bit for the cookie to be set
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                return getCookie('XSRF-TOKEN');
+            } catch (e) {
+                console.warn('CSRF cookie fetch failed:', e);
+                return null;
+            }
+        }
+
+        async function runComprehensiveTest() {
+            const btn = document.getElementById('testBtn');
+            btn.disabled = true;
+            btn.textContent = '🔄 Testing...';
+            
+            document.getElementById('testResults').innerHTML = '<h3 style="margin-bottom: 15px;">📝 Test Results:</h3>';
+            showStatus('🔄 Starting comprehensive test...', 'info');
+            
+            let passed = 0;
+            let failed = 0;
+            const total = Object.keys(allFields).length;
+            
+            try {
+                // Ensure CSRF token
+                showStatus('🔐 Fetching CSRF token...', 'info');
+                const csrfToken = await getCsrfToken();
+                
+                if (!csrfToken) {
+                    throw new Error('Could not obtain CSRF token. Make sure you are logged in as admin.');
+                }
+                
+                showStatus(`📤 Saving ${total} settings fields...`, 'info');
+                
+                // Convert to array format for API
+                const settingsArray = Object.entries(allFields).map(([key, value]) => ({
+                    key, value
+                }));const errorText = await saveResponse.text();
+                    if (saveResponse.status === 419) {
+                        throw new Error(`CSRF token expired. Please refresh the page and make sure you're logged in as admin at ${window.location.origin}/admin`);
+                    }
+                    throw new Error(`Save failed: ${saveResponse.status} ${saveResponse.statusText} - ${error
+                
+                // Save all settings
+                const saveResponse = await fetch(`${API_BASE}/admin/settings/bulk`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-XSRF-TOKEN': csrfToken
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ settings: settingsArray })
+                });
+                
+                if (!saveResponse.ok) {
+                    throw new Error(`Save failed: ${saveResponse.status} ${saveResponse.statusText}`);
+                }
+                
+                showStatus('✅ Bulk save completed. Verifying...', 'success');
+                
+                // Wait a bit for database to flush
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Fetch back and verify
+                const fetchResponse = await fetch(`${API_BASE}/admin/settings`, {
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!fetchResponse.ok) {
+                    throw new Error(`Fetch failed: ${fetchResponse.status}`);
+                }
+                
+                const result = await fetchResponse.json();
+                const savedData = result.data || {};
+                
+                // Verify each field
+                for (const [key, expectedValue] of Object.entries(allFields)) {
+                    if (key in savedData) {
+                        if (savedData[key] === expectedValue) {
+                            passed++;
+                            addResult(key, true);
+                        } else {
+                            failed++;
+                            addResult(key, false, `Expected: ${expectedValue}, Got: ${savedData[key]}`);
+                        }
+                    } else {
+                        failed++;
+                        addResult(key, false, 'NOT FOUND');
+                    }
+                    
+                    // Update stats in real-time
+                    document.getElementById('passedCount').textContent = passed;
+                    document.getElementById('failedCount').textContent = failed;
+                    const rate = ((passed / total) * 100).toFixed(1);
+                    document.getElementById('successRate').textContent = rate + '%';
+                }
+                
+                // Final status
+                if (failed === 0) {
+                    showStatus(`🎉 PERFECT! All ${total} fields are storing correctly!`, 'success');
+                } else if (passed >= total * 0.9) {
+                    showStatus(`⚠️ Mostly working: ${passed}/${total} passed (${failed} issues)`, 'warning');
+                } else {
+                    showStatus(`❌ Multiple issues: ${passed}/${total} passed (${failed} failed)`, 'error');
+                }
+                
+            } catch (error) {
+                console.error('Test error:', error);
+                showStatus(`❌ Test failed: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔄 Run Test Again';
+            }
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) {
+                return decodeURIComponent(parts.pop().split(';').shift());
+            }
+            return '';
+        }
+    </script>
+</body>
+</html>

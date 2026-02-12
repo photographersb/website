@@ -240,6 +240,30 @@ class AdminSettingsController extends Controller
         ], 'OG image uploaded successfully');
     }
 
+    /**
+     * Get settings change history
+     */
+    public function getChanges(Request $request)
+    {
+        try {
+            $perPage = $request->input('per_page', 15);
+            $page = $request->input('page', 1);
+
+            // Mock data for now - you can implement actual change tracking later
+            $changes = [];
+            
+            return $this->success($changes, 'Settings changes retrieved successfully', 200, [
+                'total' => 0,
+                'per_page' => $perPage,
+                'current_page' => $page,
+                'last_page' => 1
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch settings changes: ' . $e->getMessage());
+            return $this->error('Failed to fetch settings changes', 500);
+        }
+    }
+
     private function normalizeSettingValue($value): ?string
     {
         if (is_array($value) || is_object($value)) {

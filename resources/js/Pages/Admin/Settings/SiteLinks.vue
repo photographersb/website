@@ -55,6 +55,28 @@
           v-else
           class="space-y-6"
         >
+          <!-- Action Bar -->
+          <div class="flex justify-end items-center mb-4">
+            <a
+              href="/admin/settings/site-links/create"
+              class="px-4 py-2 bg-burgundy text-white rounded-lg hover:bg-burgundy-dark transition-colors flex items-center gap-2"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Add New Link
+            </a>
+          </div>
           <!-- Stats Cards -->
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="bg-white rounded-lg shadow p-6">
@@ -124,6 +146,46 @@
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
+                  <tr v-if="links.length === 0">
+                    <td colspan="6" class="px-6 py-16 text-center">
+                      <div class="text-gray-400">
+                        <svg
+                          class="mx-auto h-16 w-16 mb-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                          />
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No links yet</h3>
+                        <p class="text-sm text-gray-500 mb-4">Get started by creating your first site link</p>
+                        <a
+                          href="/admin/settings/site-links/create"
+                          class="inline-flex items-center px-4 py-2 bg-burgundy text-white rounded-lg hover:bg-burgundy-dark"
+                        >
+                          <svg
+                            class="w-4 h-4 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M12 4v16m8-8H4"
+                            />
+                          </svg>
+                          Create First Link
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
                   <tr
                     v-for="link in sortedLinks"
                     :key="link.id"
@@ -200,14 +262,22 @@ const loading = ref(true);
 const showDeleteModal = ref(false);
 const linkToDelete = ref(null);
 
-const activeCount = computed(() => links.value.filter(l => l.is_active).length);
-const inactiveCount = computed(() => links.value.filter(l => !l.is_active).length);
+const activeCount = computed(() => {
+  if (!Array.isArray(links.value)) return 0;
+  return links.value.filter(l => l.is_active).length;
+});
+const inactiveCount = computed(() => {
+  if (!Array.isArray(links.value)) return 0;
+  return links.value.filter(l => !l.is_active).length;
+});
 const categoryCount = computed(() => {
+  if (!Array.isArray(links.value)) return 0;
   const categories = new Set(links.value.map(l => l.category));
   return categories.size;
 });
 
 const sortedLinks = computed(() => {
+  if (!Array.isArray(links.value)) return [];
   return [...links.value].sort((a, b) => {
     if (a.category !== b.category) {
       return a.category.localeCompare(b.category);
@@ -220,9 +290,11 @@ const loadLinks = async () => {
   loading.value = true;
   try {
     const response = await api.get('/site-links');
-    links.value = response.data.data || [];
+    const data = response.data.data || response.data || [];
+    links.value = Array.isArray(data) ? data : [];
   } catch (error) {
     handleApiError(error, 'Failed to load site links');
+    links.value = [];
   } finally {
     loading.value = false;
   }
@@ -255,7 +327,9 @@ const confirmDelete = async () => {
   
   try {
     await api.delete(`/admin/site-links/${linkToDelete.value.id}`);
-    links.value = links.value.filter(l => l.id !== linkToDelete.value.id);
+    if (Array.isArray(links.value)) {
+      links.value = links.value.filter(l => l.id !== linkToDelete.value.id);
+    }
     showToast('Link deleted successfully', 'success');
     showDeleteModal.value = false;
     linkToDelete.value = null;

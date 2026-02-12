@@ -813,6 +813,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/settings/category/{category}', [AdminSettingsController::class, 'getCategory']);
             Route::post('/settings/reset', [AdminSettingsController::class, 'reset']);
             Route::post('/settings/seo/og-image', [AdminSettingsController::class, 'uploadSeoOgImage']);
+            Route::get('/settings/changes', [AdminSettingsController::class, 'getChanges']);
             
             // Error Center - System Error Tracking & Management
             Route::prefix('error-logs')->group(function () {

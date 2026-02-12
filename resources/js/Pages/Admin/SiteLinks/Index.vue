@@ -9,8 +9,8 @@
       <AdminQuickNav />
     
       <!-- Top Actions -->
-    <div class="flex flex-wrap justify-between items-center gap-4 mb-6 bg-white p-4 rounded-lg shadow">
-      <!-- Section Filter -->
+      <div class="flex flex-wrap justify-between items-center gap-4 mb-6 bg-white p-4 rounded-lg shadow">
+        <!-- Section Filter -->
       <div class="flex items-center gap-2">
         <label class="text-sm font-medium text-gray-700">Section:</label>
         <select
@@ -298,6 +298,7 @@
           </div>
         </div>
       </div>
+    </div>
     </div>
   </div>
 </template>
