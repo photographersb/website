@@ -119,6 +119,8 @@ const FeaturedPhotographerAnalytics = () => import('./Pages/FeaturedPhotographer
 const FeaturedPhotographerUpgrade = () => import('./Pages/FeaturedPhotographerUpgrade.vue')
 const Bookings = () => import('./Pages/Bookings.vue')
 const ClientDashboard = () => import('./Pages/Client/Dashboard.vue')
+const ClientGalleries = () => import('./Pages/Client/Galleries.vue')
+const ClientGalleryShow = () => import('./Pages/Client/GalleryShow.vue')
 const ForgotPassword = () => import('./Pages/ForgotPassword.vue')
 const BookingMessages = () => import('./Pages/BookingMessages.vue')
 const VerificationCenter = () => import('./Pages/VerificationCenter.vue')
@@ -352,6 +354,18 @@ const routes = [
         path: '/client/dashboard',
         component: ClientDashboard,
         name: 'client-dashboard',
+        meta: { requiresAuth: true, requiresClient: true },
+    },
+    {
+        path: '/client/galleries',
+        component: ClientGalleries,
+        name: 'client-galleries',
+        meta: { requiresAuth: true, requiresClient: true },
+    },
+    {
+        path: '/client/galleries/:albumId',
+        component: ClientGalleryShow,
+        name: 'client-gallery-show',
         meta: { requiresAuth: true, requiresClient: true },
     },
     {

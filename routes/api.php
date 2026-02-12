@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\ClickEventController;
 use App\Http\Controllers\Api\AlbumController;
 use App\Http\Controllers\Api\PackageController;
 use App\Http\Controllers\Api\PhotoController;
+use App\Http\Controllers\Api\ClientAlbumController;
 use App\Http\Controllers\Api\Photographer\PhotographerCompetitionController;
 use App\Http\Controllers\Api\Photographer\PhotographerEventController;
 use App\Http\Controllers\Api\Admin\AdminCompetitionApiController;
@@ -251,6 +252,12 @@ Route::prefix('v1')->group(function () {
         Route::post('/bookings/{booking}/invoice/generate', [BookingController::class, 'generateInvoice'])->middleware('throttle:5,60');
         Route::get('/bookings/{booking}/invoice/download', [BookingController::class, 'downloadInvoice'])->name('bookings.invoice.download');
         Route::post('/bookings/{booking}/invoice/email', [BookingController::class, 'emailInvoice'])->middleware('throttle:3,60');
+
+        // Client Galleries
+        Route::prefix('client')->group(function () {
+            Route::get('/albums', [ClientAlbumController::class, 'index']);
+            Route::get('/albums/{album}', [ClientAlbumController::class, 'show']);
+        });
 
         // Reviews
 

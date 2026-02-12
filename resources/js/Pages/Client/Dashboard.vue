@@ -33,7 +33,14 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <router-link
+          to="/client/galleries"
+          class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow"
+        >
+          <p class="text-sm font-semibold text-gray-900">Photo Galleries</p>
+          <p class="text-sm text-gray-600 mt-1">Access delivered albums from your bookings.</p>
+        </router-link>
         <router-link
           to="/"
           class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow"
