@@ -72,6 +72,9 @@ Route::bind('event', function ($value) {
 Route::model('photographer', Photographer::class);
 
 Route::prefix('v1')->group(function () {
+    // Public Health Check
+    Route::get('/health', [AdminController::class, 'health']);
+
     // Public routes
     Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:20,1');
     Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:20,1');
