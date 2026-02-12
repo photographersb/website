@@ -31,7 +31,7 @@
         });
         $trackingEnabled = filter_var($trackingSettings['tracking.enable'] ?? env('ANALYTICS_ENABLED', true), FILTER_VALIDATE_BOOLEAN);
         $ga4Id = $trackingSettings['tracking.ga4_measurement_id'] ?? env('GA4_MEASUREMENT_ID', 'G-PYWLWNZR5K');
-        $gtmId = $trackingSettings['tracking.gtm_id'] ?? env('GTM_ID');
+        $gtmId = $trackingSettings['tracking.gtm_id'] ?? env('GTM_ID', 'GTM-T3BW6WBM');
         $fbPixelId = $trackingSettings['tracking.fb_pixel_id'] ?? env('FB_PIXEL_ID');
         $gscVerification = $trackingSettings['tracking.gsc_verification'] ?? env('GSC_VERIFICATION');
     @endphp
@@ -120,6 +120,18 @@
         }
     }
     </script>
+
+    @if($trackingEnabled && !empty($gtmId))
+    <!-- Google Tag Manager -->
+    <script>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','{{ $gtmId }}');
+    </script>
+    <!-- End Google Tag Manager -->
+    @endif
 
     @if($trackingEnabled && !empty($gtmId))
     <!-- Google Tag Manager -->
