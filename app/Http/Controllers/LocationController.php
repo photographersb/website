@@ -13,7 +13,9 @@ class LocationController extends Controller
      */
     public function index()
     {
-        $locations = Location::withCount('photographers')
+        $locations = Location::withCount(['photographers' => function ($query) {
+                $query->publicVisible();
+            }])
             ->where('is_active', true)
             ->whereIn('type', ['district', 'upazila'])
             ->orderBy('photographers_count', 'desc')
@@ -45,12 +47,11 @@ class LocationController extends Controller
     {
         $location = Location::where('slug', $slug)->firstOrFail();
         
-        $photographers = Photographer::with(['user', 'city'])
+        $photographers = Photographer::publicVisible()->with(['user', 'city'])
             ->where(function ($query) use ($location) {
                 $query->where('city_id', $location->id)
                     ->orWhere('location', 'like', '%' . $location->name . '%');
             })
-            ->where('is_verified', true)
             ->paginate(24);
 
         $seoMeta = (object) [

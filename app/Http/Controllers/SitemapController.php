@@ -59,8 +59,7 @@ class SitemapController extends Controller
 
     public function photographers()
     {
-        $photographers = Photographer::with('user')
-            ->where('is_verified', true)
+        $photographers = Photographer::publicVisible()->with('user')
             ->select('slug', 'updated_at')
             ->get();
 

@@ -13,7 +13,9 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::withCount('photographers')
+        $categories = Category::withCount(['photographers' => function ($query) {
+                $query->publicVisible();
+            }])
             ->orderBy('photographers_count', 'desc')
             ->get();
 
@@ -43,14 +45,13 @@ class CategoryController extends Controller
     {
         $category = Category::where('slug', $slug)->firstOrFail();
         
-        $photographers = Photographer::with('user')
+        $photographers = Photographer::publicVisible()->with('user')
             ->where(function ($query) use ($category) {
                 $query->whereJsonContains('specializations', $category->name)
                     ->orWhereHas('categories', function ($categoryQuery) use ($category) {
                         $categoryQuery->where('categories.id', $category->id);
                     });
             })
-            ->where('is_verified', true)
             ->paginate(24);
 
         $seoMeta = (object) [

@@ -97,6 +97,21 @@ class Photographer extends Model
     }
 
     /**
+     * Scope: Publicly visible photographers.
+     * A photographer is visible if they are verified OR their user is admin-approved OR email-verified.
+     */
+    public function scopePublicVisible($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('is_verified', true)
+                ->orWhereHas('user', function ($userQuery) {
+                    $userQuery->whereNotNull('email_verified_at')
+                        ->orWhere('approval_status', 'approved');
+                });
+        });
+    }
+
+    /**
      * Social Media Accessors - Extract usernames from URLs
      */
     public function getFacebookUsernameAttribute(): ?string

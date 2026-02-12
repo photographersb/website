@@ -18,10 +18,9 @@ class PhotographerSearchController extends Controller
         $location = Location::where('slug', $locationSlug)->firstOrFail();
         $category = Category::where('slug', $categorySlug)->firstOrFail();
 
-        $photographers = Photographer::with(['user', 'city'])
+        $photographers = Photographer::publicVisible()->with(['user', 'city'])
             ->where('city_id', $location->id)
             ->whereJsonContains('specializations', $category->name)
-            ->where('is_verified', true)
             ->orderByRaw('is_featured DESC, average_rating DESC')
             ->paginate(24);
 
@@ -63,9 +62,8 @@ class PhotographerSearchController extends Controller
     {
         $location = Location::where('slug', $slug)->firstOrFail();
 
-        $photographers = Photographer::with(['user', 'city'])
+        $photographers = Photographer::publicVisible()->with(['user', 'city'])
             ->where('city_id', $location->id)
-            ->where('is_verified', true)
             ->orderByRaw('is_featured DESC, average_rating DESC')
             ->paginate(24);
 
@@ -104,9 +102,8 @@ class PhotographerSearchController extends Controller
     {
         $category = Category::where('slug', $slug)->firstOrFail();
 
-        $photographers = Photographer::with(['user', 'city'])
+        $photographers = Photographer::publicVisible()->with(['user', 'city'])
             ->whereJsonContains('specializations', $category->name)
-            ->where('is_verified', true)
             ->orderByRaw('is_featured DESC, average_rating DESC')
             ->paginate(24);
 

@@ -13,17 +13,16 @@ class CityLandingController extends Controller
     {
         $city = Location::where('slug', $citySlug)->firstOrFail();
         
-        $photographers = Photographer::with(['user', 'categories'])
+        $photographers = Photographer::publicVisible()->with(['user', 'categories'])
             ->where('city_id', $city->id)
-            ->where('is_verified', true)
             ->orderBy('average_rating', 'desc')
             ->paginate(12);
 
         $stats = [
-            'total_photographers' => Photographer::where('city_id', $city->id)->where('is_verified', true)->count(),
+            'total_photographers' => Photographer::publicVisible()->where('city_id', $city->id)->count(),
             'avg_price' => Photographer::where('city_id', $city->id)->avg('starting_price'),
             'categories' => Category::withCount(['photographers' => function($q) use ($city) {
-                $q->where('city_id', $city->id)->where('is_verified', true);
+                $q->publicVisible()->where('city_id', $city->id);
             }])->having('photographers_count', '>', 0)->get(),
         ];
 
@@ -46,22 +45,21 @@ class CityLandingController extends Controller
     {
         $category = Category::where('slug', $categorySlug)->firstOrFail();
         
-        $photographers = Photographer::with(['user', 'categories', 'city'])
+        $photographers = Photographer::publicVisible()->with(['user', 'categories', 'city'])
             ->whereHas('categories', function($q) use ($category) {
                 $q->where('categories.id', $category->id);
             })
-            ->where('is_verified', true)
             ->orderBy('average_rating', 'desc')
             ->paginate(12);
 
         $stats = [
-            'total_photographers' => Photographer::whereHas('categories', function($q) use ($category) {
+            'total_photographers' => Photographer::publicVisible()->whereHas('categories', function($q) use ($category) {
                 $q->where('categories.id', $category->id);
-            })->where('is_verified', true)->count(),
+            })->count(),
             'cities' => Location::withCount(['photographers' => function($q) use ($category) {
                 $q->whereHas('categories', function($q2) use ($category) {
                     $q2->where('categories.id', $category->id);
-                })->where('is_verified', true);
+                })->publicVisible();
             }])->having('photographers_count', '>', 0)->get(),
         ];
 
@@ -85,24 +83,22 @@ class CityLandingController extends Controller
         $city = Location::where('slug', $citySlug)->firstOrFail();
         $category = Category::where('slug', $categorySlug)->firstOrFail();
         
-        $photographers = Photographer::with(['user', 'categories'])
+        $photographers = Photographer::publicVisible()->with(['user', 'categories'])
             ->where('city_id', $city->id)
             ->whereHas('categories', function($q) use ($category) {
                 $q->where('categories.id', $category->id);
             })
-            ->where('is_verified', true)
             ->orderBy('average_rating', 'desc')
             ->paginate(12);
 
         $stats = [
             'total_photographers' => $photographers->total(),
-            'avg_rating' => Photographer::where('city_id', $city->id)
+            'avg_rating' => Photographer::publicVisible()->where('city_id', $city->id)
                 ->whereHas('categories', function($q) use ($category) {
                     $q->where('categories.id', $category->id);
                 })
-                ->where('is_verified', true)
                 ->avg('average_rating'),
-            'avg_price' => Photographer::where('city_id', $city->id)
+            'avg_price' => Photographer::publicVisible()->where('city_id', $city->id)
                 ->whereHas('categories', function($q) use ($category) {
                     $q->where('categories.id', $category->id);
                 })

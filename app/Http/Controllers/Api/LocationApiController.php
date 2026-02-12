@@ -13,7 +13,7 @@ class LocationApiController extends Controller
         $query = Location::query()
             ->where('is_active', true)
             ->withCount(['photographers' => function ($query) {
-                $query->where('is_verified', true);
+                $query->publicVisible();
             }]);
 
         if ($request->filled('type')) {

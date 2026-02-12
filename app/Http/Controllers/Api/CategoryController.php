@@ -14,10 +14,10 @@ class CategoryController extends Controller
     use ApiResponse;
     public function index(): JsonResponse
     {
-        $categories = Cache::remember('categories_public_list', 3600, function () {
+        $categories = Cache::remember('categories_public_list_public_visible_v1', 3600, function () {
             return Category::where('is_active', true)
                 ->withCount(['photographers' => function ($query) {
-                    $query->where('is_verified', true);
+                    $query->publicVisible();
                 }])
                 ->orderByDesc('photographers_count')
                 ->orderBy('display_order')
@@ -64,7 +64,7 @@ class CategoryController extends Controller
         $category = Category::create($validated);
 
         // Clear category caches
-        Cache::forget('categories_public_list');
+        Cache::forget('categories_public_list_public_visible_v1');
         Cache::forget('categories_admin_list');
 
         return $this->created($category, 'Category created successfully');
@@ -94,7 +94,7 @@ class CategoryController extends Controller
         $category->update($validated);
 
         // Clear category caches
-        Cache::forget('categories_public_list');
+        Cache::forget('categories_public_list_public_visible_v1');
         Cache::forget('categories_admin_list');
 
         return $this->success($category->fresh(), 'Category updated successfully');
@@ -112,7 +112,7 @@ class CategoryController extends Controller
         $category->delete();
 
         // Clear category caches
-        Cache::forget('categories_public_list');
+        Cache::forget('categories_public_list_public_visible_v1');
         Cache::forget('categories_admin_list');
 
         return $this->success([], 'Category deleted successfully');

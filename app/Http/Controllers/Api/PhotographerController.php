@@ -33,7 +33,7 @@ class PhotographerController extends Controller
         $perPage = min($request->get('per_page', 15), 100);
         $page = $request->get('page', 1);
 
-        $query = Photographer::where('is_verified', true)
+        $query = Photographer::publicVisible()
             ->with(['user:id,name,username', 'city:id,name,slug', 'trustScore', 'categories:id,name,slug,icon'])
             ->select('photographers.*');
 
@@ -262,7 +262,7 @@ class PhotographerController extends Controller
             return $this->validationError(['q' => 'Search query must be at least 2 characters'], 'Search query must be at least 2 characters');
         }
 
-        $photographers = Photographer::where('is_verified', true)
+        $photographers = Photographer::publicVisible()
             ->with(['city:id,name,slug', 'categories:id,name,slug,icon'])
             ->whereHas('user', function ($q) use ($query) {
                 // Prioritize exact matches, then word boundaries, then contains
