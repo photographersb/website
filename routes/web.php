@@ -71,6 +71,8 @@ Route::get('/sitemap/cities.xml', [\App\Http\Controllers\SitemapController::clas
 Route::get('/sitemap/categories.xml', [\App\Http\Controllers\SitemapController::class, 'categories']);
 
 // Public Photographer Profile Routes (SEO-friendly)
+Route::get('/og/photographer/{username}', [\App\Http\Controllers\PublicPhotographerController::class, 'ogImageByUsername'])
+    ->name('og.photographer');
 Route::get('/@{username}', [\App\Http\Controllers\PublicPhotographerController::class, 'showByUsername'])->name('photographer.profile.public');
 Route::get('/photographer/{id}', [\App\Http\Controllers\PublicPhotographerController::class, 'showById'])
     ->whereNumber('id')

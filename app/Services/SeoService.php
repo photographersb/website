@@ -68,8 +68,13 @@ class SeoService
             }
         }
 
-        // Fallback to site default
-        return asset('images/og-default.jpg');
+        // Fallback to generated OG image when user exists
+        if ($user && $user->username) {
+            return route('og.photographer', ['username' => $user->username]);
+        }
+
+        // Final fallback to site default
+        return asset('images/og-cover.jpg');
     }
 
     /**
