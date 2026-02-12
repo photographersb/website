@@ -141,7 +141,7 @@ class SubmissionShareFrameController extends Controller
         }
 
         if (!$image) {
-            return asset('images/og-image.jpg');
+            return asset('images/PhotographerSB-OG.jpg');
         }
 
         if (str_starts_with($image, 'http')) {

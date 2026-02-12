@@ -46,7 +46,7 @@
     <meta property="og:url" content="https://photographersb.com/">
     <meta property="og:title" content="PhotographerSB | Professional Photographers & Booking Platform in Bangladesh">
     <meta property="og:description" content="Discover and book verified professional photographers across Bangladesh for weddings, events, corporate, commercial, and portrait photography.">
-    <meta property="og:image" content="https://photographersb.com/images/og-cover.jpg">
+    <meta property="og:image" content="https://photographersb.com/images/PhotographerSB-OG.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:site_name" content="PhotographerSB - A Somogro Bangladesh Project">
@@ -57,7 +57,7 @@
     <meta name="twitter:url" content="https://photographersb.com/">
     <meta name="twitter:title" content="PhotographerSB | Book Professional Photographers in Bangladesh">
     <meta name="twitter:description" content="Explore portfolios and hire trusted photographers for weddings, events, corporate, and commercial projects across Bangladesh.">
-    <meta name="twitter:image" content="https://photographersb.com/images/twitter-card.jpg">
+    <meta name="twitter:image" content="https://photographersb.com/images/PhotographerSB-OG.jpg">
     <meta name="twitter:creator" content="@photographersb">
     
     <!-- Canonical URL -->

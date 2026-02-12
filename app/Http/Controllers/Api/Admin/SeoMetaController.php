@@ -484,7 +484,7 @@ class SeoMetaController extends Controller
             $title = trim("{$name} | Photographer SB");
             $description = "Hire {$name}, a photographer in {$city}. View portfolio, packages, and reviews on Photographer SB.";
             $url = $username ? url("/@{$username}") : $baseUrl;
-            $image = $model->profile_photo_url ?: ($photographer?->profile_picture ?: asset('images/og-default.jpg'));
+            $image = $model->profile_photo_url ?: ($photographer?->profile_picture ?: asset('images/PhotographerSB-OG.jpg'));
 
             return [
                 'title' => $title,
@@ -502,7 +502,7 @@ class SeoMetaController extends Controller
             $title = trim("{$name} | Photographer SB");
             $description = "Hire {$name}, a photographer in {$city}. Browse portfolio, packages, and reviews on Photographer SB.";
             $url = $username ? url("/@{$username}") : $baseUrl;
-            $image = $model->profile_picture ?: ($user?->profile_photo_url ?: asset('images/og-default.jpg'));
+            $image = $model->profile_picture ?: ($user?->profile_photo_url ?: asset('images/PhotographerSB-OG.jpg'));
 
             return [
                 'title' => $title,
@@ -516,7 +516,7 @@ class SeoMetaController extends Controller
             $title = trim("{$model->title} | Photography Competition | Photographer SB");
             $description = $model->description ? strip_tags($model->description) : 'Join the competition on Photographer SB.';
             $url = $model->slug ? url("/competitions/{$model->slug}") : $baseUrl;
-            $image = $model->cover_image ?: ($model->banner_image ?: ($model->hero_image ?: asset('images/og-competitions.jpg')));
+            $image = $model->cover_image ?: ($model->banner_image ?: ($model->hero_image ?: asset('images/PhotographerSB-OG.jpg')));
 
             return [
                 'title' => $title,
@@ -530,7 +530,7 @@ class SeoMetaController extends Controller
             $title = trim("{$model->title} | Photography Event | Photographer SB");
             $description = $model->description ? strip_tags($model->description) : 'Discover events on Photographer SB.';
             $url = $model->slug ? url("/events/{$model->slug}") : $baseUrl;
-            $image = $model->hero_image_url ?: ($model->banner_image ?: ($model->og_image ?: asset('images/og-events.jpg')));
+            $image = $model->hero_image_url ?: ($model->banner_image ?: ($model->og_image ?: asset('images/PhotographerSB-OG.jpg')));
 
             return [
                 'title' => $title,
@@ -546,7 +546,7 @@ class SeoMetaController extends Controller
             $title = trim("{$model->name} | Client Gallery | Photographer SB");
             $description = $model->description ?: "Private gallery shared by {$photographerName}.";
             $url = url("/client/galleries/{$model->id}");
-            $image = $model->cover_photo_url ?: ($photographer?->profile_picture ?: asset('images/og-default.jpg'));
+            $image = $model->cover_photo_url ?: ($photographer?->profile_picture ?: asset('images/PhotographerSB-OG.jpg'));
 
             return [
                 'title' => $title,

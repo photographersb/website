@@ -69,7 +69,7 @@ class SeoService
         }
 
         // Fallback to site default
-        return asset('images/og-cover.jpg');
+        return asset('images/PhotographerSB-OG.jpg');
     }
 
     /**
@@ -172,7 +172,7 @@ class SeoService
         $metaDescription = substr(strip_tags($event->description), 0, 155) . "...";
         $eventUrl = url("/events/{$event->slug}");
         
-        $ogImage = $event->banner_url ?? $event->image_url ?? asset('images/og-events.jpg');
+        $ogImage = $event->banner_url ?? $event->image_url ?? asset('images/PhotographerSB-OG.jpg');
         
         $schema = $this->generateEventSchema($event);
 
@@ -243,7 +243,7 @@ class SeoService
         $metaDescription = substr(strip_tags($competition->description), 0, 155) . "...";
         $competitionUrl = url("/competitions/{$competition->slug}");
         
-        $ogImage = $competition->cover_image ?? $competition->banner_url ?? asset('images/og-competitions.jpg');
+        $ogImage = $competition->cover_image ?? $competition->banner_url ?? asset('images/PhotographerSB-OG.jpg');
         
         $schema = $this->generateCompetitionSchema($competition);
 
@@ -305,7 +305,7 @@ class SeoService
             'canonical_url' => url('/'),
             'og_title' => 'Photographer SB - Professional Photography Services Bangladesh',
             'og_description' => 'Connect with verified photographers across Bangladesh. Compare portfolios, read reviews, book instantly.',
-            'og_image' => asset('images/og-home.jpg'),
+            'og_image' => asset('images/PhotographerSB-OG.jpg'),
             'og_url' => url('/'),
             'og_type' => 'website',
             'robots_index' => true,
