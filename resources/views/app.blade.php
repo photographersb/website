@@ -105,7 +105,7 @@
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "PhotographerSB",
-        "alternateName": "Photographers Across Bangladesh - A Somogro Bangladesh Project",
+        "alternateName": "PhotographerSB - A Somogro Bangladesh Project",
         "url": "https://photographersb.com",
         "description": "Bangladesh's premier photography marketplace by Somogro Bangladesh, connecting professional photographers with clients nationwide",
         "creator": {
