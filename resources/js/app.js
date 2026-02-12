@@ -89,10 +89,6 @@ const AdminCertificatesManualIssuance = () => import('./Pages/Admin/Certificates
 const AdminCertificatesTemplates = () => import('./Pages/Admin/Certificates/Templates.vue')
 const AdminShareFrameGenerator = () => import('./Pages/Admin/ShareFrameGenerator.vue')
 const AdminSettingsChangeTracking = () => import('./Pages/Admin/Settings/ChangeTracking.vue')
-const AdminSettingsSiteLinks = () => import('./Pages/Admin/Settings/SiteLinks.vue')
-const AdminSiteLinksIndex = () => import('./Pages/Admin/SiteLinks/Index.vue')
-const AdminSiteLinksCreate = () => import('./Pages/Admin/SiteLinks/Create.vue')
-const AdminSiteLinksEdit = () => import('./Pages/Admin/SiteLinks/Edit.vue')
 const AdminMentorsIndex = () => import('./Pages/Admin/Mentors/Index.vue')
 const AdminMentorsCreate = () => import('./Pages/Admin/Mentors/Create.vue')
 const AdminMentorsEdit = () => import('./Pages/Admin/Mentors/Edit.vue')
@@ -714,28 +710,6 @@ const routes = [
         path: '/admin/settings/changes',
         component: AdminSettingsChangeTracking,
         name: 'admin-settings-changes',
-        meta: { requiresAuth: true, requiresAdmin: true },
-    },
-    {
-        path: '/admin/settings-site-links',
-        redirect: '/admin/settings/site-links',
-    },
-    {
-        path: '/admin/settings/site-links',
-        component: AdminSiteLinksIndex,
-        name: 'admin-settings-site-links',
-        meta: { requiresAuth: true, requiresAdmin: true },
-    },
-    {
-        path: '/admin/settings/site-links/create',
-        component: AdminSiteLinksCreate,
-        name: 'admin-site-links-create',
-        meta: { requiresAuth: true, requiresAdmin: true },
-    },
-    {
-        path: '/admin/settings/site-links/:id/edit',
-        component: AdminSiteLinksEdit,
-        name: 'admin-site-links-edit',
         meta: { requiresAuth: true, requiresAdmin: true },
     },
     {
