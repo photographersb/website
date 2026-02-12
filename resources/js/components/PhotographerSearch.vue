@@ -603,6 +603,29 @@
                   </span>
                 </div>
 
+                <!-- Favorite Button -->
+                <button
+                  v-if="isClient"
+                  class="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-all"
+                  :class="favoriteIdSet.has(photographer.id) ? 'bg-[#7a1f2b] text-white' : 'bg-white text-[#7a1f2b] hover:scale-105'"
+                  aria-label="Toggle favorite"
+                  @click.stop="toggleFavorite(photographer.id)"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    :fill="favoriteIdSet.has(photographer.id) ? 'currentColor' : 'none'"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3.172 5.172a4 4 0 015.656 0L12 8.343l3.172-3.171a4 4 0 115.656 5.656L12 21.343l-8.828-8.829a4 4 0 010-5.656z"
+                    />
+                  </svg>
+                </button>
+
                 <!-- Rating Badge -->
                 <div
                   v-if="isValidRating(photographer.average_rating)"
@@ -1440,8 +1463,11 @@
               :key="photographer.id"
               :photographer="photographer"
               cta-text="View Profile"
+              :show-favorite="isClient"
+              :is-favorite="favoriteIdSet.has(photographer.id)"
               @click="viewPhotographer(photographer)"
               @book="bookPhotographer(photographer)"
+              @toggle-favorite="toggleFavorite"
             />
           </div>
 
@@ -1544,6 +1570,15 @@ const platformStats = ref({
   visitors: '...',
   rating: '...'
 });
+const favoriteIds = ref([]);
+
+const normalizeRole = (role) => String(role || '').toLowerCase().replace(/[\s-]+/g, '_');
+const storedUserRole = computed(() => {
+  const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+  return normalizeRole(localStorage.getItem('user_role') || storedUser.role);
+});
+const isClient = computed(() => storedUserRole.value === 'client');
+const favoriteIdSet = computed(() => new Set(favoriteIds.value));
 
 const filters = ref({
   category: '',
@@ -1689,6 +1724,37 @@ const fetchPhotographers = async () => {
     photographers.value = [];
   } finally {
     loading.value = false;
+  }
+};
+
+const loadFavorites = async () => {
+  if (!isClient.value) return;
+  try {
+    const response = await api.get('/client/favorites');
+    const items = response.data.data || [];
+    favoriteIds.value = items.map((favorite) => favorite.photographer_id);
+  } catch (error) {
+    if (import.meta.env.DEV) console.error('Error fetching favorites:', error);
+  }
+};
+
+const toggleFavorite = async (photographerId) => {
+  if (!isClient.value) {
+    router.push('/auth');
+    return;
+  }
+
+  const isFavorite = favoriteIdSet.value.has(photographerId);
+  try {
+    if (isFavorite) {
+      await api.delete(`/client/favorites/${photographerId}`);
+      favoriteIds.value = favoriteIds.value.filter((id) => id !== photographerId);
+    } else {
+      await api.post(`/client/favorites/${photographerId}`);
+      favoriteIds.value = [...favoriteIds.value, photographerId];
+    }
+  } catch (error) {
+    if (import.meta.env.DEV) console.error('Error toggling favorite:', error);
   }
 };
 
@@ -1897,7 +1963,8 @@ onMounted(async () => {
   await Promise.all([
     fetchPlatformStats(),
     fetchCategories(),
-    fetchCities()
+    fetchCities(),
+    loadFavorites()
   ]);
   
   // Load main photographer list

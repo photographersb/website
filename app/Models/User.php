@@ -138,6 +138,12 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(BookingMessage::class, 'sender_id');
     }
 
+    public function favoritePhotographers()
+    {
+        return $this->belongsToMany(Photographer::class, 'photographer_favorites')
+            ->withTimestamps();
+    }
+
     public function verifications()
     {
         return $this->hasMany(UserVerification::class);

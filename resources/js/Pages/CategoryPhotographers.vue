@@ -410,6 +410,27 @@
                     />
                   </svg>
                 </div>
+                <button
+                  v-if="isClient"
+                  class="absolute top-2 sm:top-3 left-2 sm:left-3 w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-all"
+                  :class="favoriteIdSet.has(photographer.id) ? 'bg-[#7a1f2b] text-white' : 'bg-white text-[#7a1f2b] hover:scale-105'"
+                  aria-label="Toggle favorite"
+                  @click.stop.prevent="toggleFavorite(photographer.id)"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    :fill="favoriteIdSet.has(photographer.id) ? 'currentColor' : 'none'"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3.172 5.172a4 4 0 015.656 0L12 8.343l3.172-3.171a4 4 0 115.656 5.656L12 21.343l-8.828-8.829a4 4 0 010-5.656z"
+                    />
+                  </svg>
+                </button>
               </div>
 
               <!-- Info -->
@@ -485,6 +506,27 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
+                <button
+                  v-if="isClient"
+                  class="absolute top-2 left-2 w-8 h-8 rounded-full flex items-center justify-center shadow-lg transition-all"
+                  :class="favoriteIdSet.has(photographer.id) ? 'bg-[#7a1f2b] text-white' : 'bg-white text-[#7a1f2b] hover:scale-105'"
+                  aria-label="Toggle favorite"
+                  @click.stop.prevent="toggleFavorite(photographer.id)"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    :fill="favoriteIdSet.has(photographer.id) ? 'currentColor' : 'none'"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3.172 5.172a4 4 0 015.656 0L12 8.343l3.172-3.171a4 4 0 115.656 5.656L12 21.343l-8.828-8.829a4 4 0 010-5.656z"
+                    />
+                  </svg>
+                </button>
                 <div
                   v-if="photographer.verified"
                   class="absolute top-1 sm:top-1 right-1 sm:right-1 bg-green-500 rounded-full p-1 shadow-lg"
@@ -726,11 +768,20 @@ const viewMode = ref('grid')
 const displayLimit = ref(12)
 const itemsPerPage = 12
 const isFilterOpen = ref(false)
+const favoriteIds = ref([])
 
 const route = useRoute()
 const router = useRouter()
 const { log } = useDevLogger()
 const { toastMessage, toastType, toastVisible, handleApiError, closeToast } = useApiError()
+
+const normalizeRole = (role) => String(role || '').toLowerCase().replace(/[\s-]+/g, '_')
+const storedUserRole = computed(() => {
+  const storedUser = JSON.parse(localStorage.getItem('user') || '{}')
+  return normalizeRole(localStorage.getItem('user_role') || storedUser.role)
+})
+const isClient = computed(() => storedUserRole.value === 'client')
+const favoriteIdSet = computed(() => new Set(favoriteIds.value))
 
 const priceRanges = [
   { label: '৳0 - ৳1,000', min: 0, max: 1000 },
@@ -885,6 +936,37 @@ const fetchPhotographers = async () => {
   }
 }
 
+const loadFavorites = async () => {
+  if (!isClient.value) return
+  try {
+    const response = await api.get('/client/favorites')
+    const items = response.data.data || []
+    favoriteIds.value = items.map((favorite) => favorite.photographer_id)
+  } catch (error) {
+    console.error('Failed to load favorites:', error)
+  }
+}
+
+const toggleFavorite = async (photographerId) => {
+  if (!isClient.value) {
+    router.push('/auth')
+    return
+  }
+
+  const isFavorite = favoriteIdSet.value.has(photographerId)
+  try {
+    if (isFavorite) {
+      await api.delete(`/client/favorites/${photographerId}`)
+      favoriteIds.value = favoriteIds.value.filter((id) => id !== photographerId)
+    } else {
+      await api.post(`/client/favorites/${photographerId}`)
+      favoriteIds.value = [...favoriteIds.value, photographerId]
+    }
+  } catch (error) {
+    console.error('Failed to toggle favorite:', error)
+  }
+}
+
 // Watch for category changes
 watch(selectedCategory, (newCategory) => {
   if (newCategory) {
@@ -899,6 +981,7 @@ watch(selectedCategory, (newCategory) => {
 
 onMounted(async () => {
   await loadCategories()
+  await loadFavorites()
   const initialCategory = route.query.category
   if (typeof initialCategory === 'string') {
     selectedCategory.value = initialCategory

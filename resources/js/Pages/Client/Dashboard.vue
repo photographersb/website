@@ -33,13 +33,34 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <router-link
           to="/client/galleries"
           class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow"
         >
           <p class="text-sm font-semibold text-gray-900">Photo Galleries</p>
           <p class="text-sm text-gray-600 mt-1">Access delivered albums from your bookings.</p>
+        </router-link>
+        <router-link
+          to="/client/favorites"
+          class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow"
+        >
+          <p class="text-sm font-semibold text-gray-900">Favorite Photographers</p>
+          <p class="text-sm text-gray-600 mt-1">Keep a shortlist for future shoots.</p>
+        </router-link>
+        <router-link
+          to="/client/payments"
+          class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow"
+        >
+          <p class="text-sm font-semibold text-gray-900">Payments</p>
+          <p class="text-sm text-gray-600 mt-1">Review your transaction history.</p>
+        </router-link>
+        <router-link
+          to="/client/notifications"
+          class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow"
+        >
+          <p class="text-sm font-semibold text-gray-900">Notifications</p>
+          <p class="text-sm text-gray-600 mt-1">Stay updated on bookings and updates.</p>
         </router-link>
         <router-link
           to="/"
@@ -54,13 +75,6 @@
         >
           <p class="text-sm font-semibold text-gray-900">Competitions</p>
           <p class="text-sm text-gray-600 mt-1">Vote and follow your favorite entries.</p>
-        </router-link>
-        <router-link
-          to="/notifications"
-          class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow"
-        >
-          <p class="text-sm font-semibold text-gray-900">Notifications</p>
-          <p class="text-sm text-gray-600 mt-1">Stay updated on bookings and messages.</p>
         </router-link>
       </div>
 

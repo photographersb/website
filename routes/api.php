@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\AlbumController;
 use App\Http\Controllers\Api\PackageController;
 use App\Http\Controllers\Api\PhotoController;
 use App\Http\Controllers\Api\ClientAlbumController;
+use App\Http\Controllers\Api\ClientFavoritesController;
 use App\Http\Controllers\Api\Photographer\PhotographerCompetitionController;
 use App\Http\Controllers\Api\Photographer\PhotographerEventController;
 use App\Http\Controllers\Api\Admin\AdminCompetitionApiController;
@@ -257,6 +258,9 @@ Route::prefix('v1')->group(function () {
         Route::prefix('client')->group(function () {
             Route::get('/albums', [ClientAlbumController::class, 'index']);
             Route::get('/albums/{album}', [ClientAlbumController::class, 'show']);
+            Route::get('/favorites', [ClientFavoritesController::class, 'index']);
+            Route::post('/favorites/{photographer}', [ClientFavoritesController::class, 'store']);
+            Route::delete('/favorites/{photographer}', [ClientFavoritesController::class, 'destroy']);
         });
 
         // Reviews

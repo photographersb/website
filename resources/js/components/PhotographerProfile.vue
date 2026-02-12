@@ -604,7 +604,7 @@
               </div>
 
               <!-- Primary CTA -->
-              <div class="flex justify-center pt-4 border-t border-[#eadfd7]">
+              <div class="flex flex-wrap justify-center gap-3 pt-4 border-t border-[#eadfd7]">
                 <button
                   :disabled="isSelfBooking"
                   :class="[
@@ -619,6 +619,32 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   Request Booking
+                </button>
+                <button
+                  v-if="isClient"
+                  :disabled="favoriteLoading"
+                  :class="[
+                    'px-6 py-3 rounded-full font-semibold text-base transition-all duration-200 flex items-center gap-2.5 shadow-md',
+                    isFavorite
+                      ? 'bg-[#7a1f2b] text-white'
+                      : 'bg-white border border-[#7a1f2b] text-[#7a1f2b] hover:shadow-lg'
+                  ]"
+                  @click="toggleFavorite"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    :fill="isFavorite ? 'currentColor' : 'none'"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3.172 5.172a4 4 0 015.656 0L12 8.343l3.172-3.171a4 4 0 115.656 5.656L12 21.343l-8.828-8.829a4 4 0 010-5.656z"
+                    />
+                  </svg>
+                  {{ isFavorite ? 'Saved' : 'Save' }}
                 </button>
               </div>
             </div>
@@ -1197,6 +1223,15 @@ const activeTab = ref('portfolio');
 const loading = ref(true);
 const selectedPhoto = ref(null);
 const currentUser = ref(null);
+const favoriteLoading = ref(false);
+const isFavorite = ref(false);
+
+const normalizeRole = (role) => String(role || '').toLowerCase().replace(/[\s-]+/g, '_');
+const storedUserRole = computed(() => {
+  const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+  return normalizeRole(localStorage.getItem('user_role') || storedUser.role);
+});
+const isClient = computed(() => storedUserRole.value === 'client');
 
 const shortBio = computed(() => {
   // Use custom short_bio if set, otherwise auto-truncate from bio
@@ -1255,11 +1290,46 @@ const fetchPhotographer = async () => {
       reviews.value = data.data.reviews || [];
       awards.value = data.data.awards || [];
       competitionWins.value = data.data.competition_wins || [];
+
+      loadFavoriteStatus();
     }
   } catch (error) {
     console.error('Error fetching photographer:', error);
   } finally {
     loading.value = false;
+  }
+};
+
+const loadFavoriteStatus = async () => {
+  if (!isClient.value || !photographer.value?.id) return;
+  try {
+    const response = await api.get('/client/favorites');
+    const items = response.data.data || [];
+    isFavorite.value = items.some((favorite) => favorite.photographer_id === photographer.value.id);
+  } catch (error) {
+    console.error('Failed to load favorite status:', error);
+  }
+};
+
+const toggleFavorite = async () => {
+  if (!isClient.value || !photographer.value?.id) {
+    router.push('/auth');
+    return;
+  }
+
+  favoriteLoading.value = true;
+  try {
+    if (isFavorite.value) {
+      await api.delete(`/client/favorites/${photographer.value.id}`);
+      isFavorite.value = false;
+    } else {
+      await api.post(`/client/favorites/${photographer.value.id}`);
+      isFavorite.value = true;
+    }
+  } catch (error) {
+    console.error('Failed to toggle favorite:', error);
+  } finally {
+    favoriteLoading.value = false;
   }
 };
 

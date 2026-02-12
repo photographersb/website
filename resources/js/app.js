@@ -121,6 +121,9 @@ const Bookings = () => import('./Pages/Bookings.vue')
 const ClientDashboard = () => import('./Pages/Client/Dashboard.vue')
 const ClientGalleries = () => import('./Pages/Client/Galleries.vue')
 const ClientGalleryShow = () => import('./Pages/Client/GalleryShow.vue')
+const ClientFavorites = () => import('./Pages/Client/Favorites.vue')
+const ClientPayments = () => import('./Pages/Client/Payments.vue')
+const ClientNotifications = () => import('./Pages/Client/Notifications.vue')
 const ForgotPassword = () => import('./Pages/ForgotPassword.vue')
 const BookingMessages = () => import('./Pages/BookingMessages.vue')
 const VerificationCenter = () => import('./Pages/VerificationCenter.vue')
@@ -366,6 +369,24 @@ const routes = [
         path: '/client/galleries/:albumId',
         component: ClientGalleryShow,
         name: 'client-gallery-show',
+        meta: { requiresAuth: true, requiresClient: true },
+    },
+    {
+        path: '/client/favorites',
+        component: ClientFavorites,
+        name: 'client-favorites',
+        meta: { requiresAuth: true, requiresClient: true },
+    },
+    {
+        path: '/client/payments',
+        component: ClientPayments,
+        name: 'client-payments',
+        meta: { requiresAuth: true, requiresClient: true },
+    },
+    {
+        path: '/client/notifications',
+        component: ClientNotifications,
+        name: 'client-notifications',
         meta: { requiresAuth: true, requiresClient: true },
     },
     {
