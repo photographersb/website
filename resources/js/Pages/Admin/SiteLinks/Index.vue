@@ -106,7 +106,7 @@
           Total Links
         </div>
         <div class="text-2xl font-bold text-gray-900">
-          {{ links.total }}
+          {{ links?.total || 0 }}
         </div>
       </div>
       <div class="bg-green-50 p-4 rounded-lg shadow">
@@ -165,8 +165,19 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-if="!links?.data?.length" class="hover:bg-gray-50">
+              <td colspan="7" class="px-4 py-8 text-center text-gray-500">
+                <div class="flex flex-col items-center gap-3">
+                  <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <p class="text-lg font-medium">No links found</p>
+                  <a href="/admin/settings/site-links/create" class="text-burgundy hover:underline">Create your first link</a>
+                </div>
+              </td>
+            </tr>
             <tr
-              v-for="link in links.data"
+              v-for="link in links?.data || []"
               :key="link.id"
               class="hover:bg-gray-50"
             >
@@ -276,19 +287,19 @@
 
       <!-- Pagination -->
       <div
-        v-if="links.last_page > 1"
+        v-if="links?.last_page > 1"
         class="bg-gray-50 px-4 py-3 border-t border-gray-200"
       >
         <div class="flex justify-between items-center">
           <div class="text-sm text-gray-700">
-            Showing {{ links.from }} to {{ links.to }} of {{ links.total }} links
+            Showing {{ links?.from || 0 }} to {{ links?.to || 0 }} of {{ links?.total || 0 }} links
           </div>
           <div class="flex gap-2">
             <button
-              v-for="page in links.last_page"
+              v-for="page in links?.last_page || 1"
               :key="page"
               class="px-3 py-1 rounded transition-colors"
-              :class="page === links.current_page 
+              :class="page === (links?.current_page || 1) 
                 ? 'bg-burgundy text-white' 
                 : 'bg-white text-gray-700 hover:bg-gray-100'"
               @click="goToPage(page)"
@@ -311,19 +322,30 @@ import AdminQuickNav from '../../../components/AdminQuickNav.vue'
 import api from '../../../api'
 
 const props = defineProps({
-  links: Object,
-  sections: Object,
-  visibilityOptions: Object,
+  links: {
+    type: Object,
+    default: () => ({ data: [], total: 0, current_page: 1, last_page: 1, from: 0, to: 0 })
+  },
+  sections: {
+    type: Object,
+    default: () => ({})
+  },
+  visibilityOptions: {
+    type: Object,
+    default: () => ({})
+  },
   currentSection: String,
 })
 
 const selectedSection = ref(props.currentSection || '')
 
 const activeCount = computed(() => {
+  if (!props.links || !props.links.data || !Array.isArray(props.links.data)) return 0
   return props.links.data.filter(link => link.is_active).length
 })
 
 const inactiveCount = computed(() => {
+  if (!props.links || !props.links.data || !Array.isArray(props.links.data)) return 0
   return props.links.data.filter(link => !link.is_active).length
 })
 
