@@ -23,7 +23,7 @@
             <meta property="og:url" content="{{ $seoMeta->canonical_url }}">
             <meta property="og:image" content="{{ $seoMeta->og_image ?: 'https://photographersb.com/images/og-cover.jpg' }}">
             <meta property="og:image:alt" content="{{ $seoMeta->meta_title }}">
-            <meta property="og:site_name" content="Photographer SB">
+            <meta property="og:site_name" content="PhotographerSB">
             
             <!-- Twitter Card Tags -->
             <meta name="twitter:card" content="summary_large_image">
@@ -44,7 +44,7 @@
             @endif
         @else
             <!-- Title -->
-            <title>PhotographersB | Professional Photographers & Booking Platform in Bangladesh</title>
+            <title>PhotographerSB | Professional Photographers & Booking Platform in Bangladesh</title>
             
             <!-- Meta Description -->
             <meta name="description" content="Discover and book verified professional photographers across Bangladesh for weddings, events, corporate, commercial, and portrait photography.">
@@ -54,17 +54,17 @@
             
             <!-- OpenGraph Tags -->
             <meta property="og:type" content="website">
-            <meta property="og:title" content="PhotographersB | Professional Photographers & Booking Platform in Bangladesh">
+            <meta property="og:title" content="PhotographerSB | Professional Photographers & Booking Platform in Bangladesh">
             <meta property="og:description" content="Discover and book verified professional photographers across Bangladesh for weddings, events, corporate, commercial, and portrait photography.">
             <meta property="og:url" content="https://photographersb.com/">
             <meta property="og:image" content="https://photographersb.com/images/og-cover.jpg">
-            <meta property="og:image:alt" content="PhotographersB">
-            <meta property="og:site_name" content="Photographer SB">
+            <meta property="og:image:alt" content="PhotographerSB">
+            <meta property="og:site_name" content="PhotographerSB">
             
             <!-- Twitter Card Tags -->
             <meta name="twitter:card" content="summary_large_image">
             <meta name="twitter:url" content="https://photographersb.com/">
-            <meta name="twitter:title" content="PhotographersB | Book Professional Photographers in Bangladesh">
+            <meta name="twitter:title" content="PhotographerSB | Book Professional Photographers in Bangladesh">
             <meta name="twitter:description" content="Explore portfolios and hire trusted photographers for weddings, events, corporate, and commercial projects across Bangladesh.">
             <meta name="twitter:image" content="https://photographersb.com/images/twitter-card.jpg">
             <meta name="twitter:creator" content="@photographersb">
@@ -72,7 +72,7 @@
     @show
     
     <!-- Primary Meta Tags (defaults) -->
-    <meta name="title" content="Photographer SB - Find Professional Photographers in Bangladesh">
+    <meta name="title" content="PhotographerSB - Find Professional Photographers in Bangladesh">
     <meta name="keywords" content="photographers in bangladesh, wedding photographer, professional photography, event photography">
     <meta name="author" content="Somogro Bangladesh">
     <meta name="robots" content="index, follow">
