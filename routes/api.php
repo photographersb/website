@@ -746,7 +746,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/seo', [\App\Http\Controllers\Api\Admin\SeoMetaController::class, 'show']);
             Route::post('/seo', [\App\Http\Controllers\Api\Admin\SeoMetaController::class, 'store']);
             Route::post('/seo/generate', [\App\Http\Controllers\Api\Admin\SeoMetaController::class, 'generate']);
+            Route::post('/seo/bulk-generate', [\App\Http\Controllers\Api\Admin\SeoMetaController::class, 'bulkGenerate']);
             Route::post('/seo/preview', [\App\Http\Controllers\Api\Admin\SeoMetaController::class, 'preview']);
+            Route::post('/seo/scan', [\App\Http\Controllers\Api\Admin\SeoMetaController::class, 'scan']);
             Route::delete('/seo', [\App\Http\Controllers\Api\Admin\SeoMetaController::class, 'destroy']);
             
             // City Management
@@ -810,6 +812,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/settings/bulk', [AdminSettingsController::class, 'bulkUpdate']);
             Route::get('/settings/category/{category}', [AdminSettingsController::class, 'getCategory']);
             Route::post('/settings/reset', [AdminSettingsController::class, 'reset']);
+            Route::post('/settings/seo/og-image', [AdminSettingsController::class, 'uploadSeoOgImage']);
             
             // Error Center - System Error Tracking & Management
             Route::prefix('error-logs')->group(function () {

@@ -25,7 +25,7 @@
           </div>
 
           <!-- Filters -->
-          <div class="mt-4 flex gap-3">
+          <div class="flex flex-wrap gap-3">
             <button
               :class="[
                 'px-4 py-2 rounded-lg transition-colors text-sm font-medium',
@@ -33,7 +33,7 @@
                   ? 'btn-primary'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               ]"
-              @click="filter = 'all'"
+              @click="setFilter('all')"
             >
               All
             </button>
@@ -44,7 +44,7 @@
                   ? 'btn-primary'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               ]"
-              @click="filter = 'unread'"
+              @click="setFilter('unread')"
             >
               Unread {{ unreadCount > 0 ? `(${unreadCount})` : '' }}
             </button>
@@ -55,10 +55,32 @@
                   ? 'btn-primary'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               ]"
-              @click="filter = 'read'"
+              @click="setFilter('read')"
             >
               Read
             </button>
+            <select
+              v-model="typeFilter"
+              class="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700"
+              @change="loadNotifications"
+            >
+              <option value="">All Types</option>
+              <option value="booking">Booking</option>
+              <option value="payment">Payment</option>
+              <option value="review">Review</option>
+              <option value="competition">Competition</option>
+              <option value="system">System</option>
+            </select>
+            <select
+              v-model="periodFilter"
+              class="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700"
+              @change="loadNotifications"
+            >
+              <option value="all">All Time</option>
+              <option value="today">Today</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+            </select>
           </div>
         </div>
 
@@ -69,7 +91,7 @@
         >
           <div
             class="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"
-            style="border-bottom-color: var(--admin-brand-primary);\"
+            style="border-bottom-color: var(--admin-brand-primary);"
           />
           <p class="text-gray-600 mt-4">
             Loading notifications...
@@ -161,6 +183,22 @@
                     </svg>
                   </router-link>
                 </div>
+
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <button
+                    v-if="!notification.read_at"
+                    class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-100 text-blue-700 hover:bg-blue-200"
+                    @click.stop="markAsRead(notification)"
+                  >
+                    Mark Read
+                  </button>
+                  <button
+                    class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    @click.stop="deleteNotification(notification)"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -206,6 +244,15 @@ const router = useRouter();
 const notifications = ref([]);
 const loading = ref(true);
 const filter = ref('all');
+const typeFilter = ref('');
+const periodFilter = ref('all');
+
+const normalizeRole = (role) => String(role || '').toLowerCase().replace(/[\s-]+/g, '_');
+const storedUserRole = computed(() => {
+  const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+  return normalizeRole(localStorage.getItem('user_role') || storedUser.role);
+});
+const isClient = computed(() => storedUserRole.value === 'client');
 
 onMounted(() => {
   loadNotifications();
@@ -214,13 +261,26 @@ onMounted(() => {
 const loadNotifications = async () => {
   loading.value = true;
   try {
-    const response = await api.get('/notifications');
-    notifications.value = response.data.data || [];
+    const params = {};
+    if (filter.value === 'unread') params.status = 'unread';
+    if (filter.value === 'read') params.status = 'read';
+    if (typeFilter.value) params.type = typeFilter.value;
+    if (periodFilter.value) params.period = periodFilter.value;
+
+    const response = await api.get('/notifications', { params });
+    const data = response.data.data || {};
+    notifications.value = data.notifications || response.data.data || [];
   } catch (error) {
     console.error('Failed to load notifications:', error);
   } finally {
     loading.value = false;
   }
+};
+
+const setFilter = (value) => {
+  if (filter.value === value) return;
+  filter.value = value;
+  loadNotifications();
 };
 
 const filteredNotifications = computed(() => {
@@ -247,6 +307,25 @@ const markAllAsRead = async () => {
   }
 };
 
+const markAsRead = async (notification) => {
+  if (notification.read_at) return;
+  try {
+    await api.post(`/notifications/${notification.id}/read`);
+    notification.read_at = new Date().toISOString();
+  } catch (error) {
+    console.error('Failed to mark as read:', error);
+  }
+};
+
+const deleteNotification = async (notification) => {
+  try {
+    await api.delete(`/notifications/${notification.id}`);
+    notifications.value = notifications.value.filter(n => n.id !== notification.id);
+  } catch (error) {
+    console.error('Failed to delete notification:', error);
+  }
+};
+
 const handleNotificationClick = async (notification) => {
   // Mark as read
   if (!notification.read_at) {
@@ -267,6 +346,31 @@ const handleNotificationClick = async (notification) => {
 
 const getNotificationIcon = (type) => {
   const icons = {
+    booking: {
+      bg: 'bg-blue-100',
+      text: 'text-blue-600',
+      path: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>',
+    },
+    payment: {
+      bg: 'bg-green-100',
+      text: 'text-green-600',
+      path: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+    },
+    review: {
+      bg: 'bg-yellow-100',
+      text: 'text-yellow-600',
+      path: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>',
+    },
+    competition: {
+      bg: 'bg-purple-100',
+      text: 'text-purple-600',
+      path: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>',
+    },
+    system: {
+      bg: 'bg-gray-100',
+      text: 'text-gray-600',
+      path: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+    },
     'App\\Notifications\\BookingCreated': {
       bg: 'bg-blue-100',
       text: 'text-blue-600',
@@ -293,6 +397,11 @@ const getNotificationIcon = (type) => {
 
 const getNotificationTitle = (notification) => {
   const titles = {
+    booking: 'Booking Update',
+    payment: 'Payment Update',
+    review: 'Review Request',
+    competition: 'Competition Update',
+    system: 'System Notification',
     'App\\Notifications\\BookingCreated': 'New Booking Request',
     'App\\Notifications\\BookingStatusUpdated': 'Booking Status Updated',
     'App\\Notifications\\PaymentReceived': 'Payment Received',
@@ -303,6 +412,18 @@ const getNotificationTitle = (notification) => {
 
 const getNotificationMessage = (notification) => {
   const data = notification.data;
+
+  if (notification.type === 'booking') {
+    return data?.message || 'You have a booking update.';
+  } else if (notification.type === 'payment') {
+    return data?.message || 'You have a payment update.';
+  } else if (notification.type === 'review') {
+    return data?.message || 'A review is requested.';
+  } else if (notification.type === 'competition') {
+    return data?.message || 'Competition update available.';
+  } else if (notification.type === 'system') {
+    return data?.message || 'System update available.';
+  }
   
   if (notification.type === 'App\\Notifications\\BookingCreated') {
     return `Booking for ${data.event_date} at ${data.location}`;
@@ -319,12 +440,20 @@ const getNotificationMessage = (notification) => {
 
 const getNotificationAction = (notification) => {
   const data = notification.data;
+
+  if (notification.type === 'booking') {
+    return '/bookings';
+  } else if (notification.type === 'payment') {
+    return isClient.value ? '/client/payments' : '/transactions';
+  } else if (notification.type === 'review') {
+    return data?.photographer_id ? `/review/${data.photographer_id}` : null;
+  }
   
   if (notification.type === 'App\\Notifications\\BookingCreated' || 
       notification.type === 'App\\Notifications\\BookingStatusUpdated') {
     return '/bookings';
   } else if (notification.type === 'App\\Notifications\\PaymentReceived') {
-    return '/transactions';
+    return isClient.value ? '/client/payments' : '/transactions';
   } else if (notification.type === 'App\\Notifications\\ReviewRequest') {
     return `/review/${data.photographer_id}`;
   }

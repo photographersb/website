@@ -82,7 +82,17 @@
                 class="upload-input text-sm"
                 @change="handleOgImageSelect"
               >
-              <p class="upload-hint">Max 5 MB. JPG/PNG. 1200x630 px.</p>
+              <p class="upload-hint">Max 5 MB. JPG/PNG. Min 1200x630 px.</p>
+              <p v-if="ogImageUploading" class="text-xs text-blue-600">Uploading OG image...</p>
+              <p v-if="ogImageError" class="text-xs text-red-600">{{ ogImageError }}</p>
+            </div>
+            <div v-if="ogImageUrl" class="mt-3 flex items-center gap-3">
+              <img
+                :src="ogImageUrl"
+                alt="OG preview"
+                class="h-16 w-28 rounded border border-gray-200 object-cover"
+              >
+              <span class="text-xs text-gray-600">Current OG image</span>
             </div>
           </div>
 
@@ -107,9 +117,17 @@
           <button
             class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             @click="saveSEOSettings"
+            :disabled="savingSettings"
           >
-            Save Settings
+            {{ savingSettings ? 'Saving...' : 'Save Settings' }}
           </button>
+          <p
+            v-if="saveError || lastSavedAt"
+            class="mt-2 text-sm"
+            :class="saveError ? 'text-red-600' : 'text-green-600'"
+          >
+            {{ saveError || `Last saved: ${lastSavedAt}` }}
+          </p>
         </div>
 
         <!-- Structured Data Tab -->
@@ -167,9 +185,17 @@
           <button
             class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             @click="saveSEOSettings"
+            :disabled="savingSettings"
           >
-            Save Settings
+            {{ savingSettings ? 'Saving...' : 'Save Settings' }}
           </button>
+          <p
+            v-if="saveError || lastSavedAt"
+            class="mt-2 text-sm"
+            :class="saveError ? 'text-red-600' : 'text-green-600'"
+          >
+            {{ saveError || `Last saved: ${lastSavedAt}` }}
+          </p>
         </div>
 
         <!-- Sitemap Tab -->
@@ -188,10 +214,13 @@
                     Main Sitemap
                   </p>
                   <p class="text-sm text-gray-600">
-                    http://photographar.local/sitemap.xml
+                    /sitemap.xml
                   </p>
                 </div>
-                <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                <button
+                  class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                  @click="openSitemap('/sitemap.xml')"
+                >
                   View
                 </button>
               </div>
@@ -201,10 +230,13 @@
                     Photographers Index
                   </p>
                   <p class="text-sm text-gray-600">
-                    http://photographar.local/sitemap-photographers.xml
+                    /sitemap/photographers.xml
                   </p>
                 </div>
-                <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                <button
+                  class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                  @click="openSitemap('/sitemap/photographers.xml')"
+                >
                   View
                 </button>
               </div>
@@ -214,10 +246,61 @@
                     Events Index
                   </p>
                   <p class="text-sm text-gray-600">
-                    http://photographar.local/sitemap-events.xml
+                    /sitemap/events.xml
                   </p>
                 </div>
-                <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                <button
+                  class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                  @click="openSitemap('/sitemap/events.xml')"
+                >
+                  View
+                </button>
+              </div>
+              <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                <div>
+                  <p class="font-medium text-gray-900">
+                    Competitions Index
+                  </p>
+                  <p class="text-sm text-gray-600">
+                    /sitemap/competitions.xml
+                  </p>
+                </div>
+                <button
+                  class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                  @click="openSitemap('/sitemap/competitions.xml')"
+                >
+                  View
+                </button>
+              </div>
+              <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                <div>
+                  <p class="font-medium text-gray-900">
+                    Cities Index
+                  </p>
+                  <p class="text-sm text-gray-600">
+                    /sitemap/cities.xml
+                  </p>
+                </div>
+                <button
+                  class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                  @click="openSitemap('/sitemap/cities.xml')"
+                >
+                  View
+                </button>
+              </div>
+              <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                <div>
+                  <p class="font-medium text-gray-900">
+                    Categories Index
+                  </p>
+                  <p class="text-sm text-gray-600">
+                    /sitemap/categories.xml
+                  </p>
+                </div>
+                <button
+                  class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                  @click="openSitemap('/sitemap/categories.xml')"
+                >
                   View
                 </button>
               </div>
@@ -313,6 +396,88 @@
               </div>
             </div>
           </div>
+          <button
+            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            @click="saveSEOSettings"
+            :disabled="savingSettings"
+          >
+            {{ savingSettings ? 'Saving...' : 'Save Redirects' }}
+          </button>
+          <p
+            v-if="saveError || lastSavedAt"
+            class="mt-2 text-sm"
+            :class="saveError ? 'text-red-600' : 'text-green-600'"
+          >
+            {{ saveError || `Last saved: ${lastSavedAt}` }}
+          </p>
+        </div>
+
+        <!-- SEO Scan Tab -->
+        <div
+          v-if="activeTab === 'SEO Scan'"
+          class="bg-white rounded-lg shadow-md p-6 space-y-6"
+        >
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 class="font-semibold text-gray-900">SEO Scan & Generation</h3>
+              <p class="text-sm text-gray-600">Scan for missing metadata and auto-generate SEO meta.</p>
+            </div>
+            <div class="flex gap-2 flex-col sm:flex-row">
+              <button
+                class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-60"
+                :disabled="bulkGenerating"
+                @click="bulkGenerateSEO"
+              >
+                {{ bulkGenerating ? 'Generating...' : 'Bulk Generate' }}
+              </button>
+              <button
+                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-60"
+                :disabled="scanning"
+                @click="runScan"
+              >
+                {{ scanning ? 'Scanning...' : 'Run Scan' }}
+              </button>
+            </div>
+          </div>
+
+          <div v-if="scanResults">
+            <p class="text-xs text-gray-500">
+              Last run: {{ scanResults.generated_at }}
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
+              <div
+                v-for="item in scanResults.items"
+                :key="item.model_type"
+                class="border border-gray-200 rounded-lg p-4 bg-gray-50"
+              >
+                <h4 class="font-semibold text-gray-900 mb-2">{{ item.model_type }}</h4>
+                <div class="text-sm text-gray-700 space-y-1">
+                  <div>Total: {{ item.total }}</div>
+                  <div>Meta: {{ item.meta_records }}</div>
+                  <div>Missing: {{ item.missing_meta }}</div>
+                  <div>No title: {{ item.missing_title }}</div>
+                  <div>No desc: {{ item.missing_description }}</div>
+                  <div>No canonical: {{ item.missing_canonical }}</div>
+                  <div>No OG image: {{ item.missing_og_image }}</div>
+                </div>
+                <div
+                  v-if="item.missing_samples?.length"
+                  class="mt-3 text-xs text-gray-600"
+                >
+                  <p class="font-semibold text-gray-700">Sample missing entries:</p>
+                  <ul class="mt-1 space-y-1">
+                    <li
+                      v-for="sample in item.missing_samples"
+                      :key="sample.model_id"
+                    >
+                      <div class="font-medium text-gray-800">{{ sample.title }}</div>
+                      <div class="truncate">{{ sample.url }}</div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
     </div>
 
@@ -375,19 +540,33 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import AdminHeader from '../../components/AdminHeader.vue'
 import AdminQuickNav from '../../components/AdminQuickNav.vue'
 import Toast from '../../components/ui/Toast.vue'
 import { formatDateTimeUtc } from '../../utils/formatters'
 import { validateUploadFile } from '../../utils/imageValidation'
+import api from '../../api'
 const toast = ref({ show: false, message: '', type: 'success' })
 const ogImageFile = ref(null)
-const ogImageName = computed(() => ogImageFile.value?.name || 'No image selected')
+const ogImageUrl = ref('')
+const ogImageUploading = ref(false)
+const ogImageError = ref('')
+const ogImageName = computed(() => {
+  if (ogImageFile.value?.name) return ogImageFile.value.name
+  if (ogImageUrl.value) {
+    const parts = ogImageUrl.value.split('/')
+    return parts[parts.length - 1] || 'Current OG image'
+  }
+  return 'No image selected'
+})
 const activeTab = ref('General')
 const showAddRedirect = ref(false)
+const savingSettings = ref(false)
+const saveError = ref('')
+const lastSavedAt = ref('')
 
-const tabs = ['General', 'Structured Data', 'Sitemap', 'Robots.txt', 'Redirects']
+const tabs = ['General', 'Structured Data', 'Sitemap', 'Robots.txt', 'Redirects', 'SEO Scan']
 
 const seoSettings = ref({
   metaTitleTemplate: 'Photographar | {title}',
@@ -405,13 +584,14 @@ const availableSchemas = ['Organization', 'LocalBusiness', 'Event', 'Person', 'B
 
 const sitemapLastGenerated = ref('2026-02-04 at 14:32 UTC')
 
+const siteOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://photographersb.com'
 const robotsContent = ref(`User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /api/
 Disallow: /private/
 
-Sitemap: http://photographar.local/sitemap.xml
+Sitemap: ${siteOrigin}/sitemap.xml
 
 User-agent: Googlebot
 Allow: /
@@ -425,6 +605,10 @@ const redirects = ref([
   { id: 3, from: '/events-old', to: '/events', type: '301' }
 ])
 
+const scanResults = ref(null)
+const scanning = ref(false)
+const bulkGenerating = ref(false)
+
 const newRedirect = ref({ from: '', to: '', type: '301' })
 
 const handleOgImageSelect = async (event) => {
@@ -434,26 +618,147 @@ const handleOgImageSelect = async (event) => {
     return
   }
 
+  ogImageError.value = ''
   const validation = await validateUploadFile(file, {
     label: 'OG image',
     maxBytes: 5 * 1024 * 1024,
     allowedTypes: ['image/jpeg', 'image/png'],
-    imageWidth: 1200,
-    imageHeight: 630
+    minImageWidth: 1200,
+    minImageHeight: 630
   })
 
   if (!validation.ok) {
     toast.value = { show: true, message: validation.message, type: 'error' }
+    ogImageError.value = validation.message
     ogImageFile.value = null
     event.target.value = ''
     return
   }
 
   ogImageFile.value = file
+  await uploadOgImage(file)
 }
 
-const saveSEOSettings = () => {
-  toast.value = { show: true, message: 'SEO settings saved successfully!', type: 'success' }
+const uploadOgImage = async (file) => {
+  if (!file) return
+  ogImageUploading.value = true
+  try {
+    const formData = new FormData()
+    formData.append('og_image', file)
+
+    const { data } = await api.post('/admin/settings/seo/og-image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+
+    if (data?.status === 'success') {
+      ogImageUrl.value = data.data?.url || ''
+      toast.value = { show: true, message: 'OG image uploaded successfully!', type: 'success' }
+    } else {
+      ogImageError.value = data?.message || 'Failed to upload OG image.'
+      toast.value = { show: true, message: data?.message || 'Failed to upload OG image.', type: 'error' }
+    }
+  } catch (error) {
+    console.error('Error uploading OG image', error)
+    ogImageError.value = error?.response?.data?.message || 'Failed to upload OG image.'
+    toast.value = { show: true, message: 'Failed to upload OG image.', type: 'error' }
+  } finally {
+    ogImageUploading.value = false
+  }
+}
+
+const parseBooleanSetting = (value, fallback = false) => {
+  if (typeof value === 'boolean') return value
+  if (value === null || value === undefined || value === '') return fallback
+  const normalized = String(value).toLowerCase().trim()
+  if (['1', 'true', 'yes', 'on'].includes(normalized)) return true
+  if (['0', 'false', 'no', 'off'].includes(normalized)) return false
+  return fallback
+}
+
+const parseJsonSetting = (value, fallback) => {
+  if (typeof value === 'object' && value !== null) return value
+  if (!value) return fallback
+  try {
+    return JSON.parse(value)
+  } catch (error) {
+    return fallback
+  }
+}
+
+const loadSEOSettings = async () => {
+  try {
+    const { data } = await api.get('/admin/settings/category/seo')
+    const settings = data?.data || {}
+
+    seoSettings.value = {
+      metaTitleTemplate: settings.meta_title_template || seoSettings.value.metaTitleTemplate,
+      metaDescriptionTemplate: settings.meta_description_template || seoSettings.value.metaDescriptionTemplate,
+      defaultKeywords: settings.default_keywords || seoSettings.value.defaultKeywords,
+      enableSitemap: parseBooleanSetting(settings.enable_sitemap, seoSettings.value.enableSitemap),
+      enableRobots: parseBooleanSetting(settings.enable_robots, seoSettings.value.enableRobots),
+      enabledSchemas: parseJsonSetting(settings.enabled_schemas, seoSettings.value.enabledSchemas),
+      organizationName: settings.organization_name || seoSettings.value.organizationName,
+      organizationPhone: settings.organization_phone || seoSettings.value.organizationPhone,
+      organizationEmail: settings.organization_email || seoSettings.value.organizationEmail
+    }
+
+    if (settings.og_image_url) {
+      ogImageUrl.value = settings.og_image_url
+    }
+
+    const storedRobots = settings.robots_content
+    if (storedRobots) {
+      robotsContent.value = storedRobots
+    }
+
+    const storedRedirects = parseJsonSetting(settings.redirects, null)
+    if (Array.isArray(storedRedirects) && storedRedirects.length > 0) {
+      redirects.value = storedRedirects
+    }
+  } catch (error) {
+    console.error('Error loading SEO settings', error)
+    toast.value = { show: true, message: 'Failed to load SEO settings.', type: 'error' }
+  }
+}
+
+const saveSEOSettings = async () => {
+  savingSettings.value = true
+  saveError.value = ''
+  try {
+    const payload = {
+      settings: {
+        'seo.meta_title_template': seoSettings.value.metaTitleTemplate,
+        'seo.meta_description_template': seoSettings.value.metaDescriptionTemplate,
+        'seo.default_keywords': seoSettings.value.defaultKeywords,
+        'seo.enable_sitemap': seoSettings.value.enableSitemap,
+        'seo.enable_robots': seoSettings.value.enableRobots,
+        'seo.enabled_schemas': seoSettings.value.enabledSchemas,
+        'seo.organization_name': seoSettings.value.organizationName,
+        'seo.organization_phone': seoSettings.value.organizationPhone,
+        'seo.organization_email': seoSettings.value.organizationEmail,
+        'seo.og_image_url': ogImageUrl.value,
+        'seo.robots_content': robotsContent.value,
+        'seo.redirects': redirects.value
+      }
+    }
+
+    const { data } = await api.post('/admin/settings/bulk', payload)
+    if (data?.status === 'success') {
+      lastSavedAt.value = `${formatDateTimeUtc(new Date())} UTC`
+      toast.value = { show: true, message: 'SEO settings saved successfully!', type: 'success' }
+    } else {
+      const message = data?.message || 'Failed to save SEO settings.'
+      saveError.value = message
+      toast.value = { show: true, message, type: 'error' }
+    }
+  } catch (error) {
+    console.error('Error saving SEO settings', error)
+    const message = error?.response?.data?.message || 'Failed to save SEO settings.'
+    saveError.value = message
+    toast.value = { show: true, message, type: 'error' }
+  } finally {
+    savingSettings.value = false
+  }
 }
 
 const generateSitemap = () => {
@@ -465,11 +770,63 @@ const generateSitemap = () => {
 }
 
 const saveRobotsContent = () => {
-  toast.value = { show: true, message: 'Robots.txt updated!', type: 'success' }
+  saveSEOSettings()
 }
 
 const previewRobots = () => {
   toast.value = { show: true, message: 'Opening robots.txt preview...', type: 'info' }
+}
+
+const openSitemap = (path) => {
+  if (typeof window === 'undefined') return
+  const safePath = String(path || '').startsWith('/') ? path : `/${path}`
+  window.open(`${window.location.origin}${safePath}`, '_blank')
+}
+
+const runScan = async () => {
+  scanning.value = true
+  try {
+    const { data } = await api.post('/admin/seo/scan', {
+      model_types: ['Photographer', 'Competition', 'Event', 'Album']
+    })
+    if (data.status === 'success') {
+      scanResults.value = data.data
+      toast.value = { show: true, message: 'SEO scan completed.', type: 'success' }
+    } else {
+      toast.value = { show: true, message: data.message || 'Scan failed.', type: 'error' }
+    }
+  } catch (error) {
+    console.error('Error running SEO scan', error)
+    toast.value = { show: true, message: 'Error running SEO scan.', type: 'error' }
+  } finally {
+    scanning.value = false
+  }
+}
+
+const bulkGenerateSEO = async () => {
+  if (!confirm('Generate SEO metadata for all entities without existing metadata?\n\nThis may take a while.')) return
+  bulkGenerating.value = true
+  try {
+    const { data } = await api.post('/admin/seo/bulk-generate', {
+      model_types: ['Photographer', 'Competition', 'Event', 'Album']
+    })
+    if (data.status === 'success') {
+      toast.value = {
+        show: true,
+        message: `Generated ${data.data.generated_count} SEO records (${data.data.skipped_count} skipped).`,
+        type: 'success'
+      }
+      // Re-run scan to show updated counts
+      setTimeout(() => runScan(), 1000)
+    } else {
+      toast.value = { show: true, message: data.message || 'Generation failed.', type: 'error' }
+    }
+  } catch (error) {
+    console.error('Error bulk generating SEO', error)
+    toast.value = { show: true, message: 'Error during bulk generation.', type: 'error' }
+  } finally {
+    bulkGenerating.value = false
+  }
 }
 
 const addRedirect = () => {
@@ -483,6 +840,7 @@ const addRedirect = () => {
     newRedirect.value = { from: '', to: '', type: '301' }
     showAddRedirect.value = false
     toast.value = { show: true, message: 'Redirect added successfully!', type: 'success' }
+    saveSEOSettings()
   }
 }
 
@@ -491,6 +849,11 @@ const deleteRedirect = (id) => {
   if (index > -1) {
     redirects.value.splice(index, 1)
     toast.value = { show: true, message: 'Redirect deleted!', type: 'success' }
+    saveSEOSettings()
   }
 }
+
+onMounted(() => {
+  loadSEOSettings()
+})
 </script>

@@ -97,6 +97,42 @@ class Photographer extends Model
     }
 
     /**
+     * SEO helpers for auto-generated meta
+     */
+    protected function getSeoTitle(): string
+    {
+        $name = $this->user?->name ?? $this->business_name ?? 'Photographer';
+        $username = $this->user?->username ? "@{$this->user->username}" : null;
+        $suffix = $username ? " ({$username})" : '';
+        return trim("{$name}{$suffix} | Photographer SB");
+    }
+
+    protected function getSeoDescription(): string
+    {
+        $name = $this->user?->name ?? $this->business_name ?? 'Photographer';
+        $city = $this->city?->name ?? 'Bangladesh';
+        $bio = trim(strip_tags($this->short_bio ?? $this->bio ?? ''));
+        $fallback = "Hire {$name}, a photographer in {$city}. View portfolio, packages, and reviews on Photographer SB.";
+        return $bio !== '' ? $bio : $fallback;
+    }
+
+    protected function getSeoCanonicalUrl(string $slug): string
+    {
+        $baseUrl = config('app.url');
+        $username = $this->user?->username;
+        if ($username) {
+            return "{$baseUrl}/@{$username}";
+        }
+
+        return "{$baseUrl}/photographer/{$slug}";
+    }
+
+    protected function getSeoImage(): ?string
+    {
+        return $this->profile_picture ?: $this->user?->profile_photo_url;
+    }
+
+    /**
      * Scope: Publicly visible photographers.
      * A photographer is visible if they are verified OR their user is admin-approved OR email-verified.
      */

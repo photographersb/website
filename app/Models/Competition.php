@@ -120,6 +120,30 @@ class Competition extends Model
         });
     }
 
+    /**
+     * SEO helpers for auto-generated meta
+     */
+    protected function getSeoTitle(): string
+    {
+        return trim("{$this->title} | Photography Competition | Photographer SB");
+    }
+
+    protected function getSeoDescription(): string
+    {
+        $description = trim(strip_tags($this->description ?? ''));
+        return $description !== '' ? $description : 'Join this photography competition on Photographer SB.';
+    }
+
+    protected function getSeoCanonicalUrl(string $slug): string
+    {
+        return url("/competitions/{$slug}");
+    }
+
+    protected function getSeoImage(): ?string
+    {
+        return $this->cover_image ?? $this->banner_image ?? $this->hero_image;
+    }
+
     public function admin(): BelongsTo
     {
         return $this->belongsTo(User::class, 'admin_id');

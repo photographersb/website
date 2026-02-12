@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -194,6 +196,48 @@ class AdminSettingsController extends Controller
             Log::error('Failed to reset settings: ' . $e->getMessage());
             return $this->error('Failed to reset settings', 500);
         }
+    }
+
+    /**
+     * Upload SEO OG image and store settings key
+     */
+    public function uploadSeoOgImage(Request $request)
+    {
+        $request->validate([
+            'og_image' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+        ]);
+
+        if (!$request->hasFile('og_image')) {
+            return $this->error('No file uploaded', 400);
+        }
+
+        $file = $request->file('og_image');
+        $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('seo', $filename, 'public');
+        $url = Storage::url($path);
+
+        try {
+            DB::table('settings')->updateOrInsert(
+                ['key' => 'seo.og_image_url'],
+                [
+                    'value' => $url,
+                    'group' => 'seo',
+                    'data_type' => 'string',
+                    'description' => 'Default OG image for social sharing',
+                    'is_public' => false,
+                    'updated_at' => now()
+                ]
+            );
+            Cache::forget('setting_seo.og_image_url');
+        } catch (\Exception $e) {
+            Log::error('Failed to save SEO OG image setting: ' . $e->getMessage());
+            return $this->error('Failed to store OG image setting', 500);
+        }
+
+        return $this->success([
+            'url' => $url,
+            'path' => $path,
+        ], 'OG image uploaded successfully');
     }
 
     private function normalizeSettingValue($value): ?string

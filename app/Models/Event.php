@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use App\Traits\HasSeoMeta;
 
 class Event extends Model
 {
     use HasFactory;
+    use HasSeoMeta;
 
     protected $fillable = [
         'uuid',
@@ -104,6 +106,30 @@ class Event extends Model
     }
 
     // Relationships
+
+            /**
+             * SEO helpers for auto-generated meta
+             */
+            protected function getSeoTitle(): string
+            {
+                return trim("{$this->title} | Photography Event | Photographer SB");
+            }
+
+            protected function getSeoDescription(): string
+            {
+                $description = trim(strip_tags($this->description ?? ''));
+                return $description !== '' ? $description : 'Discover this photography event on Photographer SB.';
+            }
+
+            protected function getSeoCanonicalUrl(string $slug): string
+            {
+                return url("/events/{$slug}");
+            }
+
+            protected function getSeoImage(): ?string
+            {
+                return $this->banner_image ?? $this->cover_image ?? $this->featured_image;
+            }
     public function organizer()
     {
         return $this->belongsTo(Photographer::class, 'organizer_id');

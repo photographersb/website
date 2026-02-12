@@ -27,7 +27,7 @@
               <option value="">
                 Select entity type...
               </option>
-              <option value="User">
+              <option value="Photographer">
                 Photographer
               </option>
               <option value="Competition">
@@ -84,6 +84,13 @@
           </button>
           <button
             class="btn-secondary"
+            :disabled="scanning"
+            @click="runScan"
+          >
+            {{ scanning ? 'Scanning...' : 'Run Scan' }}
+          </button>
+          <button
+            class="btn-secondary"
             @click="resetForm"
           >
             Reset
@@ -101,6 +108,15 @@
           class="preview-card"
         >
           <h4>Preview</h4>
+          <div
+            v-if="preview.og_image"
+            class="preview-image"
+          >
+            <img
+              :src="preview.og_image"
+              alt="Preview image"
+            >
+          </div>
           <p class="preview-title">
             {{ preview.title }}
           </p>
@@ -109,6 +125,12 @@
           </p>
           <p class="preview-desc">
             {{ preview.description }}
+          </p>
+          <p
+            v-if="preview.note"
+            class="preview-note"
+          >
+            {{ preview.note }}
           </p>
         </div>
 
@@ -406,7 +428,7 @@
                 v-for="meta in filteredMeta"
                 :key="meta.id"
               >
-                <td>{{ meta.model_type }}</td>
+                <td>{{ formatModelType(meta.model_type) }}</td>
                 <td>{{ meta.model_id }}</td>
                 <td>{{ meta.meta_title || '(No title)' }}</td>
                 <td>
@@ -441,6 +463,55 @@
           <p class="empty-desc">
             Create SEO metadata using the form above
           </p>
+        </div>
+      </div>
+
+      <div
+        v-if="scanResults"
+        class="content-card"
+      >
+        <h3 class="section-title">
+          🧭 SEO Scan Results
+        </h3>
+        <p class="section-desc">
+          Last run: {{ scanResults.generated_at }}
+        </p>
+        <div class="scan-grid">
+          <div
+            v-for="item in scanResults.items"
+            :key="item.model_type"
+            class="scan-card"
+          >
+            <h4 class="scan-title">
+              {{ formatModelType(item.model_type) }}
+            </h4>
+            <div class="scan-stats">
+              <span>Total: {{ item.total }}</span>
+              <span>Meta: {{ item.meta_records }}</span>
+              <span>Missing: {{ item.missing_meta }}</span>
+            </div>
+            <div class="scan-stats">
+              <span>No title: {{ item.missing_title }}</span>
+              <span>No desc: {{ item.missing_description }}</span>
+              <span>No canonical: {{ item.missing_canonical }}</span>
+              <span>No OG image: {{ item.missing_og_image }}</span>
+            </div>
+            <div
+              v-if="item.missing_samples?.length"
+              class="scan-samples"
+            >
+              <p class="scan-samples-title">Sample missing entries:</p>
+              <ul>
+                <li
+                  v-for="sample in item.missing_samples"
+                  :key="sample.model_id"
+                >
+                  <span class="sample-title">{{ sample.title }}</span>
+                  <span class="sample-url">{{ sample.url }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -482,6 +553,8 @@ const loadingEntities = ref(false)
 const allMeta = ref([])
 const loadingAll = ref(false)
 const metaSearch = ref('')
+const scanResults = ref(null)
+const scanning = ref(false)
 const uploadingImages = ref({
   og_image: false,
   twitter_image: false,
@@ -673,7 +746,7 @@ const loadEntities = async () => {
   modelId.value = null
   try {
     let endpoint = ''
-    if (modelType.value === 'User') endpoint = '/admin/photographers'
+    if (modelType.value === 'Photographer') endpoint = '/admin/photographers'
     else if (modelType.value === 'Competition') endpoint = '/admin/competitions'
     else if (modelType.value === 'Event') endpoint = '/admin/events'
     else if (modelType.value === 'Album') endpoint = '/albums'
@@ -722,10 +795,25 @@ const loadAllMeta = async () => {
 }
 
 const loadMetaRecord = (meta) => {
-  modelType.value = meta.model_type
+  modelType.value = normalizeModelType(meta.model_type)
   modelId.value = meta.model_id
   Object.assign(form.value, meta)
   window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+const normalizeModelType = (value) => {
+  if (!value) return ''
+  if (String(value).includes('Photographer') || value === 'User') return 'Photographer'
+  if (String(value).includes('Competition')) return 'Competition'
+  if (String(value).includes('Event')) return 'Event'
+  if (String(value).includes('Album')) return 'Album'
+  return value
+}
+
+const formatModelType = (value) => {
+  if (!value) return 'Unknown'
+  const normalized = normalizeModelType(value)
+  return String(normalized).replace('App\\Models\\', '')
 }
 
 const formatDate = (value) => {
@@ -787,6 +875,25 @@ const previewMeta = async () => {
   }
 }
 
+const runScan = async () => {
+  scanning.value = true
+  try {
+    const { data } = await api.post('/admin/seo/scan', {
+      model_types: ['Photographer', 'Competition', 'Event', 'Album']
+    })
+    if (data.status === 'success') {
+      scanResults.value = data.data
+    } else {
+      showToastMessage(data.message || 'Scan failed')
+    }
+  } catch (error) {
+    console.error('Error running SEO scan', error)
+    showToastMessage('Error running SEO scan')
+  } finally {
+    scanning.value = false
+  }
+}
+
 const saveMeta = async () => {
   if (!modelType.value || !modelId.value) return showToastMessage('Model type and ID required')
   saving.value = true
@@ -843,9 +950,12 @@ onMounted(() => {
 .btn-danger:hover { background: var(--admin-danger); color: white; }
 .btn-save { padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; background: var(--admin-brand-primary); color: white; }
 .preview-card { border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1rem; margin-bottom: 1rem; background: #f9fafb; }
+.preview-image { width: 100%; max-width: 520px; margin-bottom: 0.75rem; border-radius: 0.75rem; overflow: hidden; border: 1px solid #e5e7eb; background: #fff; }
+.preview-image img { display: block; width: 100%; height: auto; }
 .preview-title { font-weight: 700; }
 .preview-url { color: var(--admin-brand-primary); }
 .preview-desc { color: #4b5563; }
+.preview-note { color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem; }
 .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--admin-success-dark); color: white; padding: 0.75rem 1rem; border-radius: 0.5rem; z-index: 1001; }
 .section-title { font-size: 1.125rem; font-weight: 700; margin-bottom: 0.5rem; }
 .section-desc { color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem; }
@@ -867,5 +977,15 @@ onMounted(() => {
 .empty-desc { color: #6b7280; font-size: 0.875rem; }
 .loading-state { display: flex; flex-direction: column; align-items: center; padding: 2rem 0; }
 .spinner { width: 2rem; height: 2rem; border: 3px solid #e5e7eb; border-top: 3px solid var(--admin-brand-primary); border-radius: 50%; animation: spin 1s linear infinite; }
+.scan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+.scan-card { border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1rem; background: #fff; }
+.scan-title { font-weight: 700; margin-bottom: 0.5rem; }
+.scan-stats { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; font-size: 0.85rem; color: #374151; margin-bottom: 0.5rem; }
+.scan-samples { border-top: 1px dashed #e5e7eb; padding-top: 0.5rem; margin-top: 0.5rem; }
+.scan-samples-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; }
+.scan-samples ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.35rem; }
+.scan-samples li { display: flex; flex-direction: column; gap: 0.1rem; }
+.sample-title { font-weight: 600; font-size: 0.85rem; }
+.sample-url { font-size: 0.75rem; color: #6b7280; word-break: break-all; }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>

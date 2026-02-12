@@ -124,6 +124,7 @@ const ClientGalleryShow = () => import('./Pages/Client/GalleryShow.vue')
 const ClientFavorites = () => import('./Pages/Client/Favorites.vue')
 const ClientPayments = () => import('./Pages/Client/Payments.vue')
 const ClientNotifications = () => import('./Pages/Client/Notifications.vue')
+const ClientPaymentDetail = () => import('./Pages/Client/PaymentDetail.vue')
 const ForgotPassword = () => import('./Pages/ForgotPassword.vue')
 const BookingMessages = () => import('./Pages/BookingMessages.vue')
 const VerificationCenter = () => import('./Pages/VerificationCenter.vue')
@@ -382,6 +383,18 @@ const routes = [
         component: ClientPayments,
         name: 'client-payments',
         meta: { requiresAuth: true, requiresClient: true },
+    },
+    {
+        path: '/client/payments/:transactionId',
+        component: ClientPaymentDetail,
+        name: 'client-payment-detail',
+        meta: { requiresAuth: true, requiresClient: true },
+    },
+    {
+        path: '/transaction/:transactionId',
+        component: ClientPaymentDetail,
+        name: 'payment-detail',
+        meta: { requiresAuth: true },
     },
     {
         path: '/client/notifications',

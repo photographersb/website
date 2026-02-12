@@ -7,10 +7,20 @@ use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 
 class SeoMetaController extends Controller
 {
     use ApiResponse;
+    private const DEFAULT_SCAN_TYPES = ['Photographer', 'Competition', 'Event', 'Album'];
+    private const MODEL_TYPE_MAP = [
+        'Photographer' => \App\Models\Photographer::class,
+        'User' => \App\Models\User::class,
+        'Competition' => \App\Models\Competition::class,
+        'Event' => \App\Models\Event::class,
+        'Album' => \App\Models\Album::class,
+    ];
     /**
      * Get all SEO meta records for admin browser
      */
@@ -53,7 +63,7 @@ class SeoMetaController extends Controller
             'model_id' => 'required|integer',
         ]);
 
-        $meta = SeoMeta::where('model_type', $validated['model_type'])
+        $meta = SeoMeta::whereIn('model_type', $this->getModelTypeCandidates($validated['model_type']))
             ->where('model_id', $validated['model_id'])
             ->first();
 
@@ -105,19 +115,25 @@ class SeoMetaController extends Controller
         ]);
 
         try {
-            $meta = SeoMeta::updateOrCreate(
+            $modelType = $this->normalizeModelType($validated['model_type']);
+            $meta = SeoMeta::whereIn('model_type', $this->getModelTypeCandidates($validated['model_type']))
+                ->where('model_id', $validated['model_id'])
+                ->first();
+
+            $payload = array_merge(
+                array_filter($validated, fn($value) => $value !== null),
                 [
-                    'model_type' => $validated['model_type'],
-                    'model_id' => $validated['model_id'],
-                ],
-                array_merge(
-                    array_filter($validated, fn($value) => $value !== null),
-                    [
-                        'updated_by' => auth()->id(),
-                        'is_auto_generated' => false,
-                    ]
-                )
+                    'model_type' => $modelType,
+                    'updated_by' => auth()->id(),
+                    'is_auto_generated' => false,
+                ]
             );
+
+            if ($meta) {
+                $meta->update($payload);
+            } else {
+                $meta = SeoMeta::create($payload);
+            }
 
             Log::info('SEO meta updated', [
                 'model_type' => $validated['model_type'],
@@ -155,7 +171,7 @@ class SeoMetaController extends Controller
 
         try {
             // Find the model
-            $modelClass = 'App\\Models\\' . str($validated['model_type'])->studly();
+            $modelClass = $this->resolveModelClass($validated['model_type']);
             
             if (!class_exists($modelClass)) {
                 return response()->json([
@@ -206,28 +222,192 @@ class SeoMetaController extends Controller
             'model_id' => 'required|integer',
         ]);
 
-        $meta = SeoMeta::where('model_type', $validated['model_type'])
+        $meta = SeoMeta::whereIn('model_type', $this->getModelTypeCandidates($validated['model_type']))
             ->where('model_id', $validated['model_id'])
             ->first();
 
-        if (!$meta) {
-            return response()->json([
-                'status' => 'success',
-                'data' => [
-                    'title' => 'No SEO meta found',
-                    'description' => 'Auto-generation available',
-                    'url' => config('app.url'),
-                ],
-            ]);
+        $modelClass = $this->resolveModelClass($validated['model_type']);
+        $model = class_exists($modelClass)
+            ? $modelClass::find($validated['model_id'])
+            : null;
+
+        $fallback = $model ? $this->buildPreviewFromModel($model, $validated['model_type']) : [
+            'title' => 'Unknown entity',
+            'description' => 'Preview unavailable',
+            'url' => config('app.url'),
+            'og_image' => null,
+        ];
+
+        $data = [
+            'title' => $meta?->meta_title ?: $fallback['title'],
+            'description' => $meta?->meta_description
+                ? $this->limitDescription($meta->meta_description)
+                : $fallback['description'],
+            'url' => $meta?->canonical_url ?: $fallback['url'],
+            'og_image' => $meta?->og_image ?: ($fallback['og_image'] ?? null),
+        ];
+
+        if (isset($fallback['note'])) {
+            $data['note'] = $fallback['note'];
+        }
+        if (isset($fallback['requires_auth'])) {
+            $data['requires_auth'] = $fallback['requires_auth'];
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * Bulk auto-generate SEO meta for all entities of specified types
+     */
+    public function bulkGenerate(Request $request)
+    {
+        if (!in_array(auth()->user()->role, ['admin', 'super_admin'])) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 403);
+        }
+
+        $types = $request->input('model_types');
+        $types = is_array($types) && count($types) > 0 ? $types : self::DEFAULT_SCAN_TYPES;
+        $generated = [];
+        $skipped = [];
+
+        foreach ($types as $type) {
+            $modelClass = $this->resolveModelClass($type);
+            if (!class_exists($modelClass) || !is_subclass_of($modelClass, Model::class)) {
+                continue;
+            }
+
+            // Get all models of this type that don't have SEO meta yet
+            $modelIds = SeoMeta::whereIn('model_type', $this->getModelTypeCandidates($type))
+                ->pluck('model_id')
+                ->all();
+
+            $query = $modelClass::query();
+            if (count($modelIds) > 0) {
+                $query->whereNotIn('id', $modelIds);
+            }
+            $modelsWithoutMeta = $query->get();
+
+            foreach ($modelsWithoutMeta as $model) {
+                try {
+                    if (method_exists($model, 'generateSeoMeta')) {
+                        $model->generateSeoMeta();
+                        $generated[] = [
+                            'model_type' => $type,
+                            'model_id' => $model->id,
+                            'success' => true,
+                        ];
+                    } else {
+                        $skipped[] = [
+                            'model_type' => $type,
+                            'model_id' => $model->id,
+                            'reason' => 'Model does not support SEO meta',
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    $skipped[] = [
+                        'model_type' => $type,
+                        'model_id' => $model->id,
+                        'reason' => $e->getMessage(),
+                    ];
+                }
+            }
+        }
+
+        Log::info('SEO meta bulk auto-generated', [
+            'generated' => count($generated),
+            'skipped' => count($skipped),
+            'types' => $types,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Bulk auto-generation completed',
+            'data' => [
+                'generated_count' => count($generated),
+                'skipped_count' => count($skipped),
+                'generated' => array_slice($generated, 0, 10),
+                'skipped' => array_slice($skipped, 0, 10),
+                'timestamp' => now()->toDateTimeString(),
+            ],
+        ]);
+    }
+
+    /**
+     * Scan SEO coverage for connected entities
+     */
+    public function scan(Request $request)
+    {
+        if (!in_array(auth()->user()->role, ['admin', 'super_admin'])) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 403);
+        }
+
+        $types = $request->input('model_types');
+        $types = is_array($types) && count($types) > 0 ? $types : self::DEFAULT_SCAN_TYPES;
+        $results = [];
+
+        foreach ($types as $type) {
+            $modelClass = $this->resolveModelClass($type);
+            if (!class_exists($modelClass) || !is_subclass_of($modelClass, Model::class)) {
+                continue;
+            }
+
+            $total = $modelClass::count();
+            $metaQuery = SeoMeta::whereIn('model_type', $this->getModelTypeCandidates($type));
+            $metaCount = (clone $metaQuery)->count();
+
+            $missingTitle = (clone $metaQuery)
+                ->where(function ($q) {
+                    $q->whereNull('meta_title')->orWhere('meta_title', '');
+                })
+                ->count();
+            $missingDescription = (clone $metaQuery)
+                ->where(function ($q) {
+                    $q->whereNull('meta_description')->orWhere('meta_description', '');
+                })
+                ->count();
+            $missingCanonical = (clone $metaQuery)
+                ->where(function ($q) {
+                    $q->whereNull('canonical_url')->orWhere('canonical_url', '');
+                })
+                ->count();
+            $missingOgImage = (clone $metaQuery)
+                ->where(function ($q) {
+                    $q->whereNull('og_image')->orWhere('og_image', '');
+                })
+                ->count();
+
+            $metaIds = (clone $metaQuery)->limit(5000)->pluck('model_id')->all();
+            $missingModels = $total > 0
+                ? $modelClass::whereNotIn('id', $metaIds)->limit(3)->get()
+                : collect();
+
+            $samples = $missingModels->map(function ($model) use ($type) {
+                $preview = $this->buildPreviewFromModel($model, $type);
+                return array_merge($preview, ['model_id' => $model->id]);
+            })->values();
+
+            $results[] = [
+                'model_type' => $type,
+                'total' => $total,
+                'meta_records' => $metaCount,
+                'missing_meta' => max($total - $metaCount, 0),
+                'missing_title' => $missingTitle,
+                'missing_description' => $missingDescription,
+                'missing_canonical' => $missingCanonical,
+                'missing_og_image' => $missingOgImage,
+                'missing_samples' => $samples,
+            ];
         }
 
         return response()->json([
             'status' => 'success',
             'data' => [
-                'title' => $meta->meta_title ?? 'Untitled',
-                'description' => substr($meta->meta_description ?? '', 0, 160) ?? 'No description',
-                'url' => $meta->canonical_url ?? config('app.url'),
-                'og_image' => $meta->og_image,
+                'generated_at' => now()->toDateTimeString(),
+                'items' => $results,
             ],
         ]);
     }
@@ -246,7 +426,7 @@ class SeoMetaController extends Controller
             'model_id' => 'required|integer',
         ]);
 
-        SeoMeta::where('model_type', $validated['model_type'])
+        SeoMeta::whereIn('model_type', $this->getModelTypeCandidates($validated['model_type']))
             ->where('model_id', $validated['model_id'])
             ->delete();
 
@@ -259,5 +439,141 @@ class SeoMetaController extends Controller
             'status' => 'success',
             'message' => 'SEO meta deleted successfully',
         ]);
+    }
+
+    private function normalizeModelType(string $value): string
+    {
+        $normalized = self::MODEL_TYPE_MAP[$value] ?? null;
+        if ($normalized && class_exists($normalized)) {
+            return $normalized;
+        }
+
+        if (class_exists($value) && is_subclass_of($value, Model::class)) {
+            return $value;
+        }
+
+        $classGuess = 'App\\Models\\' . Str::studly($value);
+        return class_exists($classGuess) ? $classGuess : $value;
+    }
+
+    private function resolveModelClass(string $value): string
+    {
+        return $this->normalizeModelType($value);
+    }
+
+    private function getModelTypeCandidates(string $value): array
+    {
+        $candidates = [$value, $this->normalizeModelType($value)];
+        $classGuess = 'App\\Models\\' . Str::studly($value);
+        if (class_exists($classGuess)) {
+            $candidates[] = $classGuess;
+        }
+
+        return array_values(array_unique($candidates));
+    }
+
+    private function buildPreviewFromModel($model, string $modelType): array
+    {
+        $baseUrl = config('app.url');
+
+        if ($model instanceof \App\Models\User) {
+            $photographer = $model->photographer;
+            $name = $model->name ?? 'Photographer';
+            $city = $photographer?->city?->name ?? 'Bangladesh';
+            $username = $model->username;
+            $title = trim("{$name} | Photographer SB");
+            $description = "Hire {$name}, a photographer in {$city}. View portfolio, packages, and reviews on Photographer SB.";
+            $url = $username ? url("/@{$username}") : $baseUrl;
+            $image = $model->profile_photo_url ?: ($photographer?->profile_picture ?: asset('images/og-default.jpg'));
+
+            return [
+                'title' => $title,
+                'description' => $this->limitDescription($description),
+                'url' => $url,
+                'og_image' => $image,
+            ];
+        }
+
+        if ($model instanceof \App\Models\Photographer) {
+            $user = $model->user;
+            $name = $user?->name ?? $model->business_name ?? 'Photographer';
+            $city = $model->city?->name ?? 'Bangladesh';
+            $username = $user?->username;
+            $title = trim("{$name} | Photographer SB");
+            $description = "Hire {$name}, a photographer in {$city}. Browse portfolio, packages, and reviews on Photographer SB.";
+            $url = $username ? url("/@{$username}") : $baseUrl;
+            $image = $model->profile_picture ?: ($user?->profile_photo_url ?: asset('images/og-default.jpg'));
+
+            return [
+                'title' => $title,
+                'description' => $this->limitDescription($description),
+                'url' => $url,
+                'og_image' => $image,
+            ];
+        }
+
+        if ($model instanceof \App\Models\Competition) {
+            $title = trim("{$model->title} | Photography Competition | Photographer SB");
+            $description = $model->description ? strip_tags($model->description) : 'Join the competition on Photographer SB.';
+            $url = $model->slug ? url("/competitions/{$model->slug}") : $baseUrl;
+            $image = $model->cover_image ?: ($model->banner_image ?: ($model->hero_image ?: asset('images/og-competitions.jpg')));
+
+            return [
+                'title' => $title,
+                'description' => $this->limitDescription($description),
+                'url' => $url,
+                'og_image' => $image,
+            ];
+        }
+
+        if ($model instanceof \App\Models\Event) {
+            $title = trim("{$model->title} | Photography Event | Photographer SB");
+            $description = $model->description ? strip_tags($model->description) : 'Discover events on Photographer SB.';
+            $url = $model->slug ? url("/events/{$model->slug}") : $baseUrl;
+            $image = $model->hero_image_url ?: ($model->banner_image ?: ($model->og_image ?: asset('images/og-events.jpg')));
+
+            return [
+                'title' => $title,
+                'description' => $this->limitDescription($description),
+                'url' => $url,
+                'og_image' => $image,
+            ];
+        }
+
+        if ($model instanceof \App\Models\Album) {
+            $photographer = $model->photographer;
+            $photographerName = $photographer?->user?->name ?? $photographer?->business_name ?? 'Photographer';
+            $title = trim("{$model->name} | Client Gallery | Photographer SB");
+            $description = $model->description ?: "Private gallery shared by {$photographerName}.";
+            $url = url("/client/galleries/{$model->id}");
+            $image = $model->cover_photo_url ?: ($photographer?->profile_picture ?: asset('images/og-default.jpg'));
+
+            return [
+                'title' => $title,
+                'description' => $this->limitDescription($description),
+                'url' => $url,
+                'og_image' => $image,
+                'note' => 'Private gallery (client login required).',
+                'requires_auth' => true,
+            ];
+        }
+
+        $label = Str::headline(class_basename($modelType));
+        return [
+            'title' => "{$label} | Photographer SB",
+            'description' => 'Preview not available for this entity type.',
+            'url' => $baseUrl,
+            'og_image' => null,
+        ];
+    }
+
+    private function limitDescription(string $text): string
+    {
+        $clean = trim(preg_replace('/\s+/', ' ', $text));
+        if ($clean === '') {
+            return 'No description available.';
+        }
+
+        return Str::limit($clean, 160, '');
     }
 }
