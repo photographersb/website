@@ -29,7 +29,8 @@
                 ->pluck('value', 'key')
                 ->toArray();
         });
-        $trackingEnabled = filter_var($trackingSettings['tracking.enable'] ?? env('ANALYTICS_ENABLED', true), FILTER_VALIDATE_BOOLEAN);
+        // Tracking enabled by default
+        $trackingEnabled = (isset($trackingSettings['tracking.enable']) && $trackingSettings['tracking.enable'] === '0') ? false : true;
         $ga4Id = $trackingSettings['tracking.ga4_measurement_id'] ?? env('GA4_MEASUREMENT_ID', 'G-PYWLWNZR5K');
         $gtmId = $trackingSettings['tracking.gtm_id'] ?? env('GTM_ID', 'GTM-T3BW6WBM');
         $fbPixelId = $trackingSettings['tracking.fb_pixel_id'] ?? env('FB_PIXEL_ID');
@@ -122,7 +123,7 @@
     </script>
 
     @if($trackingEnabled && !empty($gtmId))
-    @if($trackingEnabled && !empty($gtmId))
+    @if($trackingEnabled && $gtmId)
     <!-- Google Tag Manager -->
     <script>
         (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -134,7 +135,7 @@
     <!-- End Google Tag Manager -->
     @endif
 
-    @if($trackingEnabled && !empty($ga4Id))
+    @if($trackingEnabled && $ga4Id)
     <!-- Google Analytics 4 with Consent Management -->
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -157,7 +158,7 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ $ga4Id }}"></script>
     @endif
 
-    @if($trackingEnabled && !empty($fbPixelId))
+    @if($trackingEnabled && $fbPixelId)
     <!-- Meta Pixel -->
     <script>
         !(function(f,b,e,v,n,t,s){
