@@ -78,8 +78,10 @@
                                     <div class="d-flex align-items-center">
                                         @if($event->banner_image)
                                         <img src="{{ asset('storage/' . $event->banner_image) }}" 
-                                            alt="{{ $event->title }}" class="rounded me-2" 
-                                            style="width: 40px; height: 40px; object-fit: cover;">
+                                            <picture>
+                                                <source srcset="{{ preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', asset('storage/' . $event->banner_image)) }}" type="image/webp">
+                                                <img src="{{ asset('storage/' . $event->banner_image) }}" alt="{{ $event->title }}" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;" loading="lazy">
+                                            </picture>
                                         @else
                                         <div class="bg-light rounded me-2" style="width: 40px; height: 40px; 
                                             display: flex; align-items: center; justify-content: center;">

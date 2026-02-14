@@ -3,7 +3,7 @@
     <div class="max-w-4xl mx-auto">
       <!-- Header -->
       <div class="mb-8">
-        <p class="text-xs uppercase tracking-[0.3em] text-burgundy/70 mb-2">
+        <p class="text-xs uppercase tracking-[0.3em] text-burgundy mb-2 bg-opacity-70">
           Photographer Settings
         </p>
         <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
@@ -15,7 +15,7 @@
       </div>
 
       <!-- Settings Tabs -->
-      <div class="flex flex-wrap gap-2 mb-6 sm:mb-8 bg-white/80 border border-gray-200/80 rounded-xl p-2 shadow-sm">
+      <div class="flex flex-wrap gap-2 mb-6 sm:mb-8 bg-white border border-gray-200 rounded-xl p-2 shadow-sm bg-opacity-80">
         <button
           v-for="tab in tabs"
           :key="tab.id"
@@ -32,7 +32,7 @@
       </div>
 
       <!-- Settings Content -->
-      <div class="bg-white/90 backdrop-blur rounded-2xl border border-gray-200/80 shadow-sm p-6 sm:p-8">
+      <div class="bg-white backdrop-blur rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-8 bg-opacity-90">
         <div
           v-if="successMessage"
           class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl"

@@ -1,14 +1,14 @@
 <template>
   <div
     v-if="tipInfo"
-    class="relative mb-10 overflow-hidden rounded-3xl border border-amber-200/70 bg-[radial-gradient(circle_at_top,_rgba(255,196,120,0.28)_0,_transparent_60%)] p-6 sm:p-8"
+    class="relative mb-10 overflow-hidden rounded-3xl border border-amber-200 bg-[radial-gradient(circle_at_top,_rgba(255,196,120,0.28)_0,_transparent_60%)] p-6 sm:p-8 bg-opacity-70"
   >
-    <div class="pointer-events-none absolute -top-20 right-0 h-48 w-48 rounded-full bg-amber-200/40 blur-3xl" />
-    <div class="pointer-events-none absolute -bottom-24 -left-16 h-60 w-60 rounded-full bg-orange-200/40 blur-3xl" />
+    <div class="pointer-events-none absolute -top-20 right-0 h-48 w-48 rounded-full bg-amber-200 bg-opacity-40 blur-3xl" />
+    <div class="pointer-events-none absolute -bottom-24 -left-16 h-60 w-60 rounded-full bg-orange-200 bg-opacity-40 blur-3xl" />
 
     <div class="relative z-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
       <div>
-        <p class="text-[11px] uppercase tracking-[0.45em] text-amber-700/80">
+        <p class="text-[11px] uppercase tracking-[0.45em] text-amber-700 bg-opacity-80">
           Tip the artist
         </p>
         <h3 class="mt-3 text-2xl sm:text-3xl font-display font-semibold text-[#2a160a]">
@@ -17,13 +17,13 @@
         <p class="mt-2 text-sm sm:text-base text-[#5f3c1f]">
           {{ tipInfo.tip_message || 'Your tip helps me keep creating, learning, and improving for you.' }}
         </p>
-        <div class="mt-4 flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-wide text-amber-800/80">
-          <span class="rounded-full bg-white/70 px-3 py-1">{{ tipInfo.tip_count || 0 }} tips</span>
-          <span class="rounded-full bg-white/70 px-3 py-1">৳{{ formatNumber(tipInfo.total_tips || 0) }} raised</span>
+        <div class="mt-4 flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-wide text-amber-800 bg-opacity-80">
+          <span class="rounded-full bg-white bg-opacity-70 px-3 py-1">{{ tipInfo.tip_count || 0 }} tips</span>
+          <span class="rounded-full bg-white bg-opacity-70 px-3 py-1">৳{{ formatNumber(tipInfo.total_tips || 0) }} raised</span>
         </div>
       </div>
 
-      <div class="flex flex-col justify-between gap-4 rounded-2xl border border-amber-200/60 bg-white/70 p-4 sm:p-5 shadow-sm">
+      <div class="flex flex-col justify-between gap-4 rounded-2xl border border-amber-200 bg-white p-4 sm:p-5 shadow-sm bg-opacity-60">
         <div class="flex items-center gap-3">
           <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-2xl">
             ☕
@@ -57,7 +57,7 @@
 
     <div
       v-if="showTipPanel"
-      class="relative z-10 mt-6 rounded-2xl border border-amber-200/70 bg-white/90 p-5 sm:p-6 shadow-lg"
+      class="relative z-10 mt-6 rounded-2xl border border-amber-200 bg-white p-5 sm:p-6 shadow-lg bg-opacity-90"
     >
       <div
         v-if="confirmSuccess"
@@ -85,7 +85,7 @@
       </div>
 
       <div class="grid gap-4 md:grid-cols-[180px_1fr]">
-        <div class="rounded-2xl border border-amber-200/70 bg-amber-50/70 p-4">
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 bg-opacity-70">
           <p class="text-[11px] uppercase tracking-[0.3em] text-amber-700">Amount</p>
           <input
             v-model.number="customTipAmount"
@@ -125,7 +125,7 @@
           </div>
         </div>
 
-        <div class="rounded-2xl border border-amber-200/60 bg-white p-4 shadow-sm">
+        <div class="rounded-2xl border border-amber-200 bg-white p-4 shadow-sm bg-opacity-60">
           <p class="text-xs uppercase tracking-[0.25em] text-gray-500">Selected number</p>
           <div class="mt-3 flex items-center justify-between gap-3">
             <div>
@@ -154,7 +154,7 @@
 
       <div
         v-if="tipInfo.recent_tips.length > 0"
-        class="mt-6 border-t border-amber-200/70 pt-4"
+        class="mt-6 border-t border-amber-200 pt-4 bg-opacity-70"
       >
         <p class="text-xs font-semibold uppercase tracking-[0.3em] text-gray-500">Recent tips</p>
         <div class="mt-3 space-y-3">
@@ -178,7 +178,7 @@
 
     <div
       v-if="showTrxModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black p-4 bg-opacity-50"
       @click.self="closeTrxModal"
     >
       <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">

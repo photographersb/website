@@ -544,7 +544,7 @@
     <!-- Featured Photographers Section -->
     <section
       v-if="featuredPhotographers.length > 0"
-      class="py-8 sm:py-12 bg-gradient-to-br from-burgundy-50 via-white to-burgundy-50/30"
+      class="py-8 sm:py-12 bg-gradient-to-br from-burgundy-50 via-white to-burgundy-50 bg-opacity-30"
     >
       <div class="w-full px-4 sm:px-6 md:px-8 lg:px-4">
         <div class="max-w-5xl mx-auto">
@@ -888,7 +888,7 @@
     <!-- Testimonials Section -->
     <section
       v-if="testimonials.length > 0"
-      class="py-8 sm:py-12 bg-gradient-to-br from-burgundy-50 via-white to-burgundy-50/30"
+      class="py-8 sm:py-12 bg-gradient-to-br from-burgundy-50 via-white to-burgundy-50 bg-opacity-30"
     >
       <div class="w-full px-4 sm:px-6 md:px-8 lg:px-4">
         <div class="max-w-5xl mx-auto">
@@ -1076,7 +1076,7 @@
           <!-- Statistics Grid -->
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <!-- Total Photographers -->
-            <div class="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-5 sm:p-6 text-center hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-1 border border-white/20">
+            <div class="bg-white backdrop-blur-sm rounded-xl sm:rounded-2xl p-5 sm:p-6 text-center hover:bg-white transition-all duration-300 transform hover:-translate-y-1 border border-white bg-opacity-10 hover:bg-opacity-20 border-opacity-20">
               <div class="w-12 h-12 sm:w-14 sm:h-14 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
                 <svg
                   class="w-6 h-6 sm:w-7 sm:h-7 text-white"

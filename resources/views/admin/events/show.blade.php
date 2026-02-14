@@ -31,7 +31,10 @@
             @if($event->banner_image)
             <div class="card border-0 shadow-sm mb-4">
                 <img src="{{ asset('storage/' . $event->banner_image) }}" class="card-img-top" alt="{{ $event->title }}"
-                    style="height: 300px; object-fit: cover;">
+                    <picture>
+                        <source srcset="{{ preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', asset('storage/' . $event->banner_image)) }}" type="image/webp">
+                        <img src="{{ asset('storage/' . $event->banner_image) }}" class="card-img-top" alt="{{ $event->title }}" style="height: 300px; object-fit: cover;" loading="lazy">
+                    </picture>
             </div>
             @endif
 

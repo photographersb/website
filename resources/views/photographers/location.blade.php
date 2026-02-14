@@ -35,7 +35,10 @@
                         <!-- Profile Picture -->
                         <div class="h-48 bg-gray-200 overflow-hidden">
                             @if($photographer->profile_picture)
-                                <img src="{{ $photographer->profile_picture }}" alt="{{ $photographer->user->name }}" class="w-full h-full object-cover">
+                                <picture>
+                                    <source srcset="{{ preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $photographer->profile_picture) }}" type="image/webp">
+                                    <img src="{{ $photographer->profile_picture }}" alt="{{ $photographer->user->name }}" class="w-full h-full object-cover" loading="lazy">
+                                </picture>
                             @else
                                 <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-purple-500">
                                     <span class="text-white text-4xl font-bold">{{ substr($photographer->user->name, 0, 1) }}</span>

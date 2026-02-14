@@ -30,6 +30,12 @@ api.interceptors.request.use(
             }
         }
 
+        // Add token to Authorization header if it exists
+        const token = localStorage.getItem('token')
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`
+        }
+
         const method = String(config.method || 'get').toLowerCase()
         const isUnsafe = !['get', 'head', 'options'].includes(method)
         if (isUnsafe && !hasXsrfCookie()) {

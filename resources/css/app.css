@@ -11,6 +11,10 @@
    ============================================ */
 
 :root {
+  /* Prevent iOS input zoom by setting minimum font-size */
+  input, textarea, select {
+    font-size: 16px;
+  }
   /* Primary Brand Colors */
   --sb-primary: #8B1538;
   --sb-primary-hover: #6F112D;
@@ -114,6 +118,11 @@ img.lazy-error {
 
 /* Smooth scroll */
 html {
+  /* Safe area insets for mobile notch support */
+  body, .safe-area, .main-content, .container, .max-w-7xl, .max-w-6xl, .max-w-4xl {
+    padding-top: max(env(safe-area-inset-top), 0px);
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+  }
   scroll-behavior: smooth;
 }
 

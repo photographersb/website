@@ -14,7 +14,7 @@
             <span v-else>{{ user?.name?.charAt(0).toUpperCase() }}</span>
           </div>
           <div class="min-w-0 flex-1">
-            <div class="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-burgundy/70">
+            <div class="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-burgundy bg-opacity-70">
               Photographer HQ
             </div>
             <h1 class="text-xl sm:text-2xl md:text-3xl font-bold truncate">Welcome, {{ user?.name }}</h1>
@@ -325,7 +325,7 @@
 
       <!-- Tabs -->
       <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm">
-        <div class="border-b border-gray-200/70 bg-gray-50/70">
+        <div class="border-b border-gray-200 bg-gray-50 bg-opacity-70 border-opacity-70">
           <div class="overflow-x-auto scrollbar-hide">
             <div class="flex gap-3 sm:gap-6 px-3 sm:px-6 py-3 sm:py-4 min-w-max">
               <button

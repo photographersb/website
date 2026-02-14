@@ -91,12 +91,11 @@ class AuthController extends Controller
             ]);
         }
 
-        $request->session()->regenerate();
+        // Get authenticated user
+        $user = Auth::user();
 
-        $user = $request->user();
-
-        // Check if email is verified
-        if (!$user->hasVerifiedEmail()) {
+        // Check if email is verified (allow approved users to proceed)
+        if (!$user->hasVerifiedEmail() && $user->role !== 'super_admin' && $user->approval_status !== 'approved') {
             return $this->error('Please verify your email before logging in. Check your inbox for verification link.', 403);
         }
 
@@ -140,8 +139,12 @@ class AuthController extends Controller
         // Check if user is also a judge
         $isJudge = $user->isJudge();
 
+        // Create API token for the user
+        $token = $user->createToken('auth-token')->plainTextToken;
+
         return $this->success([
             'user' => array_merge($user->toArray(), ['is_judge' => $isJudge]),
+            'token' => $token,
         ], 'Login successful');
     }
 
@@ -150,10 +153,8 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        Auth::guard('web')->logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        // Revoke all tokens for the user
+        $request->user()->tokens()->delete();
 
         return $this->success([], 'Logged out successfully');
     }

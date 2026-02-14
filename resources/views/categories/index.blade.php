@@ -31,10 +31,10 @@
                     @if($category->image_url)
                         <div class="aspect-video overflow-hidden">
                             <img 
-                                src="{{ $category->image_url }}" 
-                                alt="{{ $category->name }}"
-                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                            >
+                                <picture>
+                                    <source srcset="{{ preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $category->image_url) }}" type="image/webp">
+                                    <img src="{{ $category->image_url }}" alt="{{ $category->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" loading="lazy">
+                                </picture>
                         </div>
                     @else
                         <div class="aspect-video bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">

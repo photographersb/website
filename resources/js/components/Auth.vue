@@ -157,11 +157,8 @@
             {{ loginError }}
           </p>
 
-          <!-- Resend Verification Button -->
-          <div
-            v-if="showResendVerification"
-            class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4"
-          >
+          <!-- Always show Resend Verification Button -->
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
             <p class="text-sm text-gray-700 mb-3">
               📧 <strong>Email not verified?</strong> Check your inbox or spam folder.
             </p>
@@ -597,6 +594,7 @@ const login = async () => {
       localStorage.setItem('user_name', data.data.user.name);
       localStorage.setItem('user_email', data.data.user.email);
       localStorage.setItem('user_id', data.data.user.id);
+      localStorage.setItem('token', data.data.token);
       
       notifySuccess('Welcome back!', 'Login Successful');
       

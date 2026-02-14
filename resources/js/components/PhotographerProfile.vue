@@ -541,15 +541,15 @@
                   <p class="text-2xl font-bold text-[#7a1f2b]">{{ photographer.experience_years || 0 }}</p>
                   <p class="text-xs uppercase text-gray-600 font-medium mt-1">Yrs Exp</p>
                 </div>
-                <div class="bg-amber-50/70 rounded-lg p-4 text-center border border-amber-200/50">
+                <div class="bg-amber-50 rounded-lg p-4 text-center border border-amber-200 bg-opacity-70 border-opacity-50">
                   <p class="text-2xl font-bold text-amber-700">{{ (photographer.average_rating || 0) }}</p>
                   <p class="text-xs uppercase text-gray-600 font-medium mt-1">Rating</p>
                 </div>
-                <div class="bg-emerald-50/70 rounded-lg p-4 text-center border border-emerald-200/50">
+                <div class="bg-emerald-50 rounded-lg p-4 text-center border border-emerald-200 bg-opacity-70 border-opacity-50">
                   <p class="text-2xl font-bold text-emerald-700">{{ formatNumber(photographer.completed_bookings || 0) }}</p>
                   <p class="text-xs uppercase text-gray-600 font-medium mt-1">Bookings</p>
                 </div>
-                <div class="bg-blue-50/70 rounded-lg p-4 text-center border border-blue-200/50">
+                <div class="bg-blue-50 rounded-lg p-4 text-center border border-blue-200 bg-opacity-70 border-opacity-50">
                   <p class="text-2xl font-bold text-blue-700">{{ photographer.is_verified ? '✓' : '–' }}</p>
                   <p class="text-xs uppercase text-gray-600 font-medium mt-1">{{ photographer.is_verified ? 'Verified' : 'Not Verified' }}</p>
                 </div>
@@ -566,7 +566,7 @@
 
               <!-- Location & Service Area -->
               <div v-if="locationLabel || serviceRadiusLabel" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div v-if="locationLabel" class="bg-blue-50/70 rounded-lg p-4 border border-blue-200/50">
+                <div v-if="locationLabel" class="bg-blue-50 rounded-lg p-4 border border-blue-200 bg-opacity-70 border-opacity-50">
                   <p class="flex items-center gap-2 text-blue-900 font-semibold text-sm">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M5.05 3.05a7 7 0 019.9 9.9L10 18l-4.95-5.05a7 7 0 010-9.9z" />
@@ -575,7 +575,7 @@
                   </p>
                   <p class="text-blue-700 mt-2 font-medium">{{ locationLabel }}</p>
                 </div>
-                <div v-if="serviceRadiusLabel" class="bg-amber-50/70 rounded-lg p-4 border border-amber-200/50">
+                <div v-if="serviceRadiusLabel" class="bg-amber-50 rounded-lg p-4 border border-amber-200 bg-opacity-70 border-opacity-50">
                   <p class="flex items-center gap-2 text-amber-900 font-semibold text-sm">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 8.414l2.95 2.95-1.414 1.414-3.536-3.536V5h2v5.414z" />

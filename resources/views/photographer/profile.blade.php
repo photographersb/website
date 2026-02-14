@@ -53,10 +53,10 @@
                 <div class="flex-shrink-0">
                     <div class="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-burgundy shadow-lg">
                         <img 
-                            src="{{ $user->profile_photo_url ?? '/placeholder-photographer.jpg' }}" 
-                            alt="{{ $user->name }}"
-                            class="w-full h-full object-cover"
-                        >
+                            <picture>
+                                <source srcset="{{ preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $user->profile_photo_url ?? '/placeholder-photographer.jpg') }}" type="image/webp">
+                                <img src="{{ $user->profile_photo_url ?? '/placeholder-photographer.jpg' }}" alt="{{ $user->name }}" class="w-full h-full object-cover" loading="lazy">
+                            </picture>
                     </div>
                 </div>
                 
@@ -131,10 +131,10 @@
                     @forelse($portfolios as $portfolio)
                         <div class="relative group overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-all">
                             <img 
-                                src="{{ $portfolio->image_url ?? '/images/placeholder.svg' }}" 
-                                alt="{{ $portfolio->title ?? 'Portfolio image' }}"
-                                class="w-full h-48 object-cover group-hover:scale-105 transition-transform"
-                            >
+                                <picture>
+                                    <source srcset="{{ preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $portfolio->image_url ?? '/images/placeholder.svg') }}" type="image/webp">
+                                    <img src="{{ $portfolio->image_url ?? '/images/placeholder.svg' }}" alt="{{ $portfolio->title ?? 'Portfolio image' }}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform" loading="lazy">
+                                </picture>
                             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
                                 <button class="opacity-0 group-hover:opacity-100 bg-burgundy text-white px-4 py-2 rounded-lg font-semibold transition-opacity">
                                     View
@@ -212,10 +212,10 @@
                         <div class="border-b border-gray-100 pb-6">
                             <div class="flex items-start gap-4">
                                 <img 
-                                    src="{{ $review->reviewer->profile_photo_url ?? '/placeholder.jpg' }}" 
-                                    alt="{{ $review->reviewer->name ?? 'Reviewer' }}"
-                                    class="w-12 h-12 rounded-full object-cover"
-                                >
+                                    <picture>
+                                        <source srcset="{{ preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $review->reviewer->profile_photo_url ?? '/placeholder.jpg') }}" type="image/webp">
+                                        <img src="{{ $review->reviewer->profile_photo_url ?? '/placeholder.jpg' }}" alt="{{ $review->reviewer->name ?? 'Reviewer' }}" class="w-12 h-12 rounded-full object-cover" loading="lazy">
+                                    </picture>
                                 <div class="flex-1">
                                     <h4 class="font-semibold text-gray-900">{{ $review->reviewer->name }}</h4>
                                     <div class="flex items-center gap-2 mt-1">

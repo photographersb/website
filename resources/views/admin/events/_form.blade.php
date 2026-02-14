@@ -246,7 +246,10 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Preview</label>
                 <div id="imagePreview">
                     @if($event->banner_image ?? false)
-                    <img src="{{ asset('storage/' . $event->banner_image) }}" class="rounded" style="max-height: 150px; width: 100%; object-fit: cover;">
+                    <picture>
+                        <source srcset="{{ preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', asset('storage/' . $event->banner_image)) }}" type="image/webp">
+                        <img src="{{ asset('storage/' . $event->banner_image) }}" class="rounded" style="max-height: 150px; width: 100%; object-fit: cover;" loading="lazy">
+                    </picture>
                     @else
                     <div class="bg-gray-100 rounded text-center py-8">
                         <p class="text-gray-500 text-sm">No image</p>
@@ -334,7 +337,7 @@ function previewImage(input) {
         const reader = new FileReader();
         reader.onload = function(e) {
             const preview = document.getElementById('imagePreview');
-            preview.innerHTML = `<img src="${e.target.result}" class="rounded" style="max-height: 150px; width: 100%; object-fit: cover;">`;
+            preview.innerHTML = `<img src="${e.target.result}" class="rounded" style="max-height: 150px; width: 100%; object-fit: cover;" loading="lazy">`;
         };
         reader.readAsDataURL(input.files[0]);
     }

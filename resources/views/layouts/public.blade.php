@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    @php
+        $trackingSettings = cache()->remember('tracking_settings', 300, function () {
+            return DB::table('settings')
+                ->whereIn('key', [
+                    'tracking.fb_domain_verification'
+                ])
+                ->pluck('value', 'key')
+                ->toArray();
+        });
+        $fbDomainVerification = $trackingSettings['tracking.fb_domain_verification'] ?? env('FB_DOMAIN_VERIFICATION');
+    @endphp
     
     @section('meta')
         @if($seoMeta)
@@ -70,6 +81,10 @@
             <meta name="twitter:creator" content="@photographersb">
         @endif
     @show
+
+    @if(!empty($fbDomainVerification))
+    <meta name="facebook-domain-verification" content="{{ $fbDomainVerification }}">
+    @endif
     
     <!-- Primary Meta Tags (defaults) -->
     <meta name="title" content="PhotographerSB - Find Professional Photographers in Bangladesh">

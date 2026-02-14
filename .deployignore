@@ -1,11 +1,17 @@
 # Files and Folders to EXCLUDE from Upload
 # Do NOT upload these to production server
 
+# ⚠️ CLEANUP FOLDER - ALL UNWANTED FILES ORGANIZED HERE
+_CLEANUP_FILES/
+
 # Development files
 node_modules/
 .git/
 .github/
 tests/
+docs/
+_archive_docs/
+scripts/
 .env
 .env.testing
 .env.example

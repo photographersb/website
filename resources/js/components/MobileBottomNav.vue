@@ -23,9 +23,9 @@
       </router-link>
 
       <router-link
-        to="/photographers"
+        to="/browse"
         class="nav-item"
-        :class="{ active: isActive('/photographers') }"
+        :class="{ active: isActive('/browse') }"
       >
         <svg
           class="w-6 h-6"
@@ -40,8 +40,21 @@
             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
           />
         </svg>
-        <span class="text-xs mt-1">Search</span>
+        <span class="text-xs mt-1">Browse</span>
       </router-link>
+
+    <!-- Back to Top Button -->
+    <button
+      v-show="showBackToTop"
+      @click="scrollToTop"
+      class="fixed z-60 bottom-20 right-4 bg-burgundy-600 text-white rounded-full shadow-lg p-3 flex items-center justify-center transition hover:bg-burgundy-700 focus:outline-none"
+      style="box-shadow: 0 2px 8px rgba(0,0,0,0.12);"
+      aria-label="Back to top"
+    >
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+      </svg>
+    </button>
 
       <router-link
         to="/competitions"
@@ -291,7 +304,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default {
@@ -300,6 +313,15 @@ export default {
     const router = useRouter();
     const showUserMenu = ref(false);
     const unreadCount = ref(0);
+
+    // Back to Top button logic
+    const showBackToTop = ref(false);
+    const handleScroll = () => {
+      showBackToTop.value = window.scrollY > 200;
+    };
+    const scrollToTop = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     const isAuthenticated = computed(() => {
       return !!localStorage.getItem('user');
@@ -351,10 +373,15 @@ export default {
       }
     };
 
+
     onMounted(() => {
       fetchUnreadCount();
       // Poll every 30 seconds
       setInterval(fetchUnreadCount, 30000);
+      window.addEventListener('scroll', handleScroll);
+    });
+    onUnmounted(() => {
+      window.removeEventListener('scroll', handleScroll);
     });
 
     return {
@@ -365,6 +392,8 @@ export default {
       isActive,
       toggleUserMenu,
       logout,
+      showBackToTop,
+      scrollToTop,
     };
   },
 };

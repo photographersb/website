@@ -24,7 +24,8 @@
                     'tracking.ga4_measurement_id',
                     'tracking.gtm_id',
                     'tracking.fb_pixel_id',
-                    'tracking.gsc_verification'
+                    'tracking.gsc_verification',
+                    'tracking.fb_domain_verification'
                 ])
                 ->pluck('value', 'key')
                 ->toArray();
@@ -35,11 +36,15 @@
         $gtmId = $trackingSettings['tracking.gtm_id'] ?? env('GTM_ID', 'GTM-T3BW6WBM');
         $fbPixelId = $trackingSettings['tracking.fb_pixel_id'] ?? env('FB_PIXEL_ID');
         $gscVerification = $trackingSettings['tracking.gsc_verification'] ?? env('GSC_VERIFICATION');
+        $fbDomainVerification = $trackingSettings['tracking.fb_domain_verification'] ?? env('FB_DOMAIN_VERIFICATION');
     @endphp
     <meta name="language" content="English">
     <meta name="revisit-after" content="7 days">
     @if(!empty($gscVerification))
     <meta name="google-site-verification" content="{{ $gscVerification }}">
+    @endif
+    @if(!empty($fbDomainVerification))
+    <meta name="facebook-domain-verification" content="{{ $fbDomainVerification }}">
     @endif
     
     <!-- Open Graph / Facebook Meta Tags -->
@@ -122,7 +127,6 @@
     }
     </script>
 
-    @if($trackingEnabled && !empty($gtmId))
     @if($trackingEnabled && $gtmId)
     <!-- Google Tag Manager -->
     <script>

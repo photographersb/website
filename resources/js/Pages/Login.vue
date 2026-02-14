@@ -215,10 +215,11 @@ const login = async () => {
     const { data } = await api.post('/auth/login', form.value);
 
     if (data?.status === 'success' && data?.data?.user) {
-      const { user } = data.data;
+      const { user, token } = data.data;
 
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('user_role', normalizeRole(user?.role));
+      localStorage.setItem('token', token);
 
       if (user?.role === 'admin' || user?.role === 'super_admin' || user?.role === 'moderator') {
         router.push('/admin/dashboard');

@@ -13,7 +13,7 @@ export default {
 
     const updateMetaTags = (meta) => {
       // Update title
-      document.title = meta.title || 'Photographer SB - Find Perfect Photographers in Bangladesh';
+      document.title = meta.title || 'PhotographerSB - Find Perfect Photographers in Bangladesh';
 
       // Update or create meta tags
       updateMetaTag('description', meta.description || 'Discover verified professional photographers in Bangladesh. Book wedding photographers, event photography, portrait sessions and more. Trusted by thousands of clients.');
@@ -21,16 +21,16 @@ export default {
       updateMetaTag('robots', meta.robots || 'index, follow');
       
       // Open Graph tags
-      updateMetaTag('og:title', meta.title || 'Photographer SB - Find Perfect Photographers in Bangladesh', 'property');
+      updateMetaTag('og:title', meta.title || 'PhotographerSB - Find Perfect Photographers in Bangladesh', 'property');
       updateMetaTag('og:description', meta.description || 'Discover verified professional photographers in Bangladesh.', 'property');
       updateMetaTag('og:image', meta.image || `${window.location.origin}/images/og-default.svg`, 'property');
       updateMetaTag('og:url', window.location.href, 'property');
       updateMetaTag('og:type', meta.type || 'website', 'property');
-      updateMetaTag('og:site_name', 'Photographer SB', 'property');
+      updateMetaTag('og:site_name', 'PhotographerSB', 'property');
       
       // Twitter Card tags
       updateMetaTag('twitter:card', 'summary_large_image', 'name');
-      updateMetaTag('twitter:title', meta.title || 'Photographer SB', 'name');
+      updateMetaTag('twitter:title', meta.title || 'PhotographerSB', 'name');
       updateMetaTag('twitter:description', meta.description || 'Find verified photographers in Bangladesh', 'name');
       updateMetaTag('twitter:image', meta.image || `${window.location.origin}/images/og-default.svg`, 'name');
       
@@ -89,13 +89,13 @@ export default {
 
       const metaMap = {
         'home': {
-          title: 'Photographer SB - Find Perfect Photographers in Bangladesh',
+          title: 'PhotographerSB - Find Perfect Photographers in Bangladesh',
           description: 'Discover verified professional photographers in Bangladesh. Book wedding photographers, event photography, portrait sessions. Trusted platform with secure payments.',
           keywords: 'photographer bangladesh, wedding photographer dhaka, event photography, portrait photographer',
           structuredData: {
             "@context": "https://schema.org",
             "@type": "WebSite",
-            "name": "Photographer SB",
+            "name": "PhotographerSB",
             "url": "https://photographersb.com",
             "potentialAction": {
               "@type": "SearchAction",
@@ -105,15 +105,15 @@ export default {
           }
         },
         'photographer-profile': {
-          title: `${params.slug} - Professional Photographer | Photographer SB`,
+          title: `${params.slug} - Professional Photographer | PhotographerSB`,
           description: `View portfolio, packages, and reviews for ${params.slug}. Book verified professional photographer in Bangladesh.`,
           type: 'profile',
           canonical: currentUrl
         },
         'photographers-by-category': {
           title: query.category
-            ? `${toTitleCase(query.category)} Photographers in Bangladesh | Photographer SB`
-            : 'Photographers by Category | Photographer SB',
+            ? `${toTitleCase(query.category)} Photographers in Bangladesh | PhotographerSB`
+            : 'Photographers by Category | PhotographerSB',
           description: query.category
             ? `Browse verified ${toTitleCase(query.category)} photographers across Bangladesh. Compare portfolios, reviews, and pricing.`
             : 'Browse photographers by category. Discover wedding, portrait, event, and commercial photography specialists in Bangladesh.',
@@ -138,8 +138,8 @@ export default {
         },
         'photographers-by-location': {
           title: query.city
-            ? `${toTitleCase(query.city)} Photographers | Photographer SB`
-            : 'Photographers by Location | Photographer SB',
+            ? `${toTitleCase(query.city)} Photographers | PhotographerSB`
+            : 'Photographers by Location | PhotographerSB',
           description: query.city
             ? `Find verified photographers in ${toTitleCase(query.city)}. Compare portfolios, reviews, and pricing.`
             : 'Browse photographers by location across Bangladesh. Discover local professionals near you.',
@@ -161,7 +161,7 @@ export default {
           }
         },
         'categories-landing': {
-          title: 'Photography Categories in Bangladesh | Photographer SB',
+          title: 'Photography Categories in Bangladesh | PhotographerSB',
           description: 'Browse photography categories to find the right specialist. Wedding, portrait, event, product, and more.',
           image: `${origin}/images/og-categories.svg`,
           canonical: currentUrl,
@@ -173,7 +173,7 @@ export default {
           }
         },
         'locations-landing': {
-          title: 'Photographers by City in Bangladesh | Photographer SB',
+          title: 'Photographers by City in Bangladesh | PhotographerSB',
           description: 'Explore photographers by city across Bangladesh. Find professionals near you.',
           image: `${origin}/images/og-locations.svg`,
           canonical: currentUrl,
@@ -185,46 +185,46 @@ export default {
           }
         },
         'events': {
-          title: 'Photography Events in Bangladesh | Photographer SB',
+          title: 'Photography Events in Bangladesh | PhotographerSB',
           description: 'Discover photography workshops, exhibitions, networking events in Bangladesh. Register for photography events and competitions.',
           keywords: 'photography events bangladesh, photography workshop dhaka, photo exhibition'
         },
         'competitions': {
-          title: 'Photography Competitions Bangladesh | Photographer SB',
+          title: 'Photography Competitions Bangladesh | PhotographerSB',
           description: 'Join photography competitions in Bangladesh. Submit your best photos, compete with talented photographers, and win exciting prizes.',
           keywords: 'photography competition bangladesh, photo contest, photography awards'
         },
         'admin-competitions-index': {
-          title: 'Manage Competitions | Admin | Photographer SB',
+          title: 'Manage Competitions | Admin | PhotographerSB',
           description: 'Admin panel for managing photography competitions.',
           robots: 'noindex, nofollow'
         },
         'login': {
-          title: 'Login | Photographer SB',
-          description: 'Sign in to your Photographer SB account. Access your dashboard and manage your photography business.',
+          title: 'Login | PhotographerSB',
+          description: 'Sign in to your PhotographerSB account. Access your dashboard and manage your photography business.',
           robots: 'noindex, nofollow',
           canonical: currentUrl
         },
         'admin-login': {
-          title: 'Admin Login | Photographer SB',
-          description: 'Admin sign in to Photographer SB management panel.',
+          title: 'Admin Login | PhotographerSB',
+          description: 'Admin sign in to PhotographerSB management panel.',
           robots: 'noindex, nofollow',
           canonical: currentUrl
         },
         'admin-dashboard': {
-          title: 'Admin Dashboard | Photographer SB',
+          title: 'Admin Dashboard | PhotographerSB',
           description: 'Manage photographers, events, competitions, users, bookings, and platform analytics.',
           robots: 'noindex, nofollow',
           canonical: currentUrl
         },
         'verification-center': {
-          title: 'Verification Center | Photographer SB',
+          title: 'Verification Center | PhotographerSB',
           description: 'Manage your photographer verification documents and credentials.',
           robots: 'noindex, nofollow',
           canonical: currentUrl
         },
         'auth': {
-          title: 'Login / Register | Photographer SB',
+          title: 'Login / Register | PhotographerSB',
           description: 'Sign in to your account or create a new one. Join Bangladesh\'s leading photography marketplace.',
           robots: 'noindex, nofollow',
           canonical: currentUrl
@@ -232,7 +232,7 @@ export default {
       };
 
       return metaMap[routeName] || {
-        title: 'Photographar SB',
+        title: 'PhotographerSB',
         description: 'Find professional photographers in Bangladesh'
       };
     };

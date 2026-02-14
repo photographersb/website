@@ -386,14 +386,14 @@
       </button>
       <button
         v-if="hasPrev"
-        class="absolute left-6 top-1/2 -translate-y-1/2 text-white text-4xl px-3 py-2 rounded-full bg-white/10 hover:bg-white/20"
+        class="absolute left-6 top-1/2 -translate-y-1/2 text-white text-4xl px-3 py-2 rounded-full bg-white hover:bg-white bg-opacity-10 hover:bg-opacity-20"
         @click.stop="goToAdjacent(-1)"
       >
         ‹
       </button>
       <button
         v-if="hasNext"
-        class="absolute right-6 top-1/2 -translate-y-1/2 text-white text-4xl px-3 py-2 rounded-full bg-white/10 hover:bg-white/20"
+        class="absolute right-6 top-1/2 -translate-y-1/2 text-white text-4xl px-3 py-2 rounded-full bg-white hover:bg-white bg-opacity-10 hover:bg-opacity-20"
         @click.stop="goToAdjacent(1)"
       >
         ›

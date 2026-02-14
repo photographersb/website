@@ -1700,3 +1700,4 @@ class AdminController extends Controller
             return 0;
         }
     }
+}

@@ -55,10 +55,10 @@
                     >
                         <div class="aspect-square overflow-hidden bg-gray-100">
                             <img 
-                                src="{{ $photographer->user->profile_photo_url ?? '/placeholder-photographer.jpg' }}" 
-                                alt="{{ $photographer->user->name }}"
-                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                            >
+                                <picture>
+                                    <source srcset="{{ preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $photographer->user->profile_photo_url ?? '/placeholder-photographer.jpg') }}" type="image/webp">
+                                    <img src="{{ $photographer->user->profile_photo_url ?? '/placeholder-photographer.jpg' }}" alt="{{ $photographer->user->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" loading="lazy">
+                                </picture>
                         </div>
                         <div class="p-4">
                             <h3 class="text-lg font-bold text-gray-900 mb-1 group-hover:text-primary-700">
