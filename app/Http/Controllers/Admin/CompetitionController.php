@@ -340,4 +340,136 @@ class CompetitionController extends Controller
             'leaderboard' => $leaderboard
         ]);
     }
+
+    /**
+     * Issue certificate for a competition submission (for manual issuance)
+     */
+    public function issueCertificate(Request $request, Competition $competition)
+    {
+        try {
+            $validated = $request->validate([
+                'submission_id' => 'required|exists:competition_submissions,id',
+                'certificate_type' => 'required|in:participation,winner,finalist,merit',
+                'position' => 'nullable|in:1st,2nd,3rd',
+                'issue_date' => 'required|date',
+                'admin_notes' => 'nullable|string|max:500',
+                'send_email' => 'boolean',
+            ]);
+
+            // Get the submission
+            $submission = CompetitionSubmission::findOrFail($validated['submission_id']);
+
+            if ($submission->competition_id !== $competition->id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Submission does not belong to this competition'
+                ], 400);
+            }
+
+            // Load photographer and user relationship
+            $submission->load(['photographer', 'photographer.user']);
+            
+            if (!$submission->photographer || !$submission->photographer->user) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Photographer information not found'
+                ], 400);
+            }
+
+            // Use CertificateIssuanceService to issue the certificate
+            $issuanceService = app(\App\Services\CertificateIssuanceService::class);
+            
+            // Get or create certificate template
+            $template = \App\Models\CertificateTemplate::where('type', $validated['certificate_type'])
+                ->where('is_default', true)
+                ->first();
+
+            if (!$template) {
+                // Create a basic template if none exists
+                $template = \App\Models\CertificateTemplate::create([
+                    'title' => ucfirst(str_replace('_', ' ', $validated['certificate_type'])) . ' Certificate',
+                    'type' => $validated['certificate_type'],
+                    'description' => 'Auto-generated certificate template',
+                    'width' => 1000,
+                    'height' => 700,
+                    'background_color' => '#ffffff',
+                    'accent_color' => '#8e0e3f',
+                    'text_color' => '#000000',
+                ]);
+            }
+
+            // Issue the certificate
+            $certificate = $issuanceService->issueCertificate(
+                template: $template,
+                event: null, // No event for competition certificates
+                user: $submission->photographer->user,
+                participantName: $submission->photographer->user->name,
+                participantEmail: $submission->photographer->user->email,
+                autoGenerate: false
+            );
+
+            // Update submission with certificate reference
+            $updateData = [
+                'certificate_id' => $certificate->id,
+            ];
+            
+            // Only update fields that exist in the model and are mass-assignable
+            try {
+                if (in_array('certificate_issued_at', $submission->getFillable())) {
+                    $updateData['certificate_issued_at'] = $validated['issue_date'];
+                }
+                if (in_array('awarded_type', $submission->getFillable())) {
+                    $updateData['awarded_type'] = $validated['certificate_type'];
+                }
+                if (in_array('award_position', $submission->getFillable())) {
+                    $updateData['award_position'] = $validated['position'];
+                }
+            } catch (\Exception $e) {
+                \Log::debug('Could not check fillable attributes', ['error' => $e->getMessage()]);
+            }
+            
+            $submission->update($updateData);
+
+            // Send email if requested
+            if ($validated['send_email']) {
+                try {
+                    // Try to send email if Mail notification is configured
+                    \Notification::send($submission->photographer->user, new \App\Notifications\CertificateIssuedNotification($certificate, $submission));
+                } catch (\Exception $e) {
+                    \Log::warning('Failed to send certificate notification', [
+                        'certificate_id' => $certificate->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Certificate issued successfully',
+                'data' => [
+                    'certificate_id' => $certificate->id,
+                    'certificate_code' => $certificate->certificate_code,
+                    'submission_id' => $submission->id,
+                ]
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Certificate issuance error', [
+                'competition_id' => $competition->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to issue certificate: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

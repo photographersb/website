@@ -39,13 +39,29 @@ class WinnerCalculationService
         
         // Calculate final scores for each submission
         $scoredSubmissions = $submissions->map(function ($submission) use ($voteWeight, $judgeWeight) {
-            // Normalize vote count (0-100 scale)
-            $maxVotes = CompetitionSubmission::where('competition_id', $submission->competition_id)
-                ->max('vote_count');
-            $normalizedVotes = $maxVotes > 0 ? ($submission->vote_count / $maxVotes) * 100 : 0;
+            $voteCount = $submission->vote_count ?? 0;
+            $judgeScore = $submission->judge_score ?? 0;
             
-            // Normalize judge score (already 0-50, convert to 0-100)
-            $normalizedJudgeScore = $submission->judge_score ? ($submission->judge_score / 50) * 100 : 0;
+            // Find max vote count for normalization (avoid division by zero)
+            $maxVotesInCompetition = CompetitionSubmission::where('competition_id', $submission->competition_id)
+                ->where('status', 'approved')
+                ->max('vote_count') ?? 0;
+            
+            // Normalize vote count (0-100 scale)
+            // If no votes at all in competition, use 0
+            if ($maxVotesInCompetition <= 0 && $voteCount <= 0) {
+                $normalizedVotes = 0;
+            } else {
+                $normalizedVotes = $maxVotesInCompetition > 0 
+                    ? min(100, ($voteCount / $maxVotesInCompetition) * 100) 
+                    : 0;
+            }
+            
+            // Normalize judge score (0-50 becomes 0-100 scale)
+            // Judge scores range from 0 to 50 (5 criteria x 10 points each)
+            $normalizedJudgeScore = $judgeScore > 0 
+                ? min(100, ($judgeScore / 50) * 100) 
+                : 0;
             
             // Calculate weighted final score
             $finalScore = ($normalizedVotes * $voteWeight) + ($normalizedJudgeScore * $judgeWeight);
@@ -57,31 +73,24 @@ class WinnerCalculationService
             return $submission;
         });
         
-        // Sort by final score (descending)
-        $rankedSubmissions = $scoredSubmissions->sortByDesc('final_score')->values();
-        
-        // Handle tie-breaking (if scores are equal, prioritize judge scores)
-        $rankedSubmissions = $rankedSubmissions->sortByDesc(function ($submission) {
-            return [$submission->final_score, $submission->judge_score, $submission->vote_count];
+        // Sort by final score (descending), then by judge score, then by vote count for consistency
+        $rankedSubmissions = $scoredSubmissions->sortByDesc(function ($submission) {
+            return [
+                $submission->final_score,
+                $submission->judge_score ?? 0,
+                $submission->vote_count ?? 0
+            ];
         })->values();
         
         // Assign ranks and awards
         $winners = [];
         $rank = 1;
         $previousScore = null;
-        $sameRankCount = 0;
         
         foreach ($rankedSubmissions as $index => $submission) {
-            // Handle ties
-            if ($previousScore !== null && abs($previousScore - $submission->final_score) < 0.01) {
-                // Same score as previous, same rank
-                $sameRankCount++;
-            } else {
-                // Different score, increment rank by number of tied entries
-                if ($sameRankCount > 0) {
-                    $rank += $sameRankCount;
-                    $sameRankCount = 0;
-                }
+            // If score differs from previous, update rank (can be > 1 if there were ties)
+            if ($previousScore !== null && abs($previousScore - $submission->final_score) > 0.01) {
+                $rank = $index + 1; // Use index-based ranking (accounts for ties naturally)
             }
             
             $submission->rank = $rank;
@@ -114,7 +123,6 @@ class WinnerCalculationService
             }
             
             $previousScore = $submission->final_score;
-            $rank++;
         }
         
         return [

@@ -167,7 +167,7 @@ class AuthController extends Controller
         $user = $request->user();
 
         if ($user->role === 'photographer') {
-            $user->load('photographer');
+            $user->load(['photographer.categories', 'photographer.city']);
         }
 
         return $this->success($user, 'User data retrieved successfully');

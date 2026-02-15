@@ -9,13 +9,13 @@
         <div class="absolute -bottom-28 -left-24 h-80 w-80 rounded-full bg-[#c46b7a]/20 blur-3xl" />
       </div>
 
-      <div class="container mx-auto px-4 py-16 md:py-24 relative z-10">
+      <div class="container mx-auto px-4 pt-10 pb-16 md:pt-10 md:pb-24 relative z-10">
         <!-- Logo/Brand Section -->
-        <div class="text-center mb-8">
-          <div class="inline-block mb-4 px-6 py-2 bg-white bg-opacity-10 backdrop-blur-sm rounded-full border border-white border-opacity-20">
-            <p class="text-sm md:text-base font-medium flex items-center gap-2 justify-center">
+        <div class="text-center mt-5 mb-4 sm:mb-5 md:mb-6 lg:mb-8">
+          <div class="inline-flex mb-2 sm:mb-3 px-3 sm:px-4 py-1 sm:py-1.5 bg-white bg-opacity-10 backdrop-blur-sm rounded-full border border-white border-opacity-20">
+            <p class="text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2 justify-center">
               <svg
-                class="w-5 h-5"
+                class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -77,7 +77,7 @@
     </section>
 
     <!-- Main Content -->
-    <div class="container mx-auto px-4 py-12">
+    <div class="container mx-auto px-4 py-12 mt-5">
       <!-- Filters -->
       <div class="bg-white/90 backdrop-blur rounded-2xl shadow-xl border border-[#eadfd7] p-4 sm:p-5 md:p-6 mb-6 sm:mb-8">
         <div class="flex items-center gap-3 sm:hidden">
@@ -303,7 +303,7 @@
             </div>
 
             <!-- Details -->
-            <div class="space-y-2 text-xs sm:text-sm mb-4">
+            <div class="space-y-2 text-xs sm:text-sm mb-5">
               <div class="flex items-center justify-between">
                 <span class="text-gray-600 flex items-center gap-1">
                   <svg

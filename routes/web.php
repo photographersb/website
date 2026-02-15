@@ -176,18 +176,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,super_admin,moderator'])
         Route::post('/{certificate}/reissue', [\App\Http\Controllers\Admin\CertificateController::class, 'reissue'])->name('reissue');
     });
 
-    // Event Management (Web-based CRUD UI)
-    Route::prefix('events')->name('admin.events.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\EventController::class, 'index'])->name('index');
-        Route::get('/create', [\App\Http\Controllers\Admin\EventController::class, 'create'])->name('create');
-        Route::post('/', [\App\Http\Controllers\Admin\EventController::class, 'store'])->name('store');
-        Route::get('/{event}', [\App\Http\Controllers\Admin\EventController::class, 'show'])->name('show');
-        Route::get('/{event}/edit', [\App\Http\Controllers\Admin\EventController::class, 'edit'])->name('edit');
-        Route::put('/{event}', [\App\Http\Controllers\Admin\EventController::class, 'update'])->name('update');
-        Route::delete('/{event}', [\App\Http\Controllers\Admin\EventController::class, 'destroy'])->name('destroy');
-    });
-
-    // Event Attendance QR Scanning
+    // Event Attendance QR Scanning (shared with Vue interface)
     Route::prefix('events/{event}/attendance')->name('admin.events.attendance.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\EventAttendanceController::class, 'index'])->name('index');
         Route::get('/mobile', [\App\Http\Controllers\Admin\EventAttendanceController::class, 'mobile'])->name('mobile');

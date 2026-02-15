@@ -158,6 +158,22 @@
           </select>
 
           <select
+            v-model="filters.type"
+            class="filter-select"
+            @change="fetchTransactions"
+          >
+            <option value="">
+              All Types
+            </option>
+            <option value="booking">
+              Booking Payments
+            </option>
+            <option value="event_tickets">
+              Event Tickets
+            </option>
+          </select>
+
+          <select
             v-model="filters.method"
             class="filter-select"
             @change="fetchTransactions"
@@ -166,7 +182,7 @@
               All Methods
             </option>
             <option value="card">
-              Card
+              Card / SSLCommerz
             </option>
             <option value="bkash">
               bKash
@@ -174,8 +190,11 @@
             <option value="nagad">
               Nagad
             </option>
-            <option value="bank">
-              Bank Transfer
+            <option value="rocket">
+              Rocket
+            </option>
+            <option value="manual">
+              Manual Transfer
             </option>
           </select>
 
@@ -207,8 +226,10 @@
                 <th>Transaction ID</th>
                 <th>User</th>
                 <th>Type</th>
+                <th v-if="!filters.type || filters.type === 'booking'">Gateway</th>
+                <th v-else-if="filters.type === 'event_tickets'">Event / Method</th>
+                <th v-else>Method</th>
                 <th>Amount</th>
-                <th>Gateway</th>
                 <th>Status</th>
                 <th>Date</th>
                 <th>Actions</th>
@@ -221,7 +242,7 @@
                 class="transaction-row"
               >
                 <td>
-                  <span class="transaction-id">#{{ transaction.id }}</span>
+                  <span class="transaction-id">#{{ transaction.transaction_id }}</span>
                 </td>
                 <td>
                   <div class="user-cell">
@@ -239,18 +260,29 @@
                   </div>
                 </td>
                 <td>
-                  <span class="transaction-type">{{ capitalizeFirst(transaction.type) }}</span>
+                  <span class="transaction-type">{{ transaction.type === 'event_tickets' ? 'Event Ticket' : capitalizeFirst(transaction.type) }}</span>
+                </td>
+                <td>
+                  <div v-if="transaction.type === 'event_tickets'">
+                    <div class="event-info">
+                      <strong>{{ transaction.event?.title || 'Event' }}</strong>
+                      <br/>
+                      <span class="method-badge" :class="`badge-${getMethodColor(transaction.method)}`">
+                        {{ capitalizeFirst(transaction.method) }}
+                      </span>
+                    </div>
+                  </div>
+                  <div v-else>
+                    <span
+                      class="gateway-badge"
+                      :class="`badge-${getGatewayColor(transaction.method)}`"
+                    >
+                      {{ capitalizeFirst(transaction.method) }}
+                    </span>
+                  </div>
                 </td>
                 <td>
                   <span class="amount-text">৳{{ formatNumber(transaction.amount) }}</span>
-                </td>
-                <td>
-                  <span
-                    class="gateway-badge"
-                    :class="`badge-${getGatewayColor(transaction.payment_method)}`"
-                  >
-                    {{ capitalizeFirst(transaction.payment_method) }}
-                  </span>
                 </td>
                 <td>
                   <span :class="`badge badge-${getStatusColor(transaction.status)}`">
@@ -265,7 +297,7 @@
                     <button
                       class="btn-action"
                       title="View Details"
-                      @click="viewTransaction(transaction)"
+                      @click="transaction.type === 'event_tickets' ? viewEventPayment(transaction) : viewTransaction(transaction)"
                     >
                       <svg
                         class="w-4 h-4"
@@ -382,6 +414,157 @@
           </div>
         </div>
       </div>
+
+      <!-- Event Payment Modal -->
+      <div
+        v-if="showEventPaymentModal && selectedEventPayment"
+        class="modal-overlay"
+        @click.self="showEventPaymentModal = false"
+      >
+        <div class="modal modal-lg">
+          <div class="modal-header">
+            <h3>Event Payment Review</h3>
+            <button
+              class="modal-close"
+              @click="showEventPaymentModal = false"
+            >
+              ×
+            </button>
+          </div>
+          <div class="modal-body payment-modal-body">
+            <div class="payment-details-grid">
+              <div class="detail-item">
+                <span class="detail-label">Event:</span>
+                <span class="detail-value">{{ selectedEventPayment.event?.name || 'N/A' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">User:</span>
+                <span class="detail-value">{{ selectedEventPayment.user?.name }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Email:</span>
+                <span class="detail-value">{{ selectedEventPayment.user?.email }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Amount:</span>
+                <span class="detail-value">৳{{ formatNumber(selectedEventPayment.amount) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Payment Method:</span>
+                <span :class="`badge badge-${getMethodColor(selectedEventPayment.method)}`">
+                  {{ capitalizeFirst(selectedEventPayment.method) }}
+                </span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Status:</span>
+                <span :class="`badge badge-${getStatusColor(selectedEventPayment.status)}`">
+                  {{ capitalizeFirst(selectedEventPayment.status) }}
+                </span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Transaction ID:</span>
+                <span class="detail-value">{{ selectedEventPayment.transaction_id }}</span>
+              </div>
+              <div class="detail-item" v-if="selectedEventPayment.sender_number">
+                <span class="detail-label">Sender Number:</span>
+                <span class="detail-value">{{ selectedEventPayment.sender_number }}</span>
+              </div>
+              <div class="detail-item" v-if="selectedEventPayment.trx_id">
+                <span class="detail-label">TRX ID:</span>
+                <span class="detail-value">{{ selectedEventPayment.trx_id }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Date:</span>
+                <span class="detail-value">{{ formatDate(selectedEventPayment.created_at) }}</span>
+              </div>
+            </div>
+
+            <!-- Screenshot Preview -->
+            <div v-if="selectedEventPayment.screenshot_path" class="screenshot-section">
+              <h4>Payment Proof</h4>
+              <img :src="`/storage/${selectedEventPayment.screenshot_path}`" alt="Payment Proof" class="screenshot-preview"/>
+            </div>
+
+            <!-- Admin Note -->
+            <div v-if="selectedEventPayment.status === 'pending'" class="admin-note-section">
+              <label class="detail-label">Admin Note (Optional)</label>
+              <textarea
+                v-model="approvalAdminNote"
+                placeholder="Add any notes about this payment approval/rejection..."
+                class="admin-note-textarea"
+              ></textarea>
+            </div>
+
+            <!-- Admin Note for Cancellation -->
+            <div v-if="selectedEventPayment.status === 'completed'" class="admin-note-section">
+              <label class="detail-label">Cancellation Note (Optional)</label>
+              <textarea
+                v-model="approvalAdminNote"
+                placeholder="Reason for cancellation..."
+                class="admin-note-textarea"
+              ></textarea>
+            </div>
+
+            <!-- Approved/Rejected Info -->
+            <div v-if="selectedEventPayment.status === 'rejected' || selectedEventPayment.status === 'cancelled'" class="approval-info">
+              <p v-if="selectedEventPayment.verified_by_user_id">
+                <strong>Verified By:</strong> Admin ID {{ selectedEventPayment.verified_by_user_id }}
+              </p>
+              <p v-if="selectedEventPayment.verified_at">
+                <strong>Verified At:</strong> {{ formatDate(selectedEventPayment.verified_at) }}
+              </p>
+            </div>
+          </div>
+          <div class="modal-footer" v-if="selectedEventPayment.status === 'pending'">
+            <button
+              class="btn btn-secondary"
+              @click="showEventPaymentModal = false"
+            >
+              Close
+            </button>
+            <button
+              class="btn btn-danger"
+              :disabled="approvingPayment"
+              @click="rejectEventPayment"
+            >
+              {{ approvingPayment ? 'Processing...' : 'Reject' }}
+            </button>
+            <button
+              class="btn btn-success"
+              :disabled="approvingPayment"
+              @click="approveEventPayment"
+            >
+              {{ approvingPayment ? 'Processing...' : 'Approve' }}
+            </button>
+          </div>
+          <!-- Cancel button for completed payments -->
+          <div class="modal-footer" v-else-if="selectedEventPayment.status === 'completed'">
+            <button
+              class="btn btn-secondary"
+              @click="showEventPaymentModal = false"
+            >
+              Close
+            </button>
+            <button
+              class="btn btn-danger"
+              :disabled="approvingPayment"
+              @click="cancelEventPayment"
+            >
+              {{ approvingPayment ? 'Processing...' : 'Cancel Payment' }}
+            </button>
+          </div>
+          <!-- Close button for other statuses -->
+          <div class="modal-footer" v-else>
+            <button
+              class="btn btn-secondary"
+              @click="showEventPaymentModal = false"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Toast -->
       <div
         v-if="showToast"
@@ -406,12 +589,17 @@ const transactions = ref([])
 const loading = ref(false)
 const showViewModal = ref(false)
 const selectedTransaction = ref(null)
+const showEventPaymentModal = ref(false)
+const selectedEventPayment = ref(null)
+const approvalAdminNote = ref('')
+const approvingPayment = ref(false)
 const showToast = ref(false)
 const toastMessage = ref('')
 
 const filters = ref({
   search: '',
   status: '',
+  type: '',
   method: '',
   date: ''
 })
@@ -501,21 +689,22 @@ const fetchTransactions = async () => {
     const params = {}
     if (filters.value.search) params.search = filters.value.search
     if (filters.value.status) params.status = filters.value.status
+    if (filters.value.type) params.type = filters.value.type
     if (filters.value.method) params.gateway = filters.value.method
     if (filters.value.date) params.date_from = filters.value.date
 
     const { data: result } = await api.get('/admin/transactions', { params })
-    transactions.value = result.data?.data || []
+    transactions.value = result.data || []
 
     // Update stats from backend response
-    if (result.stats) {
+    if (result.meta?.stats) {
       stats.value = {
-        totalRevenue: result.stats.total_revenue || 0,
-        monthlyRevenue: result.stats.monthly_revenue || 0,
+        totalRevenue: result.meta.stats.total_revenue || 0,
+        monthlyRevenue: result.meta.stats.monthly_revenue || 0,
         pendingRevenue: 0,
-        pendingCount: result.stats.pending || 0,
-        growth: result.stats.growth ?? stats.value.growth,
-        ...result.stats
+        pendingCount: result.meta.stats.pending || 0,
+        growth: result.meta.stats.growth ?? stats.value.growth,
+        ...result.meta.stats
       }
     }
   } catch (error) {
@@ -531,6 +720,70 @@ const viewTransaction = (transaction) => {
   showViewModal.value = true
 }
 
+const viewEventPayment = (transaction) => {
+  if (transaction.type === 'event_tickets') {
+    selectedEventPayment.value = transaction
+    showEventPaymentModal.value = true
+  }
+}
+
+const approveEventPayment = async () => {
+  approvingPayment.value = true
+  try {
+    const paymentId = selectedEventPayment.value.id.replace('event_', '')
+    await api.post(`/admin/transactions/event-payment/${paymentId}/approve`, {
+      admin_note: approvalAdminNote.value
+    })
+    showToastMessage('Event payment approved successfully')
+    showEventPaymentModal.value = false
+    approvalAdminNote.value = ''
+    fetchTransactions()
+  } catch (error) {
+    console.error('Error approving payment:', error)
+    showToastMessage('Error approving payment')
+  } finally {
+    approvingPayment.value = false
+  }
+}
+
+const rejectEventPayment = async () => {
+  approvingPayment.value = true
+  try {
+    const paymentId = selectedEventPayment.value.id.replace('event_', '')
+    await api.post(`/admin/transactions/event-payment/${paymentId}/reject`, {
+      admin_note: approvalAdminNote.value
+    })
+    showToastMessage('Event payment rejected successfully')
+    showEventPaymentModal.value = false
+    approvalAdminNote.value = ''
+    fetchTransactions()
+  } catch (error) {
+    console.error('Error rejecting payment:', error)
+    showToastMessage('Error rejecting payment')
+  } finally {
+    approvingPayment.value = false
+  }
+}
+
+const cancelEventPayment = async () => {
+  approvingPayment.value = true
+  try {
+    const paymentId = selectedEventPayment.value.id.replace('event_', '')
+    await api.post(`/admin/transactions/event-payment/${paymentId}/cancel`, {
+      admin_note: approvalAdminNote.value
+    })
+    showToastMessage('Event payment cancelled and ticket availability restored')
+    showEventPaymentModal.value = false
+    approvalAdminNote.value = ''
+    fetchTransactions()
+  } catch (error) {
+    console.error('Error cancelling payment:', error)
+    showToastMessage('Error cancelling payment')
+  } finally {
+    approvingPayment.value = false
+  }
+}
+
 const exportTransactions = () => {
   showToastMessage('Export feature coming soon')
 }
@@ -540,6 +793,8 @@ const getStatusColor = (status) => {
     completed: 'success',
     pending: 'warning',
     failed: 'danger',
+    rejected: 'danger',
+    cancelled: 'warning',
     refunded: 'info'
   }
   return colors[status] || 'gray'
@@ -551,6 +806,17 @@ const getGatewayColor = (method) => {
     bkash: 'pink',
     nagad: 'orange',
     bank: 'purple'
+  }
+  return colors[method] || 'gray'
+}
+
+const getMethodColor = (method) => {
+  const colors = {
+    manual: 'blue',
+    bkash: 'pink',
+    nagad: 'orange',
+    rocket: 'purple',
+    card: 'blue'
   }
   return colors[method] || 'gray'
 }
@@ -666,6 +932,36 @@ onMounted(() => {
 .detail-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; }
 .detail-label { font-weight: 600; color: #6b7280; }
 .detail-value { color: #1f2937; }
+
+.modal-lg { max-width: 800px; }
+.payment-modal-body { }
+.payment-details-grid { display: grid; gap: 1rem; margin-bottom: 2rem; }
+.screenshot-section { margin: 2rem 0; }
+.screenshot-section h4 { margin: 0 0 1rem 0; font-size: 1rem; font-weight: 600; color: #1f2937; }
+.screenshot-preview { max-width: 100%; max-height: 400px; border-radius: 0.5rem; border: 1px solid #e5e7eb; }
+.admin-note-section { margin: 2rem 0; }
+.admin-note-textarea { width: 100%; min-height: 100px; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; font-family: inherit; font-size: 0.875rem; }
+.approval-info { background: #f0fdf4; padding: 1rem; border-radius: 0.5rem; color: #166534; }
+.approval-info p { margin: 0.5rem 0; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 0.75rem; padding: 1.5rem; border-top: 1px solid #e5e7eb; }
+.btn { padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 500; transition: background-color 0.2s; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-secondary { background: #e5e7eb; color: #1f2937; }
+.btn-secondary:hover:not(:disabled) { background: #d1d5db; }
+.btn-success { background: #10b981; color: white; }
+.btn-success:hover:not(:disabled) { background: #059669; }
+.btn-danger { background: #ef4444; color: white; }
+.btn-danger:hover:not(:disabled) { background: #dc2626; }
+.method-badge { padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; }
+.badge-blue { background: #dbeafe; color: #1e40af; }
+.badge-pink { background: #fbddf3; color: #9d174d; }
+.badge-orange { background: #fed7aa; color: #92400e; }
+.badge-purple { background: #e9d5ff; color: #6b21a8; }
+.badge-success { background: #dcfce7; color: #166534; }
+.badge-warning { background: #fef3c7; color: #92400e; }
+.badge-danger { background: #fee2e2; color: #991b1b; }
+.badge-info { background: #cffafe; color: #164e63; }
+.badge-gray { background: #f3f4f6; color: #374151; }
 
 .toast { position: fixed; bottom: 2rem; right: 2rem; background: #065f46; color: white; padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); animation: slideIn 0.3s ease-out; z-index: 1001; }
 @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }

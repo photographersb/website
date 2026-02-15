@@ -25,7 +25,7 @@ class SuperAdminSeeder extends Seeder
                 'email_verified_at' => now(),
                 'approval_status' => 'approved',
                 'approved_at' => now(),
-                'approved_by' => null, // Super admin doesn't need approver
+                'approved_by_admin_id' => null, // Super admin doesn't need approver
                 'is_suspended' => false,
                 'suspension_reason' => null,
                 'suspended_at' => null,
@@ -44,7 +44,7 @@ class SuperAdminSeeder extends Seeder
                 'phone_verified_at' => now(),
                 'approval_status' => 'approved',
                 'approved_at' => now(),
-                'approved_by' => null, // Super admin doesn't need approver
+                'approved_by_admin_id' => null, // Super admin doesn't need approver
                 'avatar_url' => null,
                 'bio' => 'Principal Architect & System Administrator - Somogro Bangladesh',
                 'is_suspended' => false,

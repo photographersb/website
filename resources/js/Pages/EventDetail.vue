@@ -107,7 +107,7 @@
         <!-- Left Column: Event Details -->
         <div class="lg:col-span-2 space-y-6 sm:space-y-8">
           <!-- Stats Grid -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div class="bg-white rounded-lg shadow-md p-3 sm:p-4 text-center">
               <div class="text-2xl sm:text-3xl font-bold text-burgundy">
                 {{ event.registered_count || 0 }}
@@ -349,16 +349,14 @@
             </div>
 
             <button
-              :disabled="isEventFull || isPaid"
+              :disabled="isEventFull"
               :class="[
                 'w-full py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg transition-colors',
                 isRsvped
                   ? 'bg-green-600 text-white hover:bg-green-700'
                   : isEventFull
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : isPaid
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : 'bg-burgundy text-white hover:bg-rose-800'
+                    : 'bg-burgundy text-white hover:bg-rose-800'
               ]"
               @click="handleRsvp"
             >
@@ -366,7 +364,7 @@
                 isEventFull
                   ? 'Event Full'
                   : isPaid
-                    ? 'Tickets Required'
+                    ? 'Buy Tickets'
                     : isRsvped
                       ? '✓ Registered'
                       : 'Register Now'
@@ -377,7 +375,7 @@
               v-if="!isEventFull"
               class="mt-3 sm:mt-4 text-center text-xs sm:text-sm text-gray-600"
             >
-              {{ event.max_attendees ? `${event.max_attendees - (event.registered_count || 0)} spots left` : 'Unlimited spots' }}
+              {{ spotsLeftText }}
             </div>
           </div>
 
@@ -546,9 +544,9 @@ const isEventFull = computed(() => {
 const isPaid = computed(() => {
   if (!event.value) return false;
   if (typeof event.value.is_paid === 'boolean') return event.value.is_paid;
-  if (typeof event.value.is_ticketed === 'boolean') return event.value.is_ticketed;
   if (event.value.event_mode) return event.value.event_mode === 'paid';
   if (event.value.event_type) return event.value.event_type === 'paid';
+  if (typeof event.value.is_ticketed === 'boolean') return event.value.is_ticketed;
 
   const numeric = Number(
     event.value.ticket_price ?? event.value.price ?? event.value.base_price ?? 0
@@ -572,12 +570,31 @@ const priceValue = computed(() => {
   }
 
   const direct = Number(
-    event.value.price ?? event.value.ticket_price ?? event.value.base_price ?? 0
+    event.value.ticket_price ?? event.value.price ?? event.value.base_price ?? 0
   );
   return Number.isFinite(direct) ? direct : 0;
 });
 
 const priceCurrency = computed(() => event.value?.currency || 'BDT');
+
+const spotsLeftText = computed(() => {
+  if (!event.value) return '';
+
+  if (Array.isArray(event.value.tickets) && event.value.tickets.length > 0) {
+    const totalAvailable = event.value.tickets.reduce((sum, ticket) => {
+      const available = Number(ticket.available_quantity ?? ticket.quantity ?? 0);
+      return sum + (Number.isFinite(available) ? available : 0);
+    }, 0);
+    return `${totalAvailable} spots left`;
+  }
+
+  if (event.value.max_attendees) {
+    const remaining = event.value.max_attendees - (event.value.registered_count || 0);
+    return `${Math.max(remaining, 0)} spots left`;
+  }
+
+  return 'Unlimited spots';
+});
 
 const heroImage = computed(() => {
   if (!event.value) return null;
@@ -658,6 +675,11 @@ const handleRsvp = async () => {
   }
 
   if (isEventFull.value) return;
+
+  if (isPaid.value) {
+    router.push(`/events/${event.value?.slug}/tickets`);
+    return;
+  }
 
   try {
     const rsvpStatus = isRsvped.value ? 'not_going' : 'going';

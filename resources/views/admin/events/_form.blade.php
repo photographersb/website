@@ -201,7 +201,7 @@
                     <option value="">Select Template</option>
                     @foreach($certificateTemplates as $template)
                     <option value="{{ $template->id }}" {{ old('certificate_template_id', $event->certificate_template_id ?? '') == $template->id ? 'selected' : '' }}>
-                        {{ $template->name }}
+                        {{ $template->title }}
                     </option>
                     @endforeach
                 </select>
@@ -220,7 +220,7 @@
         <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-burgundy-500" id="mentors" name="mentors[]" multiple size="6">
             @foreach($mentors as $mentor)
             <option value="{{ $mentor->id }}" 
-                {{ in_array($mentor->id, old('mentors', $event->mentors->pluck('id')->toArray() ?? [])) ? 'selected' : '' }}>
+                {{ in_array($mentor->id, old('mentors', $event->id ? ($event->mentors?->pluck('id')->toArray() ?? []) : [])) ? 'selected' : '' }}>
                 {{ $mentor->name }}
             </option>
             @endforeach

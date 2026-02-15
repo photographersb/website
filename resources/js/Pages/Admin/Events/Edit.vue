@@ -201,12 +201,6 @@
                   {{ city.name }}
                 </option>
               </select>
-                <router-link
-                  to="/admin/locations"
-                  class="mt-1 inline-block text-sm text-burgundy hover:text-burgundy-dark"
-                >
-                  Manage Locations →
-                </router-link>
               <p v-if="cities.length === 0" class="mt-1 text-sm text-warning-700">⚠️ No locations available. Please add locations from Admin → Locations first.</p>
               <p v-if="errors.city_id" class="mt-1 text-sm text-red-600">{{ errors.city_id }}</p>
             </div>
@@ -324,12 +318,6 @@
                   {{ photographer.user?.name || `Photographer #${photographer.id}` }}
                 </option>
               </select>
-                <router-link
-                  to="/admin/photographers"
-                  class="mt-1 inline-block text-sm text-burgundy hover:text-burgundy-dark"
-                >
-                  Manage photographers →
-                </router-link>
               <p class="mt-1 text-sm text-gray-500">Select the photographer organizing this event</p>
               <p v-if="errors.organizer_id" class="mt-1 text-sm text-red-600">{{ errors.organizer_id }}</p>
             </div>

@@ -11,6 +11,7 @@
    ============================================ */
 
 :root {
+  color-scheme: light;
   /* Prevent iOS input zoom by setting minimum font-size */
   input, textarea, select {
     font-size: 16px;
@@ -81,14 +82,19 @@
   --sb-transition-slow: all 0.3s ease-in-out;
 }
 
-/* Dark Mode Variables (Optional) */
+/* Dark Mode Override (keep light theme for consistency) */
 @media (prefers-color-scheme: dark) {
   :root {
-    --sb-bg: #111827;
-    --sb-card-bg: #1F2937;
-    --sb-text: #F9FAFB;
-    --sb-text-light: #D1D5DB;
-    --sb-border: #374151;
+    --sb-bg: #F9FAFB;
+    --sb-card-bg: #FFFFFF;
+    --sb-text: #1F2937;
+    --sb-text-light: #6B7280;
+    --sb-border: #E5E7EB;
+  }
+
+  body {
+    background: #ffffff;
+    color: #111827;
   }
 }
 
@@ -182,6 +188,7 @@ button {
 .upload-input {
   width: 100%;
   border: 1px dashed rgba(139, 21, 56, 0.35);
+  background-color: #FDF2F5;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(253, 242, 245, 0.9));
   border-radius: 0.75rem;
   padding: 0.75rem 0.9rem;
@@ -208,6 +215,7 @@ button {
   position: relative;
   border: 2px dashed rgba(139, 21, 56, 0.35);
   border-radius: 1rem;
+  background-color: #ffffff;
   background:
     radial-gradient(circle at 10% 15%, rgba(139, 21, 56, 0.08), transparent 45%),
     radial-gradient(circle at 85% 10%, rgba(20, 83, 45, 0.08), transparent 40%),
@@ -310,7 +318,7 @@ body, html {
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
-  padding: 0.5rem 0.85rem;
+  padding: 0.6rem 1rem;
   border-radius: 9999px;
   background: rgba(139, 21, 56, 0.08);
   border: 1px solid rgba(139, 21, 56, 0.18);

@@ -7,6 +7,7 @@ use App\Models\EventRegistration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Services\QRCodeService;
 
 class EventController extends Controller
@@ -120,7 +121,7 @@ class EventController extends Controller
             try {
                 QRCodeService::generateForEventRegistration($registration);
             } catch (\Exception $e) {
-                \Log::error('QR generation failed', ['registration_id' => $registration->id]);
+                Log::error('QR generation failed', ['registration_id' => $registration->id]);
             }
 
             return redirect()->route('registrations.confirmation', $registration)
@@ -138,7 +139,7 @@ class EventController extends Controller
     public function payment(EventRegistration $registration)
     {
         // User can only see their own payments
-        if ($registration->user_id !== auth()->id()) {
+        if (!Auth::check() || $registration->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -156,7 +157,7 @@ class EventController extends Controller
     public function paymentCallback(Request $request, EventRegistration $registration)
     {
         // User can only process their own payments
-        if ($registration->user_id !== auth()->id()) {
+        if (!Auth::check() || $registration->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -178,7 +179,7 @@ class EventController extends Controller
         try {
             QRCodeService::generateForEventRegistration($registration);
         } catch (\Exception $e) {
-            \Log::error('QR generation failed', ['registration_id' => $registration->id]);
+            Log::error('QR generation failed', ['registration_id' => $registration->id]);
         }
 
         return redirect()->route('registrations.confirmation', $registration)
@@ -191,7 +192,7 @@ class EventController extends Controller
     public function confirmation(EventRegistration $registration)
     {
         // User can only see their own confirmation
-        if ($registration->user_id !== auth()->id()) {
+        if (!Auth::check() || $registration->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -215,7 +216,7 @@ class EventController extends Controller
     public function downloadTicket(EventRegistration $registration)
     {
         // User can only download their own
-        if ($registration->user_id !== auth()->id()) {
+        if (!Auth::check() || $registration->user_id !== Auth::id()) {
             abort(403);
         }
 

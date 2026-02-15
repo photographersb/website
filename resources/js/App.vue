@@ -56,7 +56,6 @@
               alt="Photographers - Across Somagro Bangladesh"
               class="h-8 md:h-12 w-auto"
             >
-            <span class="sb-nav__beta">Beta</span>
           </router-link>
 
           <button
@@ -377,7 +376,7 @@
     <footer class="bg-gray-900 text-white mt-auto pt-16 sm:pt-20 pb-20 md:pb-0 overflow-x-hidden">
       <div class="container mx-auto px-4 md:px-6 py-8 md:py-12">
         <!-- Mobile: Compact Layout -->
-        <div class="md:hidden space-y-5">
+        <div class="md:hidden space-y-6">
           <!-- Logo & Social -->
           <div class="text-center">
             <img
@@ -506,7 +505,7 @@
         <!-- Desktop: Original 4-Column Layout -->
         <div class="hidden md:block">
           <!-- Brand & Social -->
-          <div class="flex justify-between items-start mb-10 pb-8 border-b border-gray-800">
+          <div class="flex justify-between items-start mb-12 pb-10 border-b border-gray-800">
             <div class="max-w-xs">
               <div class="mb-4">
                 <img
@@ -963,19 +962,6 @@ watch(() => route.path, (newPath) => {
 
 main {
   flex: 1;
-}
-
-.sb-nav__beta {
-  margin-left: 0.5rem;
-  padding: 0.15rem 0.5rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #7c2d12;
-  background: #fde68a;
-  border-radius: 999px;
-  border: 1px solid #f59e0b;
 }
 
 .sb-error-banner {

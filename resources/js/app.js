@@ -53,6 +53,7 @@ const CompetitionGallery = () => import('./Pages/CompetitionGallery.vue')
 const SubmissionDetail = () => import('./Pages/SubmissionDetail.vue')
 const Events = () => import('./Pages/Events.vue')
 const EventDetail = () => import('./Pages/EventDetail.vue')
+const EventTickets = () => import('./Pages/EventTickets.vue')
 const PhotographerDashboard = () => import('./components/PhotographerDashboard.vue')
 const PhotographerAchievements = () => import('./Pages/PhotographerAchievements.vue')
 const ReviewForm = () => import('./components/ReviewForm.vue')
@@ -177,7 +178,8 @@ const routes = [
     },
     {
         path: '/photographers',
-        redirect: '/photographer',
+        component: PhotographerSearch,
+        name: 'photographers',
     },
     {
         path: '/photographer/:slug/tips',
@@ -311,6 +313,12 @@ const routes = [
         path: '/events/:slug',
         component: EventDetail,
         name: 'event-detail',
+    },
+    {
+        path: '/events/:slug/tickets',
+        component: EventTickets,
+        name: 'event-tickets',
+        meta: { requiresAuth: true },
     },
     {
         path: '/competitions',

@@ -1,255 +1,184 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <!-- Admin Header -->
-    <AdminHeader 
-      title="🎓 Certificate Management" 
+  <div class="min-h-screen">
+    <AdminHeader
+      title="🎓 Certificate Management"
       subtitle="Manage competition certificates and awards"
     />
 
-    <!-- Main Content -->
     <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      <AdminQuickNav />
-      
-      <!-- Header with Action Button -->
-      <div class="flex items-center justify-end">
-        <Link 
-          href="/admin/certificates/manual-issuance"
-          class="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition font-medium flex items-center gap-2"
-        >
-          <svg
-            class="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-          Issue Certificate Manually
-        </Link>
+      <section class="page-hero">
+        <div class="hero-copy">
+          <p class="hero-kicker">CERTIFICATE OPERATIONS</p>
+          <h1 class="hero-title">Certificates, unified.</h1>
+          <p class="hero-subtitle">Track awards, regenerate pending issues, and keep organizers aligned.</p>
+          <div class="hero-actions">
+            <router-link
+              to="/admin/certificates/manual-issuance"
+              class="btn-admin-primary"
+            >
+              + Issue Certificate
+            </router-link>
+            <button
+              class="btn-admin-secondary"
+              @click="loadCertificates"
+            >
+              Refresh
+            </button>
+          </div>
+        </div>
+        <div class="hero-status">
+          <div class="status-card">
+            <span class="status-label">Total</span>
+            <span class="status-value">{{ totalCount }}</span>
+          </div>
+          <div class="status-card">
+            <span class="status-label">Pending</span>
+            <span class="status-value">{{ pendingCount }}</span>
+          </div>
+          <div class="status-card">
+            <span class="status-label">Generated</span>
+            <span class="status-value">{{ generatedCount }}</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="page-topbar">
+        <div class="status-chip">
+          Certificates · Awards
+        </div>
       </div>
 
-      <!-- Tabs -->
-      <div class="flex gap-4 border-b border-gray-200">
+      <AdminQuickNav />
+
+      <div class="tab-bar">
         <button
-          :class="[
-            'px-4 py-3 font-medium border-b-2 transition',
-            activeTab === 'all'
-              ? 'border-orange-500 text-orange-600'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
-          ]"
+          class="tab-button"
+          :class="{ active: activeTab === 'all' }"
           @click="activeTab = 'all'"
         >
           All Certificates ({{ totalCount }})
         </button>
         <button
-          :class="[
-            'px-4 py-3 font-medium border-b-2 transition',
-            activeTab === 'pending'
-              ? 'border-orange-500 text-orange-600'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
-          ]"
+          class="tab-button"
+          :class="{ active: activeTab === 'pending' }"
           @click="activeTab = 'pending'"
         >
           Pending Generation ({{ pendingCount }})
         </button>
         <button
-          :class="[
-            'px-4 py-3 font-medium border-b-2 transition',
-            activeTab === 'generated'
-              ? 'border-orange-500 text-orange-600'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
-          ]"
+          class="tab-button"
+          :class="{ active: activeTab === 'generated' }"
           @click="activeTab = 'generated'"
         >
           Generated ({{ generatedCount }})
         </button>
       </div>
 
-      <!-- Search & Filter -->
-      <div class="flex gap-4">
-        <input 
-          v-model="searchQuery"
-          type="text"
-          placeholder="Search by photographer name, competition..."
-          class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-        >
-        <select
-          v-model="statusFilter"
-          class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-        >
-          <option value="">
-            All Status
-          </option>
-          <option value="participation">
-            Participation
-          </option>
-          <option value="finalist">
-            Finalist
-          </option>
-          <option value="winner">
-            Winner
-          </option>
-          <option value="merit">
-            Merit
-          </option>
-        </select>
+      <div class="filter-grid">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search by photographer name, competition..."
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+          >
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+          <select
+            v-model="statusFilter"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+          >
+            <option value="">All Status</option>
+            <option value="participation">Participation</option>
+            <option value="finalist">Finalist</option>
+            <option value="winner">Winner</option>
+            <option value="merit">Merit</option>
+          </select>
+        </div>
       </div>
 
-      <!-- Certificates Table -->
-      <div
-        v-if="loading"
-        class="bg-white rounded-lg shadow p-12 text-center"
-      >
-        <p class="text-gray-600">
-          Loading certificates...
-        </p>
-      </div>
+      <div class="panel">
+        <div v-if="loading" class="loading">Loading certificates...</div>
 
-      <div
-        v-else-if="filteredCertificates.length === 0"
-        class="bg-white rounded-lg shadow p-12 text-center"
-      >
-        <svg
-          class="w-16 h-16 text-gray-300 mx-auto mb-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 12l2 2 4-4M7 12a5 5 0 1110 0 5 5 0 01-10 0z"
-          />
-        </svg>
-        <h3 class="text-lg font-semibold text-gray-900 mb-2">
-          No Certificates Found
-        </h3>
-        <p class="text-gray-600">
-          Try adjusting your search or filters
-        </p>
-      </div>
+        <div v-else-if="filteredCertificates.length === 0" class="empty">
+          No certificates found. Try adjusting your search or filters.
+        </div>
 
-      <div
-        v-else
-        class="bg-white rounded-lg shadow overflow-hidden"
-      >
-        <table class="w-full">
-          <thead class="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                Photographer
-              </th>
-              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                Competition
-              </th>
-              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                Type
-              </th>
-              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                Status
-              </th>
-              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                Issued Date
-              </th>
-              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200">
-            <tr
-              v-for="cert in filteredCertificates"
-              :key="cert.id"
-              class="hover:bg-gray-50 transition"
-            >
-              <td class="px-6 py-4 text-sm">
-                <div class="flex items-center gap-3">
-                  <img 
-                    :src="cert.photographer_photo || defaultAvatar" 
-                    :alt="cert.photographer_name"
-                    class="w-8 h-8 rounded-full object-cover"
+        <div v-else class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Photographer</th>
+                <th>Competition</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Issued Date</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="cert in filteredCertificates" :key="cert.id">
+                <td>
+                  <div class="flex items-center gap-3">
+                    <img
+                      :src="cert.photographer_photo || defaultAvatar"
+                      :alt="cert.photographer_name"
+                      class="avatar"
+                    >
+                    <span class="font-medium text-gray-900">{{ cert.photographer_name }}</span>
+                  </div>
+                </td>
+                <td class="text-sm text-gray-600">{{ cert.competition_title }}</td>
+                <td>
+                  <span :class="['badge', getCertificateTypeClass(cert.type)]">
+                    {{ getCertificateTypeLabel(cert.type) }}
+                  </span>
+                </td>
+                <td>
+                  <span
+                    v-if="cert.certificate_id"
+                    class="badge badge-active"
                   >
-                  <span class="font-medium text-gray-900">{{ cert.photographer_name }}</span>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-600">
-                {{ cert.competition_title }}
-              </td>
-              <td class="px-6 py-4 text-sm">
-                <span :class="['px-3 py-1 rounded-full text-xs font-medium', getCertificateTypeClass(cert.type)]">
-                  {{ getCertificateTypeLabel(cert.type) }}
-                </span>
-              </td>
-              <td class="px-6 py-4 text-sm">
-                <span
-                  v-if="cert.certificate_id"
-                  class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium"
-                >
-                  <svg
-                    class="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
+                    Generated
+                  </span>
+                  <span
+                    v-else
+                    class="badge badge-pending"
                   >
-                    <path
-                      fill-rule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                  Generated
-                </span>
-                <span
-                  v-else
-                  class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium"
-                >
-                  <svg
-                    class="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
+                    Pending
+                  </span>
+                </td>
+                <td class="text-sm text-gray-600">
+                  {{ cert.certificate_generated_at ? formatDate(cert.certificate_generated_at) : '—' }}
+                </td>
+                <td class="text-right">
+                  <button
+                    v-if="cert.certificate_url"
+                    class="link"
+                    @click="downloadCertificate(cert)"
                   >
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm6 0a1 1 0 100-2 1 1 0 000 2z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                  Pending
-                </span>
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-600">
-                {{ cert.certificate_generated_at ? formatDate(cert.certificate_generated_at) : '—' }}
-              </td>
-              <td class="px-6 py-4 text-sm space-x-2">
-                <button 
-                  v-if="cert.certificate_url"
-                  class="px-3 py-1 text-orange-600 hover:bg-orange-50 rounded transition text-xs font-medium"
-                  @click="downloadCertificate(cert)"
-                >
-                  Download
-                </button>
-                <button 
-                  class="px-3 py-1 text-blue-600 hover:bg-blue-50 rounded transition text-xs font-medium"
-                  @click="viewDetails(cert)"
-                >
-                  Details
-                </button>
-                <button 
-                  v-if="!cert.certificate_id"
-                  class="px-3 py-1 text-green-600 hover:bg-green-50 rounded transition text-xs font-medium"
-                  @click="regenerateCertificate(cert)"
-                >
-                  Generate
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                    Download
+                  </button>
+                  <button
+                    class="link"
+                    @click="viewDetails(cert)"
+                  >
+                    Details
+                  </button>
+                  <button
+                    v-if="!cert.certificate_id"
+                    class="link"
+                    @click="regenerateCertificate(cert)"
+                  >
+                    Generate
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Pagination -->
@@ -279,7 +208,7 @@
       </div>
 
       <!-- Toast -->
-      <div 
+      <div
         v-if="toastMessage"
         :class="[
           'fixed bottom-4 right-4 px-6 py-3 rounded-lg text-white transition z-50',
@@ -294,7 +223,6 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { Link } from '@inertiajs/vue3';
 import api from '../../../api';
 import AdminHeader from '../../../components/AdminHeader.vue';
 import AdminQuickNav from '../../../components/AdminQuickNav.vue';
@@ -447,5 +375,33 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Smooth transitions */
+.page-hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 1.5rem; padding: 1.75rem 2rem; border-radius: 1.5rem; border: 1px solid rgba(142, 14, 63, 0.2); background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(247, 239, 233, 0.82)), linear-gradient(90deg, rgba(142, 14, 63, 0.06), transparent 45%, rgba(109, 72, 56, 0.08)); box-shadow: 0 25px 55px rgba(24, 12, 8, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6); backdrop-filter: blur(6px); }
+.hero-copy { display: flex; flex-direction: column; gap: 0.85rem; }
+.hero-kicker { font-size: 0.7rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--admin-text-secondary); font-weight: 700; }
+.hero-title { font-size: 2rem; line-height: 1.1; color: var(--admin-text-primary); text-shadow: 0 2px 14px rgba(142, 14, 63, 0.18); }
+.hero-subtitle { color: var(--admin-text-secondary); max-width: 520px; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.hero-status { display: grid; gap: 0.8rem; }
+.status-card { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(142, 14, 63, 0.2); border-radius: 1rem; padding: 1rem 1.25rem; box-shadow: 0 16px 35px rgba(22, 12, 8, 0.08); display: flex; flex-direction: column; gap: 0.35rem; }
+.status-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--admin-text-secondary); }
+.status-value { font-size: 1.1rem; font-weight: 700; color: var(--admin-text-primary); }
+.page-topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1.25rem; background: rgba(255, 255, 255, 0.88); border: 1px solid rgba(140, 108, 95, 0.2); border-radius: 1.1rem; box-shadow: 0 18px 35px rgba(18, 9, 6, 0.08); backdrop-filter: blur(8px); }
+.status-chip { background: rgba(142, 14, 63, 0.12); color: var(--admin-text-primary); padding: 0.4rem 0.8rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+.filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+.tab-bar { display: inline-flex; gap: 0.6rem; background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(140, 108, 95, 0.2); border-radius: 999px; padding: 0.35rem; }
+.tab-button { padding: 0.5rem 1rem; border-radius: 999px; font-weight: 600; font-size: 0.85rem; color: var(--admin-text-secondary); }
+.tab-button.active { background: #8e0e3f; color: #fff; }
+.panel { background: #fff; border: 1px solid rgba(140, 108, 95, 0.2); border-radius: 1.2rem; padding: 1.5rem; box-shadow: 0 18px 35px rgba(18, 9, 6, 0.08); }
+.table-wrap { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; }
+.table th { text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: #6b7280; padding: 0.75rem 0.5rem; border-bottom: 1px solid #e5e7eb; }
+.table td { padding: 0.75rem 0.5rem; border-bottom: 1px solid #f1f1f1; vertical-align: middle; }
+.avatar { width: 36px; height: 36px; border-radius: 999px; object-fit: cover; }
+.badge { display: inline-flex; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+.badge-active { background: #dcfce7; color: #166534; }
+.badge-pending { background: #fef9c3; color: #92400e; }
+.link { color: #8e0e3f; margin-left: 0.75rem; font-weight: 600; }
+.loading { padding: 2rem; text-align: center; color: #6b7280; }
+.empty { padding: 2rem; text-align: center; color: #6b7280; }
+@media (max-width: 1024px) { .page-hero { grid-template-columns: 1fr; } }
 </style>

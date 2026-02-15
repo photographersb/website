@@ -1139,10 +1139,16 @@ class AdminController extends Controller
         // NEW: Filter by status (for form dropdowns - e.g., 'active' photographers)
         if ($request->has('status')) {
             $status = $request->status;
+            $isMinimal = $request->get('minimal') === 'true' || $request->get('minimal') === '1';
             if ($status === 'active') {
-                // Active = verified photographers with completed profiles
-                $query->where('is_verified', true)
-                      ->where('profile_completeness', '>=', 75);
+                // Minimal dropdown should include all verified photographers
+                if ($isMinimal) {
+                    $query->where('is_verified', true);
+                } else {
+                    // Active = verified photographers with completed profiles
+                    $query->where('is_verified', true)
+                          ->where('profile_completeness', '>=', 75);
+                }
             } elseif ($status === 'verified') {
                 $query->where('is_verified', true);
             } elseif ($status === 'pending') {

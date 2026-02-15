@@ -331,12 +331,6 @@
                     {{ city.name }}
                   </option>
                 </select>
-                <router-link
-                  to="/admin/locations"
-                  class="mt-1 inline-block text-sm text-burgundy hover:text-burgundy-dark"
-                >
-                  Manage locations →
-                </router-link>
                 <p
                   v-if="cities.length === 0"
                   class="mt-1 text-sm text-warning-700"
@@ -619,12 +613,6 @@
                     {{ photographer.user?.name || `Photographer #${photographer.id}` }}
                   </option>
                 </select>
-                <router-link
-                  to="/admin/photographers"
-                  class="mt-1 inline-block text-sm text-burgundy hover:text-burgundy-dark"
-                >
-                  Manage photographers →
-                </router-link>
                 <p class="mt-1 text-sm text-gray-500">
                   Select the photographer organizing this event
                 </p>
@@ -1446,7 +1434,10 @@ const submitForm = async () => {
       all_day_event: form.value.all_day_event ? 1 : 0
     };
 
+    console.log('Sending event data:', JSON.stringify(formData, null, 2));
     const response = await api.post('/admin/events', formData);
+    
+    console.log('Event creation response:', response.data);
     
     if (response.data.status === 'success') {
       showToastMessage('Event created successfully!', 'success');
@@ -1457,11 +1448,17 @@ const submitForm = async () => {
   fetchMentors();
   } catch (error) {
     console.error('Error creating event:', error);
+    console.error('Error response data:', error.response?.data);
+    console.error('Error response status:', error.response?.status);
     
     if (error.response?.data?.errors) {
       errors.value = error.response.data.errors;
+      console.error('Validation errors:', errors.value);
     }
-    showToastMessage(error.response?.data?.message || 'Failed to create event', 'error');
+    
+    const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Failed to create event';
+    console.error('Final error message:', errorMsg);
+    showToastMessage(errorMsg, 'error');
   } finally {
     processing.value = false;
   }

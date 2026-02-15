@@ -15,10 +15,10 @@
         <div class="absolute bottom-10 right-5 w-24 h-24 bg-white bg-opacity-5 rounded-full blur-xl" />
       </div>
 
-      <div class="relative z-10 w-full px-4 sm:px-6 md:px-8 lg:px-4 py-6 sm:py-8 md:py-12 lg:py-16">
+      <div class="relative z-10 w-full px-4 sm:px-6 md:px-8 lg:px-4 pt-8 pb-6 sm:pt-8 sm:pb-8 md:pt-8 md:pb-12 lg:pt-8 lg:pb-16">
         <div class="max-w-5xl mx-auto">
           <!-- Logo/Brand Section - Responsive Text -->
-          <div class="text-center mb-4 sm:mb-5 md:mb-6 lg:mb-8">
+          <div class="text-center mt-5 mb-4 sm:mb-5 md:mb-6 lg:mb-8">
             <div class="inline-flex mb-2 sm:mb-3 px-3 sm:px-4 py-1 sm:py-1.5 bg-white bg-opacity-10 backdrop-blur-sm rounded-full border border-white border-opacity-20 hover:bg-opacity-20 transition-colors">
               <p class="text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2 justify-center">
                 <svg

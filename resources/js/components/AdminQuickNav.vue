@@ -109,6 +109,40 @@
           </div>
         </div>
 
+        <!-- Certificates Dropdown -->
+        <div class="admin-nav-dropdown" @mouseenter="handleEnter('certificates')" @mouseleave="handleLeave('certificates')">
+          <button type="button" class="admin-nav-link dropdown-trigger" :ref="el => setTriggerRef('certificates', el)" @click="toggleDropdown('certificates')">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Certificates
+            <svg class="w-3 h-3 ml-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+          <div v-show="activeDropdown === 'certificates'" class="admin-dropdown-menu" :style="dropdownStyle('certificates')" @mouseenter="handleEnter('certificates')" @mouseleave="handleLeave('certificates')">
+            <router-link to="/admin/certificates" class="admin-dropdown-item">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              All Certificates
+            </router-link>
+            <router-link to="/admin/certificates/manual-issuance" class="admin-dropdown-item">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/>
+              </svg>
+              Manual Issuance
+            </router-link>
+            <router-link to="/admin/certificates/templates" class="admin-dropdown-item">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6a2 2 0 012-2h7l5 5v9a2 2 0 01-2 2z"/>
+              </svg>
+              Templates
+            </router-link>
+          </div>
+        </div>
+
         <!-- Content Dropdown -->
         <div class="admin-nav-dropdown" @mouseenter="handleEnter('content')" @mouseleave="handleLeave('content')">
           <button type="button" class="admin-nav-link dropdown-trigger" :ref="el => setTriggerRef('content', el)" @click="toggleDropdown('content')">

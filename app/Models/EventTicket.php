@@ -15,6 +15,7 @@ class EventTicket extends Model
         'price',
         'quantity',
         'sold_count',
+        'reserved_qty',
         'sales_start_datetime',
         'sales_end_datetime',
         'is_active',
@@ -22,9 +23,16 @@ class EventTicket extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'reserved_qty' => 'integer',
         'sales_start_datetime' => 'datetime',
         'sales_end_datetime' => 'datetime',
         'is_active' => 'boolean',
+    ];
+
+    protected $appends = [
+        'available_quantity',
+        'is_on_sale',
+        'is_sold_out',
     ];
 
     public function event()
@@ -53,12 +61,24 @@ class EventTicket extends Model
     // Methods
     public function getAvailableQuantity()
     {
-        return $this->quantity - $this->sold_count;
+        $reserved = (int) ($this->reserved_qty ?? 0);
+        return $this->quantity - $this->sold_count - $reserved;
+    }
+
+    public function getAvailableQuantityAttribute()
+    {
+        return $this->getAvailableQuantity();
     }
 
     public function isSoldOut()
     {
-        return $this->sold_count >= $this->quantity;
+        $reserved = (int) ($this->reserved_qty ?? 0);
+        return ($this->sold_count + $reserved) >= $this->quantity;
+    }
+
+    public function getIsSoldOutAttribute()
+    {
+        return $this->isSoldOut();
     }
 
     public function isOnSale()
@@ -66,5 +86,10 @@ class EventTicket extends Model
         return $this->is_active
             && now()->between($this->sales_start_datetime, $this->sales_end_datetime)
             && !$this->isSoldOut();
+    }
+
+    public function getIsOnSaleAttribute()
+    {
+        return $this->isOnSale();
     }
 }

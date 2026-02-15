@@ -46,6 +46,11 @@ class Kernel extends ConsoleKernel
             ->dailyAt('10:00')
             ->onOneServer()
             ->withoutOverlapping();
+
+        // Release expired event capacity reservations (every 5 minutes)
+        $schedule->call(function () {
+            \App\Services\EventCapacityLockService::cleanupExpiredReservations();
+        })->everyFiveMinutes()->withoutOverlapping();
     }
 
     /**

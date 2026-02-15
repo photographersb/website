@@ -9,6 +9,7 @@ use App\Http\Middleware\ForceHttpsInProduction;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\BlockIp;
 use App\Http\Middleware\CustomThrottleRequests;
+use App\Http\Middleware\EnsureAccountApproved;
 use Inertia\Middleware as InertiaMiddleware;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Illuminate\Http\Middleware\HandleCors;
@@ -48,6 +49,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => CheckRole::class,
             'throttle' => CustomThrottleRequests::class,
+            'account.approved' => EnsureAccountApproved::class,
         ]);
         
         // Redirect unauthenticated users to the appropriate login page

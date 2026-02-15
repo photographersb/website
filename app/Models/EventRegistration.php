@@ -21,12 +21,17 @@ class EventRegistration extends Model
         'total_amount',
         'qr_token',
         'status',
+        'lock_token',
+        'locked_at',
+        'payment_expires_at',
         'attended_at',
         'checked_in_by',
     ];
 
     protected $casts = [
         'total_amount' => 'decimal:2',
+        'locked_at' => 'datetime',
+        'payment_expires_at' => 'datetime',
         'attended_at' => 'datetime',
     ];
 
@@ -94,6 +99,9 @@ class EventRegistration extends Model
         static::creating(function ($registration) {
             if (!$registration->qr_token) {
                 $registration->qr_token = Str::random(32);
+            }
+            if (!$registration->registration_code) {
+                $registration->registration_code = 'REG-' . strtoupper(Str::random(8));
             }
         });
     }

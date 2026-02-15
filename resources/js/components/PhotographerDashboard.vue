@@ -1,13 +1,13 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 pt-2 sm:pt-3 md:pt-4">
     <!-- Header -->
     <div class="bg-gradient-to-r from-white via-white to-rose-50 border-b">
-      <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-5">
+      <div class="container mx-auto px-3 sm:px-4 py-6 sm:py-7">
         <div class="flex items-center gap-3 sm:gap-4">
           <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-burgundy flex items-center justify-center text-white font-bold text-lg sm:text-2xl flex-shrink-0 shadow-md">
             <img
-              v-if="photographer?.profile_picture"
-              :src="`/storage/${photographer.profile_picture}`"
+              v-if="profileAvatarUrl"
+              :src="profileAvatarUrl"
               :alt="user?.name"
               class="w-full h-full object-cover"
             >
@@ -18,7 +18,7 @@
               Photographer HQ
             </div>
             <h1 class="text-xl sm:text-2xl md:text-3xl font-bold truncate">Welcome, {{ user?.name }}</h1>
-            <p class="text-sm sm:text-base text-gray-600 truncate">Build momentum, respond fast, and grow bookings.</p>
+            <p class="text-sm sm:text-base text-gray-600 truncate mt-1">Build momentum, respond fast, and grow bookings.</p>
           </div>
           <div class="flex items-center gap-3">
             <NotificationBell />
@@ -29,7 +29,7 @@
 
     <div class="container mx-auto px-3 sm:px-4 py-3 sm:py-5 md:py-6">
       <!-- Stats Overview -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-3 sm:mb-4 md:mb-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mt-3 sm:mt-4 md:mt-5 mb-3 sm:mb-4 md:mb-6">
         <div class="bg-white rounded-xl border border-gray-200/70 shadow-sm p-3 sm:p-4 md:p-6">
           <p class="text-[11px] sm:text-xs uppercase tracking-wide text-gray-500 mb-1">Total Bookings</p>
           <p class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{{ stats.total_bookings || 0 }}</p>
@@ -49,6 +49,78 @@
           <p class="text-[11px] sm:text-xs uppercase tracking-wide text-rose-700 mb-1">Total Revenue</p>
           <p class="text-xl sm:text-2xl md:text-3xl font-bold text-rose-800">৳{{ stats.total_revenue || 0 }}</p>
           <p class="text-xs text-rose-700 mt-1">Gross earnings</p>
+        </div>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-3 mb-3 sm:mb-4 md:mb-6">
+        <div class="md:col-span-2 bg-white rounded-2xl border border-gray-200/80 shadow-sm p-4 sm:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base sm:text-lg font-bold">Quick Actions</h3>
+            <span class="text-xs sm:text-sm text-gray-500">Keep momentum high</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div
+              v-for="item in priorityActions"
+              :key="item.key"
+              class="rounded-xl border p-4 sm:p-5 flex flex-col justify-between gap-3"
+              :class="item.cardClass"
+            >
+              <div>
+                <div class="flex items-center justify-between">
+                  <p class="text-xs uppercase tracking-wide text-gray-500">{{ item.title }}</p>
+                  <span
+                    v-if="item.badge"
+                    class="px-2 py-1 rounded-full text-[10px] font-semibold"
+                    :class="item.badgeClass"
+                  >
+                    {{ item.badge }}
+                  </span>
+                </div>
+                <p class="text-2xl font-bold text-gray-900 mt-2">
+                  {{ item.value }}
+                </p>
+                <p class="text-xs sm:text-sm text-gray-600 mt-1">
+                  {{ item.description }}
+                </p>
+              </div>
+              <button
+                type="button"
+                class="inline-flex items-center justify-center px-3 py-2 text-sm font-semibold rounded-lg"
+                :class="item.buttonClass"
+                @click="item.onClick"
+              >
+                {{ item.cta }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-4 sm:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base sm:text-lg font-bold">Profile Checklist</h3>
+            <span class="text-xs text-burgundy font-semibold">{{ profileCompletionPercent }}% complete</span>
+          </div>
+          <div class="h-2 bg-gray-200 rounded-full overflow-hidden mb-4">
+            <div
+              class="h-full bg-burgundy"
+              :style="{ width: profileCompletionPercent + '%' }"
+            />
+          </div>
+          <div class="space-y-2">
+            <div
+              v-for="item in profileChecklist"
+              :key="item.key"
+              class="flex items-center gap-2 text-sm"
+            >
+              <span
+                class="flex items-center justify-center w-5 h-5 rounded-full text-xs font-semibold"
+                :class="item.done ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400'"
+              >
+                {{ item.done ? '✓' : '•' }}
+              </span>
+              <span :class="item.done ? 'text-gray-700' : 'text-gray-500'">{{ item.label }}</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2751,6 +2823,21 @@ const shareLinks = computed(() => {
     messenger: `fb-messenger://share?link=${encodedUrl}&app_id=0&redirect_uri=${encodedUrl}`,
     telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedMessage}`,
   };
+});
+
+const profileAvatarUrl = computed(() => {
+  const raw = photographer.value?.profile_picture_url
+    || photographer.value?.profile_picture
+    || user.value?.photographer?.profile_picture
+    || user.value?.profile_photo_url
+    || '';
+
+  if (!raw) return '';
+  if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('data:') || raw.startsWith('/storage/')) {
+    return raw;
+  }
+
+  return `/storage/${raw.replace(/^\/+/, '')}`;
 });
 
 watch(canViewBookings, (allowed) => {

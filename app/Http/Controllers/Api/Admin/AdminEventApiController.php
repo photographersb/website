@@ -7,11 +7,13 @@ use App\Http\Requests\EventStoreRequest;
 use App\Http\Requests\EventUpdateRequest;
 use App\Http\Traits\ApiResponse;
 use App\Models\Event;
+use App\Models\EventTicket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
 class AdminEventApiController extends Controller
@@ -110,7 +112,49 @@ class AdminEventApiController extends Controller
 
         try {
             DB::beginTransaction();
+
+            $nullableFields = [
+                'certificate_template_id',
+                'organizer_id',
+                'created_by',
+                'city_id',
+                'capacity',
+                'max_attendees',
+                'max_tickets_per_user',
+                'ticket_price',
+                'price',
+                'duration_hours',
+                'latitude',
+                'longitude',
+            ];
+
+            foreach ($nullableFields as $field) {
+                if (array_key_exists($field, $validated) && $validated[$field] === '') {
+                    $validated[$field] = null;
+                }
+            }
             
+            // Auto-assign organizer_id to current admin if not provided
+            if (empty($validated['organizer_id'])) {
+                $currentUser = auth()->user();
+                // If current user is a photographer, use their photographer record
+                if ($currentUser->photographer) {
+                    $validated['organizer_id'] = $currentUser->photographer->id;
+                } else {
+                    // Otherwise, find first active photographer or leave null
+                    $photographer = \App\Models\Photographer::where('is_verified', true)->first();
+                    if ($photographer) {
+                        $validated['organizer_id'] = $photographer->id;
+                    }
+                    // If no verified photographer exists, organizer_id stays null
+                }
+            }
+
+            // Set created_by to current admin if not provided
+            if (empty($validated['created_by'])) {
+                $validated['created_by'] = auth()->id();
+            }
+
             // Extract mentor_ids / mentors if provided
             $mentorIds = $validated['mentor_ids'] ?? [];
             $mentors = $validated['mentors'] ?? [];
@@ -152,6 +196,8 @@ class AdminEventApiController extends Controller
                 }
                 $event->sponsors()->sync($syncSponsors);
             }
+
+            $this->ensureDefaultTicket($event);
             
             DB::commit();
 
@@ -166,13 +212,21 @@ class AdminEventApiController extends Controller
             return $this->created($event->load(['organizer.user', 'city', 'mentors', 'sponsors']), 'Event created successfully');
         } catch (\Exception $e) {
             DB::rollBack();
+            
+            $errorMessage = $e->getMessage();
+            
             Log::error('Failed to create event', [
-                'error' => $e->getMessage(),
+                'error' => $errorMessage,
+                'trace' => $e->getTraceAsString(),
                 'title' => $validated['title'] ?? null,
                 'admin_id' => auth()->id(),
             ]);
 
-            return $this->error('Failed to create event. Please try again.', 500);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to create event: ' . $errorMessage,
+                'error' => config('app.debug') ? $errorMessage : null
+            ], 500);
         }
     }
 
@@ -246,6 +300,8 @@ class AdminEventApiController extends Controller
                 }
                 $event->sponsors()->sync($syncSponsors);
             }
+
+            $this->ensureDefaultTicket($event);
             
             DB::commit();
 
@@ -269,6 +325,47 @@ class AdminEventApiController extends Controller
 
             return $this->error('Failed to update event. Please try again.', 500);
         }
+    }
+
+    private function ensureDefaultTicket(Event $event): void
+    {
+        $price = $event->ticket_price ?? $event->price ?? $event->base_price ?? 0;
+        $isPaid = ($event->event_mode === 'paid') || (bool) $event->is_ticketed || $price > 0;
+
+        if (!$isPaid) {
+            return;
+        }
+
+        if ($event->tickets()->exists()) {
+            return;
+        }
+
+        if (!$price || $price <= 0) {
+            return;
+        }
+
+        $quantity = $event->max_attendees ?? $event->capacity ?? 100;
+        $salesStart = Carbon::now();
+        $salesEnd = $event->registration_deadline ?? $event->event_date ?? Carbon::now()->addDays(30);
+
+        if ($salesEnd instanceof \Illuminate\Support\Carbon) {
+            $end = $salesEnd;
+        } else {
+            $end = Carbon::parse($salesEnd);
+        }
+
+        if ($end->lessThan($salesStart)) {
+            $end = $salesStart->copy()->addDays(1);
+        }
+
+        $event->tickets()->create([
+            'title' => 'General Admission',
+            'price' => $price,
+            'quantity' => $quantity,
+            'sales_start_datetime' => $salesStart,
+            'sales_end_datetime' => $end,
+            'is_active' => true,
+        ]);
     }
 
     /**

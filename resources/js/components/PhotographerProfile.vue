@@ -5,9 +5,9 @@
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(245,158,11,0.28)_0,_transparent_55%)]" />
       <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-[#f3b35a]/30 blur-3xl" />
       <div class="absolute -bottom-28 -left-24 h-80 w-80 rounded-full bg-[#c46b7a]/20 blur-3xl" />
-      <div class="container mx-auto px-4 relative pt-8 pb-24">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 relative pt-8 sm:pt-12 lg:pt-16 pb-24 sm:pb-32 lg:pb-40">
         <button
-          class="inline-flex items-center gap-2 rounded-full border border-white border-opacity-20 bg-white bg-opacity-10 px-4 py-2 text-sm font-medium text-white text-opacity-90 transition hover:bg-opacity-20"
+          class="inline-flex items-center gap-2 rounded-full border border-white border-opacity-20 bg-white bg-opacity-10 px-4 py-2 text-sm font-medium text-white text-opacity-90 transition hover:bg-opacity-20 mt-4 sm:mt-6"
           @click="$router.back()"
         >
           <svg
@@ -26,17 +26,17 @@
           Back
         </button>
 
-        <div class="mt-10 max-w-4xl text-white">
+        <div class="mt-8 sm:mt-10 lg:mt-12 max-w-4xl text-white">
           <p class="text-xs uppercase tracking-[0.35em] text-white text-opacity-70">
             {{ photographer?.is_featured ? 'Featured Photographer' : 'Photographer' }}
           </p>
-          <h1 class="mt-4 text-4xl md:text-5xl font-semibold font-serif tracking-tight">
+          <h1 class="mt-3 sm:mt-4 text-3xl sm:text-4xl lg:text-5xl font-semibold font-serif tracking-tight">
             {{ photographer?.user?.name || photographer?.business_name || 'Photographer' }}
           </h1>
-          <p class="mt-3 text-base text-white text-opacity-80">
+          <p class="mt-3 sm:mt-4 text-base text-white text-opacity-80">
             {{ shortBio }}
           </p>
-          <div class="mt-6 flex flex-wrap gap-3 text-sm">
+          <div class="mt-6 sm:mt-8 mb-8 sm:mb-10 lg:mb-12 flex flex-wrap gap-2 sm:gap-3 text-sm">
             <span class="inline-flex items-center gap-2 rounded-full bg-white bg-opacity-10 px-4 py-2 text-white text-opacity-90">
               <svg class="w-4 h-4 text-amber-300" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
@@ -66,7 +66,7 @@
       </div>
     </div>
 
-    <div class="container mx-auto px-4 max-w-7xl -mt-20 relative z-10 pb-12">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl mt-8 sm:mt-10 lg:mt-12 relative z-10 pb-64 sm:pb-72 lg:pb-[28rem] xl:pb-[32rem] mb-6">
       <div
         v-if="loading"
         class="text-center py-20 bg-white rounded-lg shadow-lg"
@@ -520,6 +520,14 @@
                   Awards Earned
                 </p>
               </div>
+              <div class="bg-white/80 p-4 text-center">
+                <p class="text-2xl font-bold text-burgundy">
+                  {{ memberSinceYear }}
+                </p>
+                <p class="text-gray-600 text-xs mt-1">
+                  Member Since
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -529,27 +537,27 @@
           <!-- About Section - Consolidated -->
           <div class="bg-white/90 rounded-2xl border border-[#eadfd7] shadow-lg overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
             <!-- Header -->
-            <div class="bg-gradient-to-r from-[#7a1f2b] to-[#c75d5d] px-8 py-6">
+            <div class="bg-gradient-to-r from-[#7a1f2b] to-[#c75d5d] px-8 py-7">
               <h2 class="text-2xl font-serif font-bold text-white">About {{ photographer.business_name || photographer.user?.name }}</h2>
               <p class="text-white/80 text-sm mt-1">Professional photography & specializations</p>
             </div>
 
-            <div class="p-8 space-y-6">
+            <div class="p-8 pt-10 space-y-6">
               <!-- Key Stats Grid -->
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div class="bg-[#7a1f2b]/5 rounded-lg p-4 text-center">
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-[#7a1f2b]/5 rounded-lg p-5 text-center">
                   <p class="text-2xl font-bold text-[#7a1f2b]">{{ photographer.experience_years || 0 }}</p>
                   <p class="text-xs uppercase text-gray-600 font-medium mt-1">Yrs Exp</p>
                 </div>
-                <div class="bg-amber-50 rounded-lg p-4 text-center border border-amber-200 bg-opacity-70 border-opacity-50">
+                <div class="bg-amber-50 rounded-lg p-5 text-center border border-amber-200 bg-opacity-70 border-opacity-50">
                   <p class="text-2xl font-bold text-amber-700">{{ (photographer.average_rating || 0) }}</p>
                   <p class="text-xs uppercase text-gray-600 font-medium mt-1">Rating</p>
                 </div>
-                <div class="bg-emerald-50 rounded-lg p-4 text-center border border-emerald-200 bg-opacity-70 border-opacity-50">
+                <div class="bg-emerald-50 rounded-lg p-5 text-center border border-emerald-200 bg-opacity-70 border-opacity-50">
                   <p class="text-2xl font-bold text-emerald-700">{{ formatNumber(photographer.completed_bookings || 0) }}</p>
                   <p class="text-xs uppercase text-gray-600 font-medium mt-1">Bookings</p>
                 </div>
-                <div class="bg-blue-50 rounded-lg p-4 text-center border border-blue-200 bg-opacity-70 border-opacity-50">
+                <div class="bg-blue-50 rounded-lg p-5 text-center border border-blue-200 bg-opacity-70 border-opacity-50">
                   <p class="text-2xl font-bold text-blue-700">{{ photographer.is_verified ? '✓' : '–' }}</p>
                   <p class="text-xs uppercase text-gray-600 font-medium mt-1">{{ photographer.is_verified ? 'Verified' : 'Not Verified' }}</p>
                 </div>
@@ -656,7 +664,7 @@
           />
 
           <!-- Tab Navigation -->
-          <div class="bg-white/90 rounded-2xl border border-[#eadfd7] shadow-lg">
+          <div class="bg-white/90 rounded-2xl border border-[#eadfd7] shadow-lg mb-20 sm:mb-28 lg:mb-36 xl:mb-44">
             <div class="border-b border-gray-200">
               <nav class="flex overflow-x-auto scrollbar-hide">
                 <button
@@ -707,7 +715,7 @@
             </div>
 
             <!-- Tab Content -->
-            <div class="p-6">
+            <div class="p-6 pb-12 sm:pb-16">
               <!-- Portfolio Tab -->
               <div v-if="activeTab === 'portfolio'">
                 <div v-if="albums && albums.length > 0">
@@ -1143,6 +1151,8 @@
       </div>
     </div>
     
+    <div class="h-8 sm:h-16 lg:h-32 bg-[#f7f2ee]"></div>
+
     <!-- Lightbox Modal -->
     <div
       v-if="selectedPhoto"
@@ -1258,6 +1268,12 @@ const locationLabel = computed(() => {
 const serviceRadiusLabel = computed(() => {
   const radius = Number(photographer.value?.service_area_radius || 0)
   return radius > 0 ? `${radius} km service radius` : null
+})
+
+const memberSinceYear = computed(() => {
+  if (!photographer.value?.user?.created_at) return 'N/A'
+  const date = new Date(photographer.value.user.created_at)
+  return date.getFullYear()
 })
 
 

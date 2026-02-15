@@ -1,0 +1,728 @@
+{
+  "analysis_date": "2026-02-02",
+  "page_url": "http://127.0.0.1:8000/admin/competitions/create",
+  "overall_status": "NOT_PRODUCTION_READY",
+  "critical_issues_count": 8,
+  "high_priority_issues_count": 6,
+  "medium_priority_issues_count": 5,
+  "total_issues": 19,
+  "sections": {
+    "form_field_mismatches": {
+      "status": "CRITICAL",
+      "severity": "CRITICAL",
+      "description": "Form field names do not match API endpoint expectations, causing submission failures",
+      "issues": [
+        {
+          "id": "FM001",
+          "field_name": "submission_start",
+          "severity": "CRITICAL",
+          "issue": "Form sends 'submission_start' but API validator expects 'submission_deadline'",
+          "location": {
+            "vue_file": "resources/js/Pages/Admin/Competitions/Create.vue",
+            "line_range": "105-108",
+            "api_file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "validation_line": 84
+          },
+          "impact": "FORM_SUBMISSION_FAILS - No field named 'submission_start' in database schema",
+          "database_column": "submission_deadline (datetime)",
+          "frontend_sends": "submission_start (form data)",
+          "api_expects": "submission_deadline (validation rule at line 84)",
+          "fix": "Map form.submission_start to submission_deadline in submitForm() method"
+        },
+        {
+          "id": "FM002",
+          "field_name": "voting_start",
+          "severity": "CRITICAL",
+          "issue": "Form sends 'voting_start' but API validator expects 'voting_start_at'",
+          "location": {
+            "vue_file": "resources/js/Pages/Admin/Competitions/Create.vue",
+            "line_range": "116-119",
+            "api_file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "validation_line": 85
+          },
+          "impact": "FIELD_SILENTLY_IGNORED - voting_start_at will be null",
+          "database_column": "voting_start_at (datetime)",
+          "frontend_sends": "voting_start (form data)",
+          "api_expects": "voting_start_at (validation rule at line 85)",
+          "current_error_display": "Line 125 checks errors.voting_start_at[0] but form sends voting_start",
+          "fix": "Map form.voting_start to voting_start_at in submitForm() method"
+        },
+        {
+          "id": "FM003",
+          "field_name": "voting_end",
+          "severity": "CRITICAL",
+          "issue": "Form sends 'voting_end' but API validator expects 'voting_end_at'",
+          "location": {
+            "vue_file": "resources/js/Pages/Admin/Competitions/Create.vue",
+            "line_range": "127-130",
+            "api_file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "validation_line": 86
+          },
+          "impact": "FIELD_SILENTLY_IGNORED - voting_end_at will be null",
+          "database_column": "voting_end_at (datetime)",
+          "frontend_sends": "voting_end (form data)",
+          "api_expects": "voting_end_at (validation rule at line 86)",
+          "current_error_display": "Line 129 checks errors.voting_end_at[0] but form sends voting_end",
+          "fix": "Map form.voting_end to voting_end_at in submitForm() method"
+        },
+        {
+          "id": "FM004",
+          "field_name": "announcement_date",
+          "severity": "CRITICAL",
+          "issue": "Form sends 'announcement_date' but API validator expects 'results_announcement_date'",
+          "location": {
+            "vue_file": "resources/js/Pages/Admin/Competitions/Create.vue",
+            "line_range": "137-140",
+            "api_file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "validation_line": 87
+          },
+          "impact": "FIELD_SILENTLY_IGNORED - results_announcement_date will be null",
+          "database_column": "results_announcement_date (date)",
+          "frontend_sends": "announcement_date (form data)",
+          "api_expects": "results_announcement_date (validation rule at line 87)",
+          "current_error_display": "Line 133 checks errors.results_announcement_date[0] but form sends announcement_date",
+          "fix": "Map form.announcement_date to results_announcement_date in submitForm() method"
+        }
+      ],
+      "recommendation": "FIX_BEFORE_DEPLOYMENT - These field mismatches will cause data loss and form validation errors. Update submitForm() method to map all form fields correctly to API expectations."
+    },
+    "sponsor_judge_attachment": {
+      "status": "CRITICAL",
+      "severity": "CRITICAL",
+      "description": "sponsor_ids and judge_ids are sent to API but never attached to competition records",
+      "issues": [
+        {
+          "id": "SJ001",
+          "field_name": "sponsor_ids",
+          "severity": "CRITICAL",
+          "issue": "Form sends sponsor_ids array but API store() method doesn't attach sponsors to competition",
+          "location": {
+            "vue_file": "resources/js/Pages/Admin/Competitions/Create.vue",
+            "line_range": "580-590",
+            "api_file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "store_method": "74-132"
+          },
+          "impact": "SPONSORS_NOT_SAVED - Relationship records not created in competition_sponsors table",
+          "what_happens": "sponsor_ids array is validated but not used - no sync/attach call in store() method",
+          "database_table": "competition_sponsors (pivot table)",
+          "relationship_method": "Competition::sponsorRecords() at line 134 (Edit.vue shows this relationship exists)",
+          "validation_missing": "No validation rule for sponsor_ids in store() method",
+          "fix": "Add sponsor_ids to validation rules and call $competition->sponsorRecords()->sync($validated['sponsor_ids'])"
+        },
+        {
+          "id": "SJ002",
+          "field_name": "judge_ids",
+          "severity": "CRITICAL",
+          "issue": "Form sends judge_ids array but API store() method doesn't attach judges to competition",
+          "location": {
+            "vue_file": "resources/js/Pages/Admin/Competitions/Create.vue",
+            "line_range": "591-600",
+            "api_file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "store_method": "74-132"
+          },
+          "impact": "JUDGES_NOT_SAVED - Relationship records not created in competition_judges table",
+          "what_happens": "judge_ids array is validated but not used - no sync/attach call in store() method",
+          "database_table": "competition_judges (pivot table)",
+          "relationship_method": "Competition::judgeUsers() exists (see Edit.vue line 477)",
+          "validation_missing": "No validation rule for judge_ids in store() method",
+          "fix": "Add judge_ids to validation rules and call $competition->judgeUsers()->sync($validated['judge_ids'])"
+        }
+      ],
+      "recommendation": "FIX_BEFORE_DEPLOYMENT - Without attaching sponsors/judges, the competition will have no association with them, breaking the competition setup workflow."
+    },
+    "missing_validation_rules": {
+      "status": "HIGH_PRIORITY",
+      "severity": "HIGH",
+      "description": "API validation rules missing for critical form fields",
+      "issues": [
+        {
+          "id": "MV001",
+          "field": "category_id",
+          "severity": "HIGH",
+          "issue": "No validation rule for category_id in API store() method",
+          "location": {
+            "api_file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "method": "store",
+            "line_range": "82-103"
+          },
+          "impact": "INVALID_CATEGORY_IDS_ACCEPTED - Can submit non-existent category IDs",
+          "form_sends": "category_id (nullable, integer)",
+          "validation_exists": false,
+          "should_be": "'category_id' => 'nullable|exists:categories,id'",
+          "fix": "Add category_id validation rule to store() method validation array"
+        },
+        {
+          "id": "MV002",
+          "field": "sponsor_ids",
+          "severity": "HIGH",
+          "issue": "No validation rule for sponsor_ids in API store() method",
+          "location": {
+            "api_file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "method": "store",
+            "line_range": "82-103"
+          },
+          "impact": "INVALID_SPONSOR_IDS_ACCEPTED - Can submit non-existent sponsor IDs",
+          "form_sends": "sponsor_ids (array of integers)",
+          "validation_exists": false,
+          "should_be": "'sponsor_ids' => 'nullable|array|exists:sponsors,id'",
+          "fix": "Add sponsor_ids validation rule to store() method validation array"
+        },
+        {
+          "id": "MV003",
+          "field": "judge_ids",
+          "severity": "HIGH",
+          "issue": "No validation rule for judge_ids in API store() method",
+          "location": {
+            "api_file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "method": "store",
+            "line_range": "82-103"
+          },
+          "impact": "INVALID_JUDGE_IDS_ACCEPTED - Can submit non-existent judge IDs",
+          "form_sends": "judge_ids (array of integers)",
+          "validation_exists": false,
+          "should_be": "'judge_ids' => 'nullable|array|exists:users,id' (or appropriate judge table)",
+          "fix": "Add judge_ids validation rule to store() method validation array"
+        },
+        {
+          "id": "MV004",
+          "field": "prizes",
+          "severity": "MEDIUM",
+          "issue": "No validation rule for prizes array in API store() method",
+          "location": {
+            "api_file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "method": "store",
+            "line_range": "82-103"
+          },
+          "impact": "INVALID_PRIZE_DATA_ACCEPTED - Can submit malformed prize entries",
+          "form_sends": "prizes array with {position, amount}",
+          "validation_exists": false,
+          "should_be": "'prizes' => 'nullable|array|prize_structure_valid'",
+          "fix": "Add prizes validation rule or custom validation logic"
+        },
+        {
+          "id": "MV005",
+          "field": "rules",
+          "severity": "MEDIUM",
+          "issue": "No validation rule for rules field in API store() method",
+          "location": {
+            "api_file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "method": "store",
+            "line_range": "82-103"
+          },
+          "impact": "NO_SIZE_LIMIT - Can submit extremely large rule documents",
+          "form_sends": "rules (textarea, unlimited size)",
+          "validation_exists": false,
+          "should_be": "'rules' => 'nullable|string|max:10000'",
+          "fix": "Add rules validation rule to store() method validation array"
+        },
+        {
+          "id": "MV006",
+          "field": "terms_and_conditions",
+          "severity": "MEDIUM",
+          "issue": "No validation rule for terms_and_conditions field in API store() method",
+          "location": {
+            "api_file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "method": "store",
+            "line_range": "82-103"
+          },
+          "impact": "NO_SIZE_LIMIT - Can submit extremely large terms documents",
+          "form_sends": "terms_and_conditions (textarea, unlimited size)",
+          "validation_exists": false,
+          "should_be": "'terms_and_conditions' => 'nullable|string|max:10000'",
+          "fix": "Add terms_and_conditions validation rule to store() method validation array"
+        }
+      ],
+      "recommendation": "FIX_BEFORE_DEPLOYMENT - Missing validation rules expose the API to invalid data and potential data integrity issues."
+    },
+    "error_message_inconsistencies": {
+      "status": "HIGH_PRIORITY",
+      "severity": "HIGH",
+      "description": "Error message display using incorrect array access patterns",
+      "issues": [
+        {
+          "id": "EM001",
+          "location": "resources/js/Pages/Admin/Competitions/Create.vue",
+          "line": 69,
+          "issue": "category_id error uses [0] access but may not always be an array",
+          "current_code": "{{ errors.category_id[0] }}",
+          "impact": "RUNTIME_ERROR - If error is string instead of array, [0] will show undefined or wrong character",
+          "form_field": "Category (optional select)",
+          "inconsistency": "Some error displays use [0] access, others don't - inconsistent error format assumption",
+          "fix": "Standardize error display - either ensure all are strings or wrap all with [0] after null check"
+        },
+        {
+          "id": "EM002",
+          "location": "resources/js/Pages/Admin/Competitions/Create.vue",
+          "line": 125,
+          "issue": "Error checking voting_start_at but form sends voting_start",
+          "current_code": "errors.voting_start_at",
+          "actual_error_key": "errors.voting_start (due to form field mismatch)",
+          "impact": "ERROR_NOT_DISPLAYED - User submits invalid voting_start but error doesn't show",
+          "consequence": "Silent validation failure - looks like success to user",
+          "fix": "Map field names correctly before submission (see FM002)"
+        },
+        {
+          "id": "EM003",
+          "location": "resources/js/Pages/Admin/Competitions/Create.vue",
+          "line": 129,
+          "issue": "Error checking voting_end_at but form sends voting_end",
+          "current_code": "errors.voting_end_at",
+          "actual_error_key": "errors.voting_end (due to form field mismatch)",
+          "impact": "ERROR_NOT_DISPLAYED - User submits invalid voting_end but error doesn't show",
+          "consequence": "Silent validation failure - looks like success to user",
+          "fix": "Map field names correctly before submission (see FM003)"
+        },
+        {
+          "id": "EM004",
+          "location": "resources/js/Pages/Admin/Competitions/Create.vue",
+          "line": 133,
+          "issue": "Error checking results_announcement_date but form sends announcement_date",
+          "current_code": "errors.results_announcement_date",
+          "actual_error_key": "errors.announcement_date (due to form field mismatch)",
+          "impact": "ERROR_NOT_DISPLAYED - User submits invalid date but error doesn't show",
+          "consequence": "Silent validation failure - looks like success to user",
+          "fix": "Map field names correctly before submission (see FM004)"
+        }
+      ],
+      "recommendation": "FIX_BEFORE_DEPLOYMENT - Inconsistent error handling prevents users from seeing validation errors, causing confusion and support tickets."
+    },
+    "missing_api_handling": {
+      "status": "CRITICAL",
+      "severity": "CRITICAL",
+      "description": "sponsor_ids and judge_ids not validated or processed by API",
+      "issues": [
+        {
+          "id": "AH001",
+          "severity": "CRITICAL",
+          "issue": "API store() method accepts sponsor_ids in request but never validates or uses them",
+          "location": {
+            "api_file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "store_method": "74-132"
+          },
+          "what_happens": "Form sends sponsor_ids in request body, but API validation array doesn't include sponsor_ids rule, so request->sponsor_ids is never extracted or validated",
+          "consequence": "Sponsors are not attached to competition even though form submitted them",
+          "visible_to_user": "Form submits successfully but no sponsors appear on competition",
+          "fix": "Add sponsor_ids to validation rules and attach after creation"
+        },
+        {
+          "id": "AH002",
+          "severity": "CRITICAL",
+          "issue": "API store() method accepts judge_ids in request but never validates or uses them",
+          "location": {
+            "api_file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "store_method": "74-132"
+          },
+          "what_happens": "Form sends judge_ids in request body, but API validation array doesn't include judge_ids rule, so request->judge_ids is never extracted or validated",
+          "consequence": "Judges are not attached to competition even though form submitted them",
+          "visible_to_user": "Form submits successfully but no judges appear on competition",
+          "fix": "Add judge_ids to validation rules and attach after creation"
+        }
+      ],
+      "recommendation": "CRITICAL - This is a data loss issue. Users think they're assigning sponsors/judges but they're not actually saved."
+    },
+    "authorization_and_security": {
+      "status": "GOOD",
+      "severity": "LOW",
+      "description": "Authorization and security controls are in place but could be stronger",
+      "issues": [
+        {
+          "id": "SEC001",
+          "severity": "MEDIUM",
+          "issue": "Route protection is middleware-based (role:admin) but controller lacks authorization checks",
+          "location": {
+            "route_file": "routes/api.php",
+            "line": 360,
+            "middleware": "role:admin"
+          },
+          "current_implementation": "Routes are protected by middleware('role:admin') which prevents non-admins from accessing",
+          "improvement": "Add explicit authorization policy checks in controller methods",
+          "why_matters": "More defense-in-depth if middleware is bypassed",
+          "impact": "LOW - Current implementation is sufficient but could be stronger",
+          "fix": "Add Gate::authorize('manage-competitions') or Policy authorization in controller"
+        },
+        {
+          "id": "SEC002",
+          "severity": "LOW",
+          "issue": "No SQL injection protection beyond Laravel's query builder",
+          "location": {
+            "api_file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "methods": ["index", "show", "store", "update", "destroy"]
+          },
+          "implementation": "All queries use Laravel's query builder and prepared statements - NO RAW SQL",
+          "rating": "GOOD",
+          "status": "SECURE",
+          "note": "No SQL injection vulnerabilities detected"
+        },
+        {
+          "id": "SEC003",
+          "severity": "LOW",
+          "issue": "Auth token handling could be more robust",
+          "location": {
+            "vue_file": "resources/js/Pages/Admin/Competitions/Create.vue",
+            "lines": "398-405, 460-465"
+          },
+          "current_implementation": "Token retrieved from localStorage and sent in Authorization header",
+          "potential_risk": "Token not validated for expiry before use",
+          "improvement": "Add token expiry check before API calls",
+          "fix": "Check if token needs refresh before making API calls"
+        }
+      ],
+      "recommendation": "ACCEPTABLE - Current security measures are adequate for internal admin use. Consider adding policy-based authorization for defense-in-depth."
+    },
+    "data_binding_and_state": {
+      "status": "GOOD",
+      "severity": "LOW",
+      "description": "Vue component data binding and state management are well-implemented",
+      "issues": [
+        {
+          "id": "DB001",
+          "severity": "LOW",
+          "issue": "No memory leak concerns detected",
+          "location": "resources/js/Pages/Admin/Competitions/Create.vue",
+          "assessment": "Component properly unmounts event listeners and API calls can be cancelled if needed",
+          "status": "GOOD"
+        },
+        {
+          "id": "DB002",
+          "severity": "LOW",
+          "issue": "Computed properties are efficiently implemented",
+          "location": "resources/js/Pages/Admin/Competitions/Create.vue",
+          "properties": ["filteredSponsors", "filteredJudges", "totalPrizePool"],
+          "assessment": "Computed properties properly cache and only recalculate when dependencies change",
+          "status": "GOOD"
+        },
+        {
+          "id": "DB003",
+          "severity": "MEDIUM",
+          "issue": "No loading state for fetching sponsors/judges during component mount",
+          "location": "resources/js/Pages/Admin/Competitions/Create.vue",
+          "methods": ["fetchAvailableSponsors", "fetchAvailableJudges", "fetchCategories"],
+          "impact": "UI appears unresponsive while data loads - no loading spinner",
+          "fix": "Add isLoading flag and show spinner while data fetches"
+        }
+      ],
+      "recommendation": "GOOD - Data binding implementation is sound. Add loading states for better UX."
+    },
+    "model_and_database": {
+      "status": "GOOD",
+      "severity": "LOW",
+      "description": "Competition model and database schema are well-structured",
+      "issues": [
+        {
+          "id": "MD001",
+          "severity": "LOW",
+          "issue": "All required database columns exist and are properly configured",
+          "location": "app/Models/Competition.php and database migrations",
+          "assessment": "Model fillable array includes all form fields that are used",
+          "status": "GOOD",
+          "columns_verified": [
+            "title", "slug", "theme", "description", "category_id",
+            "submission_deadline", "voting_start_at", "voting_end_at",
+            "results_announcement_date", "max_submissions_per_user",
+            "rules", "terms_and_conditions", "prizes", "total_prize_pool",
+            "status", "is_featured"
+          ]
+        },
+        {
+          "id": "MD002",
+          "severity": "LOW",
+          "issue": "Timestamps are correctly cast",
+          "location": "app/Models/Competition.php",
+          "casts": "Datetime fields use proper casting",
+          "status": "GOOD"
+        },
+        {
+          "id": "MD003",
+          "severity": "MEDIUM",
+          "issue": "Relationships for sponsors and judges exist but aren't used in store()",
+          "location": "app/Models/Competition.php",
+          "relationships": ["sponsorRecords", "judgeUsers"],
+          "status": "DEFINED_BUT_UNUSED",
+          "consequence": "Relationships are defined but never populated during creation",
+          "fix": "Use $competition->sponsorRecords()->sync() and $competition->judgeUsers()->sync() in controller"
+        },
+        {
+          "id": "MD004",
+          "severity": "MEDIUM",
+          "issue": "competition_sponsors and competition_judges pivot tables must exist",
+          "location": "database migrations",
+          "verification": "See migrations: create_competition_sponsors_table.php, create_competition_judges_table.php",
+          "status": "SHOULD_VERIFY",
+          "recommendation": "Verify migrations have been run and pivot tables exist in database"
+        }
+      ],
+      "recommendation": "GOOD - Database structure is sound. Focus on utilizing existing relationships in API."
+    },
+    "form_validation_completeness": {
+      "status": "MEDIUM",
+      "severity": "MEDIUM",
+      "description": "Form validation coverage could be improved",
+      "issues": [
+        {
+          "id": "FV001",
+          "severity": "MEDIUM",
+          "issue": "No client-side date validation for logical ordering",
+          "location": "resources/js/Pages/Admin/Competitions/Create.vue",
+          "fields": ["submission_start", "submission_deadline", "voting_start", "voting_end"],
+          "impact": "User can submit illogical dates (e.g., end before start)",
+          "current_validation": "HTML5 datetime-local input only - no JS validation",
+          "example": "submission_start can be after submission_deadline",
+          "fix": "Add computed property or watcher to validate date sequences"
+        },
+        {
+          "id": "FV002",
+          "severity": "LOW",
+          "issue": "No minimum entries check for prizes",
+          "location": "resources/js/Pages/Admin/Competitions/Create.vue",
+          "field": "prizes array",
+          "impact": "Can create competition with no prizes",
+          "current_behavior": "Shows 'No prizes added yet' message but doesn't prevent submission",
+          "fix": "Either require at least 1 prize or make optional with clear indication"
+        },
+        {
+          "id": "FV003",
+          "severity": "MEDIUM",
+          "issue": "API requires number_of_winners but form doesn't provide it",
+          "location": {
+            "form": "resources/js/Pages/Admin/Competitions/Create.vue",
+            "api": "app/Http/Controllers/Api/AdminCompetitionApiController.php"
+          },
+          "issue_description": "API validation requires 'number_of_winners' but form never sends it",
+          "current_state": "Form shows prize entries but doesn't specify number_of_winners",
+          "impact": "Form submission will fail with validation error",
+          "fix": "Add number_of_winners field to form or auto-calculate from prizes array length"
+        }
+      ],
+      "recommendation": "Add client-side validation for date ordering and required fields like number_of_winners."
+    },
+    "api_endpoint_consistency": {
+      "status": "POOR",
+      "severity": "CRITICAL",
+      "description": "Significant inconsistencies between form data and API expectations",
+      "issues": [
+        {
+          "id": "AE001",
+          "severity": "CRITICAL",
+          "issue": "Field name mismatches cause submission_start, voting_start, voting_end, announcement_date to not be saved",
+          "summary": "Form sends 4 different field names that don't match API schema",
+          "fields_affected": [
+            {
+              "form_field": "submission_start",
+              "api_field": "submission_deadline",
+              "mismatch": true
+            },
+            {
+              "form_field": "voting_start",
+              "api_field": "voting_start_at",
+              "mismatch": true
+            },
+            {
+              "form_field": "voting_end",
+              "api_field": "voting_end_at",
+              "mismatch": true
+            },
+            {
+              "form_field": "announcement_date",
+              "api_field": "results_announcement_date",
+              "mismatch": true
+            }
+          ],
+          "fix": "Update Vue component submitForm() method to map field names correctly"
+        },
+        {
+          "id": "AE002",
+          "severity": "CRITICAL",
+          "issue": "API missing required field 'number_of_winners'",
+          "location": {
+            "api_validation": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "line": 89
+          },
+          "form_provides": "Form has prizes array with amounts but no number_of_winners field",
+          "api_requires": "'number_of_winners' => 'required|integer|min:1|max:10'",
+          "consequence": "Form submission will fail with validation error",
+          "fix": "Form must provide number_of_winners or API must calculate from prizes"
+        },
+        {
+          "id": "AE003",
+          "severity": "CRITICAL",
+          "issue": "API requires 'total_prize_pool' but form only provides prizes array",
+          "location": {
+            "api_validation": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+            "line": 88
+          },
+          "form_provides": "totalPrizePool computed property calculates this correctly",
+          "submission_sends": "total_prize_pool is included in submitForm() at line 587",
+          "status": "WILL_WORK",
+          "note": "This one is handled correctly"
+        }
+      ],
+      "recommendation": "FIX_IMMEDIATELY - These field mapping issues will cause form submission failures."
+    }
+  },
+  "prioritized_fixes": [
+    {
+      "priority": 1,
+      "category": "CRITICAL",
+      "task": "Fix form field name mismatches (submission_start → submission_deadline, voting_start → voting_start_at, voting_end → voting_end_at, announcement_date → results_announcement_date)",
+      "impact": "FORM_SUBMISSION_FAILS",
+      "effort": "LOW",
+      "file": "resources/js/Pages/Admin/Competitions/Create.vue",
+      "method": "submitForm()",
+      "lines": "570-590",
+      "estimated_time": "10 minutes"
+    },
+    {
+      "priority": 2,
+      "category": "CRITICAL",
+      "task": "Add sponsor_ids and judge_ids attachment logic to API controller",
+      "impact": "SPONSORS_AND_JUDGES_NOT_SAVED",
+      "effort": "MEDIUM",
+      "file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+      "method": "store()",
+      "lines": "123-132",
+      "estimated_time": "20 minutes",
+      "details": "After competition creation, call $competition->sponsorRecords()->sync($validated['sponsor_ids']) and $competition->judgeUsers()->sync($validated['judge_ids'])"
+    },
+    {
+      "priority": 3,
+      "category": "CRITICAL",
+      "task": "Add missing validation rules to API store() method",
+      "impact": "INVALID_DATA_ACCEPTED",
+      "effort": "LOW",
+      "file": "app/Http/Controllers/Api/AdminCompetitionApiController.php",
+      "method": "store()",
+      "lines": "80-103",
+      "estimated_time": "15 minutes",
+      "rules_to_add": [
+        "category_id",
+        "sponsor_ids",
+        "judge_ids",
+        "prizes",
+        "rules",
+        "terms_and_conditions"
+      ]
+    },
+    {
+      "priority": 4,
+      "category": "CRITICAL",
+      "task": "Add number_of_winners field to form or auto-calculate",
+      "impact": "FORM_SUBMISSION_FAILS",
+      "effort": "MEDIUM",
+      "file": "resources/js/Pages/Admin/Competitions/Create.vue",
+      "options": [
+        "Add input field for number_of_winners",
+        "Auto-calculate from prizes array length",
+        "Infer from prize positions (e.g., 1st, 2nd, 3rd = 3 winners)"
+      ],
+      "estimated_time": "15 minutes"
+    },
+    {
+      "priority": 5,
+      "category": "HIGH",
+      "task": "Fix error message display inconsistencies",
+      "impact": "USERS_DONT_SEE_VALIDATION_ERRORS",
+      "effort": "LOW",
+      "file": "resources/js/Pages/Admin/Competitions/Create.vue",
+      "lines": "69, 125, 129, 133",
+      "estimated_time": "10 minutes"
+    },
+    {
+      "priority": 6,
+      "category": "HIGH",
+      "task": "Verify pivot tables (competition_sponsors, competition_judges) exist",
+      "impact": "RELATIONSHIPS_WONT_WORK",
+      "effort": "LOW",
+      "verification": "Run: php artisan migrate:status",
+      "estimated_time": "5 minutes"
+    },
+    {
+      "priority": 7,
+      "category": "MEDIUM",
+      "task": "Add client-side date validation for logical ordering",
+      "impact": "UX_IMPROVEMENT",
+      "effort": "MEDIUM",
+      "file": "resources/js/Pages/Admin/Competitions/Create.vue",
+      "estimated_time": "20 minutes"
+    },
+    {
+      "priority": 8,
+      "category": "MEDIUM",
+      "task": "Add loading states to fetch operations",
+      "impact": "UX_IMPROVEMENT",
+      "effort": "LOW",
+      "file": "resources/js/Pages/Admin/Competitions/Create.vue",
+      "estimated_time": "15 minutes"
+    }
+  ],
+  "testing_checklist": [
+    {
+      "test": "Form submission with all fields filled",
+      "expected": "Competition created successfully with all data saved",
+      "verify": "Check database for competition record and all fields populated"
+    },
+    {
+      "test": "Select multiple sponsors",
+      "expected": "Sponsors appear in competition_sponsors table",
+      "verify": "SELECT * FROM competition_sponsors WHERE competition_id = ?",
+      "critical": true
+    },
+    {
+      "test": "Select multiple judges",
+      "expected": "Judges appear in competition_judges table",
+      "verify": "SELECT * FROM competition_judges WHERE competition_id = ?",
+      "critical": true
+    },
+    {
+      "test": "Submit form with invalid category_id",
+      "expected": "Validation error returned",
+      "verify": "API returns 422 with validation error"
+    },
+    {
+      "test": "Submit form with invalid sponsor_ids",
+      "expected": "Validation error returned",
+      "verify": "API returns 422 with validation error"
+    },
+    {
+      "test": "Submit form with invalid judge_ids",
+      "expected": "Validation error returned",
+      "verify": "API returns 422 with validation error"
+    },
+    {
+      "test": "Submit form without number_of_winners",
+      "expected": "Validation error or auto-calculated value",
+      "verify": "Check form behavior"
+    },
+    {
+      "test": "Submit form with illogical dates (end before start)",
+      "expected": "Validation error or warning",
+      "verify": "Form should prevent or warn about date ordering"
+    },
+    {
+      "test": "Create competition and fetch it via Edit page",
+      "expected": "All sponsors and judges appear in Edit form",
+      "verify": "Edit page loads with sponsor_ids and judge_ids populated"
+    }
+  ],
+  "security_scan_results": {
+    "sql_injection": "SAFE - All queries use prepared statements via Laravel query builder",
+    "xss_protection": "GOOD - Vue templates auto-escape data",
+    "csrf_protection": "ENABLED - Laravel CSRF middleware on web routes (API uses Sanctum)",
+    "authorization": "ADEQUATE - Routes protected by role:admin middleware",
+    "authentication": "GOOD - Bearer token validation via Sanctum",
+    "input_validation": "INCOMPLETE - Missing validation rules for sponsor_ids, judge_ids, category_id, prizes, rules, terms_and_conditions"
+  },
+  "summary": {
+    "production_ready": false,
+    "show_stopper_issues": 3,
+    "critical_issues": 8,
+    "time_to_fix": "2-3 hours",
+    "complexity": "MEDIUM",
+    "main_problems": [
+      "Form field name mismatches prevent correct data submission",
+      "Sponsor and judge attachment logic missing in API",
+      "Missing validation rules allow invalid data",
+      "number_of_winners field missing from form"
+    ],
+    "recommendation": "DO_NOT_DEPLOY - Fix all critical issues before production deployment. The form field mismatches alone will cause every competition creation to fail or silently lose data."
+  }
+}

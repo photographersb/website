@@ -71,7 +71,7 @@ class EventStoreRequest extends FormRequest
             'currency' => 'nullable|in:BDT',
 
             // Organizer & Settings
-            'organizer_id' => [Rule::requiredIf(!$isDraft), 'nullable', 'exists:photographers,id'],
+            'organizer_id' => 'nullable|exists:photographers,id',
             'created_by' => 'nullable|exists:users,id',
             'mentor_ids' => 'nullable|array',
             'mentor_ids.*' => 'integer|exists:mentors,id',

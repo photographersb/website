@@ -11,6 +11,10 @@ class CustomThrottle
 {
     public function handle(Request $request, Closure $next, $maxAttempts = 60, $decayMinutes = 1)
     {
+        if (app()->environment('local')) {
+            return $next($request);
+        }
+
         $key = $this->resolveRequestSignature($request);
 
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {

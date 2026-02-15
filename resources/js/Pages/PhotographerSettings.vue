@@ -209,13 +209,19 @@
               <label
                 v-for="category in categories"
                 :key="category.id || category.name"
-                class="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 transition-colors hover:border-burgundy/50"
+                :class="[
+                  'flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors cursor-pointer',
+                  form.category_ids.includes(category.id)
+                    ? 'border-burgundy bg-burgundy/5 text-burgundy'
+                    : 'border-gray-200 text-gray-700 hover:border-burgundy/50'
+                ]"
               >
                 <input
                   v-model="form.category_ids"
                   type="checkbox"
                   :value="category.id"
-                  class="w-4 h-4 rounded border-gray-300"
+                  class="h-4 w-4 rounded border-gray-300 accent-burgundy focus:ring-burgundy"
+                  :aria-checked="form.category_ids.includes(category.id)"
                 >
                 <span>{{ category.name }}</span>
               </label>

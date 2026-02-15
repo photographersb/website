@@ -5,111 +5,191 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
 use App\Models\Transaction;
+use App\Models\EventPayment;
+use App\Models\EventRegistration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Collection;
 
 class AdminTransactionController extends Controller
 {
     use ApiResponse;
     /**
-     * Get all transactions with filters and pagination
+     * Get all transactions (booking & event payments) with filters and pagination
      */
     public function index(Request $request)
     {
         try {
-            // Build base query for stats calculation (before pagination)
-            $statsQuery = Transaction::query();
+            $type = $request->input('type'); // null/all, 'booking', 'event_tickets'
+            $status = $request->input('status');
+            $search = $request->input('search');
+            $dateFrom = $request->input('date_from');
+            $dateTo = $request->input('date_to');
+            $page = $request->input('page', 1);
+            $perPage = $request->input('per_page', 15);
 
-            // Apply same filters to stats query
-            if ($request->has('status')) {
-                $statsQuery->where('status', $request->status);
+            // Get transactions (booking payments)
+            $bookingQuery = Transaction::with(['user']);
+            $eventQuery = EventPayment::with(['user', 'event']);
+
+            // Filter type
+            if ($type && $type !== 'all') {
+                if ($type === 'booking') {
+                    $eventQuery = null;
+                } elseif ($type === 'event_tickets') {
+                    $bookingQuery = null;
+                }
             }
 
-            if ($request->has('type')) {
-                $statsQuery->where('transaction_type', $request->type);
+            // Apply filters to booking transactions
+            if ($bookingQuery) {
+                if ($status) {
+                    $bookingQuery->where('status', $status);
+                }
+                if ($search) {
+                    $bookingQuery->where(function($q) use ($search) {
+                        $q->where('transaction_id', 'LIKE', "%{$search}%")
+                          ->orWhere('gateway_transaction_id', 'LIKE', "%{$search}%")
+                          ->orWhereHas('user', function($userQ) use ($search) {
+                              $userQ->where('name', 'LIKE', "%{$search}%")
+                                    ->orWhere('email', 'LIKE', "%{$search}%");
+                          });
+                    });
+                }
+                if ($dateFrom) {
+                    $bookingQuery->where('created_at', '>=', $dateFrom);
+                }
+                if ($dateTo) {
+                    $bookingQuery->where('created_at', '<=', $dateTo);
+                }
             }
 
-            if ($request->has('gateway')) {
-                $statsQuery->where('payment_gateway', $request->gateway);
+            // Apply filters to event payments
+            if ($eventQuery) {
+                if ($status) {
+                    $eventQuery->where('status', $status);
+                }
+                if ($search) {
+                    $eventQuery->where(function($q) use ($search) {
+                        $q->where('transaction_id', 'LIKE', "%{$search}%")
+                          ->orWhere('trx_id', 'LIKE', "%{$search}%")
+                          ->orWhereHas('user', function($userQ) use ($search) {
+                              $userQ->where('name', 'LIKE', "%{$search}%")
+                                    ->orWhere('email', 'LIKE', "%{$search}%");
+                          });
+                    });
+                }
+                if ($dateFrom) {
+                    $eventQuery->where('created_at', '>=', $dateFrom);
+                }
+                if ($dateTo) {
+                    $eventQuery->where('created_at', '<=', $dateTo);
+                }
             }
 
-            if ($request->has('search')) {
-                $statsQuery->where(function($q) use ($request) {
-                    $q->where('transaction_id', 'LIKE', "%{$request->search}%")
-                      ->orWhere('gateway_transaction_id', 'LIKE', "%{$request->search}%")
-                      ->orWhereHas('user', function($userQ) use ($request) {
-                          $userQ->where('name', 'LIKE', "%{$request->search}%")
-                                ->orWhere('email', 'LIKE', "%{$request->search}%");
-                      });
-                });
+            // Get counts/stats from both sources
+            $totalRevenue = 0;
+            $todayRevenue = 0;
+            $monthlyRevenue = 0;
+            $stats = ['total' => 0, 'completed' => 0, 'pending' => 0, 'failed' => 0];
+
+            if ($bookingQuery) {
+                $bookingStats = (clone $bookingQuery)->select('status')->get()->groupBy('status')->map->count();
+                $stats['completed'] += $bookingStats->get('completed', 0);
+                $stats['pending'] += $bookingStats->get('pending', 0);
+                $stats['failed'] += $bookingStats->get('failed', 0);
+                $stats['total'] += (clone $bookingQuery)->count();
+                
+                $completedQuery = (clone $bookingQuery)->where('status', 'completed');
+                $totalRevenue += $completedQuery->sum('amount') ?? 0;
+                $todayRevenue += (clone $completedQuery)->whereDate('created_at', today())->sum('amount') ?? 0;
+                $monthlyRevenue += (clone $completedQuery)->whereMonth('created_at', now()->month)->sum('amount') ?? 0;
             }
 
-            if ($request->has('date_from')) {
-                $statsQuery->where('created_at', '>=', $request->date_from);
+            if ($eventQuery) {
+                $eventStats = (clone $eventQuery)->select('status')->get()->groupBy('status')->map->count();
+                $stats['completed'] += $eventStats->get('completed', 0);
+                $stats['pending'] += $eventStats->get('pending', 0);
+                $stats['failed'] += $eventStats->get('failed', 0);
+                $stats['total'] += (clone $eventQuery)->count();
+                
+                $completedQuery = (clone $eventQuery)->where('status', 'completed');
+                $totalRevenue += $completedQuery->sum('amount') ?? 0;
+                $todayRevenue += (clone $completedQuery)->whereDate('created_at', today())->sum('amount') ?? 0;
+                $monthlyRevenue += (clone $completedQuery)->whereMonth('created_at', now()->month)->sum('amount') ?? 0;
             }
 
-            if ($request->has('date_to')) {
-                $statsQuery->where('created_at', '<=', $request->date_to);
+            $stats['total_revenue'] = $totalRevenue;
+            $stats['today_revenue'] = $todayRevenue;
+            $stats['monthly_revenue'] = $monthlyRevenue;
+
+            // Get paginated results, combining both types
+            $results = [];
+
+            if ($bookingQuery) {
+                $bookings = $bookingQuery->orderBy('created_at', 'desc')->get();
+                foreach ($bookings as $booking) {
+                    $results[] = (object)[
+                        'id' => 'booking_' . $booking->id,
+                        'type' => 'booking',
+                        'transaction_id' => $booking->transaction_id,
+                        'user_id' => $booking->user_id,
+                        'user' => $booking->user,
+                        'event_id' => null,
+                        'event' => null,
+                        'amount' => $booking->amount,
+                        'status' => $booking->status,
+                        'method' => $booking->payment_gateway,
+                        'sender_number' => null,
+                        'trx_id' => $booking->gateway_transaction_id,
+                        'screenshot_path' => null,
+                        'created_at' => $booking->created_at,
+                        'verified_at' => null,
+                        'verified_by_user_id' => null,
+                    ];
+                }
             }
 
-            // Calculate stats from all filtered records (before pagination)
-            $stats = [
-                'total' => $statsQuery->count(),
-                'completed' => (clone $statsQuery)->where('status', 'completed')->count(),
-                'pending' => (clone $statsQuery)->where('status', 'pending')->count(),
-                'failed' => (clone $statsQuery)->where('status', 'failed')->count(),
-                'refunded' => (clone $statsQuery)->where('status', 'refunded')->count(),
-                'total_revenue' => (clone $statsQuery)->where('status', 'completed')->sum('amount') ?? 0,
-                'today_revenue' => (clone $statsQuery)->where('status', 'completed')->whereDate('created_at', today())->sum('amount') ?? 0,
-                'monthly_revenue' => (clone $statsQuery)->where('status', 'completed')->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('amount') ?? 0,
-                'yearly_revenue' => (clone $statsQuery)->where('status', 'completed')->whereYear('created_at', now()->year)->sum('amount') ?? 0,
-            ];
-
-            // Build query for paginated data (with eager loading)
-            $query = Transaction::with(['user']);
-
-            // Apply same filters
-            if ($request->has('status')) {
-                $query->where('status', $request->status);
+            if ($eventQuery) {
+                $events = $eventQuery->get();
+                foreach ($events as $event) {
+                    $results[] = (object)[
+                        'id' => 'event_' . $event->id,
+                        'type' => 'event_tickets',
+                        'transaction_id' => $event->transaction_id,
+                        'user_id' => $event->user_id,
+                        'user' => $event->user,
+                        'event_id' => $event->event_id,
+                        'event' => $event->event,
+                        'amount' => $event->amount,
+                        'status' => $event->status,
+                        'method' => $event->method,
+                        'sender_number' => $event->sender_number,
+                        'trx_id' => $event->trx_id,
+                        'screenshot_path' => $event->screenshot_path,
+                        'created_at' => $event->created_at,
+                        'verified_at' => $event->verified_at,
+                        'verified_by_user_id' => $event->verified_by_user_id,
+                    ];
+                }
             }
 
-            if ($request->has('type')) {
-                $query->where('transaction_type', $request->type);
-            }
+            // Sort combined results by created_at desc
+            usort($results, function($a, $b) {
+                return $b->created_at <=> $a->created_at;
+            });
 
-            if ($request->has('gateway')) {
-                $query->where('payment_gateway', $request->gateway);
-            }
+            // Paginate manually
+            $total = count($results);
+            $lastPage = ceil($total / $perPage);
+            $offset = ($page - 1) * $perPage;
+            $items = array_slice($results, $offset, $perPage);
 
-            if ($request->has('search')) {
-                $query->where(function($q) use ($request) {
-                    $q->where('transaction_id', 'LIKE', "%{$request->search}%")
-                      ->orWhere('gateway_transaction_id', 'LIKE', "%{$request->search}%")
-                      ->orWhereHas('user', function($userQ) use ($request) {
-                          $userQ->where('name', 'LIKE', "%{$request->search}%")
-                                ->orWhere('email', 'LIKE', "%{$request->search}%");
-                      });
-                });
-            }
-
-            if ($request->has('date_from')) {
-                $query->where('created_at', '>=', $request->date_from);
-            }
-
-            if ($request->has('date_to')) {
-                $query->where('created_at', '<=', $request->date_to);
-            }
-
-            // Sort by newest first
-            $query->orderBy('created_at', 'desc');
-
-            $transactions = $query->paginate($request->per_page ?? 15);
-
-            return $this->success($transactions->items(), 'Transactions retrieved successfully', 200, [
-                'total' => $transactions->total(),
-                'per_page' => $transactions->perPage(),
-                'current_page' => $transactions->currentPage(),
-                'last_page' => $transactions->lastPage(),
+            return $this->success($items, 'Transactions retrieved successfully', 200, [
+                'total' => $total,
+                'per_page' => $perPage,
+                'current_page' => $page,
+                'last_page' => $lastPage,
                 'stats' => $stats,
             ]);
         } catch (\Exception $e) {
@@ -249,6 +329,144 @@ class AdminTransactionController extends Controller
         } catch (\Exception $e) {
             Log::error('Failed to export transactions: ' . $e->getMessage());
             return $this->error('Failed to export transactions', 500);
+        }
+    }
+
+    /**
+     * Approve an event payment (sets to completed and confirms registration)
+     */
+    public function approveEventPayment(Request $request, $paymentId)
+    {
+        try {
+            $payment = EventPayment::findOrFail($paymentId);
+
+            if ($payment->status !== 'pending') {
+                return $this->validationError(
+                    ['payment' => 'Only pending payments can be approved'],
+                    'Validation failed'
+                );
+            }
+
+            // Update payment status
+            $payment->update([
+                'status' => 'completed',
+                'verified_by_user_id' => auth()->user()->id,
+                'verified_at' => now(),
+                'admin_note' => $request->input('admin_note'),
+            ]);
+
+            // Confirm the registration
+            if ($payment->registration) {
+                $payment->registration->update([
+                    'status' => 'confirmed',
+                    'confirmed_at' => now(),
+                ]);
+
+                // Increase sold_count on approval
+                $ticket = $payment->registration->ticket;
+                if ($ticket) {
+                    $qty = $payment->registration->qty ?? 1;
+                    $ticket->increment('sold_count', $qty);
+                    Log::info("Increased ticket #{$ticket->id} sold_count by {$qty} (now: {$ticket->fresh()->sold_count})");
+                }
+            }
+
+            Log::info("Event payment #{$paymentId} approved by admin " . auth()->user()->id);
+
+            return $this->success($payment->load(['user', 'event']), 'Event payment approved successfully');
+        } catch (\Exception $e) {
+            Log::error('Failed to approve event payment: ' . $e->getMessage());
+            return $this->error('Failed to approve payment', 500);
+        }
+    }
+
+    /**
+     * Reject an event payment
+     */
+    public function rejectEventPayment(Request $request, $paymentId)
+    {
+        try {
+            $payment = EventPayment::findOrFail($paymentId);
+
+            if ($payment->status !== 'pending') {
+                return $this->validationError(
+                    ['payment' => 'Only pending payments can be rejected'],
+                    'Validation failed'
+                );
+            }
+
+            // Update payment status
+            $payment->update([
+                'status' => 'rejected',
+                'verified_by_user_id' => auth()->user()->id,
+                'verified_at' => now(),
+                'admin_note' => $request->input('admin_note'),
+            ]);
+
+            // Cancel the registration and restore ticket availability
+            if ($payment->registration) {
+                $payment->registration->update(['status' => 'cancelled']);
+
+                // Decrease sold_count back on rejection
+                $ticket = $payment->registration->ticket;
+                if ($ticket) {
+                    $qty = $payment->registration->qty ?? 1;
+                    $newSoldCount = max(0, $ticket->sold_count - $qty);
+                    $ticket->update(['sold_count' => $newSoldCount]);
+                    Log::info("Decreased ticket #{$ticket->id} sold_count by {$qty} (now: {$ticket->fresh()->sold_count})");
+                }
+            }
+
+            Log::info("Event payment #{$paymentId} rejected by admin " . auth()->user()->id);
+
+            return $this->success($payment->load(['user', 'event']), 'Event payment rejected successfully');
+        } catch (\Exception $e) {
+            Log::error('Failed to reject event payment: ' . $e->getMessage());
+            return $this->error('Failed to reject payment', 500);
+        }
+    }
+
+    /**
+     * Cancel an approved event payment and restore ticket availability
+     */
+    public function cancelEventPayment(Request $request, $paymentId)
+    {
+        try {
+            $payment = EventPayment::findOrFail($paymentId);
+
+            if ($payment->status !== 'completed') {
+                return $this->validationError(
+                    ['payment' => 'Only approved payments can be cancelled'],
+                    'Validation failed'
+                );
+            }
+
+            // Update payment status to cancelled
+            $payment->update([
+                'status' => 'cancelled',
+                'admin_note' => $request->input('admin_note', 'Payment cancelled by admin'),
+            ]);
+
+            // Cancel the registration and restore ticket availability
+            if ($payment->registration) {
+                $payment->registration->update(['status' => 'cancelled']);
+
+                // Restore sold_count on cancellation
+                $ticket = $payment->registration->ticket;
+                if ($ticket) {
+                    $qty = $payment->registration->qty ?? 1;
+                    $newSoldCount = max(0, $ticket->sold_count - $qty);
+                    $ticket->update(['sold_count' => $newSoldCount]);
+                    Log::info("Restored ticket #{$ticket->id} sold_count by {$qty} (now: {$ticket->fresh()->sold_count})");
+                }
+            }
+
+            Log::info("Event payment #{$paymentId} cancelled by admin " . auth()->user()->id);
+
+            return $this->success($payment->load(['user', 'event', 'registration']), 'Event payment cancelled and ticket availability restored');
+        } catch (\Exception $e) {
+            Log::error('Failed to cancel event payment: ' . $e->getMessage());
+            return $this->error('Failed to cancel payment', 500);
         }
     }
 }

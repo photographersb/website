@@ -15,13 +15,13 @@
         <div class="absolute top-1/2 left-1/2 w-64 h-64 bg-white bg-opacity-5 rounded-full blur-2xl" />
       </div>
 
-      <div class="container mx-auto px-4 py-16 md:py-24 relative z-10">
+      <div class="container mx-auto px-4 pt-10 pb-16 md:pt-10 md:pb-24 relative z-10">
         <!-- Logo/Brand Section -->
-        <div class="text-center mb-8">
-          <div class="inline-block mb-4 px-6 py-2 bg-white bg-opacity-10 backdrop-blur-sm rounded-full border border-white border-opacity-20">
-            <p class="text-sm md:text-base font-medium flex items-center gap-2 justify-center">
+        <div class="text-center mt-5 mb-4 sm:mb-5 md:mb-6 lg:mb-8">
+          <div class="inline-flex mb-2 sm:mb-3 px-3 sm:px-4 py-1 sm:py-1.5 bg-white bg-opacity-10 backdrop-blur-sm rounded-full border border-white border-opacity-20">
+            <p class="text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2 justify-center">
               <svg
-                class="w-5 h-5"
+                class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -83,7 +83,7 @@
     </section>
 
     <!-- Main Content -->
-    <div class="container mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">
+    <div class="container mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12 mt-5">
       <!-- Filters -->
       <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 md:p-6 mb-6 sm:mb-8">
         <h2 class="text-lg sm:text-xl font-semibold mb-4">
@@ -278,7 +278,7 @@
                 ⭐ Featured
               </div>
               <div
-                v-if="event.is_ticketed"
+                v-if="isPaidEvent(event)"
                 class="absolute top-3 left-3 bg-burgundy text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold"
               >
                 Ticketed
@@ -368,7 +368,7 @@
 
                 <!-- Price (if ticketed) -->
                 <div
-                  v-if="event.is_ticketed"
+                  v-if="isPaidEvent(event)"
                   class="flex items-center text-xs sm:text-sm text-gray-700"
                 >
                   <svg
@@ -384,7 +384,7 @@
                       d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
                     />
                   </svg>
-                  <span class="font-semibold text-burgundy">৳{{ event.ticket_price }}</span>
+                  <span class="font-semibold text-burgundy">৳{{ event.ticket_price || event.price || event.base_price || 0 }}</span>
                 </div>
               </div>
 
@@ -426,20 +426,20 @@
         <div class="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 mt-8 sm:mt-10 md:mt-12">
           <button
             v-if="currentPage > 1"
-            class="w-full sm:w-auto px-4 sm:px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
+            class="w-full sm:w-auto px-4 sm:px-6 py-2 border border-[#eadfd7] rounded-full bg-white/90 hover:bg-white transition-colors text-sm sm:text-base shadow-sm"
             @click="previousPage"
           >
             <span class="hidden sm:inline">← Previous</span>
             <span class="sm:hidden">←</span>
           </button>
           
-          <span class="text-sm sm:text-base text-gray-600">
+          <span class="text-sm sm:text-base text-gray-700 bg-white/90 border border-[#eadfd7] rounded-full px-4 sm:px-5 py-2 shadow-sm">
             Page <span class="font-semibold">{{ currentPage }}</span> of <span class="font-semibold">{{ totalPages }}</span>
           </span>
           
           <button
             v-if="currentPage < totalPages"
-            class="w-full sm:w-auto px-4 sm:px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
+            class="w-full sm:w-auto px-4 sm:px-6 py-2 border border-[#eadfd7] rounded-full bg-white/90 hover:bg-white transition-colors text-sm sm:text-base shadow-sm"
             @click="nextPage"
           >
             <span class="hidden sm:inline">Next →</span>
@@ -558,9 +558,24 @@ const viewEvent = (event) => {
   router.push(`/events/${event.slug}`);
 };
 
+const isPaidEvent = (event) => {
+  if (!event) return false;
+  if (typeof event.is_ticketed === 'boolean') return event.is_ticketed;
+  if (event.event_mode) return event.event_mode === 'paid';
+  if (event.event_type) return event.event_type === 'paid';
+
+  const numeric = Number(event.ticket_price ?? event.price ?? event.base_price ?? 0);
+  return Number.isFinite(numeric) && numeric > 0;
+};
+
 const toggleRsvp = async (event) => {
   if (!localStorage.getItem('user')) {
     router.push('/auth');
+    return;
+  }
+
+  if (isPaidEvent(event)) {
+    router.push(`/events/${event.slug}/tickets`);
     return;
   }
 

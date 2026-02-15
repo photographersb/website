@@ -8,6 +8,15 @@ use App\Services\ThrottleEventLogger;
 
 class CustomThrottleRequests extends ThrottleRequests
 {
+    public function handle($request, \Closure $next, $maxAttempts = 60, $decayMinutes = 1, $prefix = '')
+    {
+        if (app()->environment('local')) {
+            return $next($request);
+        }
+
+        return parent::handle($request, $next, $maxAttempts, $decayMinutes, $prefix);
+    }
+
     /**
      * Create a 'too many attempts' exception with a user-friendly message.
      *

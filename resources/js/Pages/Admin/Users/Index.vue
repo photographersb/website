@@ -1695,22 +1695,30 @@ const saveUser = async () => {
       ? `/admin/users/${selectedUser.value.id}` 
       : '/admin/users'
 
+    console.log('Saving user:', showEditModal.value ? 'Update' : 'Create', userForm.value)
+
     const request = showEditModal.value
       ? api.put(url, userForm.value)
       : api.post(url, userForm.value)
 
     const { data } = await request
     
+    console.log('API Response:', data)
+    
     if (data.status === 'success') {
-      showToastMessage(data.message)
+      showToastMessage(data.message || 'User saved successfully!')
       closeEditModal()
-      fetchUsers()
+      await fetchUsers()
+      console.log('✅ User saved and list refreshed')
     } else {
-      showToastMessage(data.message || 'Error saving user')
+      showToastMessage(data.message || 'Error saving user', 'error')
+      console.error('Save failed:', data)
     }
   } catch (error) {
     console.error('Error saving user:', error)
-    showToastMessage('Error saving user')
+    console.error('Error details:', error.response?.data)
+    const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Failed to save user'
+    showToastMessage(errorMsg, 'error')
   }
 }
 

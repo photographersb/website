@@ -42,6 +42,7 @@ use App\Http\Controllers\Api\Admin\AdminProfileController;
 use App\Http\Controllers\Api\Admin\RoleController;
 use App\Http\Controllers\Api\Admin\CertificateTemplateController;
 use App\Http\Controllers\Api\Admin\ErrorCenterController;
+use App\Http\Controllers\Api\Admin\AdminPhotographerController;
 use App\Http\Controllers\Api\BookingMessageController;
 use App\Http\Controllers\Api\VerificationController;
 use App\Http\Controllers\Api\SitemapController;
@@ -165,6 +166,10 @@ Route::prefix('v1')->group(function () {
     Route::get('/events/{slug}', [\App\Http\Controllers\Api\EventApiController::class, 'show']);
     Route::post('/events/{event}/rsvp', [EventController::class, 'rsvp'])
         ->middleware(['auth:sanctum', 'throttle:20,60']);
+    Route::post('/events/{event}/payments/initiate', [\App\Http\Controllers\Api\EventPaymentController::class, 'initiate'])
+        ->middleware(['auth:sanctum', 'account.approved', 'throttle:120,60']);
+    Route::post('/events/{event}/payments/manual', [\App\Http\Controllers\Api\EventPaymentController::class, 'manual'])
+        ->middleware(['auth:sanctum', 'account.approved', 'throttle:120,60']);
 
     // Public competitions
     Route::middleware('throttle:200,1')->group(function () {
@@ -544,6 +549,10 @@ Route::prefix('v1')->group(function () {
             Route::post('/judges/{id}/toggle-status', [\App\Http\Controllers\Api\Admin\JudgeController::class, 'toggleStatus'])->where('id', '[0-9]+');
             Route::post('/judges/{id}/assign-competitions', [\App\Http\Controllers\Api\Admin\JudgeController::class, 'assignCompetitions'])->where('id', '[0-9]+');
             
+            // Photographers Management
+            Route::get('/photographers', [\App\Http\Controllers\Api\Admin\AdminPhotographerController::class, 'index']);
+            Route::get('/photographers/{id}', [\App\Http\Controllers\Api\Admin\AdminPhotographerController::class, 'show'])->where('id', '[0-9]+');
+            
             // Sponsors Management
             Route::get('/sponsors', [\App\Http\Controllers\Api\Admin\SponsorManagementController::class, 'index']);
             Route::post('/sponsors', [\App\Http\Controllers\Api\Admin\SponsorManagementController::class, 'store']);
@@ -608,6 +617,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/competitions/{competition}/announce-winners', [\App\Http\Controllers\Admin\CompetitionController::class, 'announceWinners']);
             Route::get('/competitions/{competition}/winners', [\App\Http\Controllers\Admin\CompetitionController::class, 'getWinners']);
             Route::get('/competitions/{competition}/leaderboard', [\App\Http\Controllers\Admin\CompetitionController::class, 'getLeaderboard']);
+            Route::post('/competitions/{competition}/issue-certificate', [\App\Http\Controllers\Admin\CompetitionController::class, 'issueCertificate']);
 
             // Event Management
             Route::get('/events', [AdminEventApiController::class, 'index']);
@@ -736,6 +746,10 @@ Route::prefix('v1')->group(function () {
             Route::put('/certificate-templates/{id}', [CertificateTemplateController::class, 'update']);
             Route::delete('/certificate-templates/{id}', [CertificateTemplateController::class, 'destroy']);
             Route::get('/certificate-templates/type/{type}/default', [CertificateTemplateController::class, 'getDefault']);
+
+            // Certificates (Admin)
+            Route::get('/certificates', [\App\Http\Controllers\Api\Admin\CertificateController::class, 'index']);
+            Route::post('/certificates/{certificate}/regenerate', [\App\Http\Controllers\Api\Admin\CertificateController::class, 'regenerate']);
             
             // Notice Management
             Route::get('/notices', [\App\Http\Controllers\Api\Admin\NoticeController::class, 'index']);
@@ -809,6 +823,9 @@ Route::prefix('v1')->group(function () {
             Route::put('/transactions/{id}/status', [AdminTransactionController::class, 'updateStatus']);
             Route::post('/transactions/{id}/refund', [AdminTransactionController::class, 'refund']);
             Route::get('/transactions/export', [AdminTransactionController::class, 'export']);
+            Route::post('/transactions/event-payment/{paymentId}/approve', [AdminTransactionController::class, 'approveEventPayment']);
+            Route::post('/transactions/event-payment/{paymentId}/reject', [AdminTransactionController::class, 'rejectEventPayment']);
+            Route::post('/transactions/event-payment/{paymentId}/cancel', [AdminTransactionController::class, 'cancelEventPayment']);
             
             // Settings Management
             Route::get('/settings', [AdminSettingsController::class, 'index']);

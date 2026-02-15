@@ -227,6 +227,7 @@ class CompetitionSubmissionController extends Controller
         // Check max submissions
         $existingCount = CompetitionSubmission::forCompetition($competitionId)
             ->byPhotographer($user->id)
+            ->whereNotIn('status', ['rejected', 'disqualified'])
             ->count();
         
         if ($existingCount >= $competition->max_submissions_per_user) {
@@ -336,6 +337,9 @@ class CompetitionSubmissionController extends Controller
             }
         }
         
+        // Determine submission status based on competition payment requirement
+        $initialStatus = $competition->is_paid_competition ? 'payment_pending' : 'pending';
+        
         $submission = CompetitionSubmission::create([
             'competition_id' => $competitionId,
             'photographer_id' => $user->id,
@@ -351,11 +355,16 @@ class CompetitionSubmissionController extends Controller
             'camera_settings' => $this->normalizeCameraSettings($validated['camera_settings'] ?? null),
             'hashtags' => $validated['hashtags'] ?? null,
             'is_watermarked' => $validated['is_watermarked'] ?? false,
-            'status' => 'pending_review',
+            'status' => $initialStatus,
+            'submitted_at' => now(),
             'terms_accepted_at' => now(),
         ]);
         
-        return $this->created($submission, 'Submission uploaded successfully! It will be reviewed before appearing in the gallery.');
+        $message = $competition->is_paid_competition 
+            ? 'Submission uploaded! Please proceed with payment to confirm your entry.' 
+            : 'Submission uploaded successfully! It will be reviewed before appearing in the gallery.';
+        
+        return $this->created($submission->load('competition'), $message);
     }
 
     private function normalizeCameraSettings(?string $value): ?string

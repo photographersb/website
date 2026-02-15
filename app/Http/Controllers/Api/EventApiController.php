@@ -153,6 +153,12 @@ class EventApiController extends Controller
         }
 
         $event->load(['city', 'mentors', 'category', 'organizer.user', 'registrations', 'sponsors']);
+        if (Schema::hasTable('event_tickets')) {
+            $event->load(['tickets' => function ($query) {
+                $query->where('is_active', true)
+                    ->orderBy('price');
+            }]);
+        }
 
         // Calculate stats
         $registeredCount = $event->registrations()->count();
@@ -177,6 +183,9 @@ class EventApiController extends Controller
                 'venue_address' => $event->venue_address,
                 'type' => $event->type,
                 'event_mode' => $event->event_mode,
+                'is_ticketed' => $event->is_ticketed,
+                'ticket_price' => $event->ticket_price,
+                'base_price' => $event->base_price,
                 'price' => $event->price,
                 'currency' => $event->currency,
                 'max_tickets_per_user' => $event->max_tickets_per_user,
@@ -203,6 +212,7 @@ class EventApiController extends Controller
                 'certificates_enabled' => $event->certificates_enabled,
                 'mentors' => $event->mentors,
                 'sponsors' => $event->sponsors,
+                'tickets' => $event->relationLoaded('tickets') ? $event->tickets : [],
                 'is_featured' => $event->is_featured,
                 'organizer' => $event->organizer,
                 'user_registration' => $userRegistration,

@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 
 class CompetitionSponsorController extends Controller
 {
+    use ApiResponse;
+
     /**
      * Get all sponsors for a competition
      */

@@ -22,12 +22,14 @@ class EventPayment extends Model
         'amount',
         'currency',
         'status',
+        'verification_status',
         'screenshot_path',
         'admin_note',
         'verified_by_user_id',
         'verified_at',
         'paid_at',
         'raw_response',
+        'gateway_response',
     ];
 
     protected $casts = [
@@ -35,6 +37,7 @@ class EventPayment extends Model
         'paid_at' => 'datetime',
         'verified_at' => 'datetime',
         'raw_response' => 'json',
+        'gateway_response' => 'json',
     ];
 
     public function registration()

@@ -1,0 +1,32 @@
+Added username shortcut route to app.js after line 405:
+
+```javascript
+    {
+        path: '/settings',
+        component: Settings,
+        name: 'settings',
+        meta: { requiresAuth: true },
+    },
+    // Catch-all for @username or direct username access (must be last)
+    {
+        path: '/:username',
+        redirect: to => {
+            const username = to.params.username;
+            // Skip if it looks like a system route
+            const systemRoutes = ['admin', 'api', 'auth', 'payment', 'sitemap', 'storage', 'dashboard', 'photographer'];
+            if (systemRoutes.includes(username)) {
+                return to.path;
+            }
+            // Redirect to photographer profile
+            return `/photographer/${username}`;
+        }
+    },
+]
+```
+
+This allows:
+- `http://127.0.0.1:8000/johndoe` → redirects to `/photographer/johndoe`
+- `http://127.0.0.1:8000/@johndoe` → redirects to `/photographer/johndoe` 
+- Protects system routes (admin, api, etc.) from being treated as usernames
+
+Add this route BEFORE the closing `]` of the routes array, after the settings route.

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Str;
 use App\Traits\HasSeoMeta;
 
 class Photographer extends Model
@@ -71,6 +72,38 @@ class Photographer extends Model
     protected $appends = ['profile_picture_url'];
 
     /**
+     * Auto-generate slug on creating and ensure it's unique
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($photographer) {
+            // Generate slug if not provided
+            if (empty($photographer->slug)) {
+                // Prefer username for slug
+                if ($photographer->user && $photographer->user->username) {
+                    $baseSlug = Str::slug($photographer->user->username);
+                } elseif ($photographer->user && $photographer->user->name) {
+                    $baseSlug = Str::slug($photographer->user->name);
+                } else {
+                    $baseSlug = 'photographer-' . Str::random(8);
+                }
+                
+                // Ensure uniqueness
+                $slug = $baseSlug;
+                $counter = 1;
+                while (self::where('slug', $slug)->exists()) {
+                    $slug = $baseSlug . '-' . $counter;
+                    $counter++;
+                }
+                
+                $photographer->slug = $slug;
+            }
+        });
+    }
+
+    /**
      * Get profile picture URL with fallback
      */
     public function getProfilePictureUrlAttribute(): ?string
@@ -88,12 +121,16 @@ class Photographer extends Model
         }
         
         // If already a full URL, return as is
-        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, '/storage/')) {
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
             return $value;
         }
-        
-        // Prepend /storage/ for relative paths
-        return '/storage/' . ltrim($value, '/');
+
+        if (str_starts_with($value, '/storage/')) {
+            return asset(ltrim($value, '/'));
+        }
+
+        // Prepend storage path for relative paths
+        return asset('storage/' . ltrim($value, '/'));
     }
 
     /**

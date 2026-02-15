@@ -53,13 +53,14 @@ class EventController extends Controller
     public function create()
     {
         return view('admin.events.create', [
+            'event' => new Event(),
             'cities' => Location::where('is_active', true)
                 ->whereIn('type', ['district', 'upazila'])
                 ->orderBy('name')
                 ->get(),
             'categories' => Category::orderBy('name')->get(),
             'mentors' => Mentor::orderBy('name')->get(),
-            'certificateTemplates' => CertificateTemplate::orderBy('name')->get(),
+            'certificateTemplates' => CertificateTemplate::orderBy('title')->get(),
         ]);
     }
 
@@ -68,34 +69,60 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $isDraft = $request->input('status') === 'draft';
+        
+        // Build validation rules based on draft status
+        $rules = [
             'title' => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => $isDraft ? 'nullable|string' : 'required|string',
             'category_id' => 'nullable|exists:categories,id',
             'organizer_id' => 'nullable|exists:photographers,id',
-            'city_id' => 'required|exists:locations,id',
-            'venue_name' => 'required|string|max:255',
-            'venue_address' => 'required|string|max:255',
+            'city_id' => $isDraft ? 'nullable|exists:locations,id' : 'required|exists:locations,id',
+            'venue_name' => $isDraft ? 'nullable|string|max:255' : 'required|string|max:255',
+            'venue_address' => $isDraft ? 'nullable|string|max:255' : 'required|string|max:255',
+            'location' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'google_map_link' => 'nullable|url',
             'latitude' => 'nullable|numeric|min:-90|max:90',
             'longitude' => 'nullable|numeric|min:-180|max:180',
-            'start_datetime' => 'required|date_format:Y-m-d\TH:i',
-            'end_datetime' => 'required|date_format:Y-m-d\TH:i|after:start_datetime',
-            'registration_deadline' => 'nullable|date_format:Y-m-d\TH:i',
-            'booking_close_datetime' => 'nullable|date_format:Y-m-d\TH:i',
-            'event_type' => 'required|in:free,paid',
+            'event_date' => $isDraft ? 'nullable|date_format:Y-m-d' : 'required|date_format:Y-m-d',
+            'event_end_date' => 'nullable|date_format:Y-m-d',
+            'start_time' => $isDraft ? 'nullable|date_format:H:i' : 'required|date_format:H:i',
+            'end_time' => $isDraft ? 'nullable|date_format:H:i' : 'required|date_format:H:i',
+            'all_day_event' => 'boolean',
+            'duration_hours' => 'nullable|numeric|min:0.5',
+            'max_attendees' => 'nullable|integer|min:1',
+            'capacity' => $isDraft ? 'nullable|integer|min:1' : 'required|integer|min:1',
+            'registration_deadline' => 'nullable|date_format:Y-m-d H:i',
+            'event_type' => $isDraft ? 'nullable|in:free,paid' : 'required|in:free,paid',
             'price' => 'nullable|numeric|min:0',
-            'capacity' => 'required|integer|min:1',
+            'ticket_price' => 'nullable|numeric|min:0',
+            'is_ticketed' => 'boolean',
+            'require_registration' => 'boolean',
             'certificates_enabled' => 'boolean',
             'certificate_template_id' => 'nullable|exists:certificate_templates,id',
             'refund_policy' => 'nullable|string',
             'requirements' => 'nullable|string',
             'banner_image' => 'nullable|image|max:5120',
+            'hero_image_url' => 'nullable|string',
+            'hero_image_credit_name' => 'nullable|string',
+            'hero_image_credit_url' => 'nullable|string',
+            'banner_image_credit_name' => 'nullable|string',
+            'banner_image_credit_url' => 'nullable|string',
+            'gallery_images' => 'nullable|array',
             'status' => 'in:draft,published,cancelled',
             'is_featured' => 'boolean',
-            'featured_until' => 'nullable|date_format:Y-m-d\TH:i',
-            'mentors' => 'nullable|array',
-            'mentors.*' => 'exists:mentors,id',
-        ]);
+            'featured_until' => 'nullable|date_format:Y-m-d H:i',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'og_image' => 'nullable|string',
+            'mentor_ids' => 'nullable|array',
+            'mentor_ids.*' => 'exists:mentors,id',
+            'sponsor_ids' => 'nullable|array',
+            'sponsor_ids.*' => 'exists:sponsors,id',
+        ];
+        
+        $validated = $request->validate($rules);
 
         // Handle banner image
         if ($request->hasFile('banner_image')) {
@@ -113,8 +140,8 @@ class EventController extends Controller
         $event = Event::create($validated);
 
         // Attach mentors if provided
-        if ($request->has('mentors') && $request->mentors) {
-            $event->mentors()->sync($request->mentors);
+        if ($request->has('mentor_ids') && is_array($request->mentor_ids) && count($request->mentor_ids) > 0) {
+            $event->mentors()->sync($request->mentor_ids);
         }
 
         return redirect()
@@ -149,7 +176,7 @@ class EventController extends Controller
                 ->get(),
             'categories' => Category::orderBy('name')->get(),
             'mentors' => Mentor::orderBy('name')->get(),
-            'certificateTemplates' => CertificateTemplate::orderBy('name')->get(),
+            'certificateTemplates' => CertificateTemplate::orderBy('title')->get(),
         ]);
     }
 
@@ -158,34 +185,60 @@ class EventController extends Controller
      */
     public function update(Request $request, Event $event)
     {
-        $validated = $request->validate([
+        $isDraft = $request->input('status') === 'draft';
+        
+        // Build validation rules based on draft status
+        $rules = [
             'title' => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => $isDraft ? 'nullable|string' : 'required|string',
             'category_id' => 'nullable|exists:categories,id',
             'organizer_id' => 'nullable|exists:photographers,id',
-            'city_id' => 'required|exists:locations,id',
-            'venue_name' => 'required|string|max:255',
-            'venue_address' => 'required|string|max:255',
+            'city_id' => $isDraft ? 'nullable|exists:locations,id' : 'required|exists:locations,id',
+            'venue_name' => $isDraft ? 'nullable|string|max:255' : 'required|string|max:255',
+            'venue_address' => $isDraft ? 'nullable|string|max:255' : 'required|string|max:255',
+            'location' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'google_map_link' => 'nullable|url',
             'latitude' => 'nullable|numeric|min:-90|max:90',
             'longitude' => 'nullable|numeric|min:-180|max:180',
-            'start_datetime' => 'required|date_format:Y-m-d\TH:i',
-            'end_datetime' => 'required|date_format:Y-m-d\TH:i|after:start_datetime',
-            'registration_deadline' => 'nullable|date_format:Y-m-d\TH:i',
-            'booking_close_datetime' => 'nullable|date_format:Y-m-d\TH:i',
-            'event_type' => 'required|in:free,paid',
+            'event_date' => $isDraft ? 'nullable|date_format:Y-m-d' : 'required|date_format:Y-m-d',
+            'event_end_date' => 'nullable|date_format:Y-m-d',
+            'start_time' => $isDraft ? 'nullable|date_format:H:i' : 'required|date_format:H:i',
+            'end_time' => $isDraft ? 'nullable|date_format:H:i' : 'required|date_format:H:i',
+            'all_day_event' => 'boolean',
+            'duration_hours' => 'nullable|numeric|min:0.5',
+            'max_attendees' => 'nullable|integer|min:1',
+            'capacity' => $isDraft ? 'nullable|integer|min:1' : 'required|integer|min:1',
+            'registration_deadline' => 'nullable|date_format:Y-m-d H:i',
+            'event_type' => $isDraft ? 'nullable|in:free,paid' : 'required|in:free,paid',
             'price' => 'nullable|numeric|min:0',
-            'capacity' => 'required|integer|min:1',
+            'ticket_price' => 'nullable|numeric|min:0',
+            'is_ticketed' => 'boolean',
+            'require_registration' => 'boolean',
             'certificates_enabled' => 'boolean',
             'certificate_template_id' => 'nullable|exists:certificate_templates,id',
             'refund_policy' => 'nullable|string',
             'requirements' => 'nullable|string',
             'banner_image' => 'nullable|image|max:5120',
+            'hero_image_url' => 'nullable|string',
+            'hero_image_credit_name' => 'nullable|string',
+            'hero_image_credit_url' => 'nullable|string',
+            'banner_image_credit_name' => 'nullable|string',
+            'banner_image_credit_url' => 'nullable|string',
+            'gallery_images' => 'nullable|array',
             'status' => 'in:draft,published,cancelled',
             'is_featured' => 'boolean',
-            'featured_until' => 'nullable|date_format:Y-m-d\TH:i',
-            'mentors' => 'nullable|array',
-            'mentors.*' => 'exists:mentors,id',
-        ]);
+            'featured_until' => 'nullable|date_format:Y-m-d H:i',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'og_image' => 'nullable|string',
+            'mentor_ids' => 'nullable|array',
+            'mentor_ids.*' => 'exists:mentors,id',
+            'sponsor_ids' => 'nullable|array',
+            'sponsor_ids.*' => 'exists:sponsors,id',
+        ];
+        
+        $validated = $request->validate($rules);
 
         // Handle banner image
         if ($request->hasFile('banner_image')) {
@@ -196,8 +249,8 @@ class EventController extends Controller
         $event->update($validated);
 
         // Sync mentors
-        if ($request->has('mentors')) {
-            $event->mentors()->sync($request->mentors ?? []);
+        if ($request->has('mentor_ids')) {
+            $event->mentors()->sync($request->mentor_ids ?? []);
         }
 
         return redirect()

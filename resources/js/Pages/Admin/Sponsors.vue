@@ -198,7 +198,21 @@
           {{ editingPlatform || editingCompetition ? 'Edit Sponsor' : 'Add Sponsor' }}
         </h2>
 
-        <div v-if="activeTab === 'platform'" class="space-y-3">
+        <div v-if="!editingPlatform && !editingCompetition" class="space-y-2">
+          <p class="text-sm font-medium text-gray-700">Add sponsor to</p>
+          <div class="flex flex-wrap gap-4 text-sm">
+            <label class="flex items-center gap-2">
+              <input v-model="createTargets.platform" type="checkbox">
+              Platform Sponsors
+            </label>
+            <label class="flex items-center gap-2">
+              <input v-model="createTargets.competition" type="checkbox">
+              Competition Sponsors
+            </label>
+          </div>
+        </div>
+
+        <div v-if="editingPlatform || (!editingCompetition && createTargets.platform)" class="space-y-3">
           <input v-model="platformForm.name" type="text" placeholder="Sponsor Name" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
           <input v-model="platformForm.website" type="text" placeholder="Website" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
           <textarea v-model="platformForm.description" rows="3" placeholder="Description" class="w-full px-4 py-2 border border-gray-300 rounded-lg"></textarea>
@@ -218,7 +232,24 @@
           </label>
         </div>
 
-        <div v-else class="space-y-3">
+        <div v-if="editingCompetition || (!editingPlatform && createTargets.competition)" class="space-y-3">
+          <div v-if="!editingCompetition" class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Competition</label>
+            <select
+              v-model="selectedCompetitionId"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            >
+              <option value="">Select competition</option>
+              <option
+                v-for="competition in competitions"
+                :key="competition.id"
+                :value="competition.id"
+              >
+                {{ competition.title }}
+              </option>
+            </select>
+            <p v-if="competitions.length === 0" class="text-xs text-gray-500">No competitions found.</p>
+          </div>
           <input v-model="competitionForm.name" type="text" placeholder="Sponsor Name" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
           <input v-model="competitionForm.website_url" type="text" placeholder="Website URL" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
           <textarea v-model="competitionForm.description" rows="3" placeholder="Description" class="w-full px-4 py-2 border border-gray-300 rounded-lg"></textarea>
@@ -298,6 +329,10 @@ const competitionSponsors = ref([])
 
 const uploadingImages = ref({ platform: false })
 const competitionLogoFile = ref(null)
+const createTargets = ref({
+  platform: true,
+  competition: false
+})
 const LOGO_MAX_BYTES = 5 * 1024 * 1024
 const LOGO_MIN_WIDTH = 600
 const LOGO_MIN_HEIGHT = 300
@@ -440,6 +475,10 @@ const resetForms = () => {
     logo_credit_url: ''
   }
   competitionLogoFile.value = null
+  createTargets.value = {
+    platform: activeTab.value === 'platform',
+    competition: activeTab.value === 'competition'
+  }
 }
 
 const fetchPlatformSponsors = async () => {
@@ -454,13 +493,42 @@ const fetchPlatformSponsors = async () => {
   }
 }
 
+const normalizeCompetitionPayload = (payload) => {
+  if (Array.isArray(payload?.data)) {
+    return payload.data
+  }
+  if (Array.isArray(payload?.data?.data)) {
+    return payload.data.data
+  }
+  return []
+}
+
+const setCompetitionList = (list) => {
+  competitions.value = list
+  if (!selectedCompetitionId.value && list.length > 0) {
+    selectedCompetitionId.value = list[0].id
+  }
+  if (list.length === 0) {
+    selectedCompetitionId.value = ''
+  }
+}
+
 const fetchCompetitions = async () => {
   try {
-    const { data } = await api.get('/admin/competitions')
-    competitions.value = data?.data || []
-    if (!selectedCompetitionId.value && competitions.value.length > 0) {
-      selectedCompetitionId.value = competitions.value[0].id
+    const { data } = await api.get('/admin/competitions', { params: { per_page: 200 } })
+    const list = normalizeCompetitionPayload(data)
+    setCompetitionList(list)
+    if (list.length > 0) {
+      return
     }
+  } catch (error) {
+    // Fallback below
+  }
+
+  try {
+    const { data } = await api.get('/competitions', { params: { per_page: 200 } })
+    const list = normalizeCompetitionPayload(data)
+    setCompetitionList(list)
   } catch (error) {
     showToast('Failed to load competitions', 'error')
   }
@@ -492,10 +560,11 @@ const refreshCurrentTab = async () => {
   }
 }
 
-const openCreateModal = () => {
+const openCreateModal = async () => {
   editingPlatform.value = null
   editingCompetition.value = null
   resetForms()
+  await fetchCompetitions()
   showModal.value = true
 }
 
@@ -543,19 +612,15 @@ const openEditCompetition = (sponsor) => {
 
 const saveSponsor = async () => {
   try {
-    if (activeTab.value === 'platform') {
-      if (editingPlatform.value) {
-        await api.put(`/admin/platform-sponsors/${editingPlatform.value.id}`, platformForm.value)
-      } else {
-        await api.post('/admin/platform-sponsors', platformForm.value)
-      }
+    if (editingPlatform.value) {
+      await api.put(`/admin/platform-sponsors/${editingPlatform.value.id}`, platformForm.value)
       showToast('Platform sponsor saved')
       await fetchPlatformSponsors()
-    } else {
-      if (!selectedCompetitionId.value) {
-        showToast('Select a competition first', 'error')
-        return
-      }
+      showModal.value = false
+      return
+    }
+
+    if (editingCompetition.value) {
       const payload = new FormData()
       payload.append('name', competitionForm.value.name)
       if (competitionForm.value.website_url) payload.append('website_url', competitionForm.value.website_url)
@@ -568,19 +633,79 @@ const saveSponsor = async () => {
       payload.append('is_active', competitionForm.value.is_active ? 1 : 0)
       if (competitionLogoFile.value) payload.append('logo', competitionLogoFile.value)
 
-      if (editingCompetition.value) {
-        payload.append('_method', 'PUT')
-        await api.post(`/competition-sponsors/${editingCompetition.value.id}`, payload, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        })
-      } else {
-        await api.post(`/competitions/${selectedCompetitionId.value}/sponsors`, payload, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        })
-      }
+      payload.append('_method', 'PUT')
+      await api.post(`/admin/competition-sponsors/${editingCompetition.value.id}`, payload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
       showToast('Competition sponsor saved')
       await fetchCompetitionSponsors()
+      showModal.value = false
+      return
     }
+
+    const createPlatform = createTargets.value.platform
+    const createCompetition = createTargets.value.competition
+
+    if (!createPlatform && !createCompetition) {
+      showToast('Select platform, competition, or both', 'error')
+      return
+    }
+
+    if (createPlatform) {
+      if (!platformForm.value.name && competitionForm.value.name) {
+        platformForm.value.name = competitionForm.value.name
+      }
+      await api.post('/admin/platform-sponsors', platformForm.value)
+    }
+
+    if (createCompetition) {
+      if (!selectedCompetitionId.value) {
+        showToast('Select a competition first', 'error')
+        return
+      }
+
+      if (!competitionForm.value.name && platformForm.value.name) {
+        competitionForm.value.name = platformForm.value.name
+      }
+      if (!competitionForm.value.website_url && platformForm.value.website) {
+        competitionForm.value.website_url = platformForm.value.website
+      }
+      if (!competitionForm.value.description && platformForm.value.description) {
+        competitionForm.value.description = platformForm.value.description
+      }
+
+      const payload = new FormData()
+      payload.append('name', competitionForm.value.name)
+      if (competitionForm.value.website_url) payload.append('website_url', competitionForm.value.website_url)
+      if (competitionForm.value.description) payload.append('description', competitionForm.value.description)
+      if (competitionForm.value.tier) payload.append('tier', competitionForm.value.tier)
+      if (competitionForm.value.contribution_amount !== '') payload.append('contribution_amount', competitionForm.value.contribution_amount)
+      if (competitionForm.value.display_order !== '') payload.append('display_order', competitionForm.value.display_order)
+      if (competitionForm.value.logo_credit_name) payload.append('logo_credit_name', competitionForm.value.logo_credit_name)
+      if (competitionForm.value.logo_credit_url) payload.append('logo_credit_url', competitionForm.value.logo_credit_url)
+      payload.append('is_active', competitionForm.value.is_active ? 1 : 0)
+      if (competitionLogoFile.value) payload.append('logo', competitionLogoFile.value)
+
+      await api.post(`/admin/competitions/${selectedCompetitionId.value}/sponsors`, payload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+    }
+
+    if (createPlatform && createCompetition) {
+      showToast('Sponsor added to platform and competition')
+    } else if (createPlatform) {
+      showToast('Platform sponsor saved')
+    } else {
+      showToast('Competition sponsor saved')
+    }
+
+    if (createPlatform) {
+      await fetchPlatformSponsors()
+    }
+    if (createCompetition) {
+      await fetchCompetitionSponsors()
+    }
+
     showModal.value = false
   } catch (error) {
     showToast('Failed to save sponsor', 'error')
@@ -601,7 +726,7 @@ const deletePlatformSponsor = async (sponsor) => {
 const deleteCompetitionSponsor = async (sponsor) => {
   if (!window.confirm(`Delete ${sponsor.name}?`)) return
   try {
-    await api.delete(`/competition-sponsors/${sponsor.id}`)
+    await api.delete(`/admin/competition-sponsors/${sponsor.id}`)
     await fetchCompetitionSponsors()
     showToast('Competition sponsor deleted')
   } catch (error) {
@@ -611,7 +736,7 @@ const deleteCompetitionSponsor = async (sponsor) => {
 
 const toggleCompetitionStatus = async (sponsor) => {
   try {
-    await api.post(`/competition-sponsors/${sponsor.id}/toggle-active`)
+    await api.post(`/admin/competition-sponsors/${sponsor.id}/toggle-active`)
     await fetchCompetitionSponsors()
   } catch (error) {
     showToast('Failed to toggle status', 'error')
