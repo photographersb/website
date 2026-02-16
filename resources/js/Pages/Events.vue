@@ -240,22 +240,31 @@
           <div
             v-for="event in events"
             :key="event.id"
-            class="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group"
+            class="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group flex flex-col"
             @click="viewEvent(event)"
           >
             <!-- Event Image -->
-            <div class="relative h-48 sm:h-52 md:h-56 overflow-hidden bg-gradient-to-br from-gray-300 to-gray-400">
-              <img
-                v-if="event.hero_image_url || event.banner_image"
-                :src="event.hero_image_url || event.banner_image"
-                :alt="event.title"
-                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                loading="lazy"
-                decoding="async"
-              >
+            <div class="relative w-full overflow-hidden bg-gradient-to-br from-gray-300 to-gray-400 pt-[56.25%]">
+              <picture v-if="event.hero_image_url || event.banner_image">
+                <source
+                  v-if="getWebpSource(event.hero_image_url || event.banner_image)"
+                  :srcset="getWebpSource(event.hero_image_url || event.banner_image)"
+                  type="image/webp"
+                >
+                <img
+                  :src="event.hero_image_url || event.banner_image"
+                  :alt="event.title"
+                  class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  loading="lazy"
+                  decoding="async"
+                  width="1280"
+                  height="720"
+                  sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                >
+              </picture>
               <div
                 v-else
-                class="w-full h-full flex items-center justify-center"
+                class="absolute inset-0 flex items-center justify-center"
               >
                 <svg
                   class="w-12 h-12 text-gray-500"
@@ -271,17 +280,22 @@
                   />
                 </svg>
               </div>
-              <div
-                v-if="event.is_featured"
-                class="absolute top-3 right-3 bg-yellow-400 text-yellow-900 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold"
-              >
-                ⭐ Featured
+              <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
+              <div class="absolute top-3 left-3 bg-black/70 text-white px-2.5 py-1 rounded-full text-xs sm:text-sm font-semibold shadow">
+                {{ formatDateBadge(event.start_datetime || event.event_date) || 'TBA' }}
               </div>
               <div
-                v-if="isPaidEvent(event)"
-                class="absolute top-3 left-3 bg-burgundy text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold"
+                v-if="getFeaturedBadge(event)"
+                class="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs sm:text-sm font-semibold shadow"
+                :class="getFeaturedBadge(event)?.tone"
               >
-                Ticketed
+                {{ getFeaturedBadge(event).label }}
+              </div>
+              <div
+                class="absolute bottom-3 left-3 px-2.5 py-1 rounded-full text-xs sm:text-sm font-semibold shadow"
+                :class="getPriceBadge(event).tone"
+              >
+                {{ getPriceBadge(event).label }}
               </div>
             </div>
 
@@ -289,8 +303,11 @@
             <div class="p-4 sm:p-5">
               <!-- Event Type Badge -->
               <div class="flex items-center gap-2 mb-2">
-                <span class="inline-block px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium uppercase">
-                  {{ event.event_type || 'Event' }}
+                <span
+                  class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide"
+                  :class="getEventTypeBadge(event).tone"
+                >
+                  {{ getEventTypeBadge(event).label }}
                 </span>
               </div>
 
@@ -300,8 +317,8 @@
               </h3>
 
               <!-- Event Description -->
-              <p class="text-xs sm:text-sm text-gray-600 mb-4 line-clamp-2">
-                {{ event.description }}
+              <p class="text-xs sm:text-sm text-gray-600 mb-4">
+                {{ truncateText(event.description, 120) }}
               </p>
 
               <!-- Event Details -->
@@ -345,7 +362,15 @@
                       d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                     />
                   </svg>
-                  <span>{{ event.venue_name || event.venue || event.location_text || event.location || 'TBA' }}</span>
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-1 text-left hover:text-burgundy focus:outline-none focus-visible:ring-2 focus-visible:ring-burgundy rounded"
+                    @click.stop="filterByLocation(event)"
+                  >
+                    <span class="underline-offset-2 hover:underline">
+                      {{ event.venue_name || event.venue || event.location_text || event.location || 'TBA' }}
+                    </span>
+                  </button>
                 </div>
 
                 <!-- Organizer -->
@@ -406,12 +431,21 @@
                   </svg>
                   {{ event.rsvp_count || 0 }} Registrations
                 </div>
+              </div>
+
+              <div class="mt-4 flex items-center gap-3">
+                <button
+                  class="flex-1 min-h-[44px] px-4 py-2 rounded-lg text-sm sm:text-base font-semibold bg-burgundy text-white hover:bg-rose-800 transition-colors"
+                  @click.stop="viewEvent(event)"
+                >
+                  View Details
+                </button>
                 <button
                   :class="[
-                    'px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors',
+                    'flex-1 min-h-[44px] px-4 py-2 rounded-lg text-sm sm:text-base font-semibold transition-colors',
                     isRsvped(event)
                       ? 'bg-green-600 text-white hover:bg-green-700'
-                      : 'bg-burgundy text-white hover:bg-rose-800'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   ]"
                   @click.stop="toggleRsvp(event)"
                 >
@@ -453,13 +487,14 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import api from '../api';
 import Toast from '../components/ui/Toast.vue';
 import { useApiError } from '../composables/useApiError';
-import { formatDate as formatDateValue } from '../utils/formatters';
+import { formatDate as formatDateValue, formatNumber } from '../utils/formatters';
 
 const router = useRouter();
+const route = useRoute();
 const { toastMessage, toastType, toastVisible, showToast, handleApiError, closeToast } = useApiError();
 
 // State
@@ -486,6 +521,126 @@ const hasActiveFilters = computed(() => {
          filters.value.to_date || filters.value.event_type;
 });
 
+const normalizeSlug = (value) => {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+};
+
+const getCityById = (id) => cities.value.find(city => String(city.id) === String(id));
+
+const getCityBySlug = (slug) => {
+  if (!slug) return null;
+  const normalized = normalizeSlug(slug);
+  return cities.value.find((city) => city.slug === slug || normalizeSlug(city.name) === normalized);
+};
+
+const getEventCitySlug = (event) => {
+  if (!event) return '';
+  return event.city?.slug
+    || event.city_slug
+    || normalizeSlug(event.city?.name || event.city_name || event.location_text || event.location || '');
+};
+
+const syncLocationFromQuery = () => {
+  const locationSlug = String(route.query.location || '').trim();
+  if (!locationSlug) return;
+  const match = getCityBySlug(locationSlug);
+  if (match) {
+    filters.value.city = match.id;
+  }
+};
+
+const updateLocationQuery = (locationSlug) => {
+  const nextQuery = { ...route.query };
+  if (locationSlug) {
+    nextQuery.location = locationSlug;
+  } else {
+    delete nextQuery.location;
+  }
+  router.replace({ query: nextQuery });
+};
+
+const EVENT_TYPE_MAP = {
+  photowalk: { label: 'PHOTOWALK', tone: 'bg-amber-100 text-amber-800' },
+  workshop: { label: 'WORKSHOP', tone: 'bg-blue-100 text-blue-800' },
+  expo: { label: 'EXPO', tone: 'bg-rose-100 text-rose-800' },
+  exhibition: { label: 'EXPO', tone: 'bg-rose-100 text-rose-800' },
+  seminar: { label: 'SEMINAR', tone: 'bg-emerald-100 text-emerald-800' },
+  webinar: { label: 'WEBINAR', tone: 'bg-blue-100 text-blue-800' },
+  meetup: { label: 'MEETUP', tone: 'bg-gray-100 text-gray-700' },
+  competition: { label: 'COMPETITION', tone: 'bg-amber-100 text-amber-800' },
+  other: { label: 'EVENT', tone: 'bg-gray-100 text-gray-700' }
+};
+
+const getEventTypeBadge = (event) => {
+  const raw = event?.event_type || event?.type || event?.event_mode || '';
+  const key = normalizeSlug(raw);
+  if (EVENT_TYPE_MAP[key]) return EVENT_TYPE_MAP[key];
+  if (!raw) return { label: 'EVENT', tone: 'bg-gray-100 text-gray-700' };
+  return { label: String(raw).replace(/[_-]/g, ' ').toUpperCase(), tone: 'bg-gray-100 text-gray-700' };
+};
+
+const isLimitedSeats = (event) => {
+  if (!event) return false;
+  if (event.is_limited_seats) return true;
+  if (!event.max_attendees) return false;
+  const remaining = event.max_attendees - (event.registered_count || 0);
+  return remaining > 0 && remaining <= 10;
+};
+
+const getFeaturedBadge = (event) => {
+  if (!event) return null;
+  const isSponsored = Boolean(event.is_sponsored || event.sponsored);
+  const isPromoted = Boolean(event.is_promoted || event.promoted);
+  const isAdminFeatured = Boolean(event.is_admin_featured || event.admin_featured);
+  const limited = isLimitedSeats(event);
+
+  if (!isSponsored && !isPromoted && !isAdminFeatured && !limited) return null;
+
+  if (limited) {
+    return { label: 'Limited Seats', tone: 'bg-amber-100 text-amber-800' };
+  }
+
+  return { label: 'Featured', tone: 'bg-yellow-400 text-yellow-900' };
+};
+
+const getPriceBadge = (event) => {
+  if (isPaidEvent(event)) {
+    const amount = Number(event.ticket_price ?? event.price ?? event.base_price ?? 0);
+    const formatted = formatNumber(Number.isFinite(amount) ? amount : 0);
+    return { label: `৳${formatted}`, tone: 'bg-burgundy text-white' };
+  }
+  return { label: 'Free', tone: 'bg-green-600 text-white' };
+};
+
+const truncateText = (value, maxLength = 120) => {
+  if (!value) return '';
+  const clean = String(value).replace(/\s+/g, ' ').trim();
+  if (clean.length <= maxLength) return clean;
+  const trimmed = clean.slice(0, maxLength);
+  const safe = trimmed.slice(0, trimmed.lastIndexOf(' ') > 60 ? trimmed.lastIndexOf(' ') : trimmed.length);
+  return `${safe}...`;
+};
+
+const formatDateBadge = (value) => {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const month = date.toLocaleString('en-US', { month: 'short' });
+  return `${month} ${date.getDate()}`;
+};
+
+const getWebpSource = (url) => {
+  if (!url || typeof url !== 'string') return '';
+  if (url.startsWith('data:')) return '';
+  const match = url.match(/\.(jpg|jpeg|png)(\?.*)?$/i);
+  if (!match) return '';
+  return url.replace(/\.(jpg|jpeg|png)(\?.*)?$/i, '.webp$2');
+};
+
 // Methods
 const fetchStats = async () => {
   try {
@@ -504,6 +659,7 @@ const fetchCities = async () => {
     if (data.status === 'success') {
       const locations = data.data || [];
       cities.value = locations.filter(location => location.type !== 'division');
+      syncLocationFromQuery();
     }
   } catch (error) {
     handleApiError(error, 'Error fetching cities');
@@ -517,6 +673,7 @@ const fetchEvents = async () => {
     params.append('page', currentPage.value);
     
     if (filters.value.city) params.append('city_id', filters.value.city);
+    if (!filters.value.city && route.query.location) params.append('location', route.query.location);
     if (filters.value.from_date) params.append('start_date', filters.value.from_date);
     if (filters.value.to_date) params.append('end_date', filters.value.to_date);
     if (filters.value.event_type) params.append('type', filters.value.event_type);
@@ -540,6 +697,8 @@ const fetchEvents = async () => {
 
 const applyFilters = () => {
   currentPage.value = 1;
+  const selectedCity = getCityById(filters.value.city);
+  updateLocationQuery(selectedCity?.slug || '');
   fetchEvents();
 };
 
@@ -551,6 +710,7 @@ const clearFilters = () => {
     event_type: '',
     sort: 'date_asc'
   };
+  updateLocationQuery('');
   applyFilters();
 };
 
@@ -605,6 +765,18 @@ const formatDate = (date) => {
   return formatDateValue(date);
 };
 
+const filterByLocation = (event) => {
+  const slug = getEventCitySlug(event);
+  if (!slug) return;
+
+  const match = getCityBySlug(slug);
+  filters.value.city = match ? match.id : '';
+  currentPage.value = 1;
+  updateLocationQuery(slug);
+  fetchEvents();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
 const previousPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
@@ -623,8 +795,11 @@ const nextPage = () => {
 
 // Lifecycle
 onMounted(() => {
-  fetchStats();
-  fetchCities();
-  fetchEvents();
+  const initialize = async () => {
+    fetchStats();
+    await fetchCities();
+    fetchEvents();
+  };
+  initialize();
 });
 </script>

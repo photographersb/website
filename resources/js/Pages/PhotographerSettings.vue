@@ -110,11 +110,12 @@
                 v-if="profilePicturePreview || form.profile_picture"
                 class="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 bg-gray-50"
               >
-                <img
-                  :src="profilePicturePreview || profilePictureSrc"
-                  alt="Profile preview"
-                  class="w-full h-full object-cover"
-                >
+                  <img
+                    :src="profilePicturePreview || profilePictureSrc"
+                    alt="Profile preview"
+                    class="w-full h-full object-cover"
+                    @error="handleAvatarError"
+                  >
                 <button
                   type="button"
                   class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
@@ -641,6 +642,8 @@ const defaultForm = () => ({
   experience_years: 0,
   category_ids: [],
   service_area_radius: 0,
+  profile_picture: '',
+  profile_picture_url: '',
   accept_tips: true,
   bkash_number: '',
   nagad_number: '',
@@ -694,7 +697,7 @@ export default {
       return this.form.tip_message || this.defaultTipMessage
     },
     profilePictureSrc() {
-      const value = this.form.profile_picture
+      const value = this.form.profile_picture_url || this.form.profile_picture
       if (!value || typeof value !== 'string') return ''
       if (value.startsWith('data:') || value.startsWith('http') || value.startsWith('/storage/')) {
         return value
@@ -749,6 +752,7 @@ export default {
           location: data.location || '',
           city_id: data.city_id ?? null,
           profile_picture: data.profile_picture || '',
+          profile_picture_url: data.profile_picture_url || data.profile_picture || '',
           specializations: Array.isArray(data.specializations) ? data.specializations.join(', ') : (data.specializations || ''),
           favorite_hashtags: Array.isArray(data.favorite_hashtags) ? data.favorite_hashtags.join(', ') : (data.favorite_hashtags || ''),
           category_ids: Array.isArray(data.category_ids) ? data.category_ids : [],
@@ -944,6 +948,9 @@ export default {
       // Store the file in form
       this.form.profile_picture = file;
       this.removeProfilePictureFlag = false;
+    },
+    handleAvatarError(event) {
+      event.target.src = '/images/default-avatar.png'
     },
 
     removeProfilePicture() {

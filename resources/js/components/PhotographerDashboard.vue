@@ -10,6 +10,7 @@
               :src="profileAvatarUrl"
               :alt="user?.name"
               class="w-full h-full object-cover"
+              @error="handleAvatarError"
             >
             <span v-else>{{ user?.name?.charAt(0).toUpperCase() }}</span>
           </div>
@@ -2839,6 +2840,10 @@ const profileAvatarUrl = computed(() => {
 
   return `/storage/${raw.replace(/^\/+/, '')}`;
 });
+
+const handleAvatarError = (event) => {
+  event.target.src = '/images/default-avatar.png';
+};
 
 watch(canViewBookings, (allowed) => {
   if (!allowed && activeTab.value === 'bookings') {

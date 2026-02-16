@@ -85,8 +85,22 @@ class AdminEventApiController extends Controller
     {
         // Support both numeric ID and slug
         $event = is_numeric($id)
-            ? Event::with(['organizer', 'city'])->findOrFail($id)
-            : Event::with(['organizer', 'city'])->where('slug', $id)->firstOrFail();
+            ? Event::with([
+                'organizer.user',
+                'city',
+                'category',
+                'mentors',
+                'sponsors',
+                'certificateTemplate'
+            ])->findOrFail($id)
+            : Event::with([
+                'organizer.user',
+                'city',
+                'category',
+                'mentors',
+                'sponsors',
+                'certificateTemplate'
+            ])->where('slug', $id)->firstOrFail();
 
         return $this->success($event, 'Event retrieved successfully');
     }

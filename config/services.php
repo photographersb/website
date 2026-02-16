@@ -18,4 +18,8 @@ return [
         'client_secret' => env('APPLE_CLIENT_SECRET', 'your-apple-client-secret'),
         'redirect' => env('APPLE_REDIRECT_URL', env('APP_URL') . '/api/v1/auth/apple/callback'),
     ],
+
+    'pexels' => [
+        'key' => env('PEXELS_API_KEY'),
+    ],
 ];

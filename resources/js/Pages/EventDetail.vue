@@ -23,13 +23,23 @@
   >
     <!-- Hero Banner -->
     <div class="relative h-64 sm:h-80 md:h-96 overflow-hidden bg-gradient-to-br from-gray-300 to-gray-400">
-      <img
-        v-if="heroImage"
-        :src="heroImage"
-        :alt="event.title"
-        class="w-full h-full object-cover"
-        decoding="async"
-      >
+      <picture v-if="heroImage">
+        <source
+          v-if="getWebpSource(heroImage)"
+          :srcset="getWebpSource(heroImage)"
+          type="image/webp"
+        >
+        <img
+          :src="heroImage"
+          :alt="event.title"
+          class="w-full h-full object-cover"
+          decoding="async"
+          loading="eager"
+          fetchpriority="high"
+          width="1600"
+          height="900"
+        >
+      </picture>
       <div
         v-else
         class="w-full h-full flex items-center justify-center"
@@ -48,13 +58,16 @@
           />
         </svg>
       </div>
-      <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
       
       <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8">
         <div class="container mx-auto">
           <div class="flex flex-wrap items-center gap-2 mb-2 sm:mb-3">
-            <span class="px-2 sm:px-3 py-1 bg-white/90 text-gray-900 rounded-full text-xs sm:text-sm font-semibold uppercase">
-              {{ displayTypeLabel || 'Event' }}
+            <span
+              class="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold uppercase"
+              :class="eventTypeBadge.tone"
+            >
+              {{ eventTypeBadge.label }}
             </span>
             <span
               v-if="eventState"
@@ -64,16 +77,23 @@
               {{ eventState.label }}
             </span>
             <span
-              v-if="event.is_featured"
-              class="px-2 sm:px-3 py-1 bg-yellow-400 text-yellow-900 rounded-full text-xs sm:text-sm font-semibold"
+              v-if="featuredBadge"
+              class="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold"
+              :class="featuredBadge.tone"
             >
-              ⭐ Featured
+              {{ featuredBadge.label }}
             </span>
             <span
               v-if="isPaid"
               class="px-2 sm:px-3 py-1 bg-burgundy text-white rounded-full text-xs sm:text-sm font-semibold"
             >
-              Paid Event
+              Paid
+            </span>
+            <span
+              v-else
+              class="px-2 sm:px-3 py-1 bg-green-600 text-white rounded-full text-xs sm:text-sm font-semibold"
+            >
+              Free
             </span>
           </div>
           <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
@@ -82,6 +102,40 @@
           <p class="text-sm sm:text-base md:text-lg text-white/90">
             {{ formatDate(event.start_datetime || event.event_date) }} • {{ event.venue_name || event.venue || event.location_text || event.location || 'TBA' }}
           </p>
+          <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+            <div class="bg-black/45 rounded-lg px-3 py-2">
+              <p class="text-[10px] uppercase tracking-wide text-white/70">
+                Date
+              </p>
+              <p class="text-xs sm:text-sm font-semibold text-white">
+                {{ formatHeroDate(event.start_datetime || event.event_date) }}
+              </p>
+            </div>
+            <div class="bg-black/45 rounded-lg px-3 py-2">
+              <p class="text-[10px] uppercase tracking-wide text-white/70">
+                Time
+              </p>
+              <p class="text-xs sm:text-sm font-semibold text-white">
+                {{ formatHeroTime(event.start_datetime || event.event_date) }}
+              </p>
+            </div>
+            <div class="bg-black/45 rounded-lg px-3 py-2">
+              <p class="text-[10px] uppercase tracking-wide text-white/70">
+                Location
+              </p>
+              <p class="text-xs sm:text-sm font-semibold text-white truncate">
+                {{ event.venue_name || event.venue || event.location_text || event.location || 'TBA' }}
+              </p>
+            </div>
+            <div class="bg-black/45 rounded-lg px-3 py-2">
+              <p class="text-[10px] uppercase tracking-wide text-white/70">
+                Entry
+              </p>
+              <p class="text-xs sm:text-sm font-semibold text-white">
+                {{ isPaid ? formatPrice(priceValue, priceCurrency) : 'Free' }}
+              </p>
+            </div>
+          </div>
           <p
             v-if="heroCredit"
             class="mt-2 text-xs text-white/80"
@@ -154,10 +208,10 @@
             </div>
           </div>
 
-          <!-- Event Details -->
+          <!-- Event Essentials -->
           <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 md:p-6">
             <h2 class="text-xl sm:text-2xl font-bold mb-4">
-              Event Details
+              Event Essentials
             </h2>
             <div class="space-y-3 sm:space-y-4">
               <!-- Date & Time -->
@@ -210,30 +264,13 @@
                   <p class="text-xs sm:text-sm text-gray-600">
                     Location
                   </p>
-                  <p
-                    v-if="event.venue_name"
-                    class="font-semibold text-sm sm:text-base"
+                  <button
+                    type="button"
+                    class="font-semibold text-sm sm:text-base text-left hover:text-burgundy focus:outline-none focus-visible:ring-2 focus-visible:ring-burgundy rounded"
+                    @click="viewEventsByLocation"
                   >
-                    {{ event.venue_name }}
-                  </p>
-                  <p
-                    v-else-if="event.venue"
-                    class="font-semibold text-sm sm:text-base"
-                  >
-                    {{ event.venue }}
-                  </p>
-                  <p
-                    v-else-if="event.location_text"
-                    class="font-semibold text-sm sm:text-base"
-                  >
-                    {{ event.location_text }}
-                  </p>
-                  <p
-                    v-else-if="event.location"
-                    class="font-semibold text-sm sm:text-base"
-                  >
-                    {{ event.location }}
-                  </p>
+                    {{ event.venue_name || event.venue || event.location_text || event.location || 'TBA' }}
+                  </button>
                   <p
                     v-if="event.venue_address"
                     class="text-xs sm:text-sm text-gray-700 mt-1"
@@ -251,6 +288,56 @@
                     class="text-xs sm:text-sm text-gray-600 mt-0.5"
                   >
                     {{ event.city.name }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Entry Type -->
+              <div class="flex items-start">
+                <svg
+                  class="w-5 h-5 sm:w-6 sm:h-6 text-burgundy mr-3 flex-shrink-0 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div>
+                  <p class="text-xs sm:text-sm text-gray-600">
+                    Entry Type
+                  </p>
+                  <p class="font-semibold text-sm sm:text-base">
+                    {{ isPaid ? formatPrice(priceValue, priceCurrency) : 'Free' }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Seats Available -->
+              <div class="flex items-start">
+                <svg
+                  class="w-5 h-5 sm:w-6 sm:h-6 text-burgundy mr-3 flex-shrink-0 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+                <div>
+                  <p class="text-xs sm:text-sm text-gray-600">
+                    Seats Available
+                  </p>
+                  <p class="font-semibold text-sm sm:text-base">
+                    {{ spotsLeftText }}
                   </p>
                 </div>
               </div>
@@ -316,6 +403,43 @@
             </div>
           </div>
 
+          <!-- Organizer -->
+          <div
+            v-if="event.organizer"
+            class="bg-white rounded-lg shadow-md p-4 sm:p-5 md:p-6"
+          >
+            <h2 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
+              Organizer
+            </h2>
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 overflow-hidden">
+                <img
+                  v-if="event.organizer?.profile_image_url"
+                  :src="event.organizer.profile_image_url"
+                  :alt="event.organizer?.user?.name"
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                >
+              </div>
+              <div>
+                <button
+                  type="button"
+                  class="font-semibold text-sm sm:text-base hover:text-burgundy focus:outline-none focus-visible:ring-2 focus-visible:ring-burgundy rounded"
+                  @click="viewPhotographer"
+                >
+                  {{ event.organizer?.user?.name || event.organizer?.name || 'Organizer' }}
+                </button>
+                <p
+                  v-if="event.organizer?.specialization"
+                  class="text-xs sm:text-sm text-gray-600"
+                >
+                  {{ event.organizer.specialization }}
+                </p>
+              </div>
+            </div>
+          </div>
+
           <!-- Requirements (if any) -->
           <div
             v-if="event.requirements"
@@ -329,6 +453,46 @@
                 {{ event.requirements }}
               </p>
             </div>
+          </div>
+
+          <!-- Schedule (if available) -->
+          <div
+            v-if="hasSchedule"
+            class="bg-white rounded-lg shadow-md p-4 sm:p-5 md:p-6"
+          >
+            <h2 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
+              Schedule
+            </h2>
+            <div
+              v-if="scheduleItems.length"
+              class="space-y-4 border-l border-gray-200 pl-4"
+            >
+              <div
+                v-for="(item, index) in scheduleItems"
+                :key="index"
+                class="relative"
+              >
+                <span class="absolute -left-[9px] top-1.5 w-3 h-3 rounded-full bg-burgundy" />
+                <p class="text-xs uppercase tracking-wide text-gray-500">
+                  {{ item.time || 'Session' }}
+                </p>
+                <p class="font-semibold text-sm sm:text-base text-gray-900">
+                  {{ item.title }}
+                </p>
+                <p
+                  v-if="item.description"
+                  class="text-xs sm:text-sm text-gray-600"
+                >
+                  {{ item.description }}
+                </p>
+              </div>
+            </div>
+            <p
+              v-else
+              class="text-sm text-gray-700 whitespace-pre-wrap"
+            >
+              {{ scheduleText }}
+            </p>
           </div>
         </div>
 
@@ -391,6 +555,8 @@
                   :src="event.organizer?.profile_image_url"
                   :alt="event.organizer?.user?.name"
                   class="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 >
                 <svg
                   v-else
@@ -423,6 +589,27 @@
             >
               View Profile
             </button>
+          </div>
+
+          <!-- Map Card -->
+          <div
+            v-if="mapLink"
+            class="bg-white rounded-lg shadow-md p-4 sm:p-5 md:p-6"
+          >
+            <h3 class="text-base sm:text-lg font-bold mb-3 sm:mb-4">
+              Location Map
+            </h3>
+            <p class="text-xs sm:text-sm text-gray-600 mb-3">
+              Open the venue in Google Maps for directions.
+            </p>
+            <a
+              :href="mapLink"
+              target="_blank"
+              rel="noopener"
+              class="inline-flex items-center justify-center w-full min-h-[44px] px-4 py-2 rounded-lg border border-burgundy text-burgundy font-semibold hover:bg-burgundy hover:text-white transition-colors"
+            >
+              Open Map
+            </a>
           </div>
 
           <!-- Share Card -->
@@ -554,9 +741,33 @@ const isPaid = computed(() => {
   return Number.isFinite(numeric) && numeric > 0;
 });
 
-const displayTypeLabel = computed(() => {
-  if (!event.value) return '';
-  return formatLabel(event.value.type || event.value.event_type || event.value.event_mode || '');
+const EVENT_TYPE_MAP = {
+  photowalk: { label: 'PHOTOWALK', tone: 'bg-amber-100 text-amber-800' },
+  workshop: { label: 'WORKSHOP', tone: 'bg-blue-100 text-blue-800' },
+  expo: { label: 'EXPO', tone: 'bg-rose-100 text-rose-800' },
+  exhibition: { label: 'EXPO', tone: 'bg-rose-100 text-rose-800' },
+  seminar: { label: 'SEMINAR', tone: 'bg-emerald-100 text-emerald-800' },
+  webinar: { label: 'WEBINAR', tone: 'bg-blue-100 text-blue-800' },
+  meetup: { label: 'MEETUP', tone: 'bg-gray-100 text-gray-700' },
+  competition: { label: 'COMPETITION', tone: 'bg-amber-100 text-amber-800' },
+  other: { label: 'EVENT', tone: 'bg-gray-100 text-gray-700' }
+};
+
+const normalizeSlug = (value) => {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+};
+
+const eventTypeBadge = computed(() => {
+  if (!event.value) return { label: 'EVENT', tone: 'bg-gray-100 text-gray-700' };
+  const raw = event.value.type || event.value.event_type || event.value.event_mode || '';
+  const key = normalizeSlug(raw);
+  if (EVENT_TYPE_MAP[key]) return EVENT_TYPE_MAP[key];
+  if (!raw) return { label: 'EVENT', tone: 'bg-gray-100 text-gray-700' };
+  return { label: String(raw).replace(/[_-]/g, ' ').toUpperCase(), tone: 'bg-gray-100 text-gray-700' };
 });
 
 const priceValue = computed(() => {
@@ -599,6 +810,20 @@ const spotsLeftText = computed(() => {
 const heroImage = computed(() => {
   if (!event.value) return null;
   return event.value.hero_image_url || event.value.banner_image || null;
+});
+
+const eventLocationSlug = computed(() => {
+  if (!event.value) return '';
+  return event.value.city?.slug
+    || event.value.city_slug
+    || normalizeSlug(
+      event.value.city?.name
+      || event.value.location_text
+      || event.value.location
+      || event.value.venue_name
+      || event.value.venue
+      || ''
+    );
 });
 
 const heroCredit = computed(() => {
@@ -648,6 +873,65 @@ const eventState = computed(() => {
   return { label: 'Ended', tone: 'bg-gray-100 text-gray-700' };
 });
 
+const featuredBadge = computed(() => {
+  if (!event.value) return null;
+  const isSponsored = Boolean(event.value.is_sponsored || event.value.sponsored);
+  const isPromoted = Boolean(event.value.is_promoted || event.value.promoted);
+  const isAdminFeatured = Boolean(event.value.is_admin_featured || event.value.admin_featured);
+  const limitedSeats = isLimitedSeats(event.value);
+
+  if (!isSponsored && !isPromoted && !isAdminFeatured && !limitedSeats) return null;
+  if (limitedSeats) return { label: 'Limited Seats', tone: 'bg-amber-100 text-amber-800' };
+  return { label: 'Featured', tone: 'bg-yellow-400 text-yellow-900' };
+});
+
+const scheduleItems = computed(() => {
+  if (!event.value) return [];
+  const items = event.value.schedule_items || event.value.schedule || event.value.timeline || [];
+  if (Array.isArray(items)) {
+    return items
+      .map((item) => {
+        if (typeof item === 'string') {
+          return { title: item.trim() };
+        }
+        if (item && typeof item === 'object') {
+          return {
+            time: item.time || item.start_time || item.slot || '',
+            title: item.title || item.name || item.topic || 'Session',
+            description: item.description || item.details || ''
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+  }
+  return [];
+});
+
+const scheduleText = computed(() => {
+  if (!event.value) return '';
+  const schedule = event.value.schedule_text || event.value.schedule_notes || event.value.schedule;
+  if (Array.isArray(schedule)) return '';
+  return schedule ? String(schedule) : '';
+});
+
+const hasSchedule = computed(() => scheduleItems.value.length > 0 || Boolean(scheduleText.value));
+
+const mapLink = computed(() => {
+  if (!event.value) return '';
+  const parts = [
+    event.value.venue_name,
+    event.value.venue,
+    event.value.venue_address,
+    event.value.address,
+    event.value.city?.name,
+    event.value.location_text,
+    event.value.location
+  ].filter(Boolean);
+  if (!parts.length) return '';
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parts.join(', '))}`;
+});
+
 // Methods
 const fetchEvent = async () => {
   loading.value = true;
@@ -659,6 +943,7 @@ const fetchEvent = async () => {
       event.value = data.event || data.data;
       const registration = event.value?.user_registration;
       isRsvped.value = registration && registration.rsvp_status === 'going';
+      updateSeoMeta(event.value);
     }
   } catch (error) {
     handleApiError(error, 'Failed to load event');
@@ -704,6 +989,11 @@ const viewPhotographer = () => {
   }
 };
 
+const viewEventsByLocation = () => {
+  if (!eventLocationSlug.value) return;
+  router.push({ path: '/events', query: { location: eventLocationSlug.value } });
+};
+
 const shareOnFacebook = () => {
   const url = encodeURIComponent(window.location.href);
   window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
@@ -723,6 +1013,22 @@ const copyLink = () => {
 const formatDate = (date) => {
   if (!date) return 'TBA';
   return formatDateValue(date);
+};
+
+const formatHeroDate = (date) => {
+  if (!date) return 'TBA';
+  const value = new Date(date);
+  if (Number.isNaN(value.getTime())) return 'TBA';
+  return value.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+};
+
+const formatHeroTime = (date) => {
+  if (!date) return 'TBA';
+  const raw = String(date);
+  if (!raw.includes(':') && raw.length <= 10) return 'TBA';
+  const value = new Date(date);
+  if (Number.isNaN(value.getTime())) return 'TBA';
+  return value.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 };
 
 const formatDateTime = (date) => {
@@ -747,11 +1053,128 @@ const formatPrice = (price, currency = 'BDT') => {
   return `${currency} ${formatNumber(amount)}`;
 };
 
-const formatLabel = (value) => {
+const isLimitedSeats = (eventValue) => {
+  if (!eventValue) return false;
+  if (eventValue.is_limited_seats) return true;
+  if (!eventValue.max_attendees) return false;
+  const remaining = eventValue.max_attendees - (eventValue.registered_count || 0);
+  return remaining > 0 && remaining <= 10;
+};
+
+const getWebpSource = (url) => {
+  if (!url || typeof url !== 'string') return '';
+  if (url.startsWith('data:')) return '';
+  const match = url.match(/\.(jpg|jpeg|png)(\?.*)?$/i);
+  if (!match) return '';
+  return url.replace(/\.(jpg|jpeg|png)(\?.*)?$/i, '.webp$2');
+};
+
+const truncateText = (value, maxLength = 155) => {
   if (!value) return '';
-  return String(value)
-    .replace(/[_-]/g, ' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+  const clean = String(value).replace(/\s+/g, ' ').trim();
+  if (clean.length <= maxLength) return clean;
+  const trimmed = clean.slice(0, maxLength);
+  const safe = trimmed.slice(0, trimmed.lastIndexOf(' ') > 60 ? trimmed.lastIndexOf(' ') : trimmed.length);
+  return `${safe}...`;
+};
+
+const resolveUrl = (value) => {
+  if (!value) return '';
+  if (/^https?:\/\//i.test(value)) return value;
+  return `${window.location.origin}${value.startsWith('/') ? '' : '/'}${value}`;
+};
+
+const setMetaTag = (attribute, key, content) => {
+  if (!content) return;
+  let tag = document.head.querySelector(`meta[${attribute}="${key}"]`);
+  if (!tag) {
+    tag = document.createElement('meta');
+    tag.setAttribute(attribute, key);
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute('content', content);
+};
+
+const setLinkTag = (rel, href) => {
+  if (!href) return;
+  let tag = document.head.querySelector(`link[rel="${rel}"]`);
+  if (!tag) {
+    tag = document.createElement('link');
+    tag.setAttribute('rel', rel);
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute('href', href);
+};
+
+const setJsonLd = (data) => {
+  if (!data) return;
+  let script = document.head.querySelector('script[data-event-schema="true"]');
+  if (!script) {
+    script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.setAttribute('data-event-schema', 'true');
+    document.head.appendChild(script);
+  }
+  script.textContent = JSON.stringify(data);
+};
+
+const updateSeoMeta = (eventValue) => {
+  if (!eventValue || typeof window === 'undefined') return;
+  const title = eventValue.title || 'Photography Event';
+  const description = truncateText(eventValue.description || 'Join this photography event.');
+  const canonicalUrl = `${window.location.origin}${route.fullPath}`;
+  const imageUrl = resolveUrl(heroImage.value || eventValue.banner_image || '/images/placeholder.svg');
+
+  document.title = `${title} | Photography Events`;
+  setMetaTag('name', 'description', description);
+  setMetaTag('property', 'og:title', title);
+  setMetaTag('property', 'og:description', description);
+  setMetaTag('property', 'og:image', imageUrl);
+  setMetaTag('property', 'og:url', canonicalUrl);
+  setMetaTag('property', 'og:type', 'event');
+  setMetaTag('property', 'og:site_name', 'Photographar');
+  setMetaTag('name', 'twitter:card', 'summary_large_image');
+  setMetaTag('name', 'twitter:title', title);
+  setMetaTag('name', 'twitter:description', description);
+  setMetaTag('name', 'twitter:image', imageUrl);
+  setLinkTag('canonical', canonicalUrl);
+
+  const locationName = eventValue.venue_name || eventValue.venue || eventValue.location_text || eventValue.location || 'TBA';
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: title,
+    startDate: eventValue.start_datetime || eventValue.event_date || undefined,
+    endDate: eventValue.end_datetime || eventValue.event_end_date || undefined,
+    eventStatus: eventValue.status === 'cancelled'
+      ? 'https://schema.org/EventCancelled'
+      : 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    eventType: eventTypeBadge.value.label,
+    image: imageUrl,
+    location: {
+      '@type': 'Place',
+      name: locationName,
+      address: eventValue.venue_address || eventValue.address || eventValue.city?.name || undefined
+    },
+    organizer: {
+      '@type': 'Organization',
+      name: eventValue.organizer?.user?.name || eventValue.organizer?.name || 'Organizer',
+      url: eventValue.organizer?.slug
+        ? `${window.location.origin}/photographers/${eventValue.organizer.slug}`
+        : undefined
+    },
+    offers: {
+      '@type': 'Offer',
+      price: isPaid.value ? String(priceValue.value || 0) : '0',
+      priceCurrency: priceCurrency.value,
+      availability: isEventFull.value
+        ? 'https://schema.org/SoldOut'
+        : 'https://schema.org/InStock'
+    }
+  };
+
+  setJsonLd(schema);
 };
 
 // Lifecycle

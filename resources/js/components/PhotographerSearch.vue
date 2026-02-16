@@ -245,57 +245,77 @@
             class="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-burgundy"
           >
             <!-- Event Image -->
-            <div class="relative h-48 bg-gradient-to-br from-burgundy to-gray-800 overflow-hidden">
-              <img
-                v-if="event.hero_image_url"
-                :src="event.hero_image_url"
-                :alt="event.title"
-                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-              >
-              <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            <div class="relative bg-gradient-to-br from-burgundy to-gray-800 overflow-hidden pt-[56.25%]">
+              <picture v-if="event.hero_image_url">
+                <source
+                  v-if="getWebpSource(event.hero_image_url)"
+                  :srcset="getWebpSource(event.hero_image_url)"
+                  type="image/webp"
+                >
+                <img
+                  :src="event.hero_image_url"
+                  :alt="event.title"
+                  class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  loading="lazy"
+                  decoding="async"
+                  width="1280"
+                  height="720"
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                >
+              </picture>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
               
               <!-- Event Type Badge -->
               <div class="absolute top-3 left-3">
-                <span class="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-burgundy">
-                  {{ event.event_type || 'Event' }}
+                <span
+                  class="px-3 py-1 rounded-full text-xs font-semibold uppercase"
+                  :class="getEventTypeBadge(event).tone"
+                >
+                  {{ getEventTypeBadge(event).label }}
                 </span>
               </div>
 
               <!-- Featured Badge -->
               <div
-                v-if="event.is_featured"
+                v-if="getFeaturedBadge(event)"
                 class="absolute top-3 right-3"
               >
-                <span class="px-3 py-1 bg-amber-400 rounded-full text-xs font-semibold text-gray-900 flex items-center gap-1">
-                  ⭐ Featured
+                <span
+                  class="px-3 py-1 rounded-full text-xs font-semibold"
+                  :class="getFeaturedBadge(event)?.tone"
+                >
+                  {{ getFeaturedBadge(event).label }}
                 </span>
               </div>
 
               <!-- Date Badge -->
-              <div class="absolute bottom-3 left-3 bg-white rounded-lg px-3 py-2 shadow-lg">
-                <div class="text-xs font-semibold text-gray-600 uppercase">
-                  {{ formatEventMonth(event.event_date) }}
-                </div>
-                <div class="text-2xl font-bold text-burgundy">
-                  {{ formatEventDay(event.event_date) }}
-                </div>
+              <div class="absolute bottom-3 left-3 bg-black/70 text-white rounded-full px-3 py-1 shadow-lg text-xs font-semibold">
+                {{ formatEventBadge(event.event_date) || 'TBA' }}
+              </div>
+
+              <!-- Price/Free Badge -->
+              <div
+                class="absolute bottom-3 right-3 px-3 py-1 rounded-full text-xs font-semibold"
+                :class="getPriceBadge(event).tone"
+              >
+                {{ getPriceBadge(event).label }}
               </div>
             </div>
 
             <!-- Event Details -->
             <div class="p-4 sm:p-5">
-              <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-burgundy transition-colors line-clamp-2">
+              <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-burgundy transition-colors">
                 {{ event.title }}
               </h3>
               
-              <p class="text-sm text-gray-600 mb-4 line-clamp-2">
-                {{ event.description }}
+              <p class="text-sm text-gray-600 mb-4">
+                {{ truncateText(event.description, 110) }}
               </p>
 
               <div class="space-y-2">
                 <!-- Location -->
                 <div
-                  v-if="event.city"
+                  v-if="event.city || event.location"
                   class="flex items-center gap-2 text-sm text-gray-600"
                 >
                   <svg
@@ -317,14 +337,20 @@
                       d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                     />
                   </svg>
-                  <span>{{ event.city.name }}</span>
+                  <button
+                    type="button"
+                    class="text-left hover:text-burgundy focus:outline-none focus-visible:ring-2 focus-visible:ring-burgundy rounded"
+                    @click.stop.prevent="viewEventsByLocation(event)"
+                  >
+                    {{ event.city?.name || event.location }}
+                  </button>
                 </div>
 
                 <!-- Price/Free -->
                 <div class="flex items-center gap-2">
                   <svg
                     class="w-4 h-4 flex-shrink-0"
-                    :class="event.price > 0 ? 'text-burgundy' : 'text-green-600'"
+                    :class="isPaidEvent(event) ? 'text-burgundy' : 'text-green-600'"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -338,9 +364,9 @@
                   </svg>
                   <span
                     class="text-sm font-semibold"
-                    :class="event.price > 0 ? 'text-burgundy' : 'text-green-600'"
+                    :class="isPaidEvent(event) ? 'text-burgundy' : 'text-green-600'"
                   >
-                    {{ event.price > 0 ? `৳${event.price}` : 'Free' }}
+                    {{ getPriceBadge(event).label }}
                   </span>
                 </div>
 
@@ -364,6 +390,23 @@
                   </svg>
                   <span>{{ event.registrations_count }} registered</span>
                 </div>
+              </div>
+
+              <div class="mt-4 flex items-center justify-between text-sm font-semibold text-burgundy">
+                <span>View Details</span>
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
               </div>
             </div>
           </router-link>
@@ -590,9 +633,10 @@
               <div class="relative">
                 <div class="aspect-square overflow-hidden bg-gray-100">
                   <img
-                    :src="photographer.profile_picture || '/images/default-avatar.png'"
+                    :src="getPhotographerAvatar(photographer)"
                     :alt="photographer.user?.name"
                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    @error="useDefaultAvatar"
                   >
                 </div>
                 
@@ -1789,15 +1833,101 @@ const fetchFeaturedEvents = async () => {
   }
 };
 
-const formatEventMonth = (dateString) => {
-  if (!dateString) return '';
-  return formatMonthShort(dateString, true);
+const normalizeSlug = (value) => {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
 };
 
-const formatEventDay = (dateString) => {
+const EVENT_TYPE_MAP = {
+  photowalk: { label: 'PHOTOWALK', tone: 'bg-amber-100 text-amber-800' },
+  workshop: { label: 'WORKSHOP', tone: 'bg-blue-100 text-blue-800' },
+  expo: { label: 'EXPO', tone: 'bg-rose-100 text-rose-800' },
+  exhibition: { label: 'EXPO', tone: 'bg-rose-100 text-rose-800' },
+  seminar: { label: 'SEMINAR', tone: 'bg-emerald-100 text-emerald-800' },
+  webinar: { label: 'WEBINAR', tone: 'bg-blue-100 text-blue-800' },
+  meetup: { label: 'MEETUP', tone: 'bg-gray-100 text-gray-700' },
+  competition: { label: 'COMPETITION', tone: 'bg-amber-100 text-amber-800' },
+  other: { label: 'EVENT', tone: 'bg-gray-100 text-gray-700' }
+};
+
+const getEventTypeBadge = (event) => {
+  const raw = event?.event_type || event?.type || event?.event_mode || '';
+  const key = normalizeSlug(raw);
+  if (EVENT_TYPE_MAP[key]) return EVENT_TYPE_MAP[key];
+  if (!raw) return { label: 'EVENT', tone: 'bg-gray-100 text-gray-700' };
+  return { label: String(raw).replace(/[_-]/g, ' ').toUpperCase(), tone: 'bg-gray-100 text-gray-700' };
+};
+
+const isPaidEvent = (event) => {
+  if (!event) return false;
+  if (typeof event.is_ticketed === 'boolean') return event.is_ticketed;
+  if (event.event_mode) return event.event_mode === 'paid';
+  if (event.event_type) return event.event_type === 'paid';
+  const numeric = Number(event.ticket_price ?? event.price ?? event.base_price ?? 0);
+  return Number.isFinite(numeric) && numeric > 0;
+};
+
+const isLimitedSeats = (event) => {
+  if (!event) return false;
+  if (event.is_limited_seats) return true;
+  if (!event.max_attendees) return false;
+  const remaining = event.max_attendees - (event.registered_count || 0);
+  return remaining > 0 && remaining <= 10;
+};
+
+const getFeaturedBadge = (event) => {
+  if (!event) return null;
+  const isSponsored = Boolean(event.is_sponsored || event.sponsored);
+  const isPromoted = Boolean(event.is_promoted || event.promoted);
+  const isAdminFeatured = Boolean(event.is_admin_featured || event.admin_featured);
+  const limited = isLimitedSeats(event);
+
+  if (!isSponsored && !isPromoted && !isAdminFeatured && !limited) return null;
+  if (limited) return { label: 'Limited Seats', tone: 'bg-amber-100 text-amber-800' };
+  return { label: 'Featured', tone: 'bg-yellow-400 text-yellow-900' };
+};
+
+const getPriceBadge = (event) => {
+  if (isPaidEvent(event)) {
+    const amount = Number(event.ticket_price ?? event.price ?? event.base_price ?? 0);
+    const formatted = new Intl.NumberFormat('en-BD').format(Number.isFinite(amount) ? amount : 0);
+    return { label: `৳${formatted}`, tone: 'bg-burgundy text-white' };
+  }
+  return { label: 'Free', tone: 'bg-green-600 text-white' };
+};
+
+const formatEventBadge = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
-  return date.getDate();
+  if (Number.isNaN(date.getTime())) return '';
+  const month = formatMonthShort(dateString, true);
+  return `${month} ${date.getDate()}`;
+};
+
+const truncateText = (value, maxLength = 110) => {
+  if (!value) return '';
+  const clean = String(value).replace(/\s+/g, ' ').trim();
+  if (clean.length <= maxLength) return clean;
+  const trimmed = clean.slice(0, maxLength);
+  const safe = trimmed.slice(0, trimmed.lastIndexOf(' ') > 50 ? trimmed.lastIndexOf(' ') : trimmed.length);
+  return `${safe}...`;
+};
+
+const getWebpSource = (url) => {
+  if (!url || typeof url !== 'string') return '';
+  if (url.startsWith('data:')) return '';
+  const match = url.match(/\.(jpg|jpeg|png)(\?.*)?$/i);
+  if (!match) return '';
+  return url.replace(/\.(jpg|jpeg|png)(\?.*)?$/i, '.webp$2');
+};
+
+const viewEventsByLocation = (event) => {
+  const slug = event?.city?.slug || event?.city_slug || normalizeSlug(event?.city?.name || event?.location || '');
+  if (!slug) return;
+  router.push({ path: '/events', query: { location: slug } });
 };
 
 const fetchFeaturedCompetitions = async () => {
@@ -1852,6 +1982,22 @@ const isValidRating = (value) => {
   const numeric = Number(value)
   return Number.isFinite(numeric) && numeric > 0
 }
+
+const fallbackAvatar = '/images/default-avatar.png';
+
+const getPhotographerAvatar = (photographer) => {
+  const raw = photographer?.profile_picture_url
+    || photographer?.profile_picture
+    || photographer?.avatar
+    || '';
+  if (!raw) return fallbackAvatar;
+  if (raw.startsWith('http') || raw.startsWith('/') || raw.startsWith('data:')) return raw;
+  return `/storage/${String(raw).replace(/^\/+/, '')}`;
+};
+
+const useDefaultAvatar = (event) => {
+  event.target.src = fallbackAvatar;
+};
 
 const formatRating = (value) => {
   const numeric = Number(value)

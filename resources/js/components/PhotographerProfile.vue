@@ -123,6 +123,7 @@
                 class="w-28 h-28 rounded-full mx-auto mb-3 object-cover border-4 border-[#7a1f2b]/60 shadow-lg"
                 loading="lazy"
                 decoding="async"
+                @error="handleAvatarError"
               >
               <h2 class="text-xl font-semibold font-serif text-gray-900 mb-2">
                 {{ photographer.user?.name || photographer.business_name || 'Unknown' }}
@@ -1288,6 +1289,10 @@ const profileImage = computed(() => {
   const name = photographer.value?.user?.name || photographer.value?.business_name || 'User'
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=200&background=6c0b1a&color=fff`
 })
+
+const handleAvatarError = (event) => {
+  event.target.src = '/images/default-avatar.png'
+}
 
 const isSelfBooking = computed(() => {
   if (!currentUser.value || !photographer.value) return false;

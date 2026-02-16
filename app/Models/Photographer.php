@@ -108,7 +108,7 @@ class Photographer extends Model
      */
     public function getProfilePictureUrlAttribute(): ?string
     {
-        return $this->profile_picture;
+        return $this->buildProfilePictureUrl($this->getRawOriginal('profile_picture'), true);
     }
 
     /**
@@ -116,21 +116,30 @@ class Photographer extends Model
      */
     public function getProfilePictureAttribute($value): ?string
     {
+        return $this->buildProfilePictureUrl($value, false);
+    }
+
+    private function buildProfilePictureUrl(?string $value, bool $withFallback): ?string
+    {
         if (!$value) {
-            return null;
+            return $withFallback ? asset('images/default-avatar.png') : null;
         }
-        
-        // If already a full URL, return as is
-        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+
+        $value = trim($value);
+        if ($value === '') {
+            return $withFallback ? asset('images/default-avatar.png') : null;
+        }
+
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, 'data:')) {
             return $value;
         }
 
-        if (str_starts_with($value, '/storage/')) {
-            return asset(ltrim($value, '/'));
+        $trimmed = ltrim($value, '/');
+        if (str_starts_with($trimmed, 'storage/')) {
+            return asset($trimmed);
         }
 
-        // Prepend storage path for relative paths
-        return asset('storage/' . ltrim($value, '/'));
+        return asset('storage/' . $trimmed);
     }
 
     /**

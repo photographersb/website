@@ -313,12 +313,19 @@ class PhotographerController extends Controller
 
         try {
             // Delete old avatar if exists
-            if ($photographer->profile_picture && Storage::disk('public')->exists($photographer->profile_picture)) {
-                Storage::disk('public')->delete($photographer->profile_picture);
+            $rawPath = $photographer->getRawOriginal('profile_picture');
+            if ($rawPath && !str_starts_with($rawPath, 'http')) {
+                $trimmed = ltrim($rawPath, '/');
+                if (str_starts_with($trimmed, 'storage/')) {
+                    $trimmed = substr($trimmed, strlen('storage/'));
+                }
+                if ($trimmed && Storage::disk('public')->exists($trimmed)) {
+                    Storage::disk('public')->delete($trimmed);
+                }
             }
 
             // Store new avatar
-            $path = $request->file('avatar')->store('avatars', 'public');
+            $path = $request->file('avatar')->store('profile_pictures/' . $photographer->id, 'public');
 
             // Update photographer record
             $photographer->update([
@@ -327,6 +334,7 @@ class PhotographerController extends Controller
 
             return $this->success([
                 'profile_picture' => Storage::url($path),
+                'profile_picture_url' => Storage::url($path),
             ], 'Profile picture updated successfully');
         } catch (\Exception $e) {
             Log::error('Avatar upload failed', [

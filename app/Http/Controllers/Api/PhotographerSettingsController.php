@@ -36,10 +36,15 @@ class PhotographerSettingsController extends Controller
         $rawProfilePath = $photographer->getRawOriginal('profile_picture');
         $profilePictureUrl = null;
         if ($rawProfilePath) {
-            if (str_starts_with($rawProfilePath, 'http') || str_starts_with($rawProfilePath, '/storage/')) {
+            if (str_starts_with($rawProfilePath, 'http') || str_starts_with($rawProfilePath, 'data:')) {
                 $profilePictureUrl = $rawProfilePath;
             } else {
-                $profilePictureUrl = Storage::url($rawProfilePath);
+                $trimmed = ltrim($rawProfilePath, '/');
+                if (str_starts_with($trimmed, 'storage/')) {
+                    $profilePictureUrl = url('/' . $trimmed);
+                } else {
+                    $profilePictureUrl = Storage::url($trimmed);
+                }
             }
         }
 
@@ -50,6 +55,7 @@ class PhotographerSettingsController extends Controller
             'location' => $locationName,
             'city_id' => $photographer->city_id,
             'profile_picture' => $profilePictureUrl,
+            'profile_picture_url' => $profilePictureUrl,
             'experience_years' => $photographer->experience_years,
             'specializations' => $photographer->specializations,
             'favorite_hashtags' => $photographer->favorite_hashtags,
@@ -135,8 +141,19 @@ class PhotographerSettingsController extends Controller
         }
 
         if ($request->hasFile('profile_picture')) {
+            $rawPath = $photographer->getRawOriginal('profile_picture');
+            if ($rawPath && !str_starts_with($rawPath, 'http')) {
+                $trimmed = ltrim($rawPath, '/');
+                if (str_starts_with($trimmed, 'storage/')) {
+                    $trimmed = substr($trimmed, strlen('storage/'));
+                }
+                if ($trimmed && Storage::disk('public')->exists($trimmed)) {
+                    Storage::disk('public')->delete($trimmed);
+                }
+            }
+
             $file = $request->file('profile_picture');
-            $path = $file->store('profile-pictures/' . $photographer->id, 'public');
+            $path = $file->store('profile_pictures/' . $photographer->id, 'public');
             // Store relative path - accessor will add /storage/ prefix
             $updateData['profile_picture'] = $path;
         }

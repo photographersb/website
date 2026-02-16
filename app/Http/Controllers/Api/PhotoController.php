@@ -8,6 +8,7 @@ use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use App\Services\ImageProcessingService;
 use App\Services\PhotoMetadataService;
 
@@ -162,9 +163,11 @@ class PhotoController extends Controller
         $orientation = $validated['orientation'] ?? 'landscape';
 
         try {
-            // Use Pexels API (you should add PEXELS_API_KEY to .env)
-            $apiKey = env('PEXELS_API_KEY', 'demo');
-            
+            $apiKey = config('services.pexels.key');
+            if (!$apiKey) {
+                return $this->error('Pexels API key is not configured.', 500);
+            }
+
             $response = Http::withHeaders([
                 'Authorization' => $apiKey,
             ])->get('https://api.pexels.com/v1/search', [
@@ -196,7 +199,7 @@ class PhotoController extends Controller
             $payload = $response->json();
             $errorDetails = $payload['error'] ?? $payload['message'] ?? Str::limit($response->body(), 200);
 
-            \Log::warning('Pexels API request failed', [
+            Log::warning('Pexels API request failed', [
                 'status' => $status,
                 'error' => $errorDetails,
             ]);

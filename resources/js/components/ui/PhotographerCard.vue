@@ -12,6 +12,7 @@
           :alt="photographer.name || photographer.business_name"
           class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           loading="lazy"
+          @error="handleAvatarError"
         >
       </div>
       
@@ -261,12 +262,21 @@ const primaryCategory = computed(() => {
   return null;
 });
 
+const fallbackAvatar = '/images/default-avatar.png';
+
 const profileImage = computed(() => {
-  const raw = props.photographer.avatar || props.photographer.profile_picture || '';
-  if (!raw) return '/placeholder-photographer.jpg';
-  if (raw.startsWith('http') || raw.startsWith('/')) return raw;
-  return `/storage/${raw}`;
+  const raw = props.photographer.profile_picture_url
+    || props.photographer.avatar
+    || props.photographer.profile_picture
+    || '';
+  if (!raw) return fallbackAvatar;
+  if (raw.startsWith('http') || raw.startsWith('/') || raw.startsWith('data:')) return raw;
+  return `/storage/${raw.replace(/^\/+/, '')}`;
 });
+
+const handleAvatarError = (event) => {
+  event.target.src = fallbackAvatar;
+};
 
 const locationName = computed(() => {
   let location = props.photographer.location || props.photographer.district || props.photographer.city;
