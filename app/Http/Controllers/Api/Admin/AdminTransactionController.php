@@ -365,7 +365,8 @@ class AdminTransactionController extends Controller
         ]);
 
         try {
-            $transaction = Transaction::findOrFail($id);
+            $transactionId = $this->normalizeBookingTransactionId($id);
+            $transaction = Transaction::findOrFail($transactionId);
             $transaction->update(['status' => $validated['status']]);
 
             Log::info("Transaction #{$id} status updated to {$validated['status']} by admin " . Auth::id());
@@ -387,7 +388,8 @@ class AdminTransactionController extends Controller
         ]);
 
         try {
-            $transaction = Transaction::findOrFail($id);
+            $transactionId = $this->normalizeBookingTransactionId($id);
+            $transaction = Transaction::findOrFail($transactionId);
             
             if ($transaction->status !== 'completed') {
                 return $this->validationError(['transaction' => 'Only completed transactions can be refunded'], 'Validation failed');
@@ -688,5 +690,20 @@ class AdminTransactionController extends Controller
             Log::error('Failed to cancel event payment: ' . $e->getMessage());
             return $this->error('Failed to cancel payment', 500);
         }
+    }
+
+    private function normalizeBookingTransactionId($id): int
+    {
+        $rawId = (string) $id;
+
+        if (str_starts_with($rawId, 'event_')) {
+            return -1;
+        }
+
+        if (str_starts_with($rawId, 'booking_')) {
+            return (int) str_replace('booking_', '', $rawId);
+        }
+
+        return (int) $rawId;
     }
 }

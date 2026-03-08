@@ -336,3 +336,10 @@ Role: Principal Laravel Architect + QA Lead + Product Engineer
 		- export now honors `type`, `status` (including event `rejected` under `failed`), `search`, `gateway`, and date range filters.
 		- exported rows are normalized to the merged transaction shape and sorted by latest `created_at`.
 	- validation: controller diagnostics clean and `php -l` syntax check passed.
+
+- Transactions mutation ID-parity hardening completed (pending commit in this continuation step):
+	- file: `app/Http/Controllers/Api/Admin/AdminTransactionController.php`
+	- changes:
+		- `updateStatus()` and `refund()` now accept merged booking identifiers (`booking_{id}`) by normalizing them to booking transaction IDs.
+		- added shared ID normalizer helper to keep mutation endpoint ID handling consistent with merged admin transaction rows.
+	- validation: controller diagnostics clean and `php -l` syntax check passed.
