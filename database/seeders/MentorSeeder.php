@@ -89,7 +89,10 @@ class MentorSeeder extends Seeder
 
         foreach ($mentors as $mentor) {
             $mentor['created_by'] = 1; // Admin user
-            Mentor::create($mentor);
+            Mentor::updateOrCreate(
+                ['slug' => $mentor['slug']],
+                $mentor
+            );
         }
     }
 }

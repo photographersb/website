@@ -28,7 +28,10 @@ class JudgeSeeder extends Seeder
 
         $createdUsers = [];
         foreach ($judgeUsers as $userData) {
-            $createdUsers[] = User::create($userData);
+            $createdUsers[] = User::updateOrCreate(
+                ['email' => $userData['email']],
+                $userData
+            );
         }
 
         $judges = [
@@ -96,7 +99,10 @@ class JudgeSeeder extends Seeder
         ];
 
         foreach ($judges as $judge) {
-            Judge::create($judge);
+            Judge::updateOrCreate(
+                ['slug' => $judge['slug']],
+                $judge
+            );
         }
     }
 }

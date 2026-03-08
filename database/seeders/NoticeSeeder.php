@@ -10,7 +10,7 @@ class NoticeSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = \App\Models\User::where('role', 'admin')->first();
+        $admin = \App\Models\User::whereIn('role', ['admin', 'super_admin'])->first();
 
         if (!$admin) {
             $this->command->warn('No admin user found. Skipping notice seeding.');
@@ -89,7 +89,10 @@ class NoticeSeeder extends Seeder
             $roles = $noticeData['roles'];
             unset($noticeData['roles']);
 
-            $notice = Notice::create($noticeData);
+            $notice = Notice::updateOrCreate(
+                ['title' => $noticeData['title']],
+                $noticeData
+            );
 
             if (!$noticeData['show_to_all_roles']) {
                 $notice->attachRoles($roles);

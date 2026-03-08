@@ -52,6 +52,14 @@ class DatabaseSeeder extends Seeder
             
             $this->call(HashtagSeeder::class);
             $this->command->line('  ✓ Trending hashtags initialized');
+
+            $this->call(CommunityStarterSeeder::class);
+            $this->command->line('  ✓ Community starter groups, clubs, and badges seeded');
+
+            if ((bool) env('ENABLE_DEMO_SEEDING', false)) {
+                $this->call(BangladeshDemoDataSeeder::class);
+                $this->command->line('  ✓ Bangladesh demo data seeded (ENABLE_DEMO_SEEDING=true)');
+            }
             
             $this->command->newLine();
 
