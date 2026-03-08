@@ -265,3 +265,11 @@ Role: Principal Laravel Architect + QA Lead + Product Engineer
 	- file: `resources/js/Pages/Events.vue`
 	- change: safe event route builders to prevent `/events/undefined` navigation for event detail and tickets.
 	- reason not committed: file has extensive pre-existing unrelated workspace modifications; committing now would mix scopes.
+- Events backend registration logic stabilized and committed:
+	- commit: `a9ebc6c`
+	- file: `app/Http/Controllers/EventController.php`
+	- change: switched free/paid branching from raw `event_type` check to normalized model accessor `is_free` for correct registration/payment routing.
+- Competitions voting consistency fix committed:
+	- commit: `00502a9`
+	- file: `app/Http/Controllers/Api/CompetitionVoteController.php`
+	- change: aligned `unvote`, `checkVote`, and `myVotes` to honor both `voter_id` and `voter_user_id`, plus explicit auth guard for `myVotes`.
