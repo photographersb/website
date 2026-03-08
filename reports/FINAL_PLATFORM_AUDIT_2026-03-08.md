@@ -292,3 +292,10 @@ Role: Principal Laravel Architect + QA Lead + Product Engineer
 	- file: `app/Http/Controllers/Api/CompetitionSponsorController.php`
 	- change: `/sponsors/{sponsor}` now enforces active-only visibility for both global sponsor lookup (`status=active` + `is_active=true`) and competition-sponsor fallback (`is_active=true`).
 	- validation: controller diagnostics clean and `php -l` syntax check passed.
+
+- Transactions failed-bucket parity hardening completed (pending commit in this continuation step):
+	- file: `app/Http/Controllers/Api/Admin/AdminTransactionController.php`
+	- changes:
+		- in `index()`, event-payment status filtering now maps `failed` to `failed|rejected` for consistent admin filtering behavior.
+		- in `index()` stats, event `rejected` payments are counted inside the consolidated `failed` bucket.
+	- validation: controller diagnostics clean and `php -l` syntax check passed.

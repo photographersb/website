@@ -72,7 +72,12 @@ class AdminTransactionController extends Controller
             // Apply filters to event payments
             if ($eventQuery) {
                 if ($status) {
-                    $eventQuery->where('status', $status);
+                    if ($status === 'failed') {
+                        // Event payments use "rejected" to represent a failed manual verification.
+                        $eventQuery->whereIn('status', ['failed', 'rejected']);
+                    } else {
+                        $eventQuery->where('status', $status);
+                    }
                 }
                 if ($search) {
                     $eventQuery->where(function($q) use ($search) {
@@ -119,7 +124,7 @@ class AdminTransactionController extends Controller
             if ($eventQuery) {
                 $stats['completed'] += (clone $eventQuery)->where('status', 'completed')->count();
                 $stats['pending'] += (clone $eventQuery)->where('status', 'pending')->count();
-                $stats['failed'] += (clone $eventQuery)->where('status', 'failed')->count();
+                $stats['failed'] += (clone $eventQuery)->whereIn('status', ['failed', 'rejected'])->count();
                 $stats['total'] += (clone $eventQuery)->count();
                 
                 $completedQuery = (clone $eventQuery)->where('status', 'completed');
