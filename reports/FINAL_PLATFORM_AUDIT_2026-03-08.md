@@ -321,3 +321,10 @@ Role: Principal Laravel Architect + QA Lead + Product Engineer
 		- `unreadCount()` now uses query-count (`unreadNotifications()->count()`) instead of materializing unread collections in memory.
 		- `markAllAsRead()` now performs a single bulk update on unread records (`whereNull('read_at')->update(...)`).
 	- validation: controller diagnostics clean and `php -l` syntax check passed.
+
+- Admin notifications performance hardening completed (pending commit in this continuation step):
+	- file: `app/Http/Controllers/Api/Admin/NotificationController.php`
+	- changes:
+		- `markAllAsRead()` now performs a single bulk update on unread rows instead of loading unread collections into memory.
+		- removed unused `App\Models\Notification` import.
+	- validation: `php -l` syntax check passed.
