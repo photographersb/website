@@ -100,8 +100,8 @@ class EventController extends Controller
                 ->with('error', 'Registration deadline has passed.');
         }
 
-        // Determine payment status
-        $paymentStatus = $event->event_type === 'free' ? 'free' : 'unpaid';
+        // Determine payment status using normalized event pricing mode.
+        $paymentStatus = $event->is_free ? 'free' : 'unpaid';
 
         // Generate registration code
         $registrationCode = 'REG-' . strtoupper(Str::random(8));
@@ -116,7 +116,7 @@ class EventController extends Controller
         ]);
 
         // For free events, auto-confirm
-        if ($event->event_type === 'free') {
+        if ($event->is_free) {
             // Generate QR code immediately
             try {
                 QRCodeService::generateForEventRegistration($registration);
