@@ -273,3 +273,7 @@ Role: Principal Laravel Architect + QA Lead + Product Engineer
 	- commit: `00502a9`
 	- file: `app/Http/Controllers/Api/CompetitionVoteController.php`
 	- change: aligned `unvote`, `checkVote`, and `myVotes` to honor both `voter_id` and `voter_user_id`, plus explicit auth guard for `myVotes`.
+- Sponsors public detail routing fix committed:
+	- commit: `f8b124a`
+	- file: `app/Http/Controllers/Api/CompetitionSponsorController.php`
+	- change: `/sponsors/{sponsor}` now resolves global `Sponsor` by id/slug first (matching public sponsor links), with backward-compatible fallback to `CompetitionSponsor` IDs.
