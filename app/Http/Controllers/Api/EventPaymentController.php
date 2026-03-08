@@ -46,7 +46,7 @@ class EventPaymentController extends Controller
                 'qty' => 'required|integer|min:1|max:100',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Payment initiation validation failed', [
+            Log::error('Payment initiation validation failed', [
                 'errors' => $e->errors(),
                 'payload' => $request->all(),
             ]);
@@ -172,7 +172,7 @@ class EventPaymentController extends Controller
                 ], 'Payment initiated');
             });
         } catch (\Exception $e) {
-            \Log::error('Payment initiation failed', ['error' => $e->getMessage()]);
+            Log::error('Payment initiation failed', ['error' => $e->getMessage()]);
             return $this->error($e->getMessage(), 400);
         }
     }
@@ -204,14 +204,14 @@ class EventPaymentController extends Controller
                 'screenshot' => 'nullable|image|max:5120',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Manual payment validation failed', [
+            Log::error('Manual payment validation failed', [
                 'errors' => $e->errors(),
                 'payload' => $request->except('screenshot'),
             ]);
             return $this->error('Validation failed: ' . implode(', ', array_map(fn($msgs) => implode(', ', $msgs), $e->errors())), 422);
         }
 
-        \Log::info('Manual payment request received', [
+        Log::info('Manual payment request received', [
             'event_id' => $event->id,
             'user_id' => Auth::id(),
             'method' => $validated['method'] ?? 'unknown',
@@ -232,34 +232,34 @@ class EventPaymentController extends Controller
 
         // Verify ticket belongs to event
         if ($ticket->event_id !== $event->id) {
-            \Log::error('Manual payment: Ticket mismatch', ['ticket_event' => $ticket->event_id, 'request_event' => $event->id]);
+            Log::error('Manual payment: Ticket mismatch', ['ticket_event' => $ticket->event_id, 'request_event' => $event->id]);
             return $this->error('Ticket not found for this event', 400);
         }
 
         if (!$ticket->is_active) {
-            \Log::error('Manual payment: Ticket inactive', ['ticket_id' => $ticket->id]);
+            Log::error('Manual payment: Ticket inactive', ['ticket_id' => $ticket->id]);
             return $this->error('Ticket sales are not active', 400);
         }
 
         if (!$ticket->isOnSale()) {
-            \Log::error('Manual payment: Ticket not on sale', ['ticket_id' => $ticket->id]);
+            Log::error('Manual payment: Ticket not on sale', ['ticket_id' => $ticket->id]);
             return $this->error('Ticket sales are closed', 400);
         }
 
         $maxPerUser = $event->max_tickets_per_user;
         if ($maxPerUser && $validated['qty'] > $maxPerUser) {
-            \Log::error('Manual payment: Max tickets exceeded', ['requested' => $validated['qty'], 'max' => $maxPerUser]);
+            Log::error('Manual payment: Max tickets exceeded', ['requested' => $validated['qty'], 'max' => $maxPerUser]);
             return $this->error('Maximum tickets per user exceeded', 400);
         }
 
         // Check availability
         if ($ticket->getAvailableQuantity() < $validated['qty']) {
-            \Log::error('Manual payment: Not enough tickets', ['available' => $ticket->getAvailableQuantity(), 'requested' => $validated['qty']]);
+            Log::error('Manual payment: Not enough tickets', ['available' => $ticket->getAvailableQuantity(), 'requested' => $validated['qty']]);
             return $this->error('Not enough tickets available', 400);
         }
 
         if ($validated['qty'] <= 0) {
-            \Log::error('Manual payment: Invalid quantity', ['qty' => $validated['qty']]);
+            Log::error('Manual payment: Invalid quantity', ['qty' => $validated['qty']]);
             return $this->error('Invalid ticket quantity', 400);
         }
 
@@ -272,7 +272,7 @@ class EventPaymentController extends Controller
 
         $maxPerUser = $event->max_tickets_per_user;
         if ($maxPerUser && ($confirmedQty + $validated['qty']) > $maxPerUser) {
-            \Log::warning('Manual payment: Max tickets exceeded', [
+            Log::warning('Manual payment: Max tickets exceeded', [
                 'user_id' => Auth::id(),
                 'already_purchased' => $confirmedQty,
                 'requesting' => $validated['qty'],
@@ -378,6 +378,10 @@ class EventPaymentController extends Controller
             return $this->error('Failed to submit payment: ' . $e->getMessage(), 500);
         }
 
+        if (!$registration || !$payment) {
+            return $this->error('Failed to create payment registration', 500);
+        }
+
         if (in_array($validated['method'], ['bkash', 'nagad', 'rocket'], true)) {
             $verified = PaymentVerificationService::verify(
                 $validated['trx_id'],
@@ -393,7 +397,7 @@ class EventPaymentController extends Controller
 
                 $transition = BookingStatusValidator::transitionStatus($registration, 'failed');
                 if (!$transition['success']) {
-                    \Log::warning('Failed to mark registration as failed', [
+                    Log::warning('Failed to mark registration as failed', [
                         'registration_id' => $registration->id,
                         'error' => $transition['error'] ?? 'unknown',
                     ]);
@@ -505,6 +509,11 @@ class EventPaymentController extends Controller
             return ['error' => 'SSLCommerz is not configured'];
         }
 
+        $customerPhone = Auth::user()->phone;
+        if (!$customerPhone) {
+            return ['error' => 'A valid phone number is required to initiate payment'];
+        }
+
         $callbackBase = config('app.url');
         $successUrl = $callbackBase . '/events/' . $registration->event->slug . '/tickets?status=success&tran_id=' . $payment->transaction_id;
         $failUrl = $callbackBase . '/events/' . $registration->event->slug . '/tickets?status=failed&tran_id=' . $payment->transaction_id;
@@ -522,7 +531,7 @@ class EventPaymentController extends Controller
             'ipn_url' => route('events.payment.webhook.sslcommerz'),
             'cus_name' => Auth::user()->name,
             'cus_email' => Auth::user()->email,
-            'cus_phone' => Auth::user()->phone ?? '01XXXXXXXXX',
+            'cus_phone' => $customerPhone,
             'cus_add1' => 'Bangladesh',
             'cus_city' => 'Dhaka',
             'cus_country' => 'Bangladesh',
@@ -532,7 +541,7 @@ class EventPaymentController extends Controller
         ];
 
         try {
-            \Log::info('SSLCommerz payment initiation started', ['store_id' => $storeId, 'amount' => $amount]);
+            Log::info('SSLCommerz payment initiation started', ['store_id' => $storeId, 'amount' => $amount]);
             
             $response = Http::asForm()->post($baseUrl . '/gwprocess/v4/api.php', $postData);
             $data = $response->json();
@@ -544,7 +553,7 @@ class EventPaymentController extends Controller
 
             // Check for HTTP errors
             if (!$response->successful()) {
-                \Log::error('SSLCommerz HTTP error', [
+                Log::error('SSLCommerz HTTP error', [
                     'status' => $response->status(),
                     'reason' => $data['failedreason'] ?? 'No reason provided',
                 ]);
@@ -553,7 +562,7 @@ class EventPaymentController extends Controller
 
             // Check for failed status in response
             if (isset($data['status']) && $data['status'] === 'FAILED') {
-                \Log::error('SSLCommerz FAILED status', [
+                Log::error('SSLCommerz FAILED status', [
                     'reason' => $data['failedreason'] ?? 'Unknown',
                     'store_id' => $storeId,
                 ]);
@@ -562,14 +571,14 @@ class EventPaymentController extends Controller
 
             // Check if gateway URL is present
             if (empty($data['GatewayPageURL'])) {
-                \Log::error('SSLCommerz missing GatewayPageURL', [
+                Log::error('SSLCommerz missing GatewayPageURL', [
                     'response_status' => $data['status'] ?? 'unknown',
                     'has_error' => isset($data['error']),
                 ]);
                 return ['error' => 'Gateway did not provide a checkout URL. Please verify your credentials.'];
             }
 
-            \Log::info('SSLCommerz payment initiated successfully', ['tran_id' => $payment->transaction_id]);
+            Log::info('SSLCommerz payment initiated successfully', ['tran_id' => $payment->transaction_id]);
 
             return [
                 'redirect_url' => $data['GatewayPageURL'],
@@ -577,7 +586,7 @@ class EventPaymentController extends Controller
                 'tran_id' => $payment->transaction_id,
             ];
         } catch (\Exception $e) {
-            \Log::error('SSLCommerz exception', [
+            Log::error('SSLCommerz exception', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);

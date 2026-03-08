@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class EventUpdateRequest extends FormRequest
@@ -12,11 +13,11 @@ class EventUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        if (!auth()->check()) {
+        if (!Auth::check()) {
             return false;
         }
 
-        $user = auth()->user();
+        $user = Auth::user();
         return in_array($user->role, ['admin', 'super_admin', 'moderator']);
     }
 
@@ -32,7 +33,7 @@ class EventUpdateRequest extends FormRequest
             'title' => 'sometimes|string|max:255',
             'event_type' => 'sometimes|in:workshop,photowalk,expo,seminar,meetup,webinar,exhibition,competition,other',
             'type' => 'sometimes|in:workshop,photowalk,expo,seminar,meetup,webinar,exhibition,competition,other',
-            'description' => 'sometimes|string|min:10',
+            'description' => 'sometimes|nullable|string|min:10',
             'hero_image_url' => 'nullable|url',
             'hero_image_credit_name' => 'nullable|string|max:255',
             'hero_image_credit_url' => 'nullable|url|max:255',
@@ -42,7 +43,7 @@ class EventUpdateRequest extends FormRequest
             'gallery_images' => 'nullable|array',
 
             // Dates & Times
-            'event_date' => 'sometimes|date|after_or_equal:today',
+            'event_date' => 'sometimes|date',
             'event_end_date' => 'nullable|date|after_or_equal:event_date',
             'start_time' => 'nullable|date_format:H:i',
             'end_time' => 'nullable|date_format:H:i|after_or_equal:start_time',
@@ -50,8 +51,8 @@ class EventUpdateRequest extends FormRequest
             'duration_hours' => 'nullable|numeric|min:0.5',
 
             // Location & Venue
-            'city_id' => 'sometimes|exists:locations,id',
-            'location' => 'sometimes|string|max:255',
+            'city_id' => 'sometimes|nullable|exists:locations,id',
+            'location' => 'sometimes|nullable|string|max:255',
             'venue_name' => 'nullable|string|max:255',
             'venue_address' => 'nullable|string|min:10',
             'google_map_link' => 'nullable|url',
@@ -71,7 +72,7 @@ class EventUpdateRequest extends FormRequest
             'currency' => 'nullable|in:BDT',
 
             // Organizer & Settings
-            'organizer_id' => 'sometimes|exists:photographers,id',
+            'organizer_id' => 'sometimes|nullable|exists:photographers,id',
             'created_by' => 'nullable|exists:users,id',
             'mentor_ids' => 'nullable|array',
             'mentor_ids.*' => 'integer|exists:mentors,id',
@@ -129,13 +130,52 @@ class EventUpdateRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        $nullableFields = [
+            'description',
+            'hero_image_url',
+            'hero_image_credit_name',
+            'hero_image_credit_url',
+            'banner_image',
+            'banner_image_credit_name',
+            'banner_image_credit_url',
+            'event_end_date',
+            'start_time',
+            'end_time',
+            'location',
+            'venue_name',
+            'venue_address',
+            'google_map_link',
+            'address',
+            'latitude',
+            'longitude',
+            'max_attendees',
+            'capacity',
+            'max_tickets_per_user',
+            'ticket_price',
+            'price',
+            'featured_until',
+            'requirements',
+            'registration_deadline',
+            'certificate_template_id',
+            'meta_title',
+            'meta_description',
+            'og_image',
+        ];
+
+        $normalized = [];
+        foreach ($nullableFields as $field) {
+            if ($this->has($field) && $this->input($field) === '') {
+                $normalized[$field] = null;
+            }
+        }
+
         // Convert boolean strings
-        $this->merge([
+        $this->merge(array_merge($normalized, [
             'all_day_event' => filter_var($this->all_day_event, FILTER_VALIDATE_BOOLEAN),
             'require_registration' => filter_var($this->require_registration, FILTER_VALIDATE_BOOLEAN),
             'is_ticketed' => filter_var($this->is_ticketed, FILTER_VALIDATE_BOOLEAN),
             'is_featured' => filter_var($this->is_featured, FILTER_VALIDATE_BOOLEAN),
             'certificates_enabled' => filter_var($this->certificates_enabled, FILTER_VALIDATE_BOOLEAN),
-        ]);
+        ]));
     }
 }
