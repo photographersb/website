@@ -298,7 +298,7 @@
             <router-link
               v-for="photographer in displayedPhotographers"
               :key="photographer.id"
-              :to="photographer.user?.username ? `/@${photographer.user.username}` : `/photographer/${photographer.slug}`"
+              :to="getPhotographerProfilePath(photographer)"
               class="bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all border border-gray-100"
             >
               <!-- Image -->
@@ -308,7 +308,7 @@
                   :src="photographer.profile_photo"
                   :alt="photographer.name"
                   class="w-full h-full object-cover hover:scale-110 transition-transform"
-                  @error="$event.target.style.display='none'; $event.target.parentElement.querySelector('.fallback-icon').style.display='flex'"
+                  @error="showImageFallback"
                   loading="lazy"
                 >
                 <div
@@ -419,7 +419,7 @@
             <router-link
               v-for="photographer in displayedPhotographers"
               :key="photographer.id"
-              :to="photographer.user?.username ? `/@${photographer.user.username}` : `/photographer/${photographer.slug}`"
+              :to="getPhotographerProfilePath(photographer)"
               class="bg-white rounded-xl sm:rounded-2xl shadow-lg p-3 sm:p-4 md:p-6 border border-gray-100 hover:shadow-xl hover:border-primary-300 transition-all flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 hover:-translate-y-1"
             >
               <!-- Photo -->
@@ -429,7 +429,7 @@
                   :src="photographer.profile_photo"
                   :alt="photographer.name"
                   class="w-full h-full object-cover"
-                  @error="$event.target.style.display='none'; $event.target.parentElement.querySelector('.fallback-icon').style.display='flex'"
+                  @error="showImageFallback"
                   loading="lazy"
                 >
                 <div
@@ -859,6 +859,28 @@ const toggleFavorite = async (photographerId) => {
     }
   } catch (error) {
     console.error('Failed to toggle favorite:', error)
+  }
+}
+
+const getPhotographerProfilePath = (photographer) => {
+  const username = photographer?.user?.username
+  if (username) {
+    return `/@${username}`
+  }
+
+  const slugOrId = photographer?.slug || photographer?.id
+  return slugOrId ? `/photographer/${slugOrId}` : '/photographers'
+}
+
+const showImageFallback = (event) => {
+  const imageEl = event?.target
+  if (!imageEl) return
+
+  imageEl.style.display = 'none'
+
+  const fallback = imageEl.parentElement?.querySelector('.fallback-icon')
+  if (fallback) {
+    fallback.style.display = 'flex'
   }
 }
 
