@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class AdminSettingsController extends Controller
@@ -43,7 +44,8 @@ class AdminSettingsController extends Controller
     public function update(Request $request, $key)
     {
         $validated = $request->validate([
-            'value' => 'required'
+            // Keep key mandatory while allowing explicit null to clear a setting value.
+            'value' => 'present'
         ]);
 
         $normalizedValue = $this->normalizeSettingValue($validated['value']);
@@ -64,7 +66,7 @@ class AdminSettingsController extends Controller
             // Clear cache
             Cache::forget("setting_{$key}");
 
-            Log::info("Setting '{$key}' updated by admin " . auth()->user()->id);
+            Log::info("Setting '{$key}' updated by admin " . Auth::id());
 
             return $this->success(['key' => $key, 'value' => $validated['value']], 'Setting updated successfully');
         } catch (\Exception $e) {
@@ -127,7 +129,7 @@ class AdminSettingsController extends Controller
                 Cache::forget("setting_{$setting['key']}");
             }
 
-            Log::info("Bulk settings updated by admin " . auth()->user()->id);
+            Log::info("Bulk settings updated by admin " . Auth::id());
 
             return $this->success([], 'Settings updated successfully');
         } catch (\Exception $e) {
@@ -189,7 +191,7 @@ class AdminSettingsController extends Controller
 
             Cache::flush();
 
-            Log::info("Settings reset to defaults by admin " . auth()->user()->id);
+            Log::info("Settings reset to defaults by admin " . Auth::id());
 
             return $this->success([], 'Settings reset to defaults');
         } catch (\Exception $e) {

@@ -307,3 +307,10 @@ Role: Principal Laravel Architect + QA Lead + Product Engineer
 		- added backward-compatible fallback to resolve numeric IDs against `EventPayment` when no booking transaction is found.
 		- event-payment detail responses are normalized to the merged-list transaction shape used by admin UI.
 	- validation: controller diagnostics clean and `php -l` syntax check passed.
+
+- Settings consistency hardening completed (pending commit in this continuation step):
+	- file: `app/Http/Controllers/Api/Admin/AdminSettingsController.php`
+	- changes:
+		- `update()` now validates `value` as `present` (instead of `required`) so admins can explicitly clear a setting by sending `null`.
+		- admin audit logs switched to `Auth::id()` for consistent authenticated actor tracking.
+	- validation: controller diagnostics clean and `php -l` syntax check passed.
