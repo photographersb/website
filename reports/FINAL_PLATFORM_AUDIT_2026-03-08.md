@@ -328,3 +328,11 @@ Role: Principal Laravel Architect + QA Lead + Product Engineer
 		- `markAllAsRead()` now performs a single bulk update on unread rows instead of loading unread collections into memory.
 		- removed unused `App\Models\Notification` import.
 	- validation: `php -l` syntax check passed.
+
+- Transactions export parity hardening completed (pending commit in this continuation step):
+	- file: `app/Http/Controllers/Api/Admin/AdminTransactionController.php`
+	- changes:
+		- `export()` now supports merged-source export from both `Transaction` and `EventPayment`, aligned with admin list behavior.
+		- export now honors `type`, `status` (including event `rejected` under `failed`), `search`, `gateway`, and date range filters.
+		- exported rows are normalized to the merged transaction shape and sorted by latest `created_at`.
+	- validation: controller diagnostics clean and `php -l` syntax check passed.

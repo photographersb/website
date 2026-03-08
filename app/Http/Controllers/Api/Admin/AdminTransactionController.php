@@ -416,21 +416,131 @@ class AdminTransactionController extends Controller
         // This would generate CSV/Excel export
         // For now, return JSON that can be processed by frontend
         try {
-            $query = Transaction::with(['user']);
+            $type = $request->input('type'); // null/all, 'booking', 'event_tickets'
+            $status = $request->input('status');
+            $search = $request->input('search');
+            $gateway = $request->input('gateway');
+            $dateFrom = $request->input('date_from');
+            $dateTo = $request->input('date_to');
 
-            if ($request->has('status')) {
-                $query->where('status', $request->status);
+            $bookingQuery = Transaction::with(['user']);
+            $eventQuery = EventPayment::with(['user', 'event']);
+
+            if ($type && $type !== 'all') {
+                if ($type === 'booking') {
+                    $eventQuery = null;
+                } elseif ($type === 'event_tickets') {
+                    $bookingQuery = null;
+                }
             }
 
-            if ($request->has('date_from')) {
-                $query->where('created_at', '>=', $request->date_from);
+            if ($bookingQuery) {
+                if ($status) {
+                    $bookingQuery->where('status', $status);
+                }
+                if ($search) {
+                    $bookingQuery->where(function ($q) use ($search) {
+                        $q->where('transaction_id', 'LIKE', "%{$search}%")
+                            ->orWhere('gateway_transaction_id', 'LIKE', "%{$search}%")
+                            ->orWhereHas('user', function ($userQ) use ($search) {
+                                $userQ->where('name', 'LIKE', "%{$search}%")
+                                    ->orWhere('email', 'LIKE', "%{$search}%");
+                            });
+                    });
+                }
+                if ($gateway) {
+                    $bookingQuery->where('payment_gateway', $gateway);
+                }
+                if ($dateFrom) {
+                    $bookingQuery->where('created_at', '>=', $dateFrom);
+                }
+                if ($dateTo) {
+                    $bookingQuery->where('created_at', '<=', $dateTo);
+                }
             }
 
-            if ($request->has('date_to')) {
-                $query->where('created_at', '<=', $request->date_to);
+            if ($eventQuery) {
+                if ($status) {
+                    if ($status === 'failed') {
+                        $eventQuery->whereIn('status', ['failed', 'rejected']);
+                    } else {
+                        $eventQuery->where('status', $status);
+                    }
+                }
+                if ($search) {
+                    $eventQuery->where(function ($q) use ($search) {
+                        $q->where('transaction_id', 'LIKE', "%{$search}%")
+                            ->orWhere('trx_id', 'LIKE', "%{$search}%")
+                            ->orWhereHas('user', function ($userQ) use ($search) {
+                                $userQ->where('name', 'LIKE', "%{$search}%")
+                                    ->orWhere('email', 'LIKE', "%{$search}%");
+                            });
+                    });
+                }
+                if ($gateway) {
+                    $eventQuery->where('method', $gateway);
+                }
+                if ($dateFrom) {
+                    $eventQuery->where('created_at', '>=', $dateFrom);
+                }
+                if ($dateTo) {
+                    $eventQuery->where('created_at', '<=', $dateTo);
+                }
             }
 
-            $transactions = $query->orderBy('created_at', 'desc')->get();
+            $transactions = [];
+
+            if ($bookingQuery) {
+                $bookings = $bookingQuery->get();
+                foreach ($bookings as $booking) {
+                    $transactions[] = (object) [
+                        'id' => 'booking_' . $booking->id,
+                        'type' => 'booking',
+                        'transaction_id' => $booking->transaction_id,
+                        'user_id' => $booking->user_id,
+                        'user' => $booking->user,
+                        'event_id' => null,
+                        'event' => null,
+                        'amount' => $booking->amount,
+                        'status' => $booking->status,
+                        'method' => $booking->payment_gateway,
+                        'sender_number' => null,
+                        'trx_id' => $booking->gateway_transaction_id,
+                        'screenshot_path' => null,
+                        'created_at' => $booking->created_at,
+                        'verified_at' => null,
+                        'verified_by_user_id' => null,
+                    ];
+                }
+            }
+
+            if ($eventQuery) {
+                $events = $eventQuery->get();
+                foreach ($events as $event) {
+                    $transactions[] = (object) [
+                        'id' => 'event_' . $event->id,
+                        'type' => 'event_tickets',
+                        'transaction_id' => $event->transaction_id,
+                        'user_id' => $event->user_id,
+                        'user' => $event->user,
+                        'event_id' => $event->event_id,
+                        'event' => $event->event,
+                        'amount' => $event->amount,
+                        'status' => $event->status,
+                        'method' => $event->method,
+                        'sender_number' => $event->sender_number,
+                        'trx_id' => $event->trx_id,
+                        'screenshot_path' => $event->screenshot_path,
+                        'created_at' => $event->created_at,
+                        'verified_at' => $event->verified_at,
+                        'verified_by_user_id' => $event->verified_by_user_id,
+                    ];
+                }
+            }
+
+            usort($transactions, function ($a, $b) {
+                return $b->created_at <=> $a->created_at;
+            });
 
             return $this->success([
                 'transactions' => $transactions,
