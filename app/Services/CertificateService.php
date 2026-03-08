@@ -83,6 +83,14 @@ class CertificateService
         $failed = [];
         
         foreach ($winners as $winner) {
+            if (!$winner instanceof CompetitionSubmission) {
+                $failed[] = [
+                    'submission_id' => null,
+                    'error' => 'Invalid winner record type encountered'
+                ];
+                continue;
+            }
+
             $result = $this->generateCertificate($winner);
             
             if ($result['success']) {
@@ -101,7 +109,7 @@ class CertificateService
         
         return [
             'success' => true,
-            'message' => "Generated {count($generated)} certificates",
+            'message' => 'Generated ' . count($generated) . ' certificates',
             'generated' => $generated,
             'failed' => $failed,
             'total' => $winners->count()
@@ -634,7 +642,7 @@ HTML;
      * Download certificate PDF
      * 
      * @param string $certificateId
-     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|array
+    * @return \Symfony\Component\HttpFoundation\StreamedResponse|array
      */
     public function downloadCertificate(string $certificateId)
     {
