@@ -304,7 +304,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Admin Verification Routes
-Route::middleware(['auth'])->prefix('admin/verifications')->group(function () {
+Route::middleware(['auth', 'role:admin,super_admin,moderator'])->prefix('admin/verifications')->group(function () {
     Route::get('/', [\App\Http\Controllers\Admin\VerificationController::class, 'index'])->name('admin.verifications.index');
     Route::get('/{verificationRequest}', [\App\Http\Controllers\Admin\VerificationController::class, 'show'])->name('admin.verifications.show');
     Route::post('/{verificationRequest}/approve', [\App\Http\Controllers\Admin\VerificationController::class, 'approve'])->name('admin.verifications.approve');
@@ -313,22 +313,24 @@ Route::middleware(['auth'])->prefix('admin/verifications')->group(function () {
     Route::get('/statistics/get', [\App\Http\Controllers\Admin\VerificationController::class, 'statistics'])->name('admin.verifications.statistics');
 });
 // Test Error Routes (for Error Center testing)
-Route::get('/test-error', function () {
-    throw new \Exception('🧪 Test Error: This is a P4 test exception for Error Center');
-});
+if (app()->environment(['local', 'testing'])) {
+    Route::get('/test-error', function () {
+        throw new \Exception('Test Error: This is a P4 test exception for Error Center');
+    });
 
-Route::get('/test-error-critical', function () {
-    throw new \PDOException('🔴 Critical P0 Error: Database connection failed');
-});
+    Route::get('/test-error-critical', function () {
+        throw new \PDOException('Critical P0 Error: Database connection failed');
+    });
 
-Route::get('/test-error-query', function () {
-    throw new \Illuminate\Database\QueryException(
-        'mysql',
-        'SELECT * FROM non_existent_table',
-        [],
-        new \Exception('Table not found')
-    );
-});
+    Route::get('/test-error-query', function () {
+        throw new \Illuminate\Database\QueryException(
+            'mysql',
+            'SELECT * FROM non_existent_table',
+            [],
+            new \Exception('Table not found')
+        );
+    });
+}
 
 // Authentication is handled by Vue Router navigation guards in resources/js/app.js
 
