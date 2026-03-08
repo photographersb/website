@@ -9,6 +9,7 @@ use App\Models\EventPayment;
 use App\Models\EventRegistration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Collection;
 
 class AdminTransactionController extends Controller
@@ -23,6 +24,7 @@ class AdminTransactionController extends Controller
             $type = $request->input('type'); // null/all, 'booking', 'event_tickets'
             $status = $request->input('status');
             $search = $request->input('search');
+            $gateway = $request->input('gateway');
             $dateFrom = $request->input('date_from');
             $dateTo = $request->input('date_to');
             $page = $request->input('page', 1);
@@ -62,6 +64,9 @@ class AdminTransactionController extends Controller
                 if ($dateTo) {
                     $bookingQuery->where('created_at', '<=', $dateTo);
                 }
+                if ($gateway) {
+                    $bookingQuery->where('payment_gateway', $gateway);
+                }
             }
 
             // Apply filters to event payments
@@ -85,6 +90,9 @@ class AdminTransactionController extends Controller
                 if ($dateTo) {
                     $eventQuery->where('created_at', '<=', $dateTo);
                 }
+                if ($gateway) {
+                    $eventQuery->where('method', $gateway);
+                }
             }
 
             // Get counts/stats from both sources
@@ -94,29 +102,33 @@ class AdminTransactionController extends Controller
             $stats = ['total' => 0, 'completed' => 0, 'pending' => 0, 'failed' => 0];
 
             if ($bookingQuery) {
-                $bookingStats = (clone $bookingQuery)->select('status')->get()->groupBy('status')->map->count();
-                $stats['completed'] += $bookingStats->get('completed', 0);
-                $stats['pending'] += $bookingStats->get('pending', 0);
-                $stats['failed'] += $bookingStats->get('failed', 0);
+                $stats['completed'] += (clone $bookingQuery)->where('status', 'completed')->count();
+                $stats['pending'] += (clone $bookingQuery)->where('status', 'pending')->count();
+                $stats['failed'] += (clone $bookingQuery)->where('status', 'failed')->count();
                 $stats['total'] += (clone $bookingQuery)->count();
                 
                 $completedQuery = (clone $bookingQuery)->where('status', 'completed');
                 $totalRevenue += $completedQuery->sum('amount') ?? 0;
                 $todayRevenue += (clone $completedQuery)->whereDate('created_at', today())->sum('amount') ?? 0;
-                $monthlyRevenue += (clone $completedQuery)->whereMonth('created_at', now()->month)->sum('amount') ?? 0;
+                $monthlyRevenue += (clone $completedQuery)
+                    ->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year)
+                    ->sum('amount') ?? 0;
             }
 
             if ($eventQuery) {
-                $eventStats = (clone $eventQuery)->select('status')->get()->groupBy('status')->map->count();
-                $stats['completed'] += $eventStats->get('completed', 0);
-                $stats['pending'] += $eventStats->get('pending', 0);
-                $stats['failed'] += $eventStats->get('failed', 0);
+                $stats['completed'] += (clone $eventQuery)->where('status', 'completed')->count();
+                $stats['pending'] += (clone $eventQuery)->where('status', 'pending')->count();
+                $stats['failed'] += (clone $eventQuery)->where('status', 'failed')->count();
                 $stats['total'] += (clone $eventQuery)->count();
                 
                 $completedQuery = (clone $eventQuery)->where('status', 'completed');
                 $totalRevenue += $completedQuery->sum('amount') ?? 0;
                 $todayRevenue += (clone $completedQuery)->whereDate('created_at', today())->sum('amount') ?? 0;
-                $monthlyRevenue += (clone $completedQuery)->whereMonth('created_at', now()->month)->sum('amount') ?? 0;
+                $monthlyRevenue += (clone $completedQuery)
+                    ->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year)
+                    ->sum('amount') ?? 0;
             }
 
             $stats['total_revenue'] = $totalRevenue;
@@ -204,22 +216,60 @@ class AdminTransactionController extends Controller
     public function stats()
     {
         try {
+            $transactionTotal = Transaction::count();
+            $eventPaymentTotal = EventPayment::count();
+
+            $transactionCompleted = Transaction::where('status', 'completed')->count();
+            $eventPaymentCompleted = EventPayment::where('status', 'completed')->count();
+
+            $transactionPending = Transaction::where('status', 'pending')->count();
+            $eventPaymentPending = EventPayment::where('status', 'pending')->count();
+
+            $transactionFailed = Transaction::where('status', 'failed')->count();
+            $eventPaymentRejected = EventPayment::where('status', 'rejected')->count();
+
+            $transactionRefunded = Transaction::where('status', 'refunded')->count();
+            $eventPaymentCancelled = EventPayment::where('status', 'cancelled')->count();
+
+            $transactionCompletedAmount = Transaction::where('status', 'completed')->sum('amount');
+            $eventPaymentCompletedAmount = EventPayment::where('status', 'completed')->sum('amount');
+
+            $transactionTodayAmount = Transaction::where('status', 'completed')
+                ->whereDate('created_at', today())
+                ->sum('amount');
+            $eventPaymentTodayAmount = EventPayment::where('status', 'completed')
+                ->whereDate('created_at', today())
+                ->sum('amount');
+
+            $transactionMonthlyAmount = Transaction::where('status', 'completed')
+                ->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+                ->sum('amount');
+            $eventPaymentMonthlyAmount = EventPayment::where('status', 'completed')
+                ->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+                ->sum('amount');
+
+            $transactionYearlyAmount = Transaction::where('status', 'completed')
+                ->whereYear('created_at', now()->year)
+                ->sum('amount');
+            $eventPaymentYearlyAmount = EventPayment::where('status', 'completed')
+                ->whereYear('created_at', now()->year)
+                ->sum('amount');
+
             $stats = [
-                'total' => Transaction::count(),
-                'completed' => Transaction::where('status', 'completed')->count(),
-                'pending' => Transaction::where('status', 'pending')->count(),
-                'failed' => Transaction::where('status', 'failed')->count(),
-                'refunded' => Transaction::where('status', 'refunded')->count(),
-                'total_revenue' => Transaction::where('status', 'completed')->sum('amount'),
-                'today_revenue' => Transaction::where('status', 'completed')
-                    ->whereDate('created_at', today())
-                    ->sum('amount'),
-                'monthly_revenue' => Transaction::where('status', 'completed')
-                    ->whereMonth('created_at', now()->month)
-                    ->sum('amount'),
-                'yearly_revenue' => Transaction::where('status', 'completed')
-                    ->whereYear('created_at', now()->year)
-                    ->sum('amount'),
+                'total' => $transactionTotal + $eventPaymentTotal,
+                'completed' => $transactionCompleted + $eventPaymentCompleted,
+                'pending' => $transactionPending + $eventPaymentPending,
+                // Keep failed as a summary bucket that includes explicitly rejected event payments.
+                'failed' => $transactionFailed + $eventPaymentRejected,
+                'rejected' => $eventPaymentRejected,
+                'cancelled' => $eventPaymentCancelled,
+                'refunded' => $transactionRefunded,
+                'total_revenue' => $transactionCompletedAmount + $eventPaymentCompletedAmount,
+                'today_revenue' => $transactionTodayAmount + $eventPaymentTodayAmount,
+                'monthly_revenue' => $transactionMonthlyAmount + $eventPaymentMonthlyAmount,
+                'yearly_revenue' => $transactionYearlyAmount + $eventPaymentYearlyAmount,
             ];
 
             return $this->success($stats, 'Transaction statistics retrieved');
@@ -258,7 +308,7 @@ class AdminTransactionController extends Controller
             $transaction = Transaction::findOrFail($id);
             $transaction->update(['status' => $validated['status']]);
 
-            Log::info("Transaction #{$id} status updated to {$validated['status']} by admin " . auth()->user()->id);
+            Log::info("Transaction #{$id} status updated to {$validated['status']} by admin " . Auth::id());
 
             return $this->success($transaction->load('user'), 'Transaction status updated successfully');
         } catch (\Exception $e) {
@@ -289,7 +339,7 @@ class AdminTransactionController extends Controller
                 'refunded_at' => now()
             ]);
 
-            Log::info("Transaction #{$id} refunded by admin " . auth()->user()->id);
+            Log::info("Transaction #{$id} refunded by admin " . Auth::id());
 
             return $this->success($transaction, 'Transaction refunded successfully');
         } catch (\Exception $e) {
@@ -350,7 +400,7 @@ class AdminTransactionController extends Controller
             // Update payment status
             $payment->update([
                 'status' => 'completed',
-                'verified_by_user_id' => auth()->user()->id,
+                'verified_by_user_id' => Auth::id(),
                 'verified_at' => now(),
                 'admin_note' => $request->input('admin_note'),
             ]);
@@ -371,7 +421,7 @@ class AdminTransactionController extends Controller
                 }
             }
 
-            Log::info("Event payment #{$paymentId} approved by admin " . auth()->user()->id);
+            Log::info("Event payment #{$paymentId} approved by admin " . Auth::id());
 
             return $this->success($payment->load(['user', 'event']), 'Event payment approved successfully');
         } catch (\Exception $e) {
@@ -398,7 +448,7 @@ class AdminTransactionController extends Controller
             // Update payment status
             $payment->update([
                 'status' => 'rejected',
-                'verified_by_user_id' => auth()->user()->id,
+                'verified_by_user_id' => Auth::id(),
                 'verified_at' => now(),
                 'admin_note' => $request->input('admin_note'),
             ]);
@@ -417,7 +467,7 @@ class AdminTransactionController extends Controller
                 }
             }
 
-            Log::info("Event payment #{$paymentId} rejected by admin " . auth()->user()->id);
+            Log::info("Event payment #{$paymentId} rejected by admin " . Auth::id());
 
             return $this->success($payment->load(['user', 'event']), 'Event payment rejected successfully');
         } catch (\Exception $e) {
@@ -461,7 +511,7 @@ class AdminTransactionController extends Controller
                 }
             }
 
-            Log::info("Event payment #{$paymentId} cancelled by admin " . auth()->user()->id);
+            Log::info("Event payment #{$paymentId} cancelled by admin " . Auth::id());
 
             return $this->success($payment->load(['user', 'event', 'registration']), 'Event payment cancelled and ticket availability restored');
         } catch (\Exception $e) {
