@@ -290,10 +290,65 @@ class AdminTransactionController extends Controller
     public function show($id)
     {
         try {
-            $transaction = Transaction::with(['user'])
-                ->findOrFail($id);
+            // Accept merged-list IDs such as booking_123 / event_456, plus legacy numeric IDs.
+            if (str_starts_with((string) $id, 'event_')) {
+                $eventPaymentId = (int) str_replace('event_', '', (string) $id);
+                $eventPayment = EventPayment::with(['user', 'event'])->findOrFail($eventPaymentId);
 
-            return $this->success($transaction, 'Transaction retrieved successfully');
+                return $this->success((object) [
+                    'id' => 'event_' . $eventPayment->id,
+                    'type' => 'event_tickets',
+                    'transaction_id' => $eventPayment->transaction_id,
+                    'user_id' => $eventPayment->user_id,
+                    'user' => $eventPayment->user,
+                    'event_id' => $eventPayment->event_id,
+                    'event' => $eventPayment->event,
+                    'amount' => $eventPayment->amount,
+                    'status' => $eventPayment->status,
+                    'method' => $eventPayment->method,
+                    'sender_number' => $eventPayment->sender_number,
+                    'trx_id' => $eventPayment->trx_id,
+                    'screenshot_path' => $eventPayment->screenshot_path,
+                    'created_at' => $eventPayment->created_at,
+                    'verified_at' => $eventPayment->verified_at,
+                    'verified_by_user_id' => $eventPayment->verified_by_user_id,
+                ], 'Transaction retrieved successfully');
+            }
+
+            $transactionId = str_starts_with((string) $id, 'booking_')
+                ? (int) str_replace('booking_', '', (string) $id)
+                : (int) $id;
+
+            $transaction = Transaction::with(['user'])->find($transactionId);
+
+            if ($transaction) {
+                return $this->success($transaction, 'Transaction retrieved successfully');
+            }
+
+            // Backward-compatible fallback: if a numeric/legacy ID maps to an event payment, return it.
+            $eventPayment = EventPayment::with(['user', 'event'])->find($transactionId);
+            if ($eventPayment) {
+                return $this->success((object) [
+                    'id' => 'event_' . $eventPayment->id,
+                    'type' => 'event_tickets',
+                    'transaction_id' => $eventPayment->transaction_id,
+                    'user_id' => $eventPayment->user_id,
+                    'user' => $eventPayment->user,
+                    'event_id' => $eventPayment->event_id,
+                    'event' => $eventPayment->event,
+                    'amount' => $eventPayment->amount,
+                    'status' => $eventPayment->status,
+                    'method' => $eventPayment->method,
+                    'sender_number' => $eventPayment->sender_number,
+                    'trx_id' => $eventPayment->trx_id,
+                    'screenshot_path' => $eventPayment->screenshot_path,
+                    'created_at' => $eventPayment->created_at,
+                    'verified_at' => $eventPayment->verified_at,
+                    'verified_by_user_id' => $eventPayment->verified_by_user_id,
+                ], 'Transaction retrieved successfully');
+            }
+
+            return $this->notFound('Transaction not found');
         } catch (\Exception $e) {
             Log::error('Failed to fetch transaction: ' . $e->getMessage());
             return $this->notFound('Transaction not found');
