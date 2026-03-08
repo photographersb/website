@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class AdminErrorLog extends Model
@@ -96,7 +97,7 @@ class AdminErrorLog extends Model
             'route_name' => $routeName ?? request()->route()?->getName(),
             'method' => $method ?? request()->method(),
             'status_code' => $statusCode,
-            'user_id' => $userId ?? auth()->id(),
+            'user_id' => $userId ?? Auth::id(),
             'ip' => $ip ?? request()->ip(),
             'user_agent' => request()->userAgent(),
             'message' => $exception->getMessage(),
@@ -293,7 +294,7 @@ class AdminErrorLog extends Model
      */
     public function getSafeMessage(): string
     {
-        if (auth()->user()?->hasRole('super_admin')) {
+        if (Auth::user()?->role === 'super_admin') {
             return $this->message;
         }
         

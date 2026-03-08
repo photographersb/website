@@ -4,9 +4,11 @@ namespace App\Services;
 
 use App\Models\AdminErrorLog;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
 class ErrorLogService
@@ -50,8 +52,8 @@ class ErrorLogService
                 'url' => $url ?? request()->fullUrl(),
                 'route_name' => $routeName ?? request()->route()?->getName(),
                 'method' => $method ?? request()->method(),
-                'status_code' => $statusCode ?? ($this->isHttpException($exception) ? $exception->getStatusCode() : null),
-                'user_id' => $userId ?? auth()->id(),
+                'status_code' => $statusCode ?? $this->extractStatusCode($exception),
+                'user_id' => $userId ?? Auth::id(),
                 'ip' => $ip ?? request()->ip(),
                 'user_agent' => request()->userAgent(),
                 'message' => $this->sanitizeMessage($exception->getMessage()),
@@ -193,7 +195,20 @@ class ErrorLogService
      */
     private function isHttpException(Throwable $exception): bool
     {
-        return method_exists($exception, 'getStatusCode');
+        return $exception instanceof HttpExceptionInterface;
+    }
+
+    /**
+     * Extract status code only when exception supports it
+     */
+    private function extractStatusCode(Throwable $exception): ?int
+    {
+        if (!$this->isHttpException($exception)) {
+            return null;
+        }
+
+        /** @var HttpExceptionInterface $exception */
+        return $exception->getStatusCode();
     }
 
     /**

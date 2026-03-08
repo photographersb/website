@@ -1,18 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Admin\CompetitionController as AdminCompetitionController;
 
 // Authentication Routes
 Route::get('/login', function () {
-    if (auth()->check()) {
+    if (Auth::check()) {
         return redirect()->route('admin.dashboard');
     }
     return inertia('Login');
 })->name('login');
 Route::get('/register', function () {
-    if (auth()->check()) {
+    if (Auth::check()) {
         return redirect()->route('admin.dashboard');
     }
     return inertia('Register');
@@ -26,23 +28,23 @@ Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
         
         // Verify hash
         if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-            \Log::warning("Email verification failed: Invalid hash for user {$id}");
+            Log::warning("Email verification failed: Invalid hash for user {$id}");
             return redirect('/auth?error=invalid_verification_link');
         }
         
         // Check if already verified
         if ($user->hasVerifiedEmail()) {
-            \Log::info("Email verification: User {$id} already verified");
+            Log::info("Email verification: User {$id} already verified");
             return redirect('/auth?verified=already');
         }
         
         // Mark as verified
         $user->markEmailAsVerified();
-        \Log::info("Email verified successfully for user {$id} ({$user->email})");
+        Log::info("Email verified successfully for user {$id} ({$user->email})");
         
         return redirect('/auth?verified=success');
     } catch (\Exception $e) {
-        \Log::error("Email verification error: " . $e->getMessage());
+        Log::error("Email verification error: " . $e->getMessage());
         return redirect('/auth?error=verification_failed');
     }
 })->name('verification.verify');
@@ -70,9 +72,13 @@ Route::get('/sitemap/competitions.xml', [\App\Http\Controllers\SitemapController
 Route::get('/sitemap/cities.xml', [\App\Http\Controllers\SitemapController::class, 'cities']);
 Route::get('/sitemap/categories.xml', [\App\Http\Controllers\SitemapController::class, 'categories']);
 
-// Public Photographer Profile Routes (SEO-friendly)
-Route::get('/@{username}', [\App\Http\Controllers\PublicPhotographerController::class, 'showByUsername'])->name('photographer.profile.public');
-Route::get('/photographer/{id}', [\App\Http\Controllers\PublicPhotographerController::class, 'showById'])
+// Public Photographer Profile Routes (SPA)
+Route::get('/@{username}', function () {
+    return view('app');
+})->name('photographer.profile.public');
+Route::get('/photographer/{id}', function () {
+    return view('app');
+})
     ->whereNumber('id')
     ->name('photographer.profile.legacy');
 
@@ -94,7 +100,11 @@ Route::get('/admin', [\App\Http\Controllers\Admin\AdminAccessController::class, 
 
 // Admin Management Pages (SPA Routes)
 Route::prefix('admin')->group(function () {
+    // Keep login route public for unauthenticated admins.
     Route::get('/login', function () { return view('admin.spa'); })->name('admin.login');
+});
+
+Route::prefix('admin')->middleware(['auth', 'role:admin,super_admin,moderator'])->group(function () {
     // Dashboard
     Route::get('/dashboard', function () { return view('admin.spa'); })->name('admin.dashboard');
     Route::get('/analytics', function () { return view('admin.spa'); })->name('admin.analytics');
@@ -195,7 +205,8 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,super_admin,moderator'])
 // Admin SPA fallback (keeps deep links on refresh)
 Route::get('/admin/{any}', function () {
     return view('admin.spa');
-})->where('any', '.*');
+})->where('any', '.*')
+    ->middleware(['auth', 'role:admin,super_admin,moderator']);
 
 // SEO Landing Pages: Categories & Locations
 Route::get('/categories', [\App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
