@@ -133,7 +133,10 @@ class CompetitionVoteController extends Controller
         }
         
         $vote = CompetitionVote::where('submission_id', $submission->id)
-            ->where('voter_id', $user->id)
+            ->where(function ($query) use ($user) {
+                $query->where('voter_id', $user->id)
+                    ->orWhere('voter_user_id', $user->id);
+            })
             ->first();
         
         if (!$vote) {
@@ -170,7 +173,10 @@ class CompetitionVoteController extends Controller
         }
 
         $hasVoted = CompetitionVote::where('submission_id', $submission->id)
-            ->where('voter_id', $user->id)
+            ->where(function ($query) use ($user) {
+                $query->where('voter_id', $user->id)
+                    ->orWhere('voter_user_id', $user->id);
+            })
             ->exists();
         
         return $this->success([
@@ -184,10 +190,17 @@ class CompetitionVoteController extends Controller
     public function myVotes(Request $request, $competitionId)
     {
         $user = $request->user();
+
+        if (!$user) {
+            return $this->error('Login required to view your votes', 401);
+        }
         
         $votes = CompetitionVote::with('submission')
             ->where('competition_id', $competitionId)
-            ->where('voter_id', $user->id)
+            ->where(function ($query) use ($user) {
+                $query->where('voter_id', $user->id)
+                    ->orWhere('voter_user_id', $user->id);
+            })
             ->orderBy('created_at', 'desc')
             ->get();
         
