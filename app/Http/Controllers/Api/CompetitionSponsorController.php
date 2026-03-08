@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
 use App\Models\Competition;
 use App\Models\CompetitionSponsor;
+use App\Models\Sponsor;
 use App\Services\SponsorshipService;
 use Illuminate\Http\Request;
 
@@ -31,12 +32,22 @@ class CompetitionSponsorController extends Controller
      */
     public function show($sponsorId, SponsorshipService $sponsorshipService)
     {
-        $sponsor = CompetitionSponsor::find($sponsorId);
-        
+        // Public `/sponsors/{sponsor}` links are based on global sponsors.
+        $globalSponsor = Sponsor::query()
+            ->where('id', $sponsorId)
+            ->orWhere('slug', $sponsorId)
+            ->first();
+
+        if ($globalSponsor) {
+            return $this->success($globalSponsor, 'Sponsor details retrieved successfully');
+        }
+
+        // Backward-compatible fallback for competition sponsor IDs.
+        $sponsor = CompetitionSponsor::with(['competition'])->find($sponsorId);
         if (!$sponsor) {
             return $this->notFound('Sponsor not found');
         }
-        
+
         $result = $sponsorshipService->getSponsorDetails($sponsor);
 
         return $this->success($result['data'], 'Sponsor details retrieved successfully');
