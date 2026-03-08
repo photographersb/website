@@ -314,3 +314,10 @@ Role: Principal Laravel Architect + QA Lead + Product Engineer
 		- `update()` now validates `value` as `present` (instead of `required`) so admins can explicitly clear a setting by sending `null`.
 		- admin audit logs switched to `Auth::id()` for consistent authenticated actor tracking.
 	- validation: controller diagnostics clean and `php -l` syntax check passed.
+
+- Notifications performance hardening completed (pending commit in this continuation step):
+	- file: `app/Http/Controllers/Api/NotificationController.php`
+	- changes:
+		- `unreadCount()` now uses query-count (`unreadNotifications()->count()`) instead of materializing unread collections in memory.
+		- `markAllAsRead()` now performs a single bulk update on unread records (`whereNull('read_at')->update(...)`).
+	- validation: controller diagnostics clean and `php -l` syntax check passed.

@@ -103,7 +103,7 @@ class NotificationController extends Controller
      */
     public function unreadCount(Request $request)
     {
-        $count = $request->user()->unreadNotifications->count();
+        $count = $request->user()->unreadNotifications()->count();
 
         return $this->success(['count' => $count], 'Unread notification count retrieved successfully');
     }
@@ -128,7 +128,9 @@ class NotificationController extends Controller
      */
     public function markAllAsRead(Request $request)
     {
-        $request->user()->unreadNotifications->markAsRead();
+        $request->user()->notifications()
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
 
         return $this->success([], 'All notifications marked as read');
     }
