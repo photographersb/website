@@ -277,11 +277,18 @@ Role: Principal Laravel Architect + QA Lead + Product Engineer
 	- commit: `f8b124a`
 	- file: `app/Http/Controllers/Api/CompetitionSponsorController.php`
 	- change: `/sponsors/{sponsor}` now resolves global `Sponsor` by id/slug first (matching public sponsor links), with backward-compatible fallback to `CompetitionSponsor` IDs.
-- Transactions consistency hardening completed (pending commit in this continuation step):
+
+- Transactions consistency hardening committed:
+	- commit: `9f22148`
 	- file: `app/Http/Controllers/Api/Admin/AdminTransactionController.php`
 	- changes:
 		- `/admin/transactions` now honors the frontend `gateway` filter for both booking (`payment_gateway`) and event payments (`method`).
 		- monthly revenue calculations are now constrained to current month + current year to prevent cross-year month collisions.
 		- `/admin/transactions/stats` now aggregates both `Transaction` and `EventPayment` sources for source-consistent dashboard totals.
 		- status summary now exposes `rejected` and `cancelled` counters while preserving `failed` as a consolidated failure bucket.
+	- validation: controller diagnostics clean and `php -l` syntax check passed.
+
+- Sponsors public visibility hardening completed (pending commit in this continuation step):
+	- file: `app/Http/Controllers/Api/CompetitionSponsorController.php`
+	- change: `/sponsors/{sponsor}` now enforces active-only visibility for both global sponsor lookup (`status=active` + `is_active=true`) and competition-sponsor fallback (`is_active=true`).
 	- validation: controller diagnostics clean and `php -l` syntax check passed.

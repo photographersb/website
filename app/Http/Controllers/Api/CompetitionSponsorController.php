@@ -32,18 +32,26 @@ class CompetitionSponsorController extends Controller
      */
     public function show($sponsorId, SponsorshipService $sponsorshipService)
     {
-        // Public `/sponsors/{sponsor}` links are based on global sponsors.
+        // Public `/sponsors/{sponsor}` links should only expose active sponsors.
         $globalSponsor = Sponsor::query()
-            ->where('id', $sponsorId)
-            ->orWhere('slug', $sponsorId)
+            ->where(function ($query) use ($sponsorId) {
+                $query->where('id', $sponsorId)
+                    ->orWhere('slug', $sponsorId);
+            })
+            ->where('status', 'active')
+            ->where('is_active', true)
             ->first();
 
         if ($globalSponsor) {
             return $this->success($globalSponsor, 'Sponsor details retrieved successfully');
         }
 
-        // Backward-compatible fallback for competition sponsor IDs.
-        $sponsor = CompetitionSponsor::with(['competition'])->find($sponsorId);
+        // Backward-compatible fallback for active competition sponsor IDs.
+        $sponsor = CompetitionSponsor::with(['competition'])
+            ->where('id', $sponsorId)
+            ->where('is_active', true)
+            ->first();
+
         if (!$sponsor) {
             return $this->notFound('Sponsor not found');
         }
