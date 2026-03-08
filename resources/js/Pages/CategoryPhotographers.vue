@@ -384,7 +384,7 @@
                   :src="photographer.profile_photo"
                   :alt="photographer.name"
                   class="w-full h-full object-cover hover:scale-110 transition-transform"
-                  @error="$event.target.style.display='none'; $event.target.parentElement.querySelector('.fallback-icon').style.display='flex'"
+                  @error="showImageFallback"
                   loading="lazy"
                 >
                 <div
@@ -495,7 +495,7 @@
                   :src="photographer.profile_photo"
                   :alt="photographer.name"
                   class="w-full h-full object-cover"
-                  @error="$event.target.style.display='none'; $event.target.parentElement.querySelector('.fallback-icon').style.display='flex'"
+                  @error="showImageFallback"
                   loading="lazy"
                 >
                 <div
@@ -964,6 +964,18 @@ const toggleFavorite = async (photographerId) => {
     }
   } catch (error) {
     console.error('Failed to toggle favorite:', error)
+  }
+}
+
+const showImageFallback = (event) => {
+  const imageEl = event?.target
+  if (!imageEl) return
+
+  imageEl.style.display = 'none'
+
+  const fallback = imageEl.parentElement?.querySelector('.fallback-icon')
+  if (fallback) {
+    fallback.style.display = 'flex'
   }
 }
 
