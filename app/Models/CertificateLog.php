@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class CertificateIssueLog extends Model
+class CertificateLog extends Model
 {
+    use HasFactory;
+
     protected $table = 'certificate_logs';
 
     protected $fillable = [
@@ -29,13 +32,8 @@ class CertificateIssueLog extends Model
         return $this->belongsTo(Certificate::class, 'certificate_id');
     }
 
-    public function performedByUser(): BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function scopeByAction($query, $action)
-    {
-        return $query->where('action_type', $action);
     }
 }

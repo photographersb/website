@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Certificate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CertificateVerificationController extends Controller
 {
@@ -12,7 +13,9 @@ class CertificateVerificationController extends Controller
      */
     public function verify(string $certificateCode)
     {
-        $certificate = Certificate::where('certificate_code', $certificateCode)->first();
+        $certificate = Certificate::with(['event', 'competition', 'template', 'user', 'issuedToUser'])
+            ->where('certificate_code', $certificateCode)
+            ->first();
 
         if (!$certificate) {
             return inertia('Certificates/Verify', [
@@ -24,7 +27,14 @@ class CertificateVerificationController extends Controller
 
         // Log verification
         $certificate->logs()->create([
-            'action' => 'verified',
+            'action_type' => 'verified',
+            'entity_type' => 'certificate',
+            'entity_id' => $certificate->id,
+            'message' => 'Public verification page viewed',
+            'metadata' => [
+                'ip' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ],
         ]);
 
         $isValid = $certificate->isValid();
@@ -32,12 +42,17 @@ class CertificateVerificationController extends Controller
         return inertia('Certificates/Verify', [
             'certificate' => [
                 'code' => $certificate->certificate_code,
+                'certificateId' => $certificate->certificate_code,
                 'participantName' => $certificate->getParticipantName(),
-                'eventTitle' => $certificate->event?->title ?? $certificate->competition?->name ?? 'Completion',
-                'issueDate' => $certificate->issue_date->format('j F Y'),
+                'eventTitle' => $certificate->event?->title
+                    ?? $certificate->competition?->title
+                    ?? $certificate->competition?->name
+                    ?? 'Completion',
+                'issueDate' => ($certificate->issued_at ?? $certificate->issue_date)?->format('j F Y'),
                 'expiryDate' => $certificate->valid_until?->format('j F Y'),
                 'status' => $certificate->status,
-                'templateName' => $certificate->template->name,
+                'templateName' => $certificate->template?->title,
+                'platformLogo' => asset('images/logo.png'),
             ],
             'valid' => $isValid,
             'message' => $this->getVerificationMessage($certificate),
@@ -71,6 +86,6 @@ class CertificateVerificationController extends Controller
             return response()->json(['error' => 'QR code not found'], 404);
         }
 
-        return \Storage::disk('public')->download($certificate->verification_qr_path);
+        return response()->download(Storage::disk('public')->path($certificate->verification_qr_path));
     }
 }

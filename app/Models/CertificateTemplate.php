@@ -14,9 +14,12 @@ class CertificateTemplate extends Model
         'type',
         'width',
         'height',
+        'background_image',
         'background_color',
         'accent_color',
         'text_color',
+        'font_family',
+        'font_size',
         'title_font',
         'is_default',
         'template_content',
@@ -25,6 +28,7 @@ class CertificateTemplate extends Model
     protected $casts = [
         'width' => 'decimal:2',
         'height' => 'decimal:2',
+        'font_size' => 'integer',
         'is_default' => 'boolean',
     ];
 
@@ -40,6 +44,6 @@ class CertificateTemplate extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query;
     }
 }

@@ -4,9 +4,11 @@ namespace App\Jobs;
 
 use App\Models\Event;
 use App\Models\User;
+use App\Jobs\GenerateCertificateAssetsJob;
 use App\Services\CertificateIssuanceService;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 
 class IssueCertificateForAttendanceJob implements ShouldQueue
 {
@@ -29,7 +31,7 @@ class IssueCertificateForAttendanceJob implements ShouldQueue
         $template = $this->event->certificateTemplate ?: $this->event->competition?->activeShareFrameTemplate;
 
         if (!$template) {
-            \Log::warning('No certificate template found for event', [
+            Log::warning('No certificate template found for event', [
                 'event_id' => $this->event->id,
                 'user_id' => $this->user->id,
             ]);
@@ -37,19 +39,29 @@ class IssueCertificateForAttendanceJob implements ShouldQueue
         }
 
         try {
-            $issuanceService->issueCertificate(
+            $certificate = $issuanceService->issueCertificate(
                 $template,
                 $this->event,
+                null,
                 $this->user,
-                autoGenerate: true
+                null,
+                null,
+                now()->toDateTimeString(),
+                'Automatically issued by attendance job',
+                null,
+                null,
+                false,
+                true
             );
 
-            \Log::info('Certificate auto-issued for attendance', [
+            GenerateCertificateAssetsJob::dispatch($certificate->id)->onQueue('certificates');
+
+            Log::info('Certificate auto-issued for attendance', [
                 'event_id' => $this->event->id,
                 'user_id' => $this->user->id,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Failed to auto-issue certificate', [
+            Log::error('Failed to auto-issue certificate', [
                 'event_id' => $this->event->id,
                 'user_id' => $this->user->id,
                 'error' => $e->getMessage(),

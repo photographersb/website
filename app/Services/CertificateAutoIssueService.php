@@ -6,6 +6,7 @@ use App\Models\Certificate;
 use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Models\CertificateTemplate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class CertificateAutoIssueService
@@ -21,7 +22,8 @@ class CertificateAutoIssueService
         }
 
         // Get certificate template
-        $template = $event->certificateTemplate ?: CertificateTemplate::where('type', 'participation')->where('is_default', true)->first();
+        $template = $event->certificateTemplate
+            ?: CertificateTemplate::whereIn('type', ['event', 'participation'])->where('is_default', true)->first();
         
         if (!$template) {
             return ['success' => false, 'message' => 'No certificate template found'];
@@ -45,9 +47,12 @@ class CertificateAutoIssueService
                     'certificate_code' => self::generateCertificateCode($event->id),
                     'template_id' => $template->id,
                     'event_id' => $event->id,
+                    'user_id' => $registration->user_id,
                     'issued_to_user_id' => $registration->user_id,
+                    'recipient_name' => $registration->user->name,
                     'issued_to_name' => $registration->user->name,
                     'issued_to_email' => $registration->user->email,
+                    'issued_at' => now(),
                     'issue_date' => now(),
                     'status' => 'issued',
                     'created_by_user_id' => 1, // System
@@ -59,7 +64,7 @@ class CertificateAutoIssueService
                     'user_id' => $registration->user_id,
                     'error' => $e->getMessage(),
                 ];
-                \Log::error('Certificate auto-issue failed', [
+                Log::error('Certificate auto-issue failed', [
                     'event_id' => $event->id,
                     'user_id' => $registration->user_id,
                     'error' => $e->getMessage(),
@@ -109,7 +114,8 @@ class CertificateAutoIssueService
         }
 
         // Get template
-        $template = $event->certificateTemplate ?: CertificateTemplate::where('type', 'participation')->where('is_default', true)->first();
+        $template = $event->certificateTemplate
+            ?: CertificateTemplate::whereIn('type', ['event', 'participation'])->where('is_default', true)->first();
         
         if (!$template) {
             return ['success' => false, 'message' => 'No certificate template found'];
@@ -120,9 +126,12 @@ class CertificateAutoIssueService
                 'certificate_code' => self::generateCertificateCode($event->id),
                 'template_id' => $template->id,
                 'event_id' => $event->id,
+                'user_id' => $userId,
                 'issued_to_user_id' => $userId,
+                'recipient_name' => $userName,
                 'issued_to_name' => $userName,
                 'issued_to_email' => $userEmail,
+                'issued_at' => now(),
                 'issue_date' => now(),
                 'status' => 'issued',
                 'created_by_user_id' => 1, // System
@@ -130,7 +139,7 @@ class CertificateAutoIssueService
 
             return ['success' => true, 'certificate' => $certificate];
         } catch (\Exception $e) {
-            \Log::error('Certificate auto-issue failed for attendee', [
+            Log::error('Certificate auto-issue failed for attendee', [
                 'event_id' => $event->id,
                 'user_id' => $userId,
                 'error' => $e->getMessage(),
