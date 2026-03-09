@@ -50,19 +50,19 @@ class LearningController extends Controller
         $myLearning = null;
 
         if ($user) {
+            $userEnrollments = LearningEnrollment::query()->where('user_id', $user->id);
+
             $myLearning = [
-                'active_courses' => LearningEnrollment::query()
-                    ->where('user_id', $user->id)
+                'active_courses' => (clone $userEnrollments)
                     ->where('status', 'enrolled')
                     ->count(),
-                'completed_courses' => LearningEnrollment::query()
-                    ->where('user_id', $user->id)
+                'completed_courses' => (clone $userEnrollments)
                     ->where('status', 'completed')
                     ->count(),
-                'certificates_earned' => LearningEnrollment::query()
-                    ->where('user_id', $user->id)
+                'certificates_earned' => (clone $userEnrollments)
                     ->whereNotNull('certificate_id')
                     ->count(),
+                'avg_completion' => round((float) (clone $userEnrollments)->avg('completion_percentage'), 2),
             ];
         }
 
@@ -162,18 +162,34 @@ class LearningController extends Controller
 
         $user = $request->user();
         $enrollment = null;
+        $lessonProgress = [];
 
         if ($user) {
             $enrollment = LearningEnrollment::query()
                 ->where('user_id', $user->id)
                 ->where('course_id', $course->id)
                 ->first();
+
+            if ($enrollment) {
+                $lessonProgress = $enrollment->lessonProgress()
+                    ->get(['lesson_id', 'progress_percentage', 'completed_at'])
+                    ->mapWithKeys(function ($item) {
+                        return [
+                            (string) $item->lesson_id => [
+                                'progress_percentage' => (float) $item->progress_percentage,
+                                'completed_at' => optional($item->completed_at)?->toIso8601String(),
+                            ],
+                        ];
+                    })
+                    ->all();
+            }
         }
 
         return $this->success([
             'course' => $course,
             'summary' => $summary,
             'my_enrollment' => $enrollment,
+            'my_lesson_progress' => $lessonProgress,
         ], 'Course details retrieved successfully');
     }
 

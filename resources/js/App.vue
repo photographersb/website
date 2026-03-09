@@ -45,8 +45,8 @@
       class="sticky top-0 z-50 sb-nav"
     >
       <div class="sb-nav__bg" aria-hidden="true"></div>
-      <div class="container mx-auto px-4 md:px-6 py-4 md:py-5 sb-nav__inner">
-        <div class="flex items-center justify-between gap-4">
+      <div class="container mx-auto px-4 md:px-6 py-3 md:py-4 sb-nav__inner">
+        <div class="flex items-center justify-between gap-3 md:gap-4 sb-nav__row">
           <router-link
             to="/"
             class="flex items-center"
@@ -92,7 +92,7 @@
             </svg>
           </button>
 
-          <div class="hidden md:flex items-center gap-3">
+          <div class="hidden md:flex items-center gap-1.5 xl:gap-2 sb-nav__links">
             <router-link
               v-for="link in navLinks"
               :key="link.path"
@@ -104,12 +104,12 @@
                 :is="link.icon"
                 class="w-5 h-5"
               />
-              <span class="text-sm font-medium">{{ link.name }}</span>
+              <span class="sb-nav__link-label">{{ link.name }}</span>
             </router-link>
           </div>
 
-          <div class="hidden md:flex items-center gap-3">
-            <span class="mx-1 h-1.5 w-1.5 rounded-full bg-gray-300" aria-hidden="true" />
+          <div class="hidden md:flex items-center gap-2 sb-nav__actions">
+            <span class="sb-nav__divider" aria-hidden="true" />
             <div
               v-if="user"
               class="flex items-center gap-2"
@@ -118,40 +118,40 @@
                 <div class="sb-user-chip__avatar">
                   {{ user.name.charAt(0).toUpperCase() }}
                 </div>
-                <span class="text-sm font-semibold text-gray-900">{{ user.name }}</span>
+                <span class="sb-user-chip__name">{{ user.name }}</span>
               </div>
 
               <router-link
                 v-if="isJudge"
                 to="/judge/dashboard"
-                class="sb-btn sb-btn--judge"
+                class="sb-btn sb-btn--judge sb-btn--compact"
               >
                 Judge Panel
               </router-link>
               <router-link
                 v-if="isClient"
                 to="/client/dashboard"
-                class="sb-btn sb-btn--primary"
+                class="sb-btn sb-btn--primary sb-btn--compact"
               >
                 Client Dashboard
               </router-link>
               <router-link
                 v-if="isPhotographer"
                 to="/dashboard"
-                class="sb-btn sb-btn--primary"
+                class="sb-btn sb-btn--primary sb-btn--compact"
               >
                 Dashboard
               </router-link>
               <router-link
                 v-if="isAdmin"
                 to="/admin/dashboard"
-                class="sb-btn sb-btn--admin"
+                class="sb-btn sb-btn--admin sb-btn--compact"
               >
                 Admin Dashboard
               </router-link>
 
               <button
-                class="sb-btn sb-btn--logout"
+                class="sb-btn sb-btn--logout sb-btn--compact"
                 title="Logout"
                 @click="logout"
               >

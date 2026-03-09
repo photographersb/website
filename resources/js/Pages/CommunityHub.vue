@@ -66,6 +66,13 @@
                 <button @click="likeDiscussion(item.id)" class="hover:text-rose-700">👍 {{ item.likes_count || 0 }}</button>
                 <button @click="openDiscussion(item.id)" class="hover:text-rose-700">💬 {{ item.comments_count || 0 }}</button>
                 <button @click="shareDiscussion(item.id)" class="hover:text-rose-700">🔗 Share</button>
+                <button
+                  v-if="canRemoveDiscussion(item)"
+                  @click="removeDiscussion(item.id)"
+                  class="hover:text-red-700"
+                >
+                  Remove
+                </button>
               </div>
             </div>
             <p v-if="!hubLoading && discussions.length === 0" class="text-sm text-gray-500">
@@ -208,6 +215,37 @@
                 <p class="text-sm font-semibold text-gray-900">{{ activeGroup.name }}</p>
                 <p class="text-xs text-gray-500 mt-1">{{ activeGroup.members_count || 0 }} members</p>
                 <p class="text-sm text-gray-700 mt-2">{{ activeGroup.description }}</p>
+                <button
+                  class="mt-2 text-xs text-red-700 hover:underline"
+                  @click="leaveGroup(activeGroup.id)"
+                >
+                  Leave group
+                </button>
+
+                <div v-if="canManageGroup(activeGroup)" class="mt-3 pt-3 border-t border-gray-200 space-y-2">
+                  <p class="text-xs font-semibold text-gray-800">Group Management</p>
+                  <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
+                    <select v-model.number="ownershipTargetUserId" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs">
+                      <option :value="null">Select member for ownership transfer</option>
+                      <option
+                        v-for="member in transferableMembers"
+                        :key="`owner-${member.user_id}`"
+                        :value="member.user_id"
+                      >
+                        {{ member.user?.name || `User #${member.user_id}` }}
+                      </option>
+                    </select>
+                    <button
+                      class="text-xs px-3 py-2 rounded bg-gray-900 text-white hover:bg-black"
+                      @click="transferOwnership"
+                    >
+                      Transfer
+                    </button>
+                  </div>
+                  <button class="text-xs text-red-700 hover:underline" @click="archiveActiveGroup">
+                    Archive Group
+                  </button>
+                </div>
               </div>
 
               <div class="space-y-2">
@@ -226,6 +264,13 @@
                 <div v-for="post in groupPosts" :key="post.id" class="border border-gray-200 rounded-lg p-2.5 bg-white">
                   <p class="text-xs text-gray-500">{{ post.user?.name || 'Member' }}</p>
                   <p class="text-sm text-gray-700 mt-1">{{ post.content }}</p>
+                  <button
+                    v-if="canRemoveGroupPost(post)"
+                    class="mt-1 text-[11px] text-red-700 hover:underline"
+                    @click="removeGroupPost(post.id)"
+                  >
+                    Remove post
+                  </button>
                   <div class="mt-2 space-y-1.5">
                     <input
                       v-model="groupCommentDrafts[post.id]"
@@ -329,7 +374,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../api'
 
@@ -354,6 +399,11 @@ const groupPostDraft = ref('')
 const groupCommentDrafts = ref({})
 const groupLoading = ref(false)
 const notifications = ref([])
+const currentUser = ref(JSON.parse(localStorage.getItem('user') || 'null'))
+const ownershipTargetUserId = ref(null)
+
+const normalizedRole = computed(() => String(currentUser.value?.role || '').toLowerCase().replace(/\s+/g, '_'))
+const isAdminUser = computed(() => ['admin', 'super_admin', 'moderator'].includes(normalizedRole.value))
 
 const reportForm = ref({
   reportable_type: 'discussion',
@@ -516,6 +566,40 @@ const openDiscussion = (discussionId) => {
   loadDiscussionThread(discussionId)
 }
 
+const canRemoveDiscussion = (discussion) => {
+  const userId = currentUser.value?.id
+  if (!userId) return false
+  return isAdminUser.value || Number(discussion?.user_id) === Number(userId)
+}
+
+const canManageGroup = (group) => {
+  const userId = Number(currentUser.value?.id || 0)
+  if (!userId) return false
+  return isAdminUser.value || Number(group?.created_by) === userId
+}
+
+const transferableMembers = computed(() => {
+  const members = activeGroup.value?.members || []
+  const currentOwnerId = Number(activeGroup.value?.created_by || 0)
+  return members.filter(member => Number(member.user_id) !== currentOwnerId)
+})
+
+const removeDiscussion = async (discussionId) => {
+  if (!confirm('Remove this discussion?')) return
+
+  try {
+    await api.delete(`/community/discussions/${discussionId}`)
+    if (activeDiscussion.value?.id === discussionId) {
+      activeDiscussion.value = null
+      discussionComments.value = []
+    }
+    feedbackMessage.value = 'Discussion removed successfully.'
+    await loadHub()
+  } catch (error) {
+    handleActionError(error, 'Unable to remove discussion right now.')
+  }
+}
+
 const submitDiscussionComment = async () => {
   if (!activeDiscussion.value?.id) return
   if (!discussionCommentDraft.value.trim()) {
@@ -542,6 +626,7 @@ const openGroup = async (groupId) => {
     const payload = data?.data || null
     activeGroup.value = payload
     groupPosts.value = payload?.posts || []
+    ownershipTargetUserId.value = null
     feedbackMessage.value = ''
 
     router.push({ path: '/community', query: { ...route.query, group: groupId } })
@@ -594,6 +679,26 @@ const commentOnGroupPost = async (postId) => {
   }
 }
 
+const canRemoveGroupPost = (post) => {
+  const userId = currentUser.value?.id
+  if (!userId) return false
+  return isAdminUser.value || Number(post?.user_id) === Number(userId)
+}
+
+const removeGroupPost = async (postId) => {
+  if (!activeGroup.value?.id) return
+  if (!confirm('Remove this group post?')) return
+
+  try {
+    await api.delete(`/community/group-posts/${postId}`)
+    feedbackMessage.value = 'Group post removed successfully.'
+    await openGroup(activeGroup.value.id)
+    await loadHub()
+  } catch (error) {
+    handleActionError(error, 'Unable to remove group post right now.')
+  }
+}
+
 const createGroup = async () => {
   if (!groupForm.value.name?.trim() || !groupForm.value.description?.trim()) {
     feedbackMessage.value = 'Group name and description are required.'
@@ -617,6 +722,56 @@ const joinGroup = async (groupId) => {
     await loadHub()
   } catch (error) {
     handleActionError(error, 'Unable to join group right now.')
+  }
+}
+
+const leaveGroup = async (groupId) => {
+  if (!confirm('Leave this group?')) return
+
+  try {
+    await api.delete(`/community/groups/${groupId}/leave`)
+    feedbackMessage.value = 'Left group successfully.'
+    if (activeGroup.value?.id === groupId) {
+      await openGroup(groupId)
+    }
+    await loadHub()
+  } catch (error) {
+    handleActionError(error, 'Unable to leave group right now.')
+  }
+}
+
+const transferOwnership = async () => {
+  if (!activeGroup.value?.id) return
+  if (!ownershipTargetUserId.value) {
+    feedbackMessage.value = 'Please select a member to transfer ownership.'
+    return
+  }
+
+  if (!confirm('Transfer group ownership to selected member?')) return
+
+  try {
+    await api.post(`/community/groups/${activeGroup.value.id}/transfer-ownership`, {
+      target_user_id: Number(ownershipTargetUserId.value),
+    })
+    feedbackMessage.value = 'Ownership transferred successfully.'
+    await Promise.all([openGroup(activeGroup.value.id), loadHub()])
+  } catch (error) {
+    handleActionError(error, 'Unable to transfer ownership right now.')
+  }
+}
+
+const archiveActiveGroup = async () => {
+  if (!activeGroup.value?.id) return
+  if (!confirm('Archive this group? It will no longer accept new posts.')) return
+
+  try {
+    await api.delete(`/community/groups/${activeGroup.value.id}`)
+    feedbackMessage.value = 'Group archived successfully.'
+    activeGroup.value = null
+    groupPosts.value = []
+    await loadHub()
+  } catch (error) {
+    handleActionError(error, 'Unable to archive group right now.')
   }
 }
 

@@ -312,10 +312,15 @@ Route::prefix('v1')->group(function () {
             Route::post('/discussions/{discussion}/comments', [CommunityController::class, 'commentDiscussion'])->middleware('throttle:40,10');
             Route::post('/discussions/{discussion}/like', [CommunityController::class, 'toggleDiscussionLike'])->middleware('throttle:60,10');
             Route::post('/discussions/{discussion}/share', [CommunityController::class, 'logDiscussionShare'])->middleware('throttle:60,10');
+            Route::delete('/discussions/{discussion}', [CommunityController::class, 'deleteDiscussion'])->middleware('throttle:20,10');
 
             Route::post('/groups', [CommunityController::class, 'storeGroup'])->middleware('throttle:10,10');
             Route::post('/groups/{group}/join', [CommunityController::class, 'joinGroup'])->middleware('throttle:30,10');
+            Route::delete('/groups/{group}/leave', [CommunityController::class, 'leaveGroup'])->middleware('throttle:30,10');
+            Route::post('/groups/{group}/transfer-ownership', [CommunityController::class, 'transferGroupOwnership'])->middleware('throttle:15,10');
+            Route::delete('/groups/{group}', [CommunityController::class, 'archiveGroup'])->middleware('throttle:10,10');
             Route::post('/groups/{group}/posts', [CommunityController::class, 'storeGroupPost'])->middleware('throttle:30,10');
+            Route::delete('/group-posts/{post}', [CommunityController::class, 'deleteGroupPost'])->middleware('throttle:30,10');
             Route::post('/group-posts/{post}/comments', [CommunityController::class, 'commentGroupPost'])->middleware('throttle:40,10');
 
             Route::post('/mentors/profile', [CommunityController::class, 'upsertMentorProfile'])->middleware('throttle:10,10');

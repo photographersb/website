@@ -222,6 +222,24 @@ class CommunityController extends Controller
         return $this->success(['shares_count' => $discussion->fresh()->shares_count], 'Discussion share tracked');
     }
 
+    public function deleteDiscussion(Request $request, CommunityDiscussion $discussion)
+    {
+        $user = $request->user();
+        $isOwner = $discussion->user_id === $user->id;
+        $isAdmin = method_exists($user, 'isAdmin') && $user->isAdmin();
+
+        if (!$isOwner && !$isAdmin) {
+            return $this->unauthorized('You can only remove your own discussion.');
+        }
+
+        $discussion->update([
+            'status' => 'hidden',
+            'last_activity_at' => now(),
+        ]);
+
+        return $this->success(['removed' => true, 'discussion_id' => $discussion->id], 'Discussion removed successfully');
+    }
+
     public function groups(Request $request)
     {
         $perPage = min((int) $request->input('per_page', 20), 50);
@@ -334,9 +352,111 @@ class CommunityController extends Controller
         return $this->success(['joined' => true, 'members_count' => $group->fresh()->members_count], 'Joined group successfully');
     }
 
+    public function leaveGroup(Request $request, CommunityGroup $group)
+    {
+        $user = $request->user();
+
+        $membership = CommunityGroupMember::query()
+            ->where('group_id', $group->id)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$membership) {
+            return $this->success(['left' => false, 'members_count' => $group->members_count], 'You are not a member of this group');
+        }
+
+        if ($membership->role === 'admin' && (int) $group->created_by === (int) $user->id) {
+            return $this->error('Group creator cannot leave the group. Transfer ownership first.', 422);
+        }
+
+        $membership->delete();
+
+        if ((int) $group->members_count > 0) {
+            $group->decrement('members_count');
+        }
+
+        return $this->success(['left' => true, 'members_count' => $group->fresh()->members_count], 'Left group successfully');
+    }
+
+    public function transferGroupOwnership(Request $request, CommunityGroup $group)
+    {
+        $user = $request->user();
+        $isCreator = (int) $group->created_by === (int) $user->id;
+        $isAdmin = method_exists($user, 'isAdmin') && $user->isAdmin();
+
+        if (!$isCreator && !$isAdmin) {
+            return $this->unauthorized('Only group owner or admin can transfer ownership.');
+        }
+
+        $validated = $request->validate([
+            'target_user_id' => 'required|integer|exists:users,id',
+        ]);
+
+        $targetUserId = (int) $validated['target_user_id'];
+        if ($targetUserId === (int) $group->created_by) {
+            return $this->error('Selected member is already the group owner.', 422);
+        }
+
+        $targetMembership = CommunityGroupMember::query()
+            ->where('group_id', $group->id)
+            ->where('user_id', $targetUserId)
+            ->first();
+
+        if (!$targetMembership) {
+            return $this->error('Target user must be a member of this group.', 422);
+        }
+
+        DB::transaction(function () use ($group, $targetUserId) {
+            CommunityGroupMember::query()
+                ->where('group_id', $group->id)
+                ->where('user_id', $group->created_by)
+                ->update(['role' => 'moderator']);
+
+            CommunityGroupMember::query()
+                ->where('group_id', $group->id)
+                ->where('user_id', $targetUserId)
+                ->update(['role' => 'admin']);
+
+            $group->update(['created_by' => $targetUserId]);
+        });
+
+        return $this->success([
+            'group_id' => $group->id,
+            'created_by' => $targetUserId,
+        ], 'Group ownership transferred successfully');
+    }
+
+    public function archiveGroup(Request $request, CommunityGroup $group)
+    {
+        $user = $request->user();
+        $isCreator = (int) $group->created_by === (int) $user->id;
+        $isAdmin = method_exists($user, 'isAdmin') && $user->isAdmin();
+
+        if (!$isCreator && !$isAdmin) {
+            return $this->unauthorized('Only group owner or admin can archive this group.');
+        }
+
+        if ($group->status === 'archived') {
+            return $this->success(['archived' => true, 'group_id' => $group->id], 'Group is already archived');
+        }
+
+        $group->update(['status' => 'archived']);
+
+        CommunityGroupPost::query()
+            ->where('group_id', $group->id)
+            ->where('status', 'active')
+            ->update(['status' => 'hidden']);
+
+        return $this->success(['archived' => true, 'group_id' => $group->id], 'Group archived successfully');
+    }
+
     public function storeGroupPost(Request $request, CommunityGroup $group)
     {
         $user = $request->user();
+
+        if ($group->status !== 'active') {
+            return $this->error('This group is not accepting new posts.', 422);
+        }
 
         $isMember = CommunityGroupMember::query()
             ->where('group_id', $group->id)
@@ -393,6 +513,29 @@ class CommunityController extends Controller
         }
 
         return $this->created($comment->load('user:id,name,username'), 'Comment added to group post');
+    }
+
+    public function deleteGroupPost(Request $request, CommunityGroupPost $post)
+    {
+        $user = $request->user();
+        $isOwner = (int) $post->user_id === (int) $user->id;
+        $isAdmin = method_exists($user, 'isAdmin') && $user->isAdmin();
+
+        if (!$isOwner && !$isAdmin) {
+            return $this->unauthorized('You can only remove your own group post.');
+        }
+
+        if ($post->status !== 'active') {
+            return $this->success(['removed' => true, 'post_id' => $post->id], 'Post already removed');
+        }
+
+        $post->update(['status' => 'hidden']);
+
+        if ((int) $post->group->posts_count > 0) {
+            $post->group->decrement('posts_count');
+        }
+
+        return $this->success(['removed' => true, 'post_id' => $post->id], 'Group post removed successfully');
     }
 
     public function localClubs(Request $request)
