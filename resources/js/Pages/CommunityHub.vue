@@ -72,6 +72,51 @@
               No discussions yet. Be the first to start one.
             </p>
           </div>
+
+          <div class="mt-5 border border-gray-100 rounded-xl p-3 sm:p-4 bg-gray-50/70">
+            <div class="flex items-center justify-between gap-3 mb-3">
+              <h3 class="text-sm sm:text-base font-semibold text-gray-900">Discussion Thread</h3>
+              <button
+                v-if="activeDiscussion?.id"
+                class="text-xs text-rose-700 hover:underline"
+                @click="loadDiscussionThread(activeDiscussion.id)"
+              >
+                Refresh
+              </button>
+            </div>
+
+            <p v-if="discussionLoading" class="text-sm text-gray-500">Loading thread...</p>
+
+            <div v-else-if="activeDiscussion" class="space-y-3">
+              <div class="border border-gray-200 rounded-lg p-3 bg-white">
+                <p class="text-sm font-semibold text-gray-900">{{ activeDiscussion.title }}</p>
+                <p class="text-xs text-gray-500 mt-1">{{ activeDiscussion.user?.name || 'Community Member' }} • {{ activeDiscussion.category }}</p>
+                <p class="text-sm text-gray-700 mt-2">{{ activeDiscussion.content }}</p>
+              </div>
+
+              <div class="space-y-2 max-h-56 overflow-auto pr-1">
+                <div v-for="comment in discussionComments" :key="comment.id" class="border border-gray-200 rounded-lg p-2.5 bg-white">
+                  <p class="text-xs text-gray-500">{{ comment.user?.name || 'Member' }}</p>
+                  <p class="text-sm text-gray-700 mt-1">{{ comment.content }}</p>
+                </div>
+                <p v-if="discussionComments.length === 0" class="text-xs text-gray-500">No comments yet.</p>
+              </div>
+
+              <div class="space-y-2">
+                <textarea
+                  v-model="discussionCommentDraft"
+                  rows="2"
+                  placeholder="Write a comment"
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                />
+                <button class="rounded-lg bg-gray-900 text-white text-xs px-3 py-2 font-medium hover:bg-black" @click="submitDiscussionComment">
+                  Post Comment
+                </button>
+              </div>
+            </div>
+
+            <p v-else class="text-sm text-gray-500">Select a discussion using the comment button to view the thread.</p>
+          </div>
         </article>
 
         <aside class="space-y-6">
@@ -134,11 +179,70 @@
                 <p class="text-sm font-medium text-gray-800">{{ group.name }}</p>
                 <p class="text-xs text-gray-500">{{ group.members_count }} members • {{ group.type === 'local_club' ? 'Local club' : 'Interest group' }}</p>
               </div>
-              <button class="text-xs px-3 py-1 rounded bg-rose-600 text-white hover:bg-rose-700" @click="joinGroup(group.id)">Join</button>
+              <div class="flex items-center gap-2">
+                <button class="text-xs px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-100" @click="openGroup(group.id)">Open</button>
+                <button class="text-xs px-3 py-1 rounded bg-rose-600 text-white hover:bg-rose-700" @click="joinGroup(group.id)">Join</button>
+              </div>
             </div>
             <p v-if="!hubLoading && groups.length === 0" class="text-sm text-gray-500">
               No groups available yet.
             </p>
+          </div>
+
+          <div class="mt-5 border border-gray-100 rounded-xl p-3 sm:p-4 bg-gray-50/70">
+            <div class="flex items-center justify-between gap-3 mb-3">
+              <h3 class="text-sm sm:text-base font-semibold text-gray-900">Group Feed</h3>
+              <button
+                v-if="activeGroup?.id"
+                class="text-xs text-rose-700 hover:underline"
+                @click="openGroup(activeGroup.id)"
+              >
+                Refresh
+              </button>
+            </div>
+
+            <p v-if="groupLoading" class="text-sm text-gray-500">Loading group...</p>
+
+            <div v-else-if="activeGroup" class="space-y-3">
+              <div class="border border-gray-200 rounded-lg p-3 bg-white">
+                <p class="text-sm font-semibold text-gray-900">{{ activeGroup.name }}</p>
+                <p class="text-xs text-gray-500 mt-1">{{ activeGroup.members_count || 0 }} members</p>
+                <p class="text-sm text-gray-700 mt-2">{{ activeGroup.description }}</p>
+              </div>
+
+              <div class="space-y-2">
+                <textarea
+                  v-model="groupPostDraft"
+                  rows="2"
+                  placeholder="Write a post for this group"
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                />
+                <button class="rounded-lg bg-gray-900 text-white text-xs px-3 py-2 font-medium hover:bg-black" @click="publishGroupPost">
+                  Publish Post
+                </button>
+              </div>
+
+              <div class="space-y-2 max-h-64 overflow-auto pr-1">
+                <div v-for="post in groupPosts" :key="post.id" class="border border-gray-200 rounded-lg p-2.5 bg-white">
+                  <p class="text-xs text-gray-500">{{ post.user?.name || 'Member' }}</p>
+                  <p class="text-sm text-gray-700 mt-1">{{ post.content }}</p>
+                  <div class="mt-2 space-y-1.5">
+                    <input
+                      v-model="groupCommentDrafts[post.id]"
+                      type="text"
+                      placeholder="Write a comment"
+                      class="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs"
+                    />
+                    <button class="text-xs px-2.5 py-1 rounded bg-rose-600 text-white hover:bg-rose-700" @click="commentOnGroupPost(post.id)">
+                      Comment
+                    </button>
+                  </div>
+                </div>
+                <p v-if="groupPosts.length === 0" class="text-xs text-gray-500">No posts yet in this group.</p>
+              </div>
+            </div>
+
+            <p v-else class="text-sm text-gray-500">Open a group to view and contribute to its feed.</p>
           </div>
         </article>
 
@@ -165,6 +269,59 @@
             </div>
           </div>
           <p v-else class="text-sm text-gray-500">Use search to find posts, groups, members, and topics.</p>
+
+          <div class="mt-6 pt-5 border-t border-gray-100">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-sm font-semibold text-gray-900">Community Notifications</h3>
+              <button class="text-xs text-rose-700 hover:underline" @click="loadNotifications">Refresh</button>
+            </div>
+            <div class="space-y-2 max-h-52 overflow-auto pr-1">
+              <div v-for="note in notifications" :key="note.id" class="border border-gray-100 rounded-lg p-2.5">
+                <p class="text-xs font-medium text-gray-800">{{ note.title || 'Community update' }}</p>
+                <p class="text-xs text-gray-600 mt-1">{{ note.body || note.message || 'You have a new community notification.' }}</p>
+                <button
+                  v-if="!note.read_at"
+                  class="mt-2 text-[11px] px-2 py-1 rounded bg-gray-900 text-white hover:bg-black"
+                  @click="markNotificationRead(note.id)"
+                >
+                  Mark as read
+                </button>
+              </div>
+              <p v-if="!hubLoading && notifications.length === 0" class="text-xs text-gray-500">No notifications yet.</p>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-5 border-t border-gray-100 space-y-2">
+            <h3 class="text-sm font-semibold text-gray-900">Report Content</h3>
+            <select v-model="reportForm.reportable_type" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+              <option value="discussion">Discussion</option>
+              <option value="discussion_comment">Discussion comment</option>
+              <option value="group_post">Group post</option>
+              <option value="group_post_comment">Group post comment</option>
+            </select>
+            <input
+              v-model.number="reportForm.reportable_id"
+              type="number"
+              min="1"
+              placeholder="Content ID"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            />
+            <input
+              v-model="reportForm.reason"
+              type="text"
+              placeholder="Reason (e.g., spam, abuse)"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            />
+            <textarea
+              v-model="reportForm.details"
+              rows="2"
+              placeholder="Optional details"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            />
+            <button class="rounded-lg bg-rose-600 text-white text-xs px-3 py-2 font-medium hover:bg-rose-700" @click="submitReport">
+              Submit Report
+            </button>
+          </div>
         </article>
       </section>
     </div>
@@ -173,9 +330,10 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import api from '../api'
 
+const route = useRoute()
 const router = useRouter()
 
 const discussions = ref([])
@@ -186,6 +344,23 @@ const searchQuery = ref('')
 const searchResults = ref(null)
 const hubLoading = ref(false)
 const feedbackMessage = ref('')
+const activeDiscussion = ref(null)
+const discussionComments = ref([])
+const discussionCommentDraft = ref('')
+const discussionLoading = ref(false)
+const activeGroup = ref(null)
+const groupPosts = ref([])
+const groupPostDraft = ref('')
+const groupCommentDrafts = ref({})
+const groupLoading = ref(false)
+const notifications = ref([])
+
+const reportForm = ref({
+  reportable_type: 'discussion',
+  reportable_id: null,
+  reason: '',
+  details: '',
+})
 
 const discussionForm = ref({
   title: '',
@@ -263,6 +438,23 @@ const runSearch = async () => {
   }
 }
 
+const loadDiscussionThread = async (discussionId) => {
+  discussionLoading.value = true
+  try {
+    const { data } = await api.get(`/community/discussions/${discussionId}`)
+    const payload = data?.data || null
+    activeDiscussion.value = payload
+    discussionComments.value = payload?.comments || []
+    feedbackMessage.value = ''
+  } catch (error) {
+    activeDiscussion.value = null
+    discussionComments.value = []
+    handleActionError(error, 'Unable to load discussion thread right now.')
+  } finally {
+    discussionLoading.value = false
+  }
+}
+
 const handleActionError = (error, fallbackMessage) => {
   const status = error?.response?.status
   if (status === 401 || status === 403) {
@@ -321,6 +513,85 @@ const shareDiscussion = async (discussionId) => {
 
 const openDiscussion = (discussionId) => {
   router.push({ path: '/community', query: { discussion: discussionId } })
+  loadDiscussionThread(discussionId)
+}
+
+const submitDiscussionComment = async () => {
+  if (!activeDiscussion.value?.id) return
+  if (!discussionCommentDraft.value.trim()) {
+    feedbackMessage.value = 'Comment content is required.'
+    return
+  }
+
+  try {
+    await api.post(`/community/discussions/${activeDiscussion.value.id}/comments`, {
+      content: discussionCommentDraft.value.trim(),
+    })
+    discussionCommentDraft.value = ''
+    feedbackMessage.value = 'Comment posted successfully.'
+    await Promise.all([loadDiscussionThread(activeDiscussion.value.id), loadHub()])
+  } catch (error) {
+    handleActionError(error, 'Unable to post comment right now.')
+  }
+}
+
+const openGroup = async (groupId) => {
+  groupLoading.value = true
+  try {
+    const { data } = await api.get(`/community/groups/${groupId}`)
+    const payload = data?.data || null
+    activeGroup.value = payload
+    groupPosts.value = payload?.posts || []
+    feedbackMessage.value = ''
+
+    router.push({ path: '/community', query: { ...route.query, group: groupId } })
+  } catch (error) {
+    activeGroup.value = null
+    groupPosts.value = []
+    handleActionError(error, 'Unable to load group right now.')
+  } finally {
+    groupLoading.value = false
+  }
+}
+
+const publishGroupPost = async () => {
+  if (!activeGroup.value?.id) return
+  if (!groupPostDraft.value.trim()) {
+    feedbackMessage.value = 'Post content is required.'
+    return
+  }
+
+  try {
+    await api.post(`/community/groups/${activeGroup.value.id}/posts`, {
+      content: groupPostDraft.value.trim(),
+      image_url: null,
+    })
+    groupPostDraft.value = ''
+    feedbackMessage.value = 'Group post published successfully.'
+    await Promise.all([openGroup(activeGroup.value.id), loadHub()])
+  } catch (error) {
+    handleActionError(error, 'Unable to publish group post right now.')
+  }
+}
+
+const commentOnGroupPost = async (postId) => {
+  if (!activeGroup.value?.id) return
+  const draft = groupCommentDrafts.value[postId]?.trim()
+  if (!draft) {
+    feedbackMessage.value = 'Comment content is required.'
+    return
+  }
+
+  try {
+    await api.post(`/community/group-posts/${postId}/comments`, {
+      content: draft,
+    })
+    groupCommentDrafts.value = { ...groupCommentDrafts.value, [postId]: '' }
+    feedbackMessage.value = 'Comment posted successfully.'
+    await openGroup(activeGroup.value.id)
+  } catch (error) {
+    handleActionError(error, 'Unable to post comment right now.')
+  }
 }
 
 const createGroup = async () => {
@@ -361,9 +632,65 @@ const requestMentorship = async (mentorUserId) => {
   }
 }
 
+const loadNotifications = async () => {
+  try {
+    const { data } = await api.get('/community/notifications', { params: { per_page: 10 } })
+    notifications.value = data?.data?.data || []
+  } catch (error) {
+    notifications.value = []
+    handleActionError(error, 'Unable to load notifications right now.')
+  }
+}
+
+const markNotificationRead = async (notificationId) => {
+  try {
+    await api.post(`/community/notifications/${notificationId}/read`)
+    notifications.value = notifications.value.map(note =>
+      note.id === notificationId ? { ...note, read_at: note.read_at || new Date().toISOString() } : note
+    )
+  } catch (error) {
+    handleActionError(error, 'Unable to mark notification as read right now.')
+  }
+}
+
+const submitReport = async () => {
+  if (!reportForm.value.reportable_id || !reportForm.value.reason?.trim()) {
+    feedbackMessage.value = 'Report content ID and reason are required.'
+    return
+  }
+
+  try {
+    await api.post('/community/reports', {
+      reportable_type: reportForm.value.reportable_type,
+      reportable_id: Number(reportForm.value.reportable_id),
+      reason: reportForm.value.reason.trim(),
+      details: reportForm.value.details?.trim() || null,
+    })
+
+    reportForm.value = {
+      reportable_type: 'discussion',
+      reportable_id: null,
+      reason: '',
+      details: '',
+    }
+    feedbackMessage.value = 'Content report submitted successfully.'
+  } catch (error) {
+    handleActionError(error, 'Unable to submit report right now.')
+  }
+}
+
 onMounted(async () => {
   try {
     await loadHub()
+    const discussionId = Number(route.query.discussion)
+    const groupId = Number(route.query.group)
+    if (!Number.isNaN(discussionId) && discussionId > 0) {
+      await loadDiscussionThread(discussionId)
+    }
+    if (!Number.isNaN(groupId) && groupId > 0) {
+      await openGroup(groupId)
+    }
+    await loadNotifications()
   } catch (error) {
     console.error('Failed to load community hub', error)
   }
