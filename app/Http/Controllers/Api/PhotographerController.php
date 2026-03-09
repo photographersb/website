@@ -9,7 +9,13 @@ use App\Models\EventRsvp;
 use App\Models\PhotographerStats;
 use App\Models\Inquiry;
 use App\Models\CompetitionSubmission;
+use App\Models\Certificate;
 use App\Models\SubmissionShareFrame;
+use App\Models\Referral;
+use App\Models\ReferralReward;
+use App\Models\CommunityUserBadge;
+use App\Models\LearningEnrollment;
+use App\Models\LearningInstructorProfile;
 use App\Rules\SocialMediaUrl;
 use App\Http\Requests\StorePhotographerRequest;
 use App\Http\Traits\ApiResponse;
@@ -222,6 +228,31 @@ class PhotographerController extends Controller
                 ->count('competition_id')
             : 0;
         $photographerData['awards_won'] = $photographer->awards->count();
+
+        $certifications = Certificate::query()
+            ->where('status', 'issued')
+            ->where(function ($query) use ($photographer) {
+                $query->where('user_id', $photographer->user_id)
+                    ->orWhere('issued_to_user_id', $photographer->user_id);
+            })
+            ->with(['event:id,title', 'competition:id,title', 'template:id,title'])
+            ->latest('issued_at')
+            ->limit(20)
+            ->get()
+            ->map(function (Certificate $certificate) {
+                return [
+                    'id' => $certificate->id,
+                    'title' => $certificate->template?->title ?? 'Certificate',
+                    'issuing_event' => $certificate->event?->title ?? $certificate->competition?->title,
+                    'year' => ($certificate->issued_at ?? $certificate->issue_date)?->format('Y'),
+                    'verification_badge' => $certificate->isValid(),
+                    'verification_url' => route('certificate.verify', $certificate->certificate_code),
+                    'preview_url' => $certificate->png_path ? Storage::url($certificate->png_path) : null,
+                ];
+            });
+
+        $photographerData['certifications'] = $certifications;
+        $photographerData['awards_won'] = $photographerData['awards_won'] + $certifications->count();
         
         // Add stats and achievement data
         $photographerData['stats'] = $stats;
@@ -231,6 +262,46 @@ class PhotographerController extends Controller
         $photographerData['response_rate'] = $stats ? $stats->response_rate : null;
         $photographerData['average_response_time'] = $stats ? $stats->average_response_time : null;
         $photographerData['portfolio_completeness'] = $stats ? $stats->portfolio_completeness : 0;
+
+            $growthBadges = ReferralReward::query()
+                ->where('user_id', $photographer->user_id)
+                ->where('status', 'achieved')
+                ->orderBy('milestone')
+                ->get(['milestone', 'badge_name', 'achieved_at']);
+
+            $photographerData['growth_badges'] = $growthBadges;
+            $photographerData['community_badges'] = CommunityUserBadge::query()
+                ->where('user_id', $photographer->user_id)
+                ->with('badge:id,name,code,icon')
+                ->latest('awarded_at')
+                ->get(['id', 'badge_id', 'awarded_reason', 'awarded_at']);
+            $photographerData['learning_stats'] = [
+                'active_courses' => LearningEnrollment::query()
+                    ->where('user_id', $photographer->user_id)
+                    ->where('status', 'enrolled')
+                    ->count(),
+                'completed_courses' => LearningEnrollment::query()
+                    ->where('user_id', $photographer->user_id)
+                    ->where('status', 'completed')
+                    ->count(),
+                'certificates_earned' => LearningEnrollment::query()
+                    ->where('user_id', $photographer->user_id)
+                    ->whereNotNull('certificate_id')
+                    ->count(),
+                'instructor_profile' => LearningInstructorProfile::query()
+                    ->where('user_id', $photographer->user_id)
+                    ->where('is_approved', true)
+                    ->first(['id', 'user_id', 'bio', 'expertise', 'student_rating', 'courses_created', 'students_count']),
+            ];
+            $photographerData['referral_summary'] = [
+                'successful_photographer_referrals' => Referral::query()
+                    ->where('referrer_user_id', $photographer->user_id)
+                    ->where('status', 'successful')
+                    ->whereHas('referredUser', function ($query) {
+                        $query->whereIn('role', ['photographer', 'studio_owner', 'studio_photographer']);
+                    })
+                    ->count(),
+            ];
 
         return $this->success($photographerData, 'Photographer profile retrieved successfully');
     }

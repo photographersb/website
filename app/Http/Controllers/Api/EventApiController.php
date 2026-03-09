@@ -193,6 +193,8 @@ class EventApiController extends Controller
                 'google_map_link' => $event->google_map_link,
                 'event_date' => $event->event_date,
                 'event_end_date' => $event->event_end_date,
+                'start_time' => $event->start_time,
+                'end_time' => $event->end_time,
                 'start_datetime' => $event->start_datetime,
                 'end_datetime' => $event->end_datetime,
                 'max_attendees' => $event->max_attendees,

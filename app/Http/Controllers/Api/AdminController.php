@@ -59,8 +59,8 @@ class AdminController extends Controller
         }
 
         try {
-            // Cache dashboard data for 5 minutes
-            $dashboardData = Cache::remember('admin_dashboard_' . Auth::id(), 300, function () {
+            // Cache dashboard data for 1 minute for near-real-time admin visibility
+            $dashboardData = Cache::remember('admin_dashboard_' . Auth::id(), 60, function () {
                 // Overview Statistics
                 $stats = [
                     'total_users' => User::count(),
@@ -74,6 +74,7 @@ class AdminController extends Controller
                     'confirmed_bookings' => DB::table('bookings')->where('status', 'confirmed')->count(),
                     'completed_bookings' => DB::table('bookings')->where('status', 'completed')->count(),
                     'cancelled_bookings' => DB::table('bookings')->where('status', 'cancelled')->count(),
+                    'total_inquiries' => max($this->safeCount('contact_messages'), $this->safeCount('inquiries')),
                     'total_revenue' => DB::table('transactions')->where('status', 'completed')->sum('amount') ?? 0,
                     'monthly_revenue' => DB::table('transactions')->where('status', 'completed')
                         ->where('created_at', '>=', now()->startOfMonth())
@@ -87,7 +88,9 @@ class AdminController extends Controller
                         ->where('status', 'published')
                         ->where('event_date', '>=', now())
                         ->count(),
+                    'active_events' => DB::table('events')->where('status', 'published')->count(),
                     'active_competitions' => Competition::where('status', 'active')->count(),
+                    'running_competitions' => Competition::where('status', 'active')->count(),
                     'total_competitions' => Competition::count(),
                     'total_submissions' => CompetitionSubmission::count(),
                     'pending_submissions' => CompetitionSubmission::where('status', 'pending_review')->count(),
@@ -173,6 +176,10 @@ class AdminController extends Controller
 
                 // Recent Activity Logs (safe with error handling)
                 $recentActivityLogs = $this->getSafeActivityLogs() ?? [];
+                $activityFeed = $this->getDashboardActivityFeed();
+                $systemHealthPanel = $this->getDashboardHealthPanel();
+                $errorCenterPreview = $this->getDashboardErrorPreview();
+                $noticeSummary = $this->getDashboardNoticeSummary();
 
                 // Platform Health
                 $platformHealth = [
@@ -307,6 +314,15 @@ class AdminController extends Controller
                     'top_photographers' => $topPhotographers,
                     'top_photographers_by_bookings' => $topPhotographersByBookings,
                     'recent_activity_logs' => $recentActivityLogs,
+                    'activity_feed' => $activityFeed,
+                    'system_health_panel' => $systemHealthPanel,
+                    'error_center_preview' => $errorCenterPreview,
+                    'notice_summary' => $noticeSummary,
+                    'current_user' => [
+                        'id' => Auth::id(),
+                        'name' => Auth::user()?->name,
+                        'role' => Auth::user()?->role,
+                    ],
                     'platform_health' => $platformHealth,
                     'recent_competitions' => $recentCompetitions,
                     'visitor_analytics' => $visitorAnalytics,
@@ -326,8 +342,11 @@ class AdminController extends Controller
                     'total_users' => User::count(),
                     'total_photographers' => Photographer::count(),
                     'total_bookings' => DB::table('bookings')->count(),
+                    'total_inquiries' => max($this->safeCount('contact_messages'), $this->safeCount('inquiries')),
                     'total_revenue' => DB::table('transactions')->where('status', 'completed')->sum('amount') ?? 0,
                     'total_events' => DB::table('events')->count(),
+                    'active_events' => DB::table('events')->where('status', 'published')->count(),
+                    'running_competitions' => Competition::where('status', 'active')->count(),
                     'total_competitions' => Competition::count(),
                     'total_reviews' => DB::table('reviews')->count(),
                 ],
@@ -341,11 +360,126 @@ class AdminController extends Controller
                 'top_photographers' => [],
                 'top_photographers_by_bookings' => [],
                 'recent_activity_logs' => [],
+                'activity_feed' => [],
+                'system_health_panel' => [],
+                'error_center_preview' => [],
+                'notice_summary' => [
+                    'published' => 0,
+                    'draft' => 0,
+                    'scheduled' => 0,
+                    'recent' => [],
+                ],
+                'current_user' => [
+                    'id' => Auth::id(),
+                    'name' => Auth::user()?->name,
+                    'role' => Auth::user()?->role,
+                ],
                 'platform_health' => ['system_status' => 'operational'],
                 'recent_competitions' => [],
                 'visitor_analytics' => [],
                 'profile_share_leaderboard' => [],
             ], 'Dashboard data retrieved (minimal)');
+        }
+    }
+
+    /**
+     * Admin global search for command center
+     */
+    public function globalSearch(Request $request)
+    {
+        if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'super_admin', 'moderator'])) {
+            return $this->unauthorized('Unauthorized. Admin access required.');
+        }
+
+        $query = trim((string) $request->input('q', ''));
+        if (mb_strlen($query) < 2) {
+            return $this->success(['results' => []], 'Query too short');
+        }
+
+        $limit = max(1, min((int) $request->input('limit', 5), 10));
+
+        try {
+            $users = User::query()
+                ->where(function ($q) use ($query) {
+                    $q->where('name', 'like', "%{$query}%")
+                        ->orWhere('email', 'like', "%{$query}%")
+                        ->orWhere('username', 'like', "%{$query}%");
+                })
+                ->latest('id')
+                ->limit($limit)
+                ->get(['id', 'name', 'email', 'username'])
+                ->map(function ($item) {
+                    return [
+                        'id' => 'user-' . $item->id,
+                        'type' => 'user',
+                        'title' => $item->name,
+                        'subtitle' => $item->email,
+                        'route' => '/admin/users',
+                    ];
+                });
+
+            $photographers = DB::table('photographers')
+                ->join('users', 'photographers.user_id', '=', 'users.id')
+                ->where(function ($q) use ($query) {
+                    $q->where('users.name', 'like', "%{$query}%")
+                        ->orWhere('users.username', 'like', "%{$query}%")
+                        ->orWhere('photographers.slug', 'like', "%{$query}%");
+                })
+                ->orderByDesc('photographers.id')
+                ->limit($limit)
+                ->get(['photographers.id', 'users.name', 'users.username'])
+                ->map(function ($item) {
+                    return [
+                        'id' => 'photographer-' . $item->id,
+                        'type' => 'photographer',
+                        'title' => $item->name,
+                        'subtitle' => '@' . ($item->username ?? 'unknown'),
+                        'route' => '/admin/photographers',
+                    ];
+                });
+
+            $events = DB::table('events')
+                ->where('title', 'like', "%{$query}%")
+                ->orderByDesc('id')
+                ->limit($limit)
+                ->get(['id', 'title'])
+                ->map(function ($item) {
+                    return [
+                        'id' => 'event-' . $item->id,
+                        'type' => 'event',
+                        'title' => $item->title,
+                        'subtitle' => 'Event #' . $item->id,
+                        'route' => '/admin/events/edit/' . $item->id,
+                    ];
+                });
+
+            $competitions = DB::table('competitions')
+                ->where('title', 'like', "%{$query}%")
+                ->orderByDesc('id')
+                ->limit($limit)
+                ->get(['id', 'title'])
+                ->map(function ($item) {
+                    return [
+                        'id' => 'competition-' . $item->id,
+                        'type' => 'competition',
+                        'title' => $item->title,
+                        'subtitle' => 'Competition #' . $item->id,
+                        'route' => '/admin/competitions/' . $item->id . '/edit',
+                    ];
+                });
+
+            $results = collect()
+                ->concat($users)
+                ->concat($photographers)
+                ->concat($events)
+                ->concat($competitions)
+                ->take(24)
+                ->values();
+
+            return $this->success(['results' => $results], 'Search results retrieved successfully');
+        } catch (\Exception $e) {
+            Log::error('Admin global search error', ['error' => $e->getMessage()]);
+            return $this->error('Failed to perform admin search', 500);
         }
     }
 
@@ -362,7 +496,7 @@ class AdminController extends Controller
         } catch (\Throwable $e) {
             $dbStatus = 'unhealthy';
             $dbLatency = 0;
-            \Log::error('Database health check failed: ' . $e->getMessage());
+            Log::error('Database health check failed: ' . $e->getMessage());
         }
 
         return $this->success([
@@ -515,6 +649,245 @@ class AdminController extends Controller
             return $query->count();
         } catch (\Exception $e) {
             return 0;
+        }
+    }
+
+    private function getDashboardActivityFeed()
+    {
+        try {
+            $users = DB::table('users')
+                ->select('id', 'name', 'created_at')
+                ->orderByDesc('created_at')
+                ->limit(8)
+                ->get()
+                ->map(function ($row) {
+                    return [
+                        'id' => 'user-' . $row->id,
+                        'type' => 'user_registration',
+                        'actor' => $row->name ?? 'System',
+                        'action' => 'New user registration',
+                        'route' => '/admin/users',
+                        'timestamp' => $row->created_at,
+                    ];
+                });
+
+            $photographers = DB::table('photographers')
+                ->leftJoin('users', 'photographers.user_id', '=', 'users.id')
+                ->select('photographers.id', 'photographers.created_at', 'users.name')
+                ->orderByDesc('photographers.created_at')
+                ->limit(8)
+                ->get()
+                ->map(function ($row) {
+                    return [
+                        'id' => 'photographer-' . $row->id,
+                        'type' => 'photographer_profile',
+                        'actor' => $row->name ?? 'System',
+                        'action' => 'New photographer profile',
+                        'route' => '/admin/photographers',
+                        'timestamp' => $row->created_at,
+                    ];
+                });
+
+            $eventSubmissions = DB::table('events')
+                ->leftJoin('users', 'events.user_id', '=', 'users.id')
+                ->select('events.id', 'events.title', 'events.created_at', 'users.name')
+                ->orderByDesc('events.created_at')
+                ->limit(8)
+                ->get()
+                ->map(function ($row) {
+                    return [
+                        'id' => 'event-' . $row->id,
+                        'type' => 'event_submission',
+                        'actor' => $row->name ?? 'Organizer',
+                        'action' => 'New event submission: ' . ($row->title ?? ('Event #' . $row->id)),
+                        'route' => '/admin/events/edit/' . $row->id,
+                        'timestamp' => $row->created_at,
+                    ];
+                });
+
+            $competitionSubmissions = DB::table('competition_submissions')
+                ->leftJoin('users', 'competition_submissions.user_id', '=', 'users.id')
+                ->leftJoin('competitions', 'competition_submissions.competition_id', '=', 'competitions.id')
+                ->select('competition_submissions.id', 'competition_submissions.created_at', 'users.name', 'competition_submissions.competition_id', 'competitions.title')
+                ->orderByDesc('competition_submissions.created_at')
+                ->limit(8)
+                ->get()
+                ->map(function ($row) {
+                    return [
+                        'id' => 'competition-submission-' . $row->id,
+                        'type' => 'competition_submission',
+                        'actor' => $row->name ?? 'Participant',
+                        'action' => 'Competition submission: ' . ($row->title ?? ('Competition #' . $row->competition_id)),
+                        'route' => '/admin/submissions',
+                        'timestamp' => $row->created_at,
+                    ];
+                });
+
+            $reviews = DB::table('reviews')
+                ->leftJoin('users', 'reviews.reviewer_id', '=', 'users.id')
+                ->select('reviews.id', 'reviews.created_at', 'users.name')
+                ->orderByDesc('reviews.created_at')
+                ->limit(8)
+                ->get()
+                ->map(function ($row) {
+                    return [
+                        'id' => 'review-' . $row->id,
+                        'type' => 'review_created',
+                        'actor' => $row->name ?? 'Reviewer',
+                        'action' => 'New review submitted',
+                        'route' => '/admin/reviews',
+                        'timestamp' => $row->created_at,
+                    ];
+                });
+
+            $bookings = DB::table('bookings')
+                ->leftJoin('users', 'bookings.client_id', '=', 'users.id')
+                ->select('bookings.id', 'bookings.created_at', 'users.name')
+                ->orderByDesc('bookings.created_at')
+                ->limit(8)
+                ->get()
+                ->map(function ($row) {
+                    return [
+                        'id' => 'booking-' . $row->id,
+                        'type' => 'booking_created',
+                        'actor' => $row->name ?? 'Client',
+                        'action' => 'New booking created',
+                        'route' => '/admin/bookings',
+                        'timestamp' => $row->created_at,
+                    ];
+                });
+
+            return collect()
+                ->concat($users)
+                ->concat($photographers)
+                ->concat($eventSubmissions)
+                ->concat($competitionSubmissions)
+                ->concat($reviews)
+                ->concat($bookings)
+                ->sortByDesc(function ($item) {
+                    return strtotime((string) $item['timestamp']);
+                })
+                ->take(40)
+                ->map(function ($item) {
+                    $timestamp = $item['timestamp'] ? \Carbon\Carbon::parse($item['timestamp']) : now();
+                    return array_merge($item, [
+                        'timestamp' => $timestamp->toIso8601String(),
+                        'time_ago' => $timestamp->diffForHumans(),
+                    ]);
+                })
+                ->values()
+                ->all();
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    private function getDashboardHealthPanel()
+    {
+        $checks = [];
+
+        try {
+            DB::connection()->getPdo();
+            $checks[] = ['key' => 'database', 'label' => 'Database', 'status' => 'green', 'message' => 'Connected'];
+        } catch (\Exception $e) {
+            $checks[] = ['key' => 'database', 'label' => 'Database', 'status' => 'red', 'message' => 'Connection failed'];
+        }
+
+        try {
+            Cache::put('dashboard_health_probe', 'ok', 60);
+            $cacheOk = Cache::get('dashboard_health_probe') === 'ok';
+            $checks[] = ['key' => 'cache', 'label' => 'Cache', 'status' => $cacheOk ? 'green' : 'yellow', 'message' => $cacheOk ? 'Operational' : 'Degraded'];
+        } catch (\Exception $e) {
+            $checks[] = ['key' => 'cache', 'label' => 'Cache', 'status' => 'red', 'message' => 'Unavailable'];
+        }
+
+        $pendingJobs = $this->safeCount('jobs');
+        $failedJobs = $this->safeCount('failed_jobs');
+        $checks[] = [
+            'key' => 'queue',
+            'label' => 'Queue',
+            'status' => $failedJobs > 5 ? 'red' : ($failedJobs > 0 ? 'yellow' : 'green'),
+            'message' => $failedJobs > 0 ? "{$failedJobs} failed / {$pendingJobs} pending" : "{$pendingJobs} pending",
+        ];
+
+        $freeStorage = @disk_free_space(storage_path());
+        $totalStorage = @disk_total_space(storage_path());
+        $freeRatio = ($freeStorage !== false && $totalStorage) ? ($freeStorage / $totalStorage) : null;
+        $checks[] = [
+            'key' => 'storage',
+            'label' => 'Storage',
+            'status' => is_null($freeRatio) ? 'yellow' : ($freeRatio < 0.1 ? 'red' : ($freeRatio < 0.2 ? 'yellow' : 'green')),
+            'message' => is_null($freeRatio) ? 'Unknown' : round($freeRatio * 100, 1) . '% free',
+        ];
+
+        $checks[] = ['key' => 'server', 'label' => 'Server', 'status' => 'green', 'message' => 'Operational'];
+
+        return $checks;
+    }
+
+    private function getDashboardErrorPreview()
+    {
+        try {
+            return DB::table('error_logs')
+                ->select('id', 'message', 'url', 'severity', 'last_occurrence_at', 'is_resolved')
+                ->orderByDesc('last_occurrence_at')
+                ->limit(10)
+                ->get()
+                ->map(function ($error) {
+                    return [
+                        'id' => $error->id,
+                        'message' => $error->message,
+                        'route' => $error->url,
+                        'severity' => $error->severity,
+                        'is_resolved' => (bool) $error->is_resolved,
+                        'timestamp' => optional($error->last_occurrence_at)->toIso8601String(),
+                    ];
+                })
+                ->values()
+                ->all();
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    private function getDashboardNoticeSummary()
+    {
+        try {
+            $published = DB::table('notices')->where('status', 'published')->count();
+            $draft = DB::table('notices')->where('status', 'draft')->count();
+            $scheduled = DB::table('notices')->whereNotNull('publish_at')->where('publish_at', '>', now())->count();
+
+            $recent = DB::table('notices')
+                ->select('id', 'title', 'priority', 'status', 'publish_at', 'created_at')
+                ->orderByDesc('created_at')
+                ->limit(6)
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'title' => $item->title,
+                        'priority' => $item->priority,
+                        'status' => $item->status,
+                        'publish_at' => $item->publish_at,
+                        'created_at' => $item->created_at,
+                    ];
+                })
+                ->values()
+                ->all();
+
+            return [
+                'published' => $published,
+                'draft' => $draft,
+                'scheduled' => $scheduled,
+                'recent' => $recent,
+            ];
+        } catch (\Exception $e) {
+            return [
+                'published' => 0,
+                'draft' => 0,
+                'scheduled' => 0,
+                'recent' => [],
+            ];
         }
     }
 
@@ -1702,7 +2075,7 @@ class AdminController extends Controller
         try {
             return $callback() ?? 0;
         } catch (\Throwable $e) {
-            \Log::warning('Dashboard query failed: ' . $e->getMessage());
+            Log::warning('Dashboard query failed: ' . $e->getMessage());
             return 0;
         }
     }

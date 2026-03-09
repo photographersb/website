@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Models\EventRsvp;
+use App\Services\CertificateAutomationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,10 @@ use Illuminate\Support\Facades\Schema;
 
 class EventCheckInController extends Controller
 {
+    public function __construct(protected CertificateAutomationService $certificateAutomationService)
+    {
+    }
+
     private function useRegistrationTable(Event $event): bool
     {
         if (!Schema::hasTable('event_registrations')) {
@@ -117,6 +122,10 @@ class EventCheckInController extends Controller
                 }
 
                 $registration->markAsAttended(Auth::id());
+
+                if ($event->certificates_enabled && $registration->user) {
+                    $this->certificateAutomationService->issueForEventAttendance($event, $registration->user);
+                }
 
                 return response()->json([
                     'success' => true,
@@ -223,6 +232,10 @@ class EventCheckInController extends Controller
                     }
 
                     $registration->markAsAttended(Auth::id());
+
+                    if ($event->certificates_enabled && $registration->user) {
+                        $this->certificateAutomationService->issueForEventAttendance($event, $registration->user);
+                    }
 
                     return response()->json([
                         'message' => 'Check-in successful',

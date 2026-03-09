@@ -27,7 +27,7 @@ class PlatformSettingsSeeder extends Seeder
 
             // Analytics & Tracking
             ['key' => 'ga4_measurement_id', 'value' => '', 'group' => 'tracking', 'data_type' => 'string', 'description' => 'Google Analytics 4 Measurement ID (G-XXXXXXX)', 'is_public' => false],
-            ['key' => 'gtag_id', 'value' => '', 'group' => 'tracking', 'data_type' => 'string', 'description' => 'Google Tag Manager ID (GTM-XXXXXXX)', 'group' => 'tracking', 'data_type' => 'string', 'is_public' => false],
+            ['key' => 'gtag_id', 'value' => '', 'group' => 'tracking', 'data_type' => 'string', 'description' => 'Google Tag Manager ID (GTM-XXXXXXX)', 'is_public' => false],
             ['key' => 'fb_pixel_id', 'value' => '', 'group' => 'tracking', 'data_type' => 'string', 'description' => 'Facebook Pixel ID', 'is_public' => false],
             ['key' => 'enable_analytics', 'value' => '1', 'group' => 'tracking', 'data_type' => 'boolean', 'description' => 'Enable analytics tracking', 'is_public' => false],
 

@@ -89,9 +89,9 @@ trait ApiResponse
     /**
      * Return a paginated response
      */
-    public function paginated($data, $message = 'Success')
+    public function paginated($data, $message = 'Success', $code = 200, $meta = null)
     {
-        return response()->json([
+        $response = [
             'status' => 'success',
             'message' => $message,
             'data' => $data->items(),
@@ -101,6 +101,12 @@ trait ApiResponse
                 'current_page' => $data->currentPage(),
                 'last_page' => $data->lastPage(),
             ],
-        ], 200);
+        ];
+
+        if ($meta && is_array($meta)) {
+            $response['meta'] = isset($meta['meta']) ? $meta['meta'] : $meta;
+        }
+
+        return response()->json($response, $code);
     }
 }

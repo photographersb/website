@@ -10,8 +10,10 @@ use App\Models\Photographer;
 use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Services\GrowthService;
 
 class AuthController extends Controller
 {
@@ -28,6 +30,7 @@ class AuthController extends Controller
             'phone' => 'required|unique:users',
             'role' => 'required|in:client,photographer,studio_owner',
             'accept_terms' => 'accepted',
+            'referral_code' => 'nullable|string|max:64',
         ]);
 
         $user = User::create([
@@ -61,9 +64,18 @@ class AuthController extends Controller
             // Continue registration even if email fails
         }
 
+        GrowthService::attachReferralOnRegistration(
+            $user,
+            $validated['referral_code'] ?? null,
+            $request->ip()
+        );
+
+        $referralCode = GrowthService::ensureReferralCode($user);
+
         return $this->created([
             'user_id' => $user->id,
             'email' => $user->email,
+            'referral_code' => $referralCode,
         ], 'Registration successful. Please check your email to verify your account.');
     }
 
@@ -93,6 +105,9 @@ class AuthController extends Controller
 
         // Get authenticated user
         $user = Auth::user();
+        if (!$user instanceof User) {
+            return $this->unauthorized('Authentication failed');
+        }
 
         // Check if email is verified (allow approved users to proceed)
         if (!$user->hasVerifiedEmail() && $user->role !== 'super_admin' && $user->approval_status !== 'approved') {
@@ -195,6 +210,7 @@ class AuthController extends Controller
         }
 
         $user->markEmailAsVerified();
+        GrowthService::finalizeReferral($user);
 
         return $this->success([], 'Email verified successfully. You can now log in.');
     }
@@ -231,7 +247,18 @@ class AuthController extends Controller
             'email' => 'required|email|exists:users',
         ]);
 
-        // TODO: Generate reset token and send email
+        $status = Password::sendResetLink([
+            'email' => $validated['email'],
+        ]);
+
+        if ($status !== Password::RESET_LINK_SENT) {
+            Log::warning('Failed to send password reset link', [
+                'email' => $validated['email'],
+                'status' => $status,
+            ]);
+
+            return $this->error('Unable to send password reset link at this time', 500);
+        }
 
         return $this->success([], 'Password reset link sent to email');
     }
@@ -247,10 +274,28 @@ class AuthController extends Controller
             'password' => 'required|min:8|confirmed',
         ]);
 
-        // TODO: Verify reset token
+        $status = Password::reset(
+            [
+                'email' => $validated['email'],
+                'password' => $validated['password'],
+                'password_confirmation' => $request->input('password_confirmation'),
+                'token' => $validated['token'],
+            ],
+            function (User $user, string $password): void {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                    'remember_token' => Str::random(60),
+                ])->save();
 
-        $user = User::where('email', $validated['email'])->first();
-        $user->update(['password' => Hash::make($validated['password'])]);
+                $user->tokens()->delete();
+            }
+        );
+
+        if ($status !== Password::PASSWORD_RESET) {
+            return $this->validationError([
+                'token' => ['Invalid or expired password reset token'],
+            ], 'Invalid or expired password reset token');
+        }
 
         return $this->success([], 'Password reset successfully');
     }
@@ -310,9 +355,11 @@ class AuthController extends Controller
         if (Auth::check()) {
             // If user is logged in, mark their phone as verified
             $user = Auth::user();
+            if ($user instanceof User) {
             $user->update([
                 'phone_verified_at' => now(),
             ]);
+            }
         } else {
             // Find user by phone
             $user = User::where('phone', $phone)->first();

@@ -20,6 +20,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'username',
         'email',
         'phone',
+        'referral_code',
         'password',
         'role',
         'email_verified_at',
@@ -149,9 +150,104 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(UserVerification::class);
     }
 
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class, 'user_id');
+    }
+
+    public function referralsMade()
+    {
+        return $this->hasMany(Referral::class, 'referrer_user_id');
+    }
+
+    public function referralReceived()
+    {
+        return $this->hasOne(Referral::class, 'referred_user_id');
+    }
+
+    public function referralRewards()
+    {
+        return $this->hasMany(ReferralReward::class);
+    }
+
+    public function shareLogs()
+    {
+        return $this->hasMany(ShareLog::class);
+    }
+
     public function verificationRequests()
     {
         return $this->hasMany(VerificationRequest::class);
+    }
+
+    public function communityDiscussions()
+    {
+        return $this->hasMany(CommunityDiscussion::class);
+    }
+
+    public function communityDiscussionComments()
+    {
+        return $this->hasMany(CommunityDiscussionComment::class);
+    }
+
+    public function communityGroupsCreated()
+    {
+        return $this->hasMany(CommunityGroup::class, 'created_by');
+    }
+
+    public function communityGroupMemberships()
+    {
+        return $this->hasMany(CommunityGroupMember::class, 'user_id');
+    }
+
+    public function communityMentorshipProfile()
+    {
+        return $this->hasOne(CommunityMentorshipProfile::class, 'user_id');
+    }
+
+    public function communityMentorshipRequestsReceived()
+    {
+        return $this->hasMany(CommunityMentorshipRequest::class, 'mentor_user_id');
+    }
+
+    public function communityMentorshipRequestsSent()
+    {
+        return $this->hasMany(CommunityMentorshipRequest::class, 'requester_user_id');
+    }
+
+    public function communityBadges()
+    {
+        return $this->hasMany(CommunityUserBadge::class, 'user_id');
+    }
+
+    public function communityNotifications()
+    {
+        return $this->hasMany(CommunityNotification::class, 'user_id');
+    }
+
+    public function learningInstructorProfile()
+    {
+        return $this->hasOne(LearningInstructorProfile::class, 'user_id');
+    }
+
+    public function learningCourses()
+    {
+        return $this->hasMany(LearningCourse::class, 'instructor_user_id');
+    }
+
+    public function learningEnrollments()
+    {
+        return $this->hasMany(LearningEnrollment::class, 'user_id');
+    }
+
+    public function learningLessonProgress()
+    {
+        return $this->hasMany(LearningLessonProgress::class, 'user_id');
+    }
+
+    public function learningCourseReviews()
+    {
+        return $this->hasMany(LearningCourseReview::class, 'user_id');
     }
 
     // Scopes

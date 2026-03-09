@@ -122,21 +122,37 @@ class Photographer extends Model
     private function buildProfilePictureUrl(?string $value, bool $withFallback): ?string
     {
         if (!$value) {
-            return $withFallback ? asset('images/default-avatar.png') : null;
+            return $withFallback ? asset('images/placeholder.svg') : null;
         }
 
         $value = trim($value);
         if ($value === '') {
-            return $withFallback ? asset('images/default-avatar.png') : null;
+            return $withFallback ? asset('images/placeholder.svg') : null;
         }
 
-        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, 'data:')) {
+        if (str_starts_with($value, 'data:')) {
+            return $value;
+        }
+
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+            $urlPath = parse_url($value, PHP_URL_PATH);
+            if (is_string($urlPath)) {
+                $normalizedPath = ltrim($urlPath, '/');
+                if (str_starts_with($normalizedPath, 'storage/')) {
+                    return asset($normalizedPath);
+                }
+            }
+
             return $value;
         }
 
         $trimmed = ltrim($value, '/');
         if (str_starts_with($trimmed, 'storage/')) {
             return asset($trimmed);
+        }
+
+        if (str_starts_with($trimmed, 'public/')) {
+            $trimmed = substr($trimmed, strlen('public/'));
         }
 
         return asset('storage/' . $trimmed);

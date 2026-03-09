@@ -48,6 +48,13 @@ use App\Http\Controllers\Api\VerificationController;
 use App\Http\Controllers\Api\SitemapController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\ContactController;
+use App\Http\Controllers\Api\DiscoverController;
+use App\Http\Controllers\Api\GrowthController;
+use App\Http\Controllers\Api\Admin\GrowthDashboardController;
+use App\Http\Controllers\Api\CommunityController;
+use App\Http\Controllers\Api\Admin\CommunityModerationController;
+use App\Http\Controllers\Api\LearningController;
+use App\Http\Controllers\Api\Admin\LearningAdminController;
 use App\Http\Controllers\Api\PhotographerSettingsController;
 use App\Http\Controllers\Api\FeaturedPhotographerPublicController;
 use App\Http\Controllers\Admin\SiteLinkController;
@@ -178,8 +185,45 @@ Route::prefix('v1')->group(function () {
     });
     Route::get('/competitions/{competition}', [CompetitionController::class, 'show']);
 
+    // Discovery APIs
+    Route::middleware('throttle:240,1')->prefix('discover')->group(function () {
+        Route::get('/hub', [DiscoverController::class, 'hub']);
+        Route::get('/search', [DiscoverController::class, 'search']);
+        Route::get('/personalized', [DiscoverController::class, 'personalized']);
+        Route::get('/photographers', [DiscoverController::class, 'photographers']);
+        Route::get('/photos', [DiscoverController::class, 'photos']);
+        Route::get('/events', [DiscoverController::class, 'events']);
+        Route::get('/competitions', [DiscoverController::class, 'competitions']);
+    });
+
     // Public reviews/testimonials
     Route::get('/reviews/featured', [ReviewController::class, 'featured']);
+    Route::get('/growth/top-referrers', [GrowthController::class, 'topReferrers']);
+    Route::get('/growth/leaderboard', [GrowthController::class, 'leaderboard']);
+    Route::get('/growth/share-frame', [GrowthController::class, 'shareFrame']);
+
+    // Community (public)
+    Route::middleware('throttle:180,1')->prefix('community')->group(function () {
+        Route::get('/hub', [CommunityController::class, 'hub']);
+        Route::get('/discussions', [CommunityController::class, 'discussions']);
+        Route::get('/discussions/{discussion}', [CommunityController::class, 'showDiscussion']);
+        Route::get('/groups', [CommunityController::class, 'groups']);
+        Route::get('/groups/{group}', [CommunityController::class, 'showGroup']);
+        Route::get('/clubs', [CommunityController::class, 'localClubs']);
+        Route::get('/mentors', [CommunityController::class, 'mentors']);
+        Route::get('/search', [CommunityController::class, 'search']);
+        Route::get('/leaderboard', [CommunityController::class, 'leaderboard']);
+    });
+
+    // Learning (public)
+    Route::middleware('throttle:180,1')->prefix('learn')->group(function () {
+        Route::get('/hub', [LearningController::class, 'hub']);
+        Route::get('/courses', [LearningController::class, 'courses']);
+        Route::get('/courses/{course}', [LearningController::class, 'showCourse']);
+        Route::get('/workshops', [LearningController::class, 'workshops']);
+        Route::get('/instructors', [LearningController::class, 'instructors']);
+        Route::get('/search', [LearningController::class, 'search']);
+    });
     Route::get('/competitions/{competition}/leaderboard', [CompetitionController::class, 'leaderboard']);
     Route::get('/competitions/{competition}/winners', [CompetitionController::class, 'getWinners']);
     Route::get('/competitions/{competition}/full-leaderboard', [CompetitionController::class, 'getLeaderboard']);
@@ -187,7 +231,7 @@ Route::prefix('v1')->group(function () {
     // Public competition submissions (gallery)
     Route::get('/competitions/{competition}/submissions', [CompetitionSubmissionController::class, 'index']);
     Route::get('/competitions/{competition}/submissions/{submission}', [CompetitionSubmissionController::class, 'show']);
-    Route::post('/pexels/import', [CompetitionSubmissionController::class, 'importPexelsImage'])
+    Route::match(['get', 'post'], '/pexels/import', [CompetitionSubmissionController::class, 'importPexelsImage'])
         ->middleware('throttle:10,1');
     
     // Public competition voting stats
@@ -218,7 +262,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/contact', [ContactController::class, 'contact'])
         ->middleware('throttle:5,1');
 
-    // Certificate download (public access for certificate holders)
+    // Certificate download (legacy public endpoints)
     Route::get('/certificates/{certificate_id}/download', [CompetitionController::class, 'downloadCertificate']);
     Route::get('/certificates/{certificate_id}', [CompetitionController::class, 'getCertificateDetails']);
 
@@ -248,9 +292,49 @@ Route::prefix('v1')->group(function () {
         // Social Authentication Protected Routes
         Route::post('/auth/link-social-account', [\App\Http\Controllers\Api\SocialAuthController::class, 'linkAccount'])
             ->middleware('throttle:5,60');
+
+        // Authenticated Certificate Access
+        Route::get('/my-certificates', [\App\Http\Controllers\Api\CertificateAccessController::class, 'indexMine']);
+        Route::get('/my-certificates/{certificate}/download/{format?}', [\App\Http\Controllers\Api\CertificateAccessController::class, 'downloadMine']);
+        Route::get('/my-certificates/{certificate}/share/{size}', [\App\Http\Controllers\Api\CertificateAccessController::class, 'shareImage']);
         Route::post('/auth/unlink-social-account', [\App\Http\Controllers\Api\SocialAuthController::class, 'unlinkAccount'])
             ->middleware('throttle:5,60');
         Route::get('/auth/linked-accounts', [\App\Http\Controllers\Api\SocialAuthController::class, 'getLinkedAccounts']);
+
+        // Growth engine endpoints
+        Route::get('/growth/my-referrals', [GrowthController::class, 'myReferrals']);
+        Route::post('/growth/share-log', [GrowthController::class, 'logShare'])->middleware('throttle:180,1');
+        Route::post('/growth/invite-email', [GrowthController::class, 'inviteByEmail'])->middleware('throttle:20,60');
+
+        // Community (authenticated)
+        Route::prefix('community')->group(function () {
+            Route::post('/discussions', [CommunityController::class, 'storeDiscussion'])->middleware('throttle:20,10');
+            Route::post('/discussions/{discussion}/comments', [CommunityController::class, 'commentDiscussion'])->middleware('throttle:40,10');
+            Route::post('/discussions/{discussion}/like', [CommunityController::class, 'toggleDiscussionLike'])->middleware('throttle:60,10');
+            Route::post('/discussions/{discussion}/share', [CommunityController::class, 'logDiscussionShare'])->middleware('throttle:60,10');
+
+            Route::post('/groups', [CommunityController::class, 'storeGroup'])->middleware('throttle:10,10');
+            Route::post('/groups/{group}/join', [CommunityController::class, 'joinGroup'])->middleware('throttle:30,10');
+            Route::post('/groups/{group}/posts', [CommunityController::class, 'storeGroupPost'])->middleware('throttle:30,10');
+            Route::post('/group-posts/{post}/comments', [CommunityController::class, 'commentGroupPost'])->middleware('throttle:40,10');
+
+            Route::post('/mentors/profile', [CommunityController::class, 'upsertMentorProfile'])->middleware('throttle:10,10');
+            Route::post('/mentors/{mentorUser}/request', [CommunityController::class, 'requestMentorship'])->middleware('throttle:20,10');
+
+            Route::post('/reports', [CommunityController::class, 'reportContent'])->middleware('throttle:25,10');
+            Route::get('/notifications', [CommunityController::class, 'notifications']);
+            Route::post('/notifications/{notification}/read', [CommunityController::class, 'markNotificationRead']);
+        });
+
+        // Learning (authenticated)
+        Route::prefix('learn')->group(function () {
+            Route::post('/courses/{course}/enroll', [LearningController::class, 'enroll'])->middleware('throttle:30,10');
+            Route::get('/dashboard', [LearningController::class, 'myDashboard']);
+            Route::post('/courses/{course}/lessons/{lesson}/progress', [LearningController::class, 'trackLessonProgress'])->middleware('throttle:120,10');
+            Route::post('/courses/{course}/reviews', [LearningController::class, 'submitReview'])->middleware('throttle:25,10');
+            Route::post('/instructor/profile', [LearningController::class, 'upsertInstructorProfile'])->middleware('throttle:20,10');
+            Route::get('/instructor/profile', [LearningController::class, 'myInstructorProfile']);
+        });
 
         // Bookings
         Route::post('/bookings/inquiry', [BookingController::class, 'createInquiry'])->middleware('throttle:10,1');
@@ -492,11 +576,25 @@ Route::prefix('v1')->group(function () {
 
         // Admin Routes
         Route::prefix('admin')->middleware('role:admin,super_admin,moderator')->group(function () {
+            Route::get('/growth/dashboard', [GrowthDashboardController::class, 'overview']);
+            Route::get('/community/moderation/discussions', [CommunityModerationController::class, 'discussions']);
+            Route::get('/community/moderation/reports', [CommunityModerationController::class, 'reports']);
+            Route::post('/community/moderation/reports/{report}/resolve', [CommunityModerationController::class, 'resolveReport']);
+            Route::post('/community/moderation/feature/discussions/{discussion}', [CommunityModerationController::class, 'featureDiscussion']);
+            Route::post('/community/moderation/ban-user/{user}', [CommunityModerationController::class, 'banUser']);
+            Route::get('/learning/overview', [LearningAdminController::class, 'overview']);
+            Route::get('/learning/courses', [LearningAdminController::class, 'courses']);
+            Route::post('/learning/courses/{course}/status', [LearningAdminController::class, 'updateCourseStatus']);
+            Route::get('/learning/instructors', [LearningAdminController::class, 'instructors']);
+            Route::post('/learning/instructors/{profile}/approval', [LearningAdminController::class, 'approveInstructor']);
+            Route::get('/learning/reviews', [LearningAdminController::class, 'reviews']);
+            Route::post('/learning/reviews/{review}/status', [LearningAdminController::class, 'updateReviewStatus']);
             // Media Uploads
             Route::post('/media/upload', [\App\Http\Controllers\Api\Admin\MediaUploadController::class, 'upload']);
 
             // Dashboard
             Route::get('/dashboard', [AdminController::class, 'dashboard']);
+            Route::get('/global-search', [AdminController::class, 'globalSearch']);
             Route::get('/analytics', [AdminController::class, 'analytics']);
             Route::get('/health', [AdminController::class, 'health']);
             Route::get('/system-health', [AdminController::class, 'systemHealth']);
@@ -749,6 +847,14 @@ Route::prefix('v1')->group(function () {
 
             // Certificates (Admin)
             Route::get('/certificates', [\App\Http\Controllers\Api\Admin\CertificateController::class, 'index']);
+            Route::get('/certificates/options', [\App\Http\Controllers\Api\Admin\CertificateController::class, 'options']);
+            Route::post('/certificates/manual-issue', [\App\Http\Controllers\Api\Admin\CertificateController::class, 'issueManually']);
+            Route::post('/certificates/auto-issue', [\App\Http\Controllers\Api\Admin\CertificateController::class, 'autoIssue']);
+            Route::get('/certificate-automation-rules', [\App\Http\Controllers\Api\Admin\CertificateAutomationRuleController::class, 'index']);
+            Route::post('/certificate-automation-rules', [\App\Http\Controllers\Api\Admin\CertificateAutomationRuleController::class, 'store']);
+            Route::put('/certificate-automation-rules/{rule}', [\App\Http\Controllers\Api\Admin\CertificateAutomationRuleController::class, 'update']);
+            Route::delete('/certificate-automation-rules/{rule}', [\App\Http\Controllers\Api\Admin\CertificateAutomationRuleController::class, 'destroy']);
+            Route::get('/certificates/{certificate}/download', [\App\Http\Controllers\Api\Admin\CertificateController::class, 'download']);
             Route::post('/certificates/{certificate}/regenerate', [\App\Http\Controllers\Api\Admin\CertificateController::class, 'regenerate']);
             
             // Notice Management
@@ -854,5 +960,39 @@ Route::prefix('v1')->group(function () {
         Route::get('/notices/my-notices', [\App\Http\Controllers\Api\Admin\NoticeController::class, 'getMyNotices']);
         Route::post('/notices/{id}/read', [\App\Http\Controllers\Api\Admin\NoticeController::class, 'markAsRead']);
     });
+});
+
+// Discovery APIs (non-versioned alias)
+Route::middleware('throttle:240,1')->prefix('discover')->group(function () {
+    Route::get('/hub', [DiscoverController::class, 'hub']);
+    Route::get('/search', [DiscoverController::class, 'search']);
+    Route::get('/personalized', [DiscoverController::class, 'personalized']);
+    Route::get('/photographers', [DiscoverController::class, 'photographers']);
+    Route::get('/photos', [DiscoverController::class, 'photos']);
+    Route::get('/events', [DiscoverController::class, 'events']);
+    Route::get('/competitions', [DiscoverController::class, 'competitions']);
+});
+
+// Community APIs (non-versioned alias)
+Route::middleware('throttle:180,1')->prefix('community')->group(function () {
+    Route::get('/hub', [CommunityController::class, 'hub']);
+    Route::get('/discussions', [CommunityController::class, 'discussions']);
+    Route::get('/discussions/{discussion}', [CommunityController::class, 'showDiscussion']);
+    Route::get('/groups', [CommunityController::class, 'groups']);
+    Route::get('/groups/{group}', [CommunityController::class, 'showGroup']);
+    Route::get('/clubs', [CommunityController::class, 'localClubs']);
+    Route::get('/mentors', [CommunityController::class, 'mentors']);
+    Route::get('/search', [CommunityController::class, 'search']);
+    Route::get('/leaderboard', [CommunityController::class, 'leaderboard']);
+});
+
+// Learning APIs (non-versioned alias)
+Route::middleware('throttle:180,1')->prefix('learn')->group(function () {
+    Route::get('/hub', [LearningController::class, 'hub']);
+    Route::get('/courses', [LearningController::class, 'courses']);
+    Route::get('/courses/{course}', [LearningController::class, 'showCourse']);
+    Route::get('/workshops', [LearningController::class, 'workshops']);
+    Route::get('/instructors', [LearningController::class, 'instructors']);
+    Route::get('/search', [LearningController::class, 'search']);
 });
 

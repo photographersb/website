@@ -238,6 +238,16 @@ class Event extends Model
     }
 
     // Accessors
+    public function getHeroImageUrlAttribute($value)
+    {
+        return $this->normalizeImageUrl($value);
+    }
+
+    public function getBannerImageAttribute($value)
+    {
+        return $this->normalizeImageUrl($value);
+    }
+
     public function getAvailableSeatsAttribute()
     {
         if (!$this->capacity) {
@@ -279,6 +289,49 @@ class Event extends Model
         }
 
         return $this->event_type === 'paid';
+    }
+
+    protected function normalizeImageUrl($value)
+    {
+        if (!$value) {
+            return $value;
+        }
+
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        if (Str::startsWith($value, 'data:')) {
+            return $value;
+        }
+
+        if (Str::startsWith($value, ['http://', 'https://'])) {
+            $urlPath = parse_url($value, PHP_URL_PATH);
+            if (is_string($urlPath)) {
+                $normalizedPath = ltrim($urlPath, '/');
+                if (Str::startsWith($normalizedPath, 'storage/')) {
+                    return asset($normalizedPath);
+                }
+            }
+
+            return $value;
+        }
+
+        $clean = ltrim($value, '/');
+        if (Str::startsWith($clean, 'storage/')) {
+            return asset($clean);
+        }
+
+        if (Str::startsWith($clean, 'public/')) {
+            $clean = substr($clean, strlen('public/'));
+        }
+
+        if (Str::startsWith($value, '/')) {
+            return $value;
+        }
+
+        return asset('storage/' . $clean);
     }
 
     // Methods

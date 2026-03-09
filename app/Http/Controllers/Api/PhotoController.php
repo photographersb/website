@@ -180,10 +180,28 @@ class PhotoController extends Controller
                 $data = $response->json();
                 
                 $photos = array_map(function ($photo) {
+                    $originalImageUrl = $photo['src']['original']
+                        ?? $photo['src']['large2x']
+                        ?? $photo['src']['large']
+                        ?? '';
+                    $originalThumbUrl = $photo['src']['medium']
+                        ?? $photo['src']['small']
+                        ?? $photo['src']['tiny']
+                        ?? '';
+
+                    $proxyBase = url('/api/v1/pexels/import');
+                    $proxyImageUrl = $originalImageUrl
+                        ? $proxyBase . '?url=' . urlencode($originalImageUrl)
+                        : '';
+                    $proxyThumbUrl = $originalThumbUrl
+                        ? $proxyBase . '?url=' . urlencode($originalThumbUrl)
+                        : '';
+
                     return [
                         'id' => $photo['id'],
-                        'image_url' => $photo['src']['large2x'],
-                        'thumbnail_url' => $photo['src']['medium'],
+                        'image_url' => $proxyImageUrl,
+                        'thumbnail_url' => $proxyThumbUrl,
+                        'original_url' => $originalImageUrl,
                         'photographer' => $photo['photographer'],
                         'photographer_url' => $photo['photographer_url'] ?? null,
                         'url' => $photo['url'] ?? null,

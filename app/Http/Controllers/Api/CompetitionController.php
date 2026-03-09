@@ -8,7 +8,9 @@ use App\Models\CompetitionScore;
 use App\Http\Traits\ApiResponse;
 use App\Services\WinnerCalculationService;
 use App\Services\CertificateService;
+use App\Services\CertificateAutomationService;
 use App\Services\PrizeDistributionService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -225,7 +227,7 @@ class CompetitionController extends Controller
 
         // Check submission count
         $submissionCount = CompetitionSubmission::where('competition_id', $competition->id)
-            ->where('photographer_id', auth()->id())
+              ->where('photographer_id', Auth::id())
             ->count();
 
         if ($submissionCount >= $competition->max_submissions_per_user) {
@@ -235,7 +237,7 @@ class CompetitionController extends Controller
         $submission = CompetitionSubmission::create([
             ...$validated,
             'competition_id' => $competition->id,
-            'photographer_id' => auth()->id(),
+                'photographer_id' => Auth::id(),
             'status' => 'pending_review',
         ]);
 
@@ -288,7 +290,12 @@ class CompetitionController extends Controller
     /**
      * Announce winners (saves to database)
      */
-    public function announceWinners(Request $request, Competition $competition, WinnerCalculationService $winnerService)
+    public function announceWinners(
+        Request $request,
+        Competition $competition,
+        WinnerCalculationService $winnerService,
+        CertificateAutomationService $certificateAutomationService
+    )
     {
         // Validate configuration
         $config = $request->validate([
@@ -305,6 +312,8 @@ class CompetitionController extends Controller
         if (!$result['success']) {
             return $this->error($result['message'], 400);
         }
+
+        $certificateAutomationService->issueForCompetitionWinners($competition);
         
         // TODO: Send winner notifications via email
         
