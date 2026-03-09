@@ -13,7 +13,16 @@ $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+
+$isLocalEnvironment = app()->environment('local');
+$isDebugEnabled = (bool) config('app.debug');
+$remoteAddress = $_SERVER['REMOTE_ADDR'] ?? '';
+$isLocalRequest = in_array($remoteAddress, ['127.0.0.1', '::1'], true);
+
+if (!$isLocalEnvironment || !$isDebugEnabled || !$isLocalRequest) {
+    http_response_code(403);
+    exit('Forbidden');
+}
 
 // Get admin user
 $admin = User::where('email', 'admin@photographar.com')->first();
