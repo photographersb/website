@@ -1,34 +1,53 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-8">
-    <div class="container mx-auto px-4 max-w-4xl">
-      <!-- Header -->
-      <div class="mb-8">
-        <router-link
-          :to="`/competitions/${competition?.slug}`"
-          class="text-red-600 hover:text-red-700 inline-flex items-center gap-2 mb-4"
-        >
-          <svg
-            class="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          Back to Competition
-        </router-link>
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">
-          Submit Your Photo
-        </h1>
-        <p class="text-gray-600">
-          {{ competition?.title }}
-        </p>
+  <div class="min-h-screen bg-[#f7f2ee] py-5 sm:py-8">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-5xl">
+      <div
+        v-if="loading"
+        class="min-h-[50vh] flex items-center justify-center"
+        role="status"
+        aria-live="polite"
+      >
+        <div class="text-center">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#7a1f2b]"></div>
+          <p class="text-gray-600 mt-3">Loading submission form...</p>
+        </div>
       </div>
+
+      <template v-else>
+        <section class="relative overflow-hidden rounded-2xl bg-[#1b0b12] text-white mb-6">
+          <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(245,158,11,0.28)_0,_transparent_55%)]"></div>
+          <div class="relative z-10 p-6 sm:p-8">
+            <router-link
+              :to="`/competitions/${competition?.slug}`"
+              class="inline-flex items-center gap-2 text-white/90 hover:text-white mb-4"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to Competition
+            </router-link>
+
+            <h1 class="text-3xl sm:text-4xl font-semibold font-serif mb-1">Submit Your Photo</h1>
+            <p class="text-white/85 text-sm sm:text-base">{{ competition?.title }}</p>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+              <router-link
+                :to="`/competitions/${competition?.slug}/gallery`"
+                class="px-4 py-2 rounded-full bg-white text-[#1b0b12] text-sm font-semibold hover:bg-white/90 min-h-[40px]"
+              >
+                View submissions
+              </router-link>
+              <button
+                type="button"
+                class="px-4 py-2 rounded-full border border-white/30 bg-white/10 text-white text-sm font-semibold hover:bg-white/20 min-h-[40px]"
+                aria-label="Copy submission page link"
+                @click="copyLink"
+              >
+                Copy page link
+              </button>
+            </div>
+          </div>
+        </section>
 
       <!-- Submission Info Card -->
       <div
@@ -64,7 +83,7 @@
       </div>
 
       <!-- Submission Form -->
-      <div class="bg-white rounded-lg shadow-md p-8">
+      <div class="bg-white rounded-2xl shadow-lg border border-[#eadfd7] p-4 sm:p-8">
         <form
           class="space-y-6"
           @submit.prevent="submitForm"
@@ -380,30 +399,31 @@
           </div>
 
           <!-- Submit Buttons -->
-          <div class="flex gap-4 pt-4">
+          <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
             <button
               type="submit"
               :disabled="submitting"
-              class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
             >
               <span v-if="submitting">Submitting...</span>
               <span v-else>Submit Photo</span>
             </button>
             <router-link
               :to="`/competitions/${competition?.slug}`"
-              class="px-8 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+              class="px-8 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors text-center min-h-[44px]"
             >
               Cancel
             </router-link>
           </div>
         </form>
       </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import exifr from 'exifr';
 import { validateUploadFile } from '../utils/imageValidation';
 import { useRoute, useRouter } from 'vue-router';
@@ -421,6 +441,7 @@ const imagePreview = ref(null);
 const imageFile = ref(null);
 const agreeToTerms = ref(false);
 const pexelsQuery = ref('');
+const user = ref(JSON.parse(localStorage.getItem('user') || 'null'));
 
 const form = ref({
   title: '',
@@ -448,6 +469,7 @@ const fetchCompetition = async () => {
   try {
     const { data } = await api.get(`/competitions/${route.params.slug}`);
     competition.value = data.data;
+    updatePageMeta();
     
     // Check if competition is active
     if (competition.value.status !== 'active') {
@@ -693,8 +715,21 @@ const submitForm = async () => {
         'Content-Type': 'multipart/form-data'
       }
     });
+
+    const submissionId = data?.data?.id;
+    const voteLink = submissionId
+      ? `${window.location.origin}/competitions/${competition.value.slug}/submissions/${submissionId}`
+      : `${window.location.origin}/competitions/${competition.value.slug}/gallery`;
+    const viralMessage = `Vote for my photo in the Photographer SB competition!\n\nCompetition: ${competition.value.title}\nPhotographer: ${user.value?.name || 'Photographer'}\nVote link: ${voteLink}`;
+
+    try {
+      await navigator.clipboard.writeText(viralMessage);
+      await trackShareLog('copy', submissionId);
+    } catch (copyError) {
+      console.warn('Failed to copy viral message:', copyError);
+    }
     
-    alert(data.message || 'Submission uploaded successfully!');
+    alert((data.message || 'Submission uploaded successfully!') + ' A share message has been copied to your clipboard to boost voting.');
     router.push(`/competitions/${competition.value.slug}`);
   } catch (error) {
     console.error('Error submitting:', error);
@@ -717,5 +752,52 @@ const submitForm = async () => {
 
 const formatDate = (date) => {
   return formatDateTimeValue(date);
+};
+
+const copyLink = async () => {
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+    alert('Link copied to clipboard!');
+    await trackShareLog('copy');
+  } catch (error) {
+    console.error('Copy failed:', error);
+  }
+};
+
+const trackShareLog = async (platform, entityId = null) => {
+  try {
+    await api.post('/growth/share-log', {
+      entity_type: 'competition_submission',
+      entity_id: entityId,
+      platform,
+    });
+  } catch (error) {
+    console.warn('Share log failed:', error);
+  }
+};
+
+const setMetaTag = (attribute, key, content) => {
+  if (!content) return;
+  let tag = document.head.querySelector(`meta[${attribute}="${key}"]`);
+  if (!tag) {
+    tag = document.createElement('meta');
+    tag.setAttribute(attribute, key);
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute('content', content);
+};
+
+const updatePageMeta = () => {
+  if (!competition.value || typeof window === 'undefined') return;
+  const title = `Submit Photo - ${competition.value.title} | Photographer SB`;
+  const description = `Submit your photo entry for ${competition.value.title}. Deadline: ${formatDate(competition.value.submission_deadline)}.`;
+  const canonical = `${window.location.origin}${route.fullPath}`;
+
+  document.title = title;
+  setMetaTag('name', 'description', description);
+  setMetaTag('property', 'og:title', title);
+  setMetaTag('property', 'og:description', description);
+  setMetaTag('property', 'og:url', canonical);
+  setMetaTag('property', 'og:type', 'website');
 };
 </script>

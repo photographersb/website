@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow">
+    <div class="max-w-2xl mx-auto sb-ui-card">
       <div class="px-6 py-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-2">
           Request Booking
@@ -33,7 +33,7 @@
               v-model="form.event_date"
               type="date"
               required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="sb-ui-input"
             >
             <p
               v-if="errors.event_date"
@@ -55,7 +55,7 @@
               id="event_time"
               v-model="form.event_time"
               type="time"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="sb-ui-input"
             >
           </div>
 
@@ -73,7 +73,7 @@
               type="number"
               min="1"
               max="24"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="sb-ui-input"
             >
           </div>
 
@@ -88,7 +88,7 @@
             <select
               id="category_id"
               v-model="form.category_id"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="sb-ui-select"
             >
               <option :value="null">
                 Select category
@@ -114,7 +114,7 @@
             <select
               id="city_id"
               v-model="form.city_id"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="sb-ui-select"
             >
               <option :value="null">
                 Select city
@@ -141,7 +141,7 @@
               id="venue_address"
               v-model="form.venue_address"
               rows="2"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="sb-ui-textarea"
             />
           </div>
 
@@ -158,7 +158,7 @@
                 id="budget_min"
                 v-model.number="form.budget_min"
                 type="number"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                class="sb-ui-input"
               >
             </div>
             <div>
@@ -172,7 +172,7 @@
                 id="budget_max"
                 v-model.number="form.budget_max"
                 type="number"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                class="sb-ui-input"
               >
               <p
                 v-if="errors.budget_max"
@@ -196,7 +196,7 @@
               v-model="form.notes"
               rows="4"
               placeholder="Tell the photographer more about your event..."
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="sb-ui-textarea"
             />
           </div>
 
@@ -205,13 +205,13 @@
             <button
               type="submit"
               :disabled="isSubmitting || isSelfBooking"
-              class="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-lg transition"
+              class="sb-ui-btn sb-ui-btn--primary flex-1 disabled:bg-gray-400"
             >
               {{ isSelfBooking ? 'Self Booking Blocked' : (isSubmitting ? 'Sending...' : 'Send Booking Request') }}
             </button>
             <Link
               :href="route('home')"
-              class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-lg text-center transition"
+              class="sb-ui-btn sb-ui-btn--secondary flex-1"
             >
               Cancel
             </Link>

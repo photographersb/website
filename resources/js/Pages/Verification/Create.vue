@@ -8,7 +8,7 @@
 
     <div class="py-12">
       <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white shadow-lg rounded-lg p-8">
+        <div class="sb-ui-card p-8">
           <form
             enctype="multipart/form-data"
             @submit.prevent="submit"
@@ -53,8 +53,7 @@
               <input 
                 v-model="form.full_name" 
                 type="text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
-                :class="errors.full_name ? 'border-red-600' : ''"
+                :class="['sb-ui-input', errors.full_name ? 'sb-ui-input--error' : '']"
               >
               <div
                 v-if="errors.full_name"
@@ -70,8 +69,7 @@
               <input 
                 v-model="form.phone" 
                 type="tel"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
-                :class="errors.phone ? 'border-red-600' : ''"
+                :class="['sb-ui-input', errors.phone ? 'sb-ui-input--error' : '']"
               >
               <div
                 v-if="errors.phone"
@@ -90,7 +88,7 @@
               <input 
                 v-model="form.nid_number" 
                 type="text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
+                class="sb-ui-input"
               >
             </div>
 
@@ -103,7 +101,7 @@
               <input 
                 v-model="form.business_name" 
                 type="text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
+                class="sb-ui-input"
               >
             </div>
 
@@ -233,7 +231,7 @@
               <textarea 
                 v-model="form.note"
                 rows="4"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
+                class="sb-ui-textarea"
                 placeholder="Any additional information..."
               />
             </div>
@@ -243,13 +241,13 @@
               <button 
                 type="submit" 
                 :disabled="processing"
-                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                class="sb-ui-btn sb-ui-btn--primary disabled:bg-gray-400"
               >
                 {{ processing ? 'Submitting...' : 'Submit Verification Request' }}
               </button>
               <Link
                 :href="route('verification.index')"
-                class="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400"
+                class="sb-ui-btn sb-ui-btn--secondary"
               >
                 Cancel
               </Link>

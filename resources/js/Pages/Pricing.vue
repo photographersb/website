@@ -7,17 +7,17 @@
         <div class="absolute bottom-0 right-0 w-96 h-96 bg-white bg-opacity-5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
       </div>
 
-      <div class="container mx-auto px-4 py-16 relative z-10 text-center">
-        <h1 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl py-16 relative z-10 text-center">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 tracking-tight">
           Simple, Transparent Pricing
         </h1>
-        <p class="text-lg md:text-xl text-gray-100 max-w-2xl mx-auto">
+        <p class="text-base sm:text-lg md:text-xl text-gray-100 max-w-2xl mx-auto">
           No hidden fees. Pay only when you get bookings.
         </p>
       </div>
     </section>
 
-    <div class="container mx-auto px-4 max-w-6xl">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-6xl">
       <!-- For Clients -->
       <div class="mb-16">
         <div class="text-center mb-8">

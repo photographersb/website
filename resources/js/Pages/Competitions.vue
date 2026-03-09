@@ -9,7 +9,7 @@
         <div class="absolute -bottom-28 -left-24 h-80 w-80 rounded-full bg-[#c46b7a]/20 blur-3xl" />
       </div>
 
-      <div class="container mx-auto px-4 pt-10 pb-16 md:pt-10 md:pb-24 relative z-10">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl pt-10 pb-16 md:pt-10 md:pb-24 relative z-10">
         <!-- Logo/Brand Section -->
         <div class="text-center mt-5 mb-4 sm:mb-5 md:mb-6 lg:mb-8">
           <div class="inline-flex mb-2 sm:mb-3 px-3 sm:px-4 py-1 sm:py-1.5 bg-white bg-opacity-10 backdrop-blur-sm rounded-full border border-white border-opacity-20">
@@ -31,7 +31,7 @@
           </div>
         </div>
 
-        <h1 class="text-4xl md:text-6xl font-semibold font-serif mb-4 text-center tracking-tight animate-fade-in">
+        <h1 class="text-3xl sm:text-4xl md:text-6xl font-semibold font-serif mb-4 text-center tracking-tight animate-fade-in">
           Photography Competitions
         </h1>
         <p class="text-lg md:text-xl text-gray-100 max-w-3xl mx-auto text-center leading-relaxed animate-fade-in-delay">
@@ -40,32 +40,32 @@
 
         <!-- Stats Bar -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-10 animate-fade-in-delay-2">
-          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
-            <div class="text-3xl md:text-4xl font-bold">
+          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
+            <div class="text-2xl sm:text-3xl md:text-4xl font-bold">
               {{ stats.active_competitions }}
             </div>
             <div class="text-sm md:text-base text-gray-200 mt-1">
               Active
             </div>
           </div>
-          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
-            <div class="text-3xl md:text-4xl font-bold">
+          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
+            <div class="text-2xl sm:text-3xl md:text-4xl font-bold">
               ৳{{ stats.total_prize_pool }}
             </div>
             <div class="text-sm md:text-base text-gray-200 mt-1">
               Prize Pool
             </div>
           </div>
-          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
-            <div class="text-3xl md:text-4xl font-bold">
+          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
+            <div class="text-2xl sm:text-3xl md:text-4xl font-bold">
               {{ stats.total_submissions }}
             </div>
             <div class="text-sm md:text-base text-gray-200 mt-1">
               Submissions
             </div>
           </div>
-          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
-            <div class="text-3xl md:text-4xl font-bold">
+          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
+            <div class="text-2xl sm:text-3xl md:text-4xl font-bold">
               {{ stats.total_participants }}
             </div>
             <div class="text-sm md:text-base text-gray-200 mt-1">
@@ -77,16 +77,16 @@
     </section>
 
     <!-- Main Content -->
-    <div class="container mx-auto px-4 py-12 mt-5">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl py-12 mt-5">
       <!-- Filters -->
-      <div class="bg-white/90 backdrop-blur rounded-2xl shadow-xl border border-[#eadfd7] p-4 sm:p-5 md:p-6 mb-6 sm:mb-8">
+      <div class="sb-ui-card sb-ui-card--feature bg-white/90 backdrop-blur p-4 sm:p-5 md:p-6 mb-6 sm:mb-8">
         <div class="flex items-center gap-3 sm:hidden">
           <div class="relative flex-1">
             <input
               v-model="filters.theme"
               type="text"
               placeholder="Search competitions..."
-              class="w-full pl-10 pr-4 py-2.5 border border-[#eadfd7] rounded-lg focus:ring-2 focus:ring-[#7a1f2b] focus:border-transparent"
+              class="sb-ui-input pl-10 pr-4 py-2.5"
               @input="applyFilters"
             >
             <svg
@@ -104,7 +104,7 @@
             </svg>
           </div>
           <button
-            class="px-4 py-2.5 rounded-lg border border-[#eadfd7] text-[#1b0b12] font-medium"
+            class="sb-ui-btn sb-ui-btn--secondary px-4 py-2.5 text-[#1b0b12] font-medium"
             @click="showFilters = !showFilters"
           >
             Filters
@@ -112,14 +112,14 @@
         </div>
 
         <div :class="[showFilters ? 'block' : 'hidden sm:block', 'mt-3 sm:mt-0']">
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
             <div class="hidden sm:block">
               <label class="block text-sm font-medium text-[#1b0b12] mb-2">Search</label>
               <input
                 v-model="filters.theme"
                 type="text"
                 placeholder="Search theme..."
-                class="w-full border border-[#eadfd7] rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#7a1f2b] focus:border-transparent"
+                class="sb-ui-input px-4 py-2"
                 @input="applyFilters"
               >
             </div>
@@ -127,7 +127,7 @@
               <label class="block text-sm font-medium text-[#1b0b12] mb-2">Status</label>
               <select
                 v-model="filters.status"
-                class="w-full border border-[#eadfd7] rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#7a1f2b] focus:border-transparent"
+                class="sb-ui-select px-4 py-2"
                 @change="applyFilters"
               >
                 <option value="">
@@ -151,7 +151,7 @@
               <label class="block text-sm font-medium text-[#1b0b12] mb-2">Entry Fee</label>
               <select
                 v-model="filters.is_paid"
-                class="w-full border border-[#eadfd7] rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#7a1f2b] focus:border-transparent"
+                class="sb-ui-select px-4 py-2"
                 @change="applyFilters"
               >
                 <option value="">
@@ -166,10 +166,29 @@
               </select>
             </div>
             <div>
+              <label class="block text-sm font-medium text-[#1b0b12] mb-2">Category</label>
+              <select
+                v-model="filters.category"
+                class="sb-ui-select px-4 py-2"
+                @change="applyFilters"
+              >
+                <option value="">
+                  All Categories
+                </option>
+                <option
+                  v-for="category in categoryOptions"
+                  :key="category"
+                  :value="category"
+                >
+                  {{ category }}
+                </option>
+              </select>
+            </div>
+            <div>
               <label class="block text-sm font-medium text-[#1b0b12] mb-2">Sort By</label>
               <select
                 v-model="filters.sort"
-                class="w-full border border-[#eadfd7] rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#7a1f2b] focus:border-transparent"
+                class="sb-ui-select px-4 py-2"
                 @change="applyFilters"
               >
                 <option value="deadline">
@@ -194,6 +213,8 @@
       <div
         v-if="loading"
         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8"
+        role="status"
+        aria-live="polite"
       >
         <LoadingSkeleton
           v-for="n in 6"
@@ -204,7 +225,7 @@
 
       <!-- Empty State -->
       <EmptyState
-        v-else-if="competitions.length === 0"
+        v-else-if="competitionSections.length === 0"
         icon="trophy"
         title="No Competitions Found"
         description="Try adjusting your filters or check back later for new photography competitions."
@@ -214,14 +235,32 @@
       <!-- Competitions Grid -->
       <div
         v-else
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8"
+        class="space-y-8"
       >
-        <div
-          v-for="competition in competitions"
-          :key="competition.id"
-          class="bg-white/90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer hover:-translate-y-1"
-          @click="viewCompetition(competition)"
+        <section
+          v-for="section in competitionSections"
+          :key="section.key"
         >
+          <div class="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <h2 class="text-xl sm:text-2xl font-semibold text-[#1b0b12]">{{ section.title }}</h2>
+              <p class="text-sm text-gray-600">{{ section.description }}</p>
+            </div>
+            <span class="sb-ui-badge sb-ui-badge--neutral">{{ section.items.length }}</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+            <div
+              v-for="competition in section.items"
+              :key="`${section.key}-${competition.id}`"
+              class="sb-ui-card sb-ui-card--interactive bg-white/90 backdrop-blur border-[#eadfd7] hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer hover:-translate-y-1"
+              role="button"
+              tabindex="0"
+              :aria-label="`Open competition ${competition.title}`"
+              @click="viewCompetition(competition)"
+              @keydown.enter="viewCompetition(competition)"
+              @keydown.space.prevent="viewCompetition(competition)"
+            >
           <!-- Image -->
           <div class="relative h-56 overflow-hidden">
             <img
@@ -246,7 +285,7 @@
             </div>
             
             <div class="absolute top-4 right-4">
-              <span :class="`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(competition.status)}`">
+              <span :class="`sb-ui-badge ${getStatusBadgeClass(competition.status)}`">
                 {{ formatStatus(competition.status) }}
               </span>
             </div>
@@ -254,7 +293,7 @@
               v-if="competition.is_featured"
               class="absolute top-4 left-4"
             >
-              <span class="px-3 py-1 bg-amber-400 text-[#1b0b12] rounded-full text-xs font-semibold flex items-center gap-1">
+              <span class="sb-ui-badge bg-amber-400 text-[#1b0b12] flex items-center gap-1">
                 <svg
                   class="w-4 h-4"
                   fill="currentColor"
@@ -368,18 +407,39 @@
                 </span>
                 <span class="font-semibold">{{ competition.max_submissions_per_user }}</span>
               </div>
+              <div class="flex items-center justify-between">
+                <span class="text-gray-600 flex items-center gap-1">
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  Judges
+                </span>
+                <span class="font-semibold">{{ getJudgeCount(competition) }}</span>
+              </div>
             </div>
 
             <!-- Action Button -->
             <button
-              class="w-full py-3 rounded-lg font-semibold transition-all duration-200"
+              class="w-full sb-ui-btn justify-center !rounded-lg font-semibold transition-all duration-200"
               :class="getActionButtonClass(competition.status)"
               @click.stop="viewCompetition(competition)"
             >
               {{ getActionButtonText(competition.status) }}
             </button>
           </div>
-        </div>
+            </div>
+          </div>
+        </section>
       </div>
 
       <!-- Pagination -->
@@ -389,7 +449,7 @@
       >
         <button
           :disabled="currentPage === 1"
-          class="px-3 sm:px-4 py-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+          class="sb-ui-btn sb-ui-btn--secondary sb-ui-btn--sm px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base"
           @click="goToPage(1)"
         >
           <span class="hidden sm:inline">First</span>
@@ -397,7 +457,7 @@
         </button>
         <button
           :disabled="currentPage === 1"
-          class="px-3 sm:px-4 py-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+          class="sb-ui-btn sb-ui-btn--secondary sb-ui-btn--sm px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base"
           @click="previousPage"
         >
           <span class="hidden sm:inline">Previous</span>
@@ -408,8 +468,8 @@
             v-for="page in visiblePages"
             :key="page"
             :class="[
-              'px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base',
-              page === currentPage ? 'bg-burgundy text-white' : 'border hover:bg-gray-100'
+              'sb-ui-btn sb-ui-btn--sm px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base',
+              page === currentPage ? 'sb-ui-btn--primary' : 'sb-ui-btn--secondary'
             ]"
             @click="goToPage(page)"
           >
@@ -418,7 +478,7 @@
         </div>
         <button
           :disabled="currentPage === totalPages"
-          class="px-3 sm:px-4 py-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+          class="sb-ui-btn sb-ui-btn--secondary sb-ui-btn--sm px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base"
           @click="nextPage"
         >
           <span class="hidden sm:inline">Next</span>
@@ -426,7 +486,7 @@
         </button>
         <button
           :disabled="currentPage === totalPages"
-          class="px-3 sm:px-4 py-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+          class="sb-ui-btn sb-ui-btn--secondary sb-ui-btn--sm px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base"
           @click="goToPage(totalPages)"
         >
           <span class="hidden sm:inline">Last</span>
@@ -464,8 +524,86 @@ const stats = ref({
 const filters = ref({
   status: '',
   is_paid: '',
+  category: '',
   theme: '',
   sort: 'deadline',
+});
+
+const normalizeCategory = (competition) => {
+  return competition?.category?.name
+    || competition?.category_name
+    || competition?.category
+    || competition?.genre
+    || competition?.type
+    || '';
+};
+
+const categoryOptions = computed(() => {
+  const values = competitions.value
+    .map((competition) => normalizeCategory(competition))
+    .filter((value) => String(value || '').trim().length > 0);
+  return [...new Set(values)].sort((left, right) => left.localeCompare(right));
+});
+
+const matchesCategory = (competition) => {
+  if (!filters.value.category) return true;
+  return normalizeCategory(competition) === filters.value.category;
+};
+
+const filteredCompetitions = computed(() => {
+  return competitions.value.filter((competition) => matchesCategory(competition));
+});
+
+const activeCompetitions = computed(() => {
+  return filteredCompetitions.value.filter((competition) => ['active', 'judging'].includes(String(competition.status || '').toLowerCase()));
+});
+
+const upcomingCompetitions = computed(() => {
+  return filteredCompetitions.value.filter((competition) => {
+    const status = String(competition.status || '').toLowerCase();
+    return status === 'draft' || status === 'upcoming';
+  });
+});
+
+const pastCompetitions = computed(() => {
+  return filteredCompetitions.value.filter((competition) => ['completed', 'cancelled', 'archived'].includes(String(competition.status || '').toLowerCase()));
+});
+
+const competitionSections = computed(() => {
+  const sections = [];
+  if (activeCompetitions.value.length) {
+    sections.push({
+      key: 'active',
+      title: 'Active Competitions',
+      description: 'Open for submissions, voting, or judging right now.',
+      items: activeCompetitions.value,
+    });
+  }
+  if (upcomingCompetitions.value.length) {
+    sections.push({
+      key: 'upcoming',
+      title: 'Upcoming Competitions',
+      description: 'Prepare your entries before submission opens.',
+      items: upcomingCompetitions.value,
+    });
+  }
+  if (pastCompetitions.value.length) {
+    sections.push({
+      key: 'past',
+      title: 'Past Competitions',
+      description: 'Explore completed contests and results.',
+      items: pastCompetitions.value,
+    });
+  }
+  if (!sections.length && filteredCompetitions.value.length) {
+    sections.push({
+      key: 'all',
+      title: 'Competitions',
+      description: 'All competitions matching your filters.',
+      items: filteredCompetitions.value,
+    });
+  }
+  return sections;
 });
 
 const fetchStats = async () => {
@@ -510,6 +648,15 @@ const applyFilters = () => {
   fetchCompetitions(1);
 };
 
+const getJudgeCount = (competition) => {
+  const direct = Number(competition?.judges_count ?? competition?.judge_count ?? competition?.total_judges);
+  if (Number.isFinite(direct) && direct >= 0) return direct;
+  if (Array.isArray(competition?.judges)) return competition.judges.length;
+  if (Array.isArray(competition?.judgeProfiles)) return competition.judgeProfiles.length;
+  if (Array.isArray(competition?.judge_profiles)) return competition.judge_profiles.length;
+  return 0;
+};
+
 const viewCompetition = (competition) => {
   router.push(`/competitions/${competition.slug}`);
 };
@@ -546,13 +693,13 @@ const visiblePages = computed(() => {
 
 const getStatusBadgeClass = (status) => {
   const classes = {
-    draft: 'bg-[#efe5dc] text-[#7a1f2b]',
-    active: 'bg-emerald-100 text-emerald-800',
-    judging: 'bg-amber-100 text-amber-800',
-    completed: 'bg-blue-100 text-blue-800',
-    cancelled: 'bg-rose-100 text-rose-800',
+    draft: 'sb-ui-badge--neutral',
+    active: 'sb-ui-badge--success',
+    judging: 'sb-ui-badge--warning',
+    completed: 'sb-ui-badge--info',
+    cancelled: 'sb-ui-badge--danger',
   };
-  return classes[status] || 'bg-gray-100 text-gray-800';
+  return classes[status] || 'sb-ui-badge--neutral';
 };
 
 const formatStatus = (status) => {
@@ -561,13 +708,13 @@ const formatStatus = (status) => {
 
 const getActionButtonClass = (status) => {
   if (status === 'active') {
-    return 'bg-[#7a1f2b] text-white hover:bg-[#5f1421]';
+    return 'sb-ui-btn--primary';
   } else if (status === 'completed') {
-    return 'bg-[#1b0b12] text-white hover:bg-[#14070d]';
+    return 'bg-[#1b0b12] text-white hover:bg-[#14070d] border-transparent';
   } else if (status === 'judging') {
-    return 'bg-amber-500 text-white hover:bg-amber-600';
+    return 'bg-amber-500 text-white hover:bg-amber-600 border-transparent';
   } else {
-    return 'bg-[#efe5dc] text-[#7a1f2b] cursor-not-allowed';
+    return 'sb-ui-btn--secondary text-[#7a1f2b] cursor-not-allowed';
   }
 };
 
@@ -596,7 +743,33 @@ const isDeadlineSoon = (deadline) => {
   return days <= 7 && days >= 0;
 };
 
+const setMetaTag = (attribute, key, content) => {
+  if (!content) return;
+  let tag = document.head.querySelector(`meta[${attribute}="${key}"]`);
+  if (!tag) {
+    tag = document.createElement('meta');
+    tag.setAttribute(attribute, key);
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute('content', content);
+};
+
+const updatePageMeta = () => {
+  if (typeof window === 'undefined') return;
+  const title = 'Photography Competitions | Photographar SB';
+  const description = 'Browse active, upcoming, and past photography competitions with prizes and public voting.';
+  const canonical = `${window.location.origin}/competitions`;
+
+  document.title = title;
+  setMetaTag('name', 'description', description);
+  setMetaTag('property', 'og:title', title);
+  setMetaTag('property', 'og:description', description);
+  setMetaTag('property', 'og:url', canonical);
+  setMetaTag('property', 'og:type', 'website');
+};
+
 onMounted(() => {
+  updatePageMeta();
   fetchStats();
   fetchCompetitions();
 });

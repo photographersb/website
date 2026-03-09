@@ -101,8 +101,9 @@
                 ? 'bg-white text-gray-900 hover:bg-gray-50 border border-gray-300'
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed',
           ]"
-          v-html="link.label"
-        />
+        >
+          <span v-html="link.label"></span>
+        </Link>
       </div>
     </div>
   </div>

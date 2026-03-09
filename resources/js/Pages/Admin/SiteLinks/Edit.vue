@@ -8,7 +8,7 @@
 
     <AdminQuickNav />
 
-    <div class="max-w-3xl mx-auto bg-white rounded-lg shadow p-6">
+    <div class="max-w-3xl mx-auto sb-ui-card p-6">
       <form
         class="space-y-6"
         @submit.prevent="submitForm"
@@ -19,7 +19,7 @@
           <select
             v-model="form.section"
             required
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy"
+            class="sb-ui-select"
           >
             <option value="">
               Select a section
@@ -41,7 +41,7 @@
             v-model="form.title"
             type="text"
             required
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy"
+            class="sb-ui-input"
           >
         </div>
 
@@ -51,7 +51,7 @@
           <input
             v-model="form.url"
             type="url"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy"
+            class="sb-ui-input"
           >
           <p class="mt-1 text-xs text-gray-500">
             Full URL (https://) or relative path (/about)
@@ -64,7 +64,7 @@
           <input
             v-model="form.route_name"
             type="text"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy"
+            class="sb-ui-input"
           >
         </div>
 
@@ -74,7 +74,7 @@
           <input
             v-model="form.icon"
             type="text"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy"
+            class="sb-ui-input"
           >
         </div>
 
@@ -99,7 +99,7 @@
             v-model.number="form.sort_order"
             type="number"
             min="0"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy"
+            class="sb-ui-input"
           >
         </div>
 
@@ -109,7 +109,7 @@
           <select
             v-model="form.visibility"
             required
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy"
+            class="sb-ui-select"
           >
             <option
               v-for="(label, key) in visibilityOptions"
@@ -136,7 +136,7 @@
         </div>
 
         <!-- Metadata -->
-        <div class="bg-gray-50 p-4 rounded-lg text-sm text-gray-600 space-y-1">
+        <div class="sb-ui-card p-4 text-sm text-gray-600 space-y-1">
           <div><strong>Created:</strong> {{ formatDateTime(link.created_at) }}</div>
           <div v-if="link.creator">
             <strong>Created by:</strong> {{ link.creator.name }}
@@ -148,13 +148,13 @@
         <div class="flex gap-3 pt-4 border-t">
           <button
             type="submit"
-            class="px-6 py-2 bg-burgundy text-white rounded-lg hover:bg-burgundy-dark transition-colors"
+            class="sb-ui-btn sb-ui-btn--primary"
           >
             Update Link
           </button>
           <Link
             href="/admin/settings/site-links"
-            class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+            class="sb-ui-btn sb-ui-btn--secondary"
           >
             Cancel
           </Link>

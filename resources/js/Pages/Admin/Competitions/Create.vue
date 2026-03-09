@@ -37,7 +37,7 @@
           @submit.prevent="submitForm"
         >
           <!-- Basic Information -->
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="sb-ui-card p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">
               Basic Information
             </h2>
@@ -50,7 +50,7 @@
                   type="text"
                   placeholder="e.g., Spring Photography Contest 2026"
                   required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                 >
                 <span
                   v-if="errors.title"
@@ -64,7 +64,7 @@
                   v-model="form.slug"
                   type="text"
                   placeholder="Auto-generated if left blank"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                 >
                 <span
                   v-if="errors.slug"
@@ -79,7 +79,7 @@
                   type="text"
                   placeholder="e.g., Nature & Wildlife"
                   required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                 >
                 <span
                   v-if="errors.theme"
@@ -91,7 +91,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Competition Mode *</label>
                 <select
                   v-model="form.mode"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-select"
                 >
                   <option value="open">
                     Open Contest
@@ -116,7 +116,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
                 <select
                   v-model="form.category_id"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-select"
                 >
                   <option value="">
                     -- Select Category --
@@ -137,7 +137,7 @@
                   v-model="form.description"
                   placeholder="Tell photographers about this competition..."
                   rows="4"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-textarea"
                 />
               </div>
 
@@ -147,7 +147,7 @@
                   v-model="form.hero_image"
                   type="url"
                   placeholder="https://..."
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                 >
                 <input
                   type="file"
@@ -197,7 +197,7 @@
                   v-model="form.cover_image"
                   type="url"
                   placeholder="https://..."
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                 >
                 <input
                   type="file"
@@ -247,7 +247,7 @@
                   v-model="form.banner_image"
                   type="url"
                   placeholder="https://..."
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                 >
                 <input
                   type="file"
@@ -294,7 +294,7 @@
           </div>
 
           <!-- Timeline -->
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="sb-ui-card p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">
               Competition Timeline
             </h2>
@@ -308,7 +308,7 @@
                   inputmode="numeric"
                   placeholder="dd-mm-yyyy"
                   pattern="\d{2}-\d{2}-\d{4}"
-                  class="js-date w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="js-date sb-ui-input"
                 >
                 <p
                   v-if="errors.start_date"
@@ -327,7 +327,7 @@
                   placeholder="dd-mm-yyyy hh:mm"
                   pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
                   required
-                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="js-datetime sb-ui-input"
                 >
                 <p
                   v-if="errors.submission_deadline"
@@ -345,7 +345,7 @@
                   inputmode="numeric"
                   placeholder="dd-mm-yyyy"
                   pattern="\d{2}-\d{2}-\d{4}"
-                  class="js-date w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="js-date sb-ui-input"
                 >
                 <p
                   v-if="errors.end_date"
@@ -364,7 +364,7 @@
                   placeholder="dd-mm-yyyy hh:mm"
                   pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
                   required
-                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="js-datetime sb-ui-input"
                 >
                 <p
                   v-if="errors.voting_start_at"
@@ -383,7 +383,7 @@
                   placeholder="dd-mm-yyyy hh:mm"
                   pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
                   required
-                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="js-datetime sb-ui-input"
                 >
                 <p
                   v-if="errors.voting_end_at"
@@ -401,7 +401,7 @@
                   inputmode="numeric"
                   placeholder="dd-mm-yyyy hh:mm"
                   pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
-                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="js-datetime sb-ui-input"
                 >
                 <p
                   v-if="errors.voting_start_date"
@@ -419,7 +419,7 @@
                   inputmode="numeric"
                   placeholder="dd-mm-yyyy hh:mm"
                   pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
-                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="js-datetime sb-ui-input"
                 >
                 <p
                   v-if="errors.voting_end_date"
@@ -437,7 +437,7 @@
                   inputmode="numeric"
                   placeholder="dd-mm-yyyy hh:mm"
                   pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
-                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="js-datetime sb-ui-input"
                 >
                 <p
                   v-if="errors.judging_start_at"
@@ -455,7 +455,7 @@
                   inputmode="numeric"
                   placeholder="dd-mm-yyyy hh:mm"
                   pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
-                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="js-datetime sb-ui-input"
                 >
                 <p
                   v-if="errors.judging_end_at"
@@ -473,7 +473,7 @@
                   inputmode="numeric"
                   placeholder="dd-mm-yyyy"
                   pattern="\d{2}-\d{2}-\d{4}"
-                  class="js-date w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="js-date sb-ui-input"
                 >
                 <p
                   v-if="errors.judging_deadline"
@@ -492,7 +492,7 @@
                   placeholder="dd-mm-yyyy hh:mm"
                   pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
                   required
-                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="js-datetime sb-ui-input"
                 >
                 <p
                   v-if="errors.results_announcement_date"
@@ -510,7 +510,7 @@
                   inputmode="numeric"
                   placeholder="dd-mm-yyyy"
                   pattern="\d{2}-\d{2}-\d{4}"
-                  class="js-date w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="js-date sb-ui-input"
                 >
                 <p
                   v-if="errors.announcement_date"
@@ -523,7 +523,7 @@
           </div>
 
           <!-- Details -->
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="sb-ui-card p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">
               Details
               <span class="text-xs text-gray-400 ml-2">(v2.0 - Updated Feb 2)</span>
@@ -554,7 +554,7 @@
                       v-if="cashPrizeTotal > 0"
                       type="button"
                       title="Sum all cash prizes below and set total prize pool"
-                      class="px-4 py-2 bg-burgundy text-white text-sm rounded-lg hover:bg-burgundy-dark transition-all font-medium whitespace-nowrap flex items-center gap-2"
+                      class="sb-ui-btn sb-ui-btn--primary sb-ui-btn--sm whitespace-nowrap flex items-center gap-2"
                       @click="form.total_prize_pool = cashPrizeTotal"
                     >
                       <span>⚡</span>
@@ -613,7 +613,7 @@
                 <label class="block text-sm font-medium text-gray-700">Prizes</label>
                 <button
                   type="button"
-                  class="px-3 py-1 bg-burgundy text-white text-sm rounded-lg hover:bg-burgundy-dark transition-all font-medium"
+                  class="sb-ui-btn sb-ui-btn--primary sb-ui-btn--sm"
                   @click="addPrize"
                 >
                   + Add Prize
@@ -726,7 +726,7 @@
                   type="number"
                   min="1"
                   required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                 >
               </div>
 
@@ -736,7 +736,7 @@
                   v-model.number="form.max_submissions_per_user"
                   type="number"
                   min="1"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                 >
               </div>
 
@@ -744,7 +744,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Entry Type</label>
                 <select
                   v-model="form.entry_type"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-select"
                 >
                   <option value="single">
                     Single
@@ -765,7 +765,7 @@
                   type="number"
                   min="1"
                   :disabled="form.entry_type === 'single'"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                 >
               </div>
 
@@ -776,7 +776,7 @@
                   type="number"
                   min="1"
                   :disabled="form.entry_type === 'single'"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                 >
               </div>
             </div>
@@ -808,7 +808,7 @@
                 v-model="form.rules"
                 placeholder="Enter competition rules..."
                 rows="5"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-textarea"
               />
               <p class="mt-1 text-xs text-gray-500">
                 Tip: Click "Use Default" to populate universal rules, then customize as needed.
@@ -831,7 +831,7 @@
                 v-model="form.terms_and_conditions"
                 placeholder="Enter terms and conditions..."
                 rows="5"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-textarea"
               />
               <p class="mt-1 text-xs text-gray-500">
                 Tip: Click "Use Default" to populate standard terms, then customize as needed.
@@ -840,7 +840,7 @@
           </div>
 
           <!-- Sponsors -->
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="sb-ui-card p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">
               Sponsors
             </h2>
@@ -850,7 +850,7 @@
                 v-model="sponsorSearch"
                 type="text"
                 placeholder="Search sponsors..."
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-input"
               >
             </div>
 
@@ -882,7 +882,7 @@
           </div>
 
           <!-- Judges -->
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="sb-ui-card p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">
               Judges
             </h2>
@@ -892,7 +892,7 @@
                 v-model="judgeSearch"
                 type="text"
                 placeholder="Search judges..."
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-input"
               >
             </div>
 
@@ -924,7 +924,7 @@
           </div>
 
           <!-- Entry Fees & Payment -->
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="sb-ui-card p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">
               Entry Fees & Payment
             </h2>
@@ -946,7 +946,7 @@
                     v-model.number="fee.fee_amount"
                     type="number"
                     min="0"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                    class="sb-ui-input"
                   >
                 </div>
               </div>
@@ -954,7 +954,7 @@
           </div>
 
           <!-- Status -->
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="sb-ui-card p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">
               Status
             </h2>
@@ -963,7 +963,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
               <select
                 v-model="form.status"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-select"
               >
                 <option value="draft">
                   Draft
@@ -1015,7 +1015,7 @@
                   type="number"
                   min="0"
                   :disabled="!form.is_paid_competition"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                 >
               </div>
             </div>
@@ -1080,7 +1080,7 @@
                   min="0"
                   max="100"
                   step="1"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                 >
               </div>
               <div>
@@ -1091,7 +1091,7 @@
                   min="0"
                   max="100"
                   step="1"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                 >
               </div>
             </div>
@@ -1110,14 +1110,14 @@
           <div class="flex justify-end gap-4">
             <router-link
               to="/admin/competitions"
-              class="px-6 py-2 border-2 border-burgundy text-burgundy rounded-lg font-medium hover:bg-gray-50 transition"
+              class="sb-ui-btn sb-ui-btn--secondary"
             >
               Cancel
             </router-link>
             <button
               type="submit"
               :disabled="loading"
-              class="px-6 py-2 bg-burgundy text-white rounded-lg font-medium hover:bg-burgundy-dark disabled:opacity-50 transition"
+              class="sb-ui-btn sb-ui-btn--primary disabled:opacity-50"
             >
               {{ loading ? 'Creating...' : 'Create Competition' }}
             </button>

@@ -38,14 +38,24 @@
     <div class="container mx-auto px-4 py-12 max-w-md mt-6 md:mt-8 mb-10 md:mb-12">
       <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-100">
         <!-- Tabs -->
-        <div class="flex gap-4 mb-8 border-b">
+        <div class="flex gap-4 mb-8 border-b" role="tablist" aria-label="Authentication tabs">
           <button
+            id="auth-tab-login"
+            type="button"
+            role="tab"
+            :aria-selected="isLogin"
+            aria-controls="auth-login-panel"
             :class="`pb-3 font-semibold transition-colors ${isLogin ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-500 hover:text-gray-700'}`"
             @click="isLogin = true"
           >
             Login
           </button>
           <button
+            id="auth-tab-register"
+            type="button"
+            role="tab"
+            :aria-selected="!isLogin"
+            aria-controls="auth-register-panel"
             :class="`pb-3 font-semibold transition-colors ${!isLogin ? 'text-burgundy border-b-2 border-burgundy' : 'text-gray-500 hover:text-gray-700'}`"
             @click="isLogin = false"
           >
@@ -56,6 +66,9 @@
         <!-- Login Form -->
         <form
           v-if="isLogin"
+          id="auth-login-panel"
+          role="tabpanel"
+          aria-labelledby="auth-tab-login"
           class="space-y-4"
           @submit.prevent="login"
         >
@@ -64,8 +77,9 @@
           </h2>
 
           <div>
-            <label class="block text-sm font-medium mb-1">Email or Username</label>
+            <label for="auth-login-email" class="block text-sm font-medium mb-1">Email or Username</label>
             <input
+              id="auth-login-email"
               v-model="loginForm.email"
               type="text"
               required
@@ -75,9 +89,10 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-1">Password</label>
+            <label for="auth-login-password" class="block text-sm font-medium mb-1">Password</label>
             <div class="relative">
               <input
+                id="auth-login-password"
                 v-model="loginForm.password"
                 :type="showLoginPassword ? 'text' : 'password'"
                 required
@@ -86,7 +101,9 @@
               >
               <button
                 type="button"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                :aria-label="showLoginPassword ? 'Hide password' : 'Show password'"
+                :aria-pressed="showLoginPassword"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 p-1.5 rounded-md focus-visible:ring-2 focus-visible:ring-burgundy/30"
                 @click="showLoginPassword = !showLoginPassword"
               >
                 <svg
@@ -230,6 +247,9 @@
         <!-- Register Form -->
         <form
           v-else
+          id="auth-register-panel"
+          role="tabpanel"
+          aria-labelledby="auth-tab-register"
           class="space-y-4"
           @submit.prevent="register"
         >
@@ -238,8 +258,9 @@
           </h2>
 
           <div>
-            <label class="block text-sm font-medium mb-1">Full Name</label>
+            <label for="auth-register-name" class="block text-sm font-medium mb-1">Full Name</label>
             <input
+              id="auth-register-name"
               v-model="registerForm.name"
               type="text"
               required
@@ -249,8 +270,9 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-1">Email</label>
+            <label for="auth-register-email" class="block text-sm font-medium mb-1">Email</label>
             <input
+              id="auth-register-email"
               v-model="registerForm.email"
               type="email"
               required
@@ -260,8 +282,9 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-1">Phone</label>
+            <label for="auth-register-phone" class="block text-sm font-medium mb-1">Phone</label>
             <input
+              id="auth-register-phone"
               v-model="registerForm.phone"
               type="tel"
               required
@@ -271,8 +294,9 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-1">I am a</label>
+            <label for="auth-register-role" class="block text-sm font-medium mb-1">I am a</label>
             <select
+              id="auth-register-role"
               v-model="registerForm.role"
               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-burgundy focus:border-transparent"
             >
@@ -286,9 +310,21 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-1">Password</label>
+            <label for="auth-register-ref" class="block text-sm font-medium mb-1">Referral Code (optional)</label>
+            <input
+              id="auth-register-ref"
+              v-model="registerForm.referral_code"
+              type="text"
+              class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-burgundy focus:border-transparent"
+              placeholder="Enter referral code"
+            >
+          </div>
+
+          <div>
+            <label for="auth-register-password" class="block text-sm font-medium mb-1">Password</label>
             <div class="relative">
               <input
+                id="auth-register-password"
                 v-model="registerForm.password"
                 :type="showRegisterPassword ? 'text' : 'password'"
                 required
@@ -297,7 +333,9 @@
               >
               <button
                 type="button"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                :aria-label="showRegisterPassword ? 'Hide password' : 'Show password'"
+                :aria-pressed="showRegisterPassword"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 p-1.5 rounded-md focus-visible:ring-2 focus-visible:ring-burgundy/30"
                 @click="showRegisterPassword = !showRegisterPassword"
               >
                 <svg
@@ -345,9 +383,10 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-1">Confirm Password</label>
+            <label for="auth-register-password-confirm" class="block text-sm font-medium mb-1">Confirm Password</label>
             <div class="relative">
               <input
+                id="auth-register-password-confirm"
                 v-model="registerForm.password_confirmation"
                 :type="showConfirmPassword ? 'text' : 'password'"
                 required
@@ -356,7 +395,9 @@
               >
               <button
                 type="button"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                :aria-label="showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'"
+                :aria-pressed="showConfirmPassword"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 p-1.5 rounded-md focus-visible:ring-2 focus-visible:ring-burgundy/30"
                 @click="showConfirmPassword = !showConfirmPassword"
               >
                 <svg
@@ -534,6 +575,7 @@ const registerForm = ref({
   email: '',
   phone: '',
   role: 'client',
+  referral_code: '',
   password: '',
   password_confirmation: '',
   accept_terms: false,
@@ -547,6 +589,10 @@ const showResendVerification = ref(false);
 const resendingVerification = ref(false);
 
 const syncTabFromRoute = () => {
+  if (route.path === '/register') {
+    isLogin.value = false;
+  }
+
   const tab = String(route.query?.tab || '').toLowerCase();
   if (tab === 'register') {
     isLogin.value = false;
@@ -561,6 +607,28 @@ const syncTabFromRoute = () => {
 };
 
 const normalizeRole = (role) => String(role || '').toLowerCase().replace(/[\s-]+/g, '_');
+
+const resolvePostLoginRoute = (role) => {
+  const normalizedRole = normalizeRole(role);
+
+  if (['admin', 'super_admin', 'moderator'].includes(normalizedRole)) {
+    return '/admin/dashboard';
+  }
+
+  if (normalizedRole === 'photographer' || normalizedRole === 'studio_owner') {
+    return '/dashboard';
+  }
+
+  if (normalizedRole === 'judge') {
+    return '/judge/dashboard';
+  }
+
+  if (normalizedRole === 'client') {
+    return '/client/dashboard';
+  }
+
+  return '/';
+};
 
 const login = async () => {
   loginLoading.value = true;
@@ -598,15 +666,8 @@ const login = async () => {
       
       notifySuccess('Welcome back!', 'Login Successful');
       
-      // Redirect based on user role
-      const userRole = normalizeRole(data.data.user.role);
-      if (userRole === 'admin' || userRole === 'super_admin' || userRole === 'moderator') {
-        router.push('/admin/dashboard');
-      } else if (userRole === 'photographer') {
-        router.push('/dashboard');
-      } else {
-        router.push('/');
-      }
+      const targetRoute = resolvePostLoginRoute(data.data.user.role);
+      await router.replace(targetRoute);
     }
   } catch (error) {
     console.error('Login error:', error.response?.data || error);
@@ -687,6 +748,12 @@ const register = async () => {
 
 onMounted(() => {
   syncTabFromRoute();
+
+  const referral = typeof route.query?.ref === 'string' ? route.query.ref.trim() : '';
+  if (referral) {
+    isLogin.value = false;
+    registerForm.value.referral_code = referral;
+  }
   
   // Check for email verification status
   if (route.query.verified === 'success') {

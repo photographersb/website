@@ -22,13 +22,43 @@
           </svg>
           Back to Competition
         </router-link>
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
           {{ competition?.title }} - {{ pageLabel }}
         </h1>
         <p class="text-gray-600">
           {{ totalSubmissions }} {{ totalSubmissions === 1 ? 'Entry' : 'Entries' }}
           <span v-if="isLeaderboard">ranked by votes</span>
         </p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <button
+            class="px-3 py-2 rounded-full bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 min-h-[40px]"
+            aria-label="Share this gallery on Facebook"
+            @click="shareOnFacebook"
+          >
+            Facebook
+          </button>
+          <button
+            class="px-3 py-2 rounded-full bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 min-h-[40px]"
+            aria-label="Share this gallery on WhatsApp"
+            @click="shareOnWhatsApp"
+          >
+            WhatsApp
+          </button>
+          <button
+            class="px-3 py-2 rounded-full bg-blue-700 text-white text-xs font-semibold hover:bg-blue-800 min-h-[40px]"
+            aria-label="Share this gallery on LinkedIn"
+            @click="shareOnLinkedIn"
+          >
+            LinkedIn
+          </button>
+          <button
+            class="px-3 py-2 rounded-full border border-gray-300 text-gray-700 text-xs font-semibold hover:bg-gray-100 min-h-[40px]"
+            aria-label="Copy gallery link"
+            @click="copyLink"
+          >
+            Copy link
+          </button>
+        </div>
         <div
           v-if="showScoreSplit"
           class="mt-2 flex flex-wrap items-center gap-2 text-xs"
@@ -93,7 +123,7 @@
             </div>
             <div class="flex flex-wrap gap-2">
               <button
-                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-600 text-white font-semibold shadow hover:bg-red-700 transition"
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-600 text-white font-semibold shadow hover:bg-red-700 transition min-h-[44px]"
                 @click="startVoteMode"
               >
                 Start Vote Mode
@@ -101,7 +131,7 @@
               </button>
               <button
                 v-if="resumeSubmissionId"
-                class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-red-200 text-red-700 font-semibold hover:bg-red-100 transition"
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-red-200 text-red-700 font-semibold hover:bg-red-100 transition min-h-[44px]"
                 @click="resumeVoteMode"
               >
                 Resume Voting
@@ -139,7 +169,7 @@
             </svg>
           </div>
           <button
-            class="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium"
+            class="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium min-h-[44px]"
             @click="showFilters = !showFilters"
           >
             Filters
@@ -204,6 +234,8 @@
     <div
       v-if="loading"
       class="container mx-auto px-4 py-16 text-center"
+      role="status"
+      aria-live="polite"
     >
       <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-red-600" />
       <p class="text-gray-600 mt-4">
@@ -801,6 +833,7 @@ const fetchCompetition = async () => {
   try {
     const { data } = await api.get(`/competitions/${route.params.slug}`);
     competition.value = data.data;
+    updatePageMeta();
     refreshResumeId();
   } catch (error) {
     console.error('Error fetching competition:', error);
@@ -996,5 +1029,71 @@ const maybeAutoStartVoteMode = () => {
     return;
   }
   startVoteMode();
+};
+
+const shareOnFacebook = () => {
+  const url = encodeURIComponent(window.location.href);
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+  trackShareLog('facebook');
+};
+
+const shareOnWhatsApp = () => {
+  const url = encodeURIComponent(window.location.href);
+  const text = encodeURIComponent(`Check this ${pageLabel.value.toLowerCase()} from ${competition.value?.title || 'competition'}`);
+  window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+  trackShareLog('whatsapp');
+};
+
+const shareOnLinkedIn = () => {
+  const url = encodeURIComponent(window.location.href);
+  window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+  trackShareLog('linkedin');
+};
+
+const copyLink = async () => {
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+    alert('Link copied to clipboard!');
+    trackShareLog('copy');
+  } catch (error) {
+    console.error('Copy failed:', error);
+  }
+};
+
+const trackShareLog = async (platform) => {
+  try {
+    await api.post('/growth/share-log', {
+      entity_type: 'competition',
+      entity_id: competition.value?.id || null,
+      platform,
+    });
+  } catch (error) {
+    console.warn('Share log failed:', error);
+  }
+};
+
+const setMetaTag = (attribute, key, content) => {
+  if (!content) return;
+  let tag = document.head.querySelector(`meta[${attribute}="${key}"]`);
+  if (!tag) {
+    tag = document.createElement('meta');
+    tag.setAttribute(attribute, key);
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute('content', content);
+};
+
+const updatePageMeta = () => {
+  if (!competition.value || typeof window === 'undefined') return;
+  const title = `${competition.value.title} ${isLeaderboard.value ? 'Leaderboard' : 'Gallery'} | Photographer SB`;
+  const description = `Browse public submissions and votes for ${competition.value.title}.`;
+  const canonical = `${window.location.origin}${route.fullPath}`;
+
+  document.title = title;
+  setMetaTag('name', 'description', description);
+  setMetaTag('property', 'og:title', title);
+  setMetaTag('property', 'og:description', description);
+  setMetaTag('property', 'og:url', canonical);
+  setMetaTag('property', 'og:type', 'website');
 };
 </script>

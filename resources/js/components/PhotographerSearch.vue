@@ -237,23 +237,23 @@
           </router-link>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           <router-link
             v-for="event in featuredEvents.slice(0, 3)"
             :key="event.id"
             :to="`/events/${event.slug}`"
-            class="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-burgundy"
+            class="group bg-white rounded-lg shadow hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 hover:border-burgundy"
           >
             <!-- Event Image -->
             <div class="relative bg-gradient-to-br from-burgundy to-gray-800 overflow-hidden pt-[56.25%]">
-              <picture v-if="event.hero_image_url">
+              <picture v-if="getEventImage(event) && !hasFeaturedImageError(event.id)">
                 <source
-                  v-if="getWebpSource(event.hero_image_url)"
-                  :srcset="getWebpSource(event.hero_image_url)"
+                  v-if="getWebpSource(getEventImage(event))"
+                  :srcset="getWebpSource(getEventImage(event))"
                   type="image/webp"
                 >
                 <img
-                  :src="event.hero_image_url"
+                  :src="getEventImage(event)"
                   :alt="event.title"
                   class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   loading="lazy"
@@ -261,14 +261,23 @@
                   width="1280"
                   height="720"
                   sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  @error="handleFeaturedImageError($event, event.id)"
                 >
               </picture>
+              <img
+                v-else
+                :src="imagePlaceholder"
+                :alt="event.title || 'Event image placeholder'"
+                class="absolute inset-0 w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
+              >
               <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
               
               <!-- Event Type Badge -->
-              <div class="absolute top-3 left-3">
+              <div class="absolute top-2 left-2">
                 <span
-                  class="px-3 py-1 rounded-full text-xs font-semibold uppercase"
+                  class="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase"
                   :class="getEventTypeBadge(event).tone"
                 >
                   {{ getEventTypeBadge(event).label }}
@@ -278,10 +287,10 @@
               <!-- Featured Badge -->
               <div
                 v-if="getFeaturedBadge(event)"
-                class="absolute top-3 right-3"
+                class="absolute top-2 right-2"
               >
                 <span
-                  class="px-3 py-1 rounded-full text-xs font-semibold"
+                  class="px-2 py-0.5 rounded-full text-[10px] font-semibold"
                   :class="getFeaturedBadge(event)?.tone"
                 >
                   {{ getFeaturedBadge(event).label }}
@@ -289,13 +298,13 @@
               </div>
 
               <!-- Date Badge -->
-              <div class="absolute bottom-3 left-3 bg-black/70 text-white rounded-full px-3 py-1 shadow-lg text-xs font-semibold">
+              <div class="absolute bottom-2 left-2 bg-black/70 text-white rounded-full px-2 py-0.5 shadow text-[10px] font-semibold">
                 {{ formatEventBadge(event.event_date) || 'TBA' }}
               </div>
 
               <!-- Price/Free Badge -->
               <div
-                class="absolute bottom-3 right-3 px-3 py-1 rounded-full text-xs font-semibold"
+                class="absolute bottom-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold"
                 :class="getPriceBadge(event).tone"
               >
                 {{ getPriceBadge(event).label }}
@@ -303,20 +312,51 @@
             </div>
 
             <!-- Event Details -->
-            <div class="p-4 sm:p-5">
-              <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-burgundy transition-colors">
+            <div class="p-3 sm:p-4">
+              <h3 class="text-base sm:text-lg font-bold text-gray-900 mb-1.5 group-hover:text-burgundy transition-colors">
                 {{ event.title }}
               </h3>
               
-              <p class="text-sm text-gray-600 mb-4">
-                {{ truncateText(event.description, 110) }}
+              <p class="text-xs sm:text-sm text-gray-600 mb-3">
+                {{ truncateText(event.description, 90) }}
               </p>
 
-              <div class="space-y-2">
+              <div class="space-y-1.5">
+                <!-- Date & Time -->
+                <div class="flex items-start gap-2 text-xs sm:text-sm text-gray-600 leading-tight">
+                  <svg
+                    class="w-4 h-4 flex-shrink-0 mt-0.5 text-burgundy"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <div class="space-y-0.5">
+                    <div>
+                      <span class="text-gray-500">Date:</span>
+                      <span class="ml-1 font-medium">{{ formatDateLabel(event.event_date || event.start_datetime) }}</span>
+                    </div>
+                    <div>
+                      <span class="text-gray-500">Start:</span>
+                      <span class="ml-1 font-medium">{{ formatTimeLabel(event.start_time, event.start_datetime) }}</span>
+                    </div>
+                    <div>
+                      <span class="text-gray-500">End:</span>
+                      <span class="ml-1 font-medium">{{ formatTimeLabel(event.end_time, event.end_datetime || event.event_end_date) }}</span>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Location -->
                 <div
                   v-if="event.city || event.location"
-                  class="flex items-center gap-2 text-sm text-gray-600"
+                  class="flex items-center gap-2 text-xs sm:text-sm text-gray-600"
                 >
                   <svg
                     class="w-4 h-4 flex-shrink-0"
@@ -347,7 +387,7 @@
                 </div>
 
                 <!-- Price/Free -->
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 text-xs sm:text-sm">
                   <svg
                     class="w-4 h-4 flex-shrink-0"
                     :class="isPaidEvent(event) ? 'text-burgundy' : 'text-green-600'"
@@ -363,7 +403,7 @@
                     />
                   </svg>
                   <span
-                    class="text-sm font-semibold"
+                    class="font-semibold"
                     :class="isPaidEvent(event) ? 'text-burgundy' : 'text-green-600'"
                   >
                     {{ getPriceBadge(event).label }}
@@ -373,7 +413,7 @@
                 <!-- Attendees -->
                 <div
                   v-if="event.registrations_count"
-                  class="flex items-center gap-2 text-sm text-gray-600"
+                  class="flex items-center gap-2 text-xs sm:text-sm text-gray-600"
                 >
                   <svg
                     class="w-4 h-4 flex-shrink-0"
@@ -392,7 +432,7 @@
                 </div>
               </div>
 
-              <div class="mt-4 flex items-center justify-between text-sm font-semibold text-burgundy">
+              <div class="mt-3 flex items-center justify-between text-xs sm:text-sm font-semibold text-burgundy">
                 <span>View Details</span>
                 <svg
                   class="w-4 h-4"
@@ -458,9 +498,10 @@
               <!-- Competition Image -->
               <div class="relative h-48 sm:h-56 overflow-hidden">
                 <img
-                  :src="competition.cover_image_url || '/images/default-competition.jpg'"
+                  :src="competition.cover_image_url || imagePlaceholder"
                   :alt="competition.title"
                   class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  @error="useImagePlaceholder"
                 >
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 
@@ -1615,6 +1656,8 @@ const platformStats = ref({
   rating: '...'
 });
 const favoriteIds = ref([]);
+const featuredImageErrors = ref({});
+const imagePlaceholder = '/images/placeholder.svg';
 
 const normalizeRole = (role) => String(role || '').toLowerCase().replace(/[\s-]+/g, '_');
 const storedUserRole = computed(() => {
@@ -1864,6 +1907,11 @@ const getEventTypeBadge = (event) => {
 const isPaidEvent = (event) => {
   if (!event) return false;
   if (typeof event.is_ticketed === 'boolean') return event.is_ticketed;
+  if (typeof event.is_ticketed === 'number') return event.is_ticketed === 1;
+  if (typeof event.is_ticketed === 'string') {
+    const normalized = event.is_ticketed.trim().toLowerCase();
+    return normalized === '1' || normalized === 'true';
+  }
   if (event.event_mode) return event.event_mode === 'paid';
   if (event.event_type) return event.event_type === 'paid';
   const numeric = Number(event.ticket_price ?? event.price ?? event.base_price ?? 0);
@@ -1893,7 +1941,10 @@ const getFeaturedBadge = (event) => {
 const getPriceBadge = (event) => {
   if (isPaidEvent(event)) {
     const amount = Number(event.ticket_price ?? event.price ?? event.base_price ?? 0);
-    const formatted = new Intl.NumberFormat('en-BD').format(Number.isFinite(amount) ? amount : 0);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return { label: 'Paid', tone: 'bg-burgundy text-white' };
+    }
+    const formatted = new Intl.NumberFormat('en-BD').format(amount);
     return { label: `৳${formatted}`, tone: 'bg-burgundy text-white' };
   }
   return { label: 'Free', tone: 'bg-green-600 text-white' };
@@ -1905,6 +1956,40 @@ const formatEventBadge = (dateString) => {
   if (Number.isNaN(date.getTime())) return '';
   const month = formatMonthShort(dateString, true);
   return `${month} ${date.getDate()}`;
+};
+
+const formatDateLabel = (value) => {
+  if (!value) return 'TBA';
+  return formatDateValue(value) || 'TBA';
+};
+
+const formatTimeOnly = (value) => {
+  if (!value) return '';
+  if (typeof value === 'string') {
+    const match = value.match(/^(\d{2}):(\d{2})/);
+    if (match) return `${match[1]}:${match[2]}`;
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+};
+
+const isMidnight = (value) => {
+  if (!value || Number.isNaN(value.getTime())) return false;
+  return value.getHours() === 0 && value.getMinutes() === 0 && value.getSeconds() === 0;
+};
+
+const formatTimeLabel = (timeValue, dateValue) => {
+  const timeOnly = formatTimeOnly(timeValue);
+  if (timeOnly) return timeOnly;
+  if (!dateValue) return 'TBA';
+  const raw = String(dateValue);
+  if (!raw.includes(':') && raw.length <= 10) return 'TBA';
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime()) || isMidnight(date)) return 'TBA';
+  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 };
 
 const truncateText = (value, maxLength = 110) => {
@@ -1922,6 +2007,42 @@ const getWebpSource = (url) => {
   const match = url.match(/\.(jpg|jpeg|png)(\?.*)?$/i);
   if (!match) return '';
   return url.replace(/\.(jpg|jpeg|png)(\?.*)?$/i, '.webp$2');
+};
+
+const getGalleryImage = (event) => {
+  const gallery = event?.gallery_images;
+  if (Array.isArray(gallery)) return gallery[0] || '';
+  if (typeof gallery === 'string') {
+    try {
+      const parsed = JSON.parse(gallery);
+      return Array.isArray(parsed) ? (parsed[0] || '') : '';
+    } catch {
+      return '';
+    }
+  }
+  return '';
+};
+
+const getEventImage = (event) => {
+  return event?.hero_image_url
+    || event?.banner_image
+    || event?.og_image
+    || getGalleryImage(event)
+    || '';
+};
+
+const hasFeaturedImageError = (id) => Boolean(featuredImageErrors.value[id]);
+
+const markFeaturedImageError = (id) => {
+  if (!id) return;
+  featuredImageErrors.value = { ...featuredImageErrors.value, [id]: true };
+};
+
+const handleFeaturedImageError = (event, id) => {
+  markFeaturedImageError(id);
+  if (event?.target) {
+    event.target.src = imagePlaceholder;
+  }
 };
 
 const viewEventsByLocation = (event) => {
@@ -1983,7 +2104,7 @@ const isValidRating = (value) => {
   return Number.isFinite(numeric) && numeric > 0
 }
 
-const fallbackAvatar = '/images/default-avatar.png';
+const fallbackAvatar = imagePlaceholder;
 
 const getPhotographerAvatar = (photographer) => {
   const raw = photographer?.profile_picture_url
@@ -1992,11 +2113,19 @@ const getPhotographerAvatar = (photographer) => {
     || '';
   if (!raw) return fallbackAvatar;
   if (raw.startsWith('http') || raw.startsWith('/') || raw.startsWith('data:')) return raw;
-  return `/storage/${String(raw).replace(/^\/+/, '')}`;
+  const normalized = String(raw).replace(/^\/+/, '');
+  if (normalized.startsWith('storage/')) {
+    return `/${normalized}`;
+  }
+  return `/storage/${normalized}`;
 };
 
 const useDefaultAvatar = (event) => {
   event.target.src = fallbackAvatar;
+};
+
+const useImagePlaceholder = (event) => {
+  event.target.src = imagePlaceholder;
 };
 
 const formatRating = (value) => {

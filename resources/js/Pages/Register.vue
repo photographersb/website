@@ -7,7 +7,7 @@
         <div class="absolute bottom-0 right-0 w-96 h-96 bg-white bg-opacity-5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
       </div>
 
-      <div class="container mx-auto px-4 pt-10 pb-16 md:pt-10 md:pb-24 relative z-10 text-center">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl pt-10 pb-16 md:pt-10 md:pb-24 relative z-10 text-center">
         <div class="inline-flex mt-5 mb-2 sm:mb-3 px-3 sm:px-4 py-1 sm:py-1.5 bg-white bg-opacity-10 backdrop-blur-sm rounded-full border border-white border-opacity-20">
           <p class="text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2 justify-center">
             <svg
@@ -25,17 +25,17 @@
             >Somogro Bangladesh</a>
           </p>
         </div>
-        <h1 class="text-3xl md:text-5xl font-bold mb-2 tracking-tight">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 tracking-tight">
           Join Photographer SB
         </h1>
-        <p class="text-base md:text-lg text-gray-100">
+        <p class="text-base sm:text-lg md:text-xl text-gray-100 max-w-2xl mx-auto">
           Create your account and get started
         </p>
       </div>
     </section>
 
     <!-- Registration Form -->
-    <div class="container mx-auto px-4 py-12 max-w-md">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 max-w-md">
       <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-100">
         <h2 class="text-2xl font-bold mb-6">
           Create Account
@@ -137,7 +137,7 @@
               >
               <button
                 type="button"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 p-1.5 rounded-md focus-visible:ring-2 focus-visible:ring-burgundy/30"
                 @click="showPassword = !showPassword"
               >
                 <svg
@@ -205,7 +205,7 @@
               >
               <button
                 type="button"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 p-1.5 rounded-md focus-visible:ring-2 focus-visible:ring-burgundy/30"
                 @click="showConfirmPassword = !showConfirmPassword"
               >
                 <svg

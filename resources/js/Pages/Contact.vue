@@ -7,7 +7,7 @@
         <div class="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
       </div>
 
-      <div class="container mx-auto px-4 pt-10 pb-16 md:pt-10 md:pb-24 relative z-10 text-center">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl pt-10 pb-16 md:pt-10 md:pb-24 relative z-10 text-center">
         <div class="inline-flex mt-5 mb-2 sm:mb-3 px-3 sm:px-4 py-1 sm:py-1.5 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
           <p class="text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2 justify-center">
             <svg
@@ -25,16 +25,16 @@
             >Somogro Bangladesh</a>
           </p>
         </div>
-        <h1 class="text-4xl md:text-6xl font-bold mb-4 tracking-tight">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 tracking-tight">
           Get In Touch
         </h1>
-        <p class="text-lg md:text-xl text-gray-100 max-w-3xl mx-auto">
+        <p class="text-base sm:text-lg md:text-xl text-gray-100 max-w-3xl mx-auto">
           Have questions? We'd love to hear from you.
         </p>
       </div>
     </section>
 
-    <div class="container mx-auto px-4 py-12 max-w-6xl">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 max-w-6xl">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Contact Form -->
         <div class="lg:col-span-2">

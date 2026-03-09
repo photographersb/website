@@ -478,10 +478,6 @@ const initiatePayment = async () => {
       qty: quantity.value,
     };
 
-    console.log('Initiating payment with payload:', payload);
-    console.log('Event ID:', event.value.id);
-    console.log('URL:', `/events/${event.value.id}/payments/initiate`);
-
     const { data } = await api.post(`/events/${event.value.id}/payments/initiate`, payload);
 
     if (data?.status === 'success' || data?.success) {
@@ -533,16 +529,6 @@ const submitManualPayment = async () => {
       formData.append('screenshot', screenshotFile.value);
     }
 
-    console.log('Submitting manual payment:', {
-      method: paymentMethod.value,
-      ticket_id: selectedTicketId.value,
-      qty: quantity.value,
-      sender_number: senderNumber.value,
-      sender_number_length: senderNumber.value?.length,
-      has_trx_id: isProofMethod.value && !!transactionId.value,
-      has_screenshot: !!screenshotFile.value,
-    });
-
     const { data } = await api.post(`/events/${event.value.id}/payments/manual`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
@@ -563,12 +549,6 @@ const submitManualPayment = async () => {
     }
   } catch (error) {
     console.error('Manual payment error:', error.response?.data || error.message);
-    console.error('Full error details:', {
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      data: error.response?.data,
-      message: error.message
-    });
     
     const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Failed to submit payment';
     showToast(errorMsg, 'error');

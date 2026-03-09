@@ -91,7 +91,7 @@
             </svg>
           </div>
           <p class="text-3xl font-bold text-gray-900">
-            {{ analytics?.summary?.total_views || 0 | formatNumber }}
+            {{ formatNumber(analytics?.summary?.total_views || 0) }}
           </p>
           <p class="text-sm text-gray-500 mt-2">
             {{ analytics?.summary?.avg_daily_views ? formatFixed(analytics.summary.avg_daily_views, 1, '0.0') : '0.0' }} avg/day
@@ -118,7 +118,7 @@
             </svg>
           </div>
           <p class="text-3xl font-bold text-gray-900">
-            {{ analytics?.summary?.total_profile_clicks || 0 | formatNumber }}
+            {{ formatNumber(analytics?.summary?.total_profile_clicks || 0) }}
           </p>
           <p class="text-sm text-gray-500 mt-2">
             {{ ctr }}% click rate
@@ -140,7 +140,7 @@
             </svg>
           </div>
           <p class="text-3xl font-bold text-gray-900">
-            {{ analytics?.summary?.total_portfolio_clicks || 0 | formatNumber }}
+            {{ formatNumber(analytics?.summary?.total_portfolio_clicks || 0) }}
           </p>
           <p class="text-sm text-gray-500 mt-2">
             {{ portfolioCTR }}% engagement
@@ -163,7 +163,7 @@
             </svg>
           </div>
           <p class="text-3xl font-bold text-gray-900">
-            {{ analytics?.summary?.total_inquiries || 0 | formatNumber }}
+            {{ formatNumber(analytics?.summary?.total_inquiries || 0) }}
           </p>
           <p class="text-sm text-gray-500 mt-2">
             {{ inquiryRate }}% conversion
@@ -189,7 +189,7 @@
             </svg>
           </div>
           <p class="text-3xl font-bold text-gray-900">
-            {{ analytics?.summary?.total_bookings || 0 | formatNumber }}
+            {{ formatNumber(analytics?.summary?.total_bookings || 0) }}
           </p>
           <p class="text-sm text-gray-500 mt-2">
             {{ bookingRate }}% booking rate
@@ -426,6 +426,8 @@ const renderChart = () => {
 const formatDate = (date) => {
   return formatDateValue(date)
 }
+
+const formatNumber = (value) => Number(value || 0).toLocaleString()
 
 const exportData = async () => {
   try {

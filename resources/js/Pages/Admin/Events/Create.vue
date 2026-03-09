@@ -16,7 +16,7 @@
           @submit.prevent="submitForm"
         >
           <!-- Basic Information -->
-          <div class="bg-white rounded-lg shadow-card p-6">
+          <div class="sb-ui-card p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">
               Basic Information
             </h2>
@@ -28,7 +28,7 @@
                   v-model="form.title"
                   type="text"
                   :required="form.status !== 'draft'"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                   placeholder="Photography Workshop 2026"
                 >
                 <p
@@ -44,7 +44,7 @@
                 <select
                   v-model="form.event_type"
                   :required="form.status !== 'draft'"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-select"
                 >
                   <option value="">
                     Select event type
@@ -81,7 +81,7 @@
                 <textarea
                   v-model="form.description"
                   rows="4"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-textarea"
                   placeholder="Detailed description of the event..."
                 />
                 <p
@@ -97,7 +97,7 @@
                 <input
                   v-model="form.hero_image_url"
                   type="url"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                   placeholder="https://example.com/hero-image.jpg"
                 >
                 <input
@@ -152,7 +152,7 @@
                 <input
                   v-model="form.banner_image"
                   type="url"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                   placeholder="https://example.com/banner.jpg"
                 >
                 <input
@@ -205,7 +205,7 @@
           </div>
 
           <!-- Date, Time & Location -->
-          <div class="bg-white rounded-lg shadow-card p-6">
+          <div class="sb-ui-card p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">
               Date, Time & Location
             </h2>
@@ -220,7 +220,7 @@
                   placeholder="dd-mm-yyyy"
                   pattern="\d{2}-\d{2}-\d{4}"
                   :required="form.status !== 'draft'"
-                  class="js-date w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="js-date sb-ui-input"
                 >
                 <p
                   v-if="errors.event_date"
@@ -238,7 +238,7 @@
                   inputmode="numeric"
                   placeholder="dd-mm-yyyy"
                   pattern="\d{2}-\d{2}-\d{4}"
-                  class="js-date w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="js-date sb-ui-input"
                 >
                 <p class="mt-1 text-sm text-gray-500">
                   Leave blank for single-day event
@@ -256,7 +256,7 @@
                 <input
                   v-model="form.start_time"
                   type="time"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                 >
                 <p
                   v-if="errors.start_time"
@@ -271,7 +271,7 @@
                 <input
                   v-model="form.end_time"
                   type="time"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                 >
                 <p
                   v-if="errors.end_time"
@@ -299,7 +299,7 @@
                   type="number"
                   min="0.5"
                   step="0.5"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                   placeholder="2.5"
                 >
                 <p class="mt-1 text-sm text-gray-500">
@@ -318,7 +318,7 @@
                 <select
                   v-model="form.city_id"
                   :required="form.status !== 'draft'"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-select"
                 >
                   <option value="">
                     Select location
@@ -351,7 +351,7 @@
                   v-model="form.venue_name"
                   type="text"
                   :required="form.status !== 'draft'"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                   placeholder="e.g., ICCB, Hotel InterContinental, Dhaka Club"
                 >
                 <p
@@ -368,7 +368,7 @@
                   v-model="form.venue_address"
                   rows="2"
                   :required="form.status !== 'draft'"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-textarea"
                   placeholder="e.g., 123 Main Street, Building Name, Floor 2, Near Landmark"
                 />
                 <p
@@ -385,7 +385,7 @@
                   v-model="form.location"
                   type="text"
                   :required="form.status !== 'draft'"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                   placeholder="Optional: Short location label for listings"
                 >
                 <p class="mt-1 text-sm text-gray-500">
@@ -404,7 +404,7 @@
                 <input
                   v-model="form.google_map_link"
                   type="url"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                   placeholder="https://maps.google.com/maps?q=..."
                 >
                 <p class="mt-1 text-sm text-gray-500">
@@ -430,7 +430,7 @@
                 <input
                   v-model="form.address"
                   type="text"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                   placeholder="Optional: Additional directions or notes"
                 >
                 <p class="mt-1 text-sm text-gray-500">
@@ -447,7 +447,7 @@
           </div>
 
           <!-- Attendance & Pricing -->
-          <div class="bg-white rounded-lg shadow-card p-6">
+          <div class="sb-ui-card p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">
               Attendance & Pricing
             </h2>
@@ -457,7 +457,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Event Mode</label>
                 <select
                   v-model="form.event_mode"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-select"
                 >
                   <option value="free">
                     Free
@@ -475,7 +475,7 @@
                     v-model.number="form.max_attendees"
                     type="number"
                     min="1"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                    class="sb-ui-input"
                     placeholder="50"
                   >
                   <p class="mt-1 text-sm text-gray-500">
@@ -497,7 +497,7 @@
                     min="0"
                     step="100"
                     :disabled="form.event_mode !== 'paid'"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent disabled:bg-gray-100"
+                    class="sb-ui-input disabled:bg-gray-100"
                   >
                   <p class="mt-1 text-sm text-gray-500">
                     Set to 0 for free ticketed events
@@ -516,7 +516,7 @@
                     v-model.number="form.max_tickets_per_user"
                     type="number"
                     min="1"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                    class="sb-ui-input"
                     placeholder="1"
                   >
                   <p
@@ -535,7 +535,7 @@
                     inputmode="numeric"
                     placeholder="dd-mm-yyyy hh:mm"
                     pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
-                    class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                    class="js-datetime sb-ui-input"
                   >
                   <p
                     v-if="errors.registration_deadline"
@@ -573,7 +573,7 @@
           </div>
 
           <!-- Requirements -->
-          <div class="bg-white rounded-lg shadow-card p-6">
+          <div class="sb-ui-card p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">
               Requirements & Details
             </h2>
@@ -584,7 +584,7 @@
                 <textarea
                   v-model="form.requirements"
                   rows="3"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-textarea"
                   placeholder="What attendees need to bring or know (e.g., 'Bring your own camera')"
                 />
                 <p
@@ -600,7 +600,7 @@
                 <select
                   v-model="form.organizer_id"
                   :required="form.status !== 'draft'"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-select"
                 >
                   <option value="">
                     Select photographer
@@ -684,7 +684,7 @@
                   <select
                     v-model="form.certificate_template_id"
                     :disabled="!form.certificates_enabled"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                    class="sb-ui-select"
                   >
                     <option value="">
                       Select template
@@ -703,7 +703,7 @@
           </div>
 
           <!-- Sponsors -->
-          <div class="bg-white rounded-lg shadow-card p-6">
+          <div class="sb-ui-card p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">
               Sponsors
             </h2>
@@ -712,7 +712,7 @@
                 v-model="sponsorSearch"
                 type="text"
                 placeholder="Search sponsors..."
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-input"
               >
 
               <div class="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-3 space-y-2">
@@ -800,7 +800,7 @@
           </div>
 
           <!-- SEO -->
-          <div class="bg-white rounded-lg shadow-card p-6">
+          <div class="sb-ui-card p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">
               SEO
             </h2>
@@ -810,7 +810,7 @@
                 <input
                   v-model="form.meta_title"
                   type="text"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  class="sb-ui-input"
                 >
               </div>
               <div>
@@ -818,7 +818,7 @@
                 <textarea
                   v-model="form.meta_description"
                   rows="3"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  class="sb-ui-textarea"
                 />
               </div>
               <div>
@@ -826,7 +826,7 @@
                 <input
                   v-model="form.og_image"
                   type="url"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  class="sb-ui-input"
                 >
                 <input
                   type="file"
@@ -846,7 +846,7 @@
           </div>
 
           <!-- Status & Settings -->
-          <div class="bg-white rounded-lg shadow-card p-6">
+          <div class="sb-ui-card p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">
               Status & Settings
             </h2>
@@ -857,7 +857,7 @@
                 <select
                   v-model="form.status"
                   required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-select"
                 >
                   <option value="draft">
                     Draft (Not visible to public)
@@ -896,7 +896,7 @@
                   inputmode="numeric"
                   placeholder="dd-mm-yyyy hh:mm"
                   pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
-                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="js-datetime sb-ui-input"
                 >
                 <p class="mt-1 text-sm text-gray-500">
                   Leave blank to feature indefinitely
@@ -915,14 +915,14 @@
           <div class="flex items-center justify-end gap-4">
             <router-link
               to="/admin/events"
-              class="px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 hover:border-burgundy hover:text-burgundy transition-all shadow-sm"
+              class="sb-ui-btn sb-ui-btn--secondary"
             >
               Cancel
             </router-link>
             <button
               type="button"
               :disabled="processing"
-              class="inline-flex items-center justify-center px-6 py-3 bg-gray-100 text-gray-800 rounded-lg font-semibold hover:bg-gray-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              class="sb-ui-btn sb-ui-btn--secondary disabled:opacity-50 disabled:cursor-not-allowed"
               @click="saveDraft"
             >
               Save Draft
@@ -930,7 +930,7 @@
             <button
               type="submit"
               :disabled="processing"
-              class="inline-flex items-center justify-center px-6 py-3 bg-burgundy text-white rounded-lg font-semibold hover:bg-burgundy-dark hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+              class="sb-ui-btn sb-ui-btn--primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg
                 v-if="processing"

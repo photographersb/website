@@ -1192,6 +1192,7 @@ const getVoteShareUrl = () => {
 const shareOnFacebook = () => {
   const url = getVoteShareUrl();
   window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+  trackShareLog('facebook');
 };
 
 const shareOnTwitter = () => {
@@ -1204,17 +1205,32 @@ const shareOnWhatsApp = () => {
   const url = getVoteShareUrl();
   const text = `Quick favor? 💛 Vote for "${submission.value.title}" in ${competition.value?.title}. Your vote means a lot! ${url}`;
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  trackShareLog('whatsapp');
 };
 
 const shareOnTelegram = () => {
   const url = getVoteShareUrl();
   const text = `If you like this photo, please vote for "${submission.value.title}" in ${competition.value?.title}.`;
   window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
+  trackShareLog('telegram');
 };
 
 const copyLink = () => {
   navigator.clipboard.writeText(getVoteShareUrl());
   showToast('Link copied to clipboard!', 'success');
+  trackShareLog('copy');
+};
+
+const trackShareLog = async (platform) => {
+  try {
+    await api.post('/growth/share-log', {
+      entity_type: 'competition_submission',
+      entity_id: submission.value?.id || null,
+      platform,
+    });
+  } catch (error) {
+    console.warn('Share log failed:', error);
+  }
 };
 
 const viewGallery = () => {

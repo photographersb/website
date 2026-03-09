@@ -24,6 +24,6 @@ export default [
     },
   },
   {
-    ignores: ['node_modules/**', 'vendor/**', 'public/**', 'storage/**'],
+    ignores: ['node_modules/**', 'vendor/**', 'public/**', 'storage/**', '_CLEANUP_FILES/**'],
   },
 ]

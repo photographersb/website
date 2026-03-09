@@ -5,23 +5,23 @@
         <div class="absolute top-0 left-0 w-96 h-96 bg-white bg-opacity-5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
         <div class="absolute bottom-0 right-0 w-96 h-96 bg-white bg-opacity-5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
       </div>
-      <div class="container mx-auto px-4 py-12 md:py-16 relative z-10 text-center">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl py-12 md:py-16 relative z-10 text-center">
         <p class="text-xs uppercase tracking-[0.35em] text-white text-opacity-70">
           How It Works
         </p>
-        <h1 class="text-3xl md:text-5xl font-bold mt-4 tracking-tight">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mt-4 tracking-tight">
           How Photographer SB Works
         </h1>
-        <p class="text-base md:text-lg text-white text-opacity-85 max-w-3xl mx-auto mt-4">
+        <p class="text-base sm:text-lg md:text-xl text-white text-opacity-85 max-w-3xl mx-auto mt-4">
           A clear, step-by-step path for clients and photographers.
         </p>
       </div>
     </section>
 
-    <div class="container mx-auto px-4 max-w-4xl -mt-10 relative z-10 pb-12">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-4xl -mt-10 relative z-10 pb-12">
 
       <!-- For Clients -->
-      <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+      <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-8">
         <h2 class="text-2xl font-bold mb-6 text-burgundy">
           For Clients
         </h2>
@@ -140,7 +140,7 @@
       </div>
 
       <!-- For Photographers -->
-      <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+      <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-8">
         <h2 class="text-2xl font-bold mb-6 text-burgundy">
           For Photographers
         </h2>
@@ -234,7 +234,7 @@
       </div>
 
       <!-- Additional Features -->
-      <div class="bg-white rounded-lg shadow-lg p-8">
+      <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
         <h2 class="text-2xl font-bold mb-6 text-burgundy">
           Additional Features
         </h2>

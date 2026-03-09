@@ -45,7 +45,7 @@
       class="sticky top-0 z-50 sb-nav"
     >
       <div class="sb-nav__bg" aria-hidden="true"></div>
-      <div class="container mx-auto px-4 md:px-6 py-3 sb-nav__inner">
+      <div class="container mx-auto px-4 md:px-6 py-4 md:py-5 sb-nav__inner">
         <div class="flex items-center justify-between gap-4">
           <router-link
             to="/"
@@ -92,7 +92,7 @@
             </svg>
           </button>
 
-          <div class="hidden md:flex items-center gap-2">
+          <div class="hidden md:flex items-center gap-3">
             <router-link
               v-for="link in navLinks"
               :key="link.path"
@@ -108,7 +108,7 @@
             </router-link>
           </div>
 
-          <div class="hidden md:flex items-center gap-2">
+          <div class="hidden md:flex items-center gap-3">
             <span class="mx-1 h-1.5 w-1.5 rounded-full bg-gray-300" aria-hidden="true" />
             <div
               v-if="user"
@@ -356,7 +356,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main :class="['flex-1 animate-fade-in', !isAdminRoute ? 'pb-20 md:pb-0' : '']">
+    <main :class="['flex-1 animate-fade-in', !isAdminRoute ? 'public-main pb-20 md:pb-0' : '']">
       <router-view />
     </main>
 
@@ -852,8 +852,24 @@ const TrophyIcon = () => h('svg', { class: 'w-5 h-5', fill: 'none', stroke: 'cur
   h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' })
 ])
 
+const DiscoverIcon = () => h('svg', { class: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M12 2l7 4v12l-7 4-7-4V6l7-4z' }),
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M12 8l2.5 2.5L12 14l-2.5-2.5L12 8z' })
+])
+
+const CommunityIcon = () => h('svg', { class: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M17 20h5V10a2 2 0 00-2-2h-3m-4 12h4M7 20H2V10a2 2 0 012-2h3m0 12v-6a2 2 0 012-2h2a2 2 0 012 2v6m-6 0h6' })
+])
+
+const LearningIcon = () => h('svg', { class: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' })
+])
+
 const navLinks = [
   { name: 'Home', path: '/', icon: HomeIcon },
+  { name: 'Discover', path: '/discover', icon: DiscoverIcon },
+  { name: 'Community', path: '/community', icon: CommunityIcon },
+  { name: 'Learn', path: '/learn', icon: LearningIcon },
   { name: 'Events', path: '/events', icon: CalendarIcon },
   { name: 'Competitions', path: '/competitions', icon: TrophyIcon },
 ]

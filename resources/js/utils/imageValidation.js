@@ -71,7 +71,7 @@ export const validateUploadFile = async (file, options = {}) => {
           return { ok: false, message: `${label} must be ${imageWidth}x${imageHeight} px.` }
         }
       }
-    } catch (error) {
+    } catch {
       return { ok: false, message: `${label} is not a valid image.` }
     }
   }

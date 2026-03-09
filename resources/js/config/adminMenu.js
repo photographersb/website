@@ -383,6 +383,22 @@ export const adminMenuConfig = {
         description: 'Manage photo categories',
         permission: 'manage_categories',
       },
+      {
+        id: 'community-moderation',
+        label: 'Community Moderation',
+        route: '/admin/community',
+        icon: 'Shield',
+        description: 'Feature posts, review reports, moderate users',
+        permission: 'manage_categories',
+      },
+      {
+        id: 'learning-management',
+        label: 'Learning Management',
+        route: '/admin/learning',
+        icon: 'GraduationCap',
+        description: 'Moderate courses, instructors, and learning reviews',
+        permission: 'manage_categories',
+      },
     ]
   },
 

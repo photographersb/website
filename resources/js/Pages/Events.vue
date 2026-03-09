@@ -15,7 +15,7 @@
         <div class="absolute top-1/2 left-1/2 w-64 h-64 bg-white bg-opacity-5 rounded-full blur-2xl" />
       </div>
 
-      <div class="container mx-auto px-4 pt-10 pb-16 md:pt-10 md:pb-24 relative z-10">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl pt-10 pb-16 md:pt-10 md:pb-24 relative z-10">
         <!-- Logo/Brand Section -->
         <div class="text-center mt-5 mb-4 sm:mb-5 md:mb-6 lg:mb-8">
           <div class="inline-flex mb-2 sm:mb-3 px-3 sm:px-4 py-1 sm:py-1.5 bg-white bg-opacity-10 backdrop-blur-sm rounded-full border border-white border-opacity-20">
@@ -37,7 +37,7 @@
           </div>
         </div>
 
-        <h1 class="text-4xl md:text-6xl font-bold mb-4 text-center tracking-tight animate-fade-in">
+        <h1 class="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 text-center tracking-tight animate-fade-in">
           Photography Events
         </h1>
         <p class="text-lg md:text-xl text-gray-100 max-w-3xl mx-auto text-center leading-relaxed animate-fade-in-delay mb-10">
@@ -46,32 +46,32 @@
 
         <!-- Stats Bar -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-10 animate-fade-in-delay-2">
-          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
-            <div class="text-3xl md:text-4xl font-bold">
+          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-4 sm:p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
+            <div class="text-2xl sm:text-3xl md:text-4xl font-bold">
               {{ stats.total_events || 0 }}
             </div>
             <div class="text-sm md:text-base text-gray-200 mt-1">
               Total Events
             </div>
           </div>
-          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
-            <div class="text-3xl md:text-4xl font-bold">
+          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-4 sm:p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
+            <div class="text-2xl sm:text-3xl md:text-4xl font-bold">
               {{ stats.upcoming_events || 0 }}
             </div>
             <div class="text-sm md:text-base text-gray-200 mt-1">
               Upcoming
             </div>
           </div>
-          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
-            <div class="text-3xl md:text-4xl font-bold">
+          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-4 sm:p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
+            <div class="text-2xl sm:text-3xl md:text-4xl font-bold">
               {{ stats.total_cities || 0 }}
             </div>
             <div class="text-sm md:text-base text-gray-200 mt-1">
               Locations
             </div>
           </div>
-          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
-            <div class="text-3xl md:text-4xl font-bold">
+          <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-4 sm:p-6 text-center border border-white border-opacity-20 hover:bg-opacity-20 transition-all">
+            <div class="text-2xl sm:text-3xl md:text-4xl font-bold">
               {{ stats.total_rsvps || 0 }}
             </div>
             <div class="text-sm md:text-base text-gray-200 mt-1">
@@ -83,9 +83,9 @@
     </section>
 
     <!-- Main Content -->
-    <div class="container mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12 mt-5">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl py-6 sm:py-8 md:py-12 mt-5">
       <!-- Filters -->
-      <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 md:p-6 mb-6 sm:mb-8">
+      <div class="sb-ui-card p-4 sm:p-5 md:p-6 mb-6 sm:mb-8">
         <h2 class="text-lg sm:text-xl font-semibold mb-4">
           Filter Events
         </h2>
@@ -95,7 +95,7 @@
             <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Location</label>
             <select 
               v-model="filters.city" 
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm sm:text-base focus:ring-2 focus:ring-burgundy focus:border-transparent"
+              class="sb-ui-select text-sm sm:text-base"
               @change="applyFilters"
             >
               <option value="">
@@ -117,7 +117,7 @@
             <input
               v-model="filters.from_date"
               type="date"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm sm:text-base focus:ring-2 focus:ring-burgundy focus:border-transparent"
+              class="sb-ui-input text-sm sm:text-base"
               @change="applyFilters"
             >
           </div>
@@ -128,7 +128,7 @@
             <input
               v-model="filters.to_date"
               type="date"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm sm:text-base focus:ring-2 focus:ring-burgundy focus:border-transparent"
+              class="sb-ui-input text-sm sm:text-base"
               @change="applyFilters"
             >
           </div>
@@ -138,7 +138,7 @@
             <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Event Type</label>
             <select 
               v-model="filters.event_type" 
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm sm:text-base focus:ring-2 focus:ring-burgundy focus:border-transparent"
+              class="sb-ui-select text-sm sm:text-base"
               @change="applyFilters"
             >
               <option value="">
@@ -180,6 +180,8 @@
       <div
         v-if="loading"
         class="text-center py-12"
+        role="status"
+        aria-live="polite"
       >
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-burgundy" />
         <p class="text-gray-600 mt-4">
@@ -217,11 +219,11 @@
       <div v-else>
         <div class="flex justify-between items-center mb-4 sm:mb-6">
           <p class="text-sm sm:text-base text-gray-600">
-            Showing <span class="font-semibold">{{ events.length }}</span> events
+            Showing <span class="font-semibold">{{ filteredEventsCount }}</span> events
           </p>
           <select 
             v-model="filters.sort" 
-            class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm"
+            class="sb-ui-select !min-h-[44px] px-3 py-1.5 text-xs sm:text-sm"
             @change="applyFilters"
           >
             <option value="date_asc">
@@ -236,23 +238,45 @@
           </select>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
-          <div
-            v-for="event in events"
-            :key="event.id"
-            class="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group flex flex-col"
-            @click="viewEvent(event)"
+        <div class="space-y-8 sm:space-y-10">
+          <section
+            v-for="section in eventSections"
+            :key="section.key"
           >
+            <div class="flex items-center justify-between gap-3 mb-4">
+              <div>
+                <h2 class="text-xl sm:text-2xl font-semibold text-gray-900">
+                  {{ section.title }}
+                </h2>
+                <p class="text-xs sm:text-sm text-gray-600">
+                  {{ section.description }}
+                </p>
+              </div>
+              <span class="sb-ui-badge bg-gray-100 text-gray-700 text-xs sm:text-sm">{{ section.items.length }}</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 md:gap-8">
+              <div
+                v-for="event in section.items"
+                :key="`${section.key}-${event.id}`"
+                class="sb-ui-card sb-ui-card--interactive hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group flex flex-col"
+                role="button"
+                tabindex="0"
+                :aria-label="`Open event ${event.title}`"
+                @click="viewEvent(event)"
+                @keydown.enter="viewEvent(event)"
+                @keydown.space.prevent="viewEvent(event)"
+              >
             <!-- Event Image -->
             <div class="relative w-full overflow-hidden bg-gradient-to-br from-gray-300 to-gray-400 pt-[56.25%]">
-              <picture v-if="event.hero_image_url || event.banner_image">
+              <picture v-if="getEventImage(event) && !hasImageError(event.id)">
                 <source
-                  v-if="getWebpSource(event.hero_image_url || event.banner_image)"
-                  :srcset="getWebpSource(event.hero_image_url || event.banner_image)"
+                  v-if="getWebpSource(getEventImage(event))"
+                  :srcset="getWebpSource(getEventImage(event))"
                   type="image/webp"
                 >
                 <img
-                  :src="event.hero_image_url || event.banner_image"
+                  :src="getEventImage(event)"
                   :alt="event.title"
                   class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   loading="lazy"
@@ -260,6 +284,7 @@
                   width="1280"
                   height="720"
                   sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                  @error="markImageError(event.id)"
                 >
               </picture>
               <div
@@ -281,18 +306,18 @@
                 </svg>
               </div>
               <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
-              <div class="absolute top-3 left-3 bg-black/70 text-white px-2.5 py-1 rounded-full text-xs sm:text-sm font-semibold shadow">
+              <div class="absolute top-3 left-3 sb-ui-badge bg-black/70 text-white text-xs sm:text-sm shadow">
                 {{ formatDateBadge(event.start_datetime || event.event_date) || 'TBA' }}
               </div>
               <div
                 v-if="getFeaturedBadge(event)"
-                class="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs sm:text-sm font-semibold shadow"
+                class="absolute top-3 right-3 sb-ui-badge text-xs sm:text-sm shadow"
                 :class="getFeaturedBadge(event)?.tone"
               >
                 {{ getFeaturedBadge(event).label }}
               </div>
               <div
-                class="absolute bottom-3 left-3 px-2.5 py-1 rounded-full text-xs sm:text-sm font-semibold shadow"
+                class="absolute bottom-3 left-3 sb-ui-badge text-xs sm:text-sm shadow"
                 :class="getPriceBadge(event).tone"
               >
                 {{ getPriceBadge(event).label }}
@@ -304,7 +329,7 @@
               <!-- Event Type Badge -->
               <div class="flex items-center gap-2 mb-2">
                 <span
-                  class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide"
+                  class="sb-ui-badge text-xs font-semibold uppercase tracking-wide"
                   :class="getEventTypeBadge(event).tone"
                 >
                   {{ getEventTypeBadge(event).label }}
@@ -323,10 +348,10 @@
 
               <!-- Event Details -->
               <div class="space-y-2 mb-4">
-                <!-- Date -->
-                <div class="flex items-center text-xs sm:text-sm text-gray-700">
+                <!-- Date & Time -->
+                <div class="flex items-start text-xs sm:text-sm text-gray-700">
                   <svg
-                    class="w-4 h-4 mr-2 text-burgundy"
+                    class="w-4 h-4 mr-2 mt-0.5 text-burgundy"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -338,7 +363,20 @@
                       d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                     />
                   </svg>
-                  <span class="font-medium">{{ formatDate(event.event_date) }}</span>
+                  <div class="space-y-0.5">
+                    <div>
+                      <span class="text-gray-500">Date:</span>
+                      <span class="ml-1 font-medium">{{ formatDate(event.event_date || event.start_datetime) }}</span>
+                    </div>
+                    <div>
+                      <span class="text-gray-500">Start:</span>
+                      <span class="ml-1 font-medium">{{ formatTimeLabel(event.start_time, event.start_datetime) }}</span>
+                    </div>
+                    <div>
+                      <span class="text-gray-500">End:</span>
+                      <span class="ml-1 font-medium">{{ formatTimeLabel(event.end_time, event.end_datetime || event.event_end_date) }}</span>
+                    </div>
+                  </div>
                 </div>
 
                 <!-- Location -->
@@ -435,17 +473,17 @@
 
               <div class="mt-4 flex items-center gap-3">
                 <button
-                  class="flex-1 min-h-[44px] px-4 py-2 rounded-lg text-sm sm:text-base font-semibold bg-burgundy text-white hover:bg-rose-800 transition-colors"
+                  class="flex-1 sb-ui-btn sb-ui-btn--primary text-sm sm:text-base"
                   @click.stop="viewEvent(event)"
                 >
                   View Details
                 </button>
                 <button
                   :class="[
-                    'flex-1 min-h-[44px] px-4 py-2 rounded-lg text-sm sm:text-base font-semibold transition-colors',
+                    'flex-1 sb-ui-btn text-sm sm:text-base',
                     isRsvped(event)
-                      ? 'bg-green-600 text-white hover:bg-green-700'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-green-600 text-white hover:bg-green-700 border-transparent'
+                      : 'sb-ui-btn--secondary'
                   ]"
                   @click.stop="toggleRsvp(event)"
                 >
@@ -453,14 +491,16 @@
                 </button>
               </div>
             </div>
-          </div>
+              </div>
+            </div>
+          </section>
         </div>
 
         <!-- Pagination -->
         <div class="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 mt-8 sm:mt-10 md:mt-12">
           <button
             v-if="currentPage > 1"
-            class="w-full sm:w-auto px-4 sm:px-6 py-2 border border-[#eadfd7] rounded-full bg-white/90 hover:bg-white transition-colors text-sm sm:text-base shadow-sm"
+            class="w-full sm:w-auto sb-ui-btn sb-ui-btn--secondary text-sm sm:text-base rounded-full"
             @click="previousPage"
           >
             <span class="hidden sm:inline">← Previous</span>
@@ -473,7 +513,7 @@
           
           <button
             v-if="currentPage < totalPages"
-            class="w-full sm:w-auto px-4 sm:px-6 py-2 border border-[#eadfd7] rounded-full bg-white/90 hover:bg-white transition-colors text-sm sm:text-base shadow-sm"
+            class="w-full sm:w-auto sb-ui-btn sb-ui-btn--secondary text-sm sm:text-base rounded-full"
             @click="nextPage"
           >
             <span class="hidden sm:inline">Next →</span>
@@ -505,6 +545,7 @@ const loading = ref(false);
 const currentPage = ref(1);
 const totalPages = ref(1);
 const userRsvps = ref([]);
+const imageErrors = ref({});
 
 // Filters
 const filters = ref({
@@ -520,6 +561,59 @@ const hasActiveFilters = computed(() => {
   return filters.value.city || filters.value.from_date || 
          filters.value.to_date || filters.value.event_type;
 });
+
+const getEventDateValue = (event) => {
+  const raw = event?.start_datetime || event?.event_date || event?.created_at;
+  const date = raw ? new Date(raw) : null;
+  return date && !Number.isNaN(date.getTime()) ? date : null;
+};
+
+const isPastEvent = (event) => {
+  const eventDate = getEventDateValue(event);
+  if (!eventDate) return false;
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return eventDate < now;
+};
+
+const isFeaturedEvent = (event) => {
+  return Boolean(event?.is_featured || event?.is_admin_featured || event?.is_sponsored || event?.is_promoted);
+};
+
+const featuredEvents = computed(() => events.value.filter((event) => isFeaturedEvent(event)));
+const upcomingEvents = computed(() => events.value.filter((event) => !isPastEvent(event) && !isFeaturedEvent(event)));
+const pastEvents = computed(() => events.value.filter((event) => isPastEvent(event) && !isFeaturedEvent(event)));
+
+const eventSections = computed(() => {
+  const sections = [];
+  if (featuredEvents.value.length) {
+    sections.push({
+      key: 'featured',
+      title: 'Featured Events',
+      description: 'Curated highlights and premium photography experiences.',
+      items: featuredEvents.value,
+    });
+  }
+  if (upcomingEvents.value.length) {
+    sections.push({
+      key: 'upcoming',
+      title: 'Upcoming Events',
+      description: 'Open for registration and happening soon.',
+      items: upcomingEvents.value,
+    });
+  }
+  if (pastEvents.value.length) {
+    sections.push({
+      key: 'past',
+      title: 'Past Events',
+      description: 'Browse previous events and community highlights.',
+      items: pastEvents.value,
+    });
+  }
+  return sections;
+});
+
+const filteredEventsCount = computed(() => events.value.length);
 
 const normalizeSlug = (value) => {
   return String(value || '')
@@ -610,7 +704,10 @@ const getFeaturedBadge = (event) => {
 const getPriceBadge = (event) => {
   if (isPaidEvent(event)) {
     const amount = Number(event.ticket_price ?? event.price ?? event.base_price ?? 0);
-    const formatted = formatNumber(Number.isFinite(amount) ? amount : 0);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return { label: 'Paid', tone: 'bg-burgundy text-white' };
+    }
+    const formatted = formatNumber(amount);
     return { label: `৳${formatted}`, tone: 'bg-burgundy text-white' };
   }
   return { label: 'Free', tone: 'bg-green-600 text-white' };
@@ -633,12 +730,70 @@ const formatDateBadge = (value) => {
   return `${month} ${date.getDate()}`;
 };
 
+const formatTimeOnly = (value) => {
+  if (!value) return '';
+  if (typeof value === 'string') {
+    const match = value.match(/^(\d{2}):(\d{2})/);
+    if (match) return `${match[1]}:${match[2]}`;
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+};
+
+const isMidnight = (value) => {
+  if (!value || Number.isNaN(value.getTime())) return false;
+  return value.getHours() === 0 && value.getMinutes() === 0 && value.getSeconds() === 0;
+};
+
+const formatTimeLabel = (timeValue, dateValue) => {
+  const timeOnly = formatTimeOnly(timeValue);
+  if (timeOnly) return timeOnly;
+  if (!dateValue) return 'TBA';
+  const raw = String(dateValue);
+  if (!raw.includes(':') && raw.length <= 10) return 'TBA';
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime()) || isMidnight(date)) return 'TBA';
+  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+};
+
 const getWebpSource = (url) => {
   if (!url || typeof url !== 'string') return '';
   if (url.startsWith('data:')) return '';
   const match = url.match(/\.(jpg|jpeg|png)(\?.*)?$/i);
   if (!match) return '';
   return url.replace(/\.(jpg|jpeg|png)(\?.*)?$/i, '.webp$2');
+};
+
+const getGalleryImage = (event) => {
+  const gallery = event?.gallery_images;
+  if (Array.isArray(gallery)) return gallery[0] || '';
+  if (typeof gallery === 'string') {
+    try {
+      const parsed = JSON.parse(gallery);
+      return Array.isArray(parsed) ? (parsed[0] || '') : '';
+    } catch {
+      return '';
+    }
+  }
+  return '';
+};
+
+const getEventImage = (event) => {
+  return event?.hero_image_url
+    || event?.banner_image
+    || event?.og_image
+    || getGalleryImage(event)
+    || '';
+};
+
+const hasImageError = (id) => Boolean(imageErrors.value[id]);
+
+const markImageError = (id) => {
+  if (!id) return;
+  imageErrors.value = { ...imageErrors.value, [id]: true };
 };
 
 // Methods
@@ -714,13 +869,32 @@ const clearFilters = () => {
   applyFilters();
 };
 
+const getEventRouteKey = (event) => {
+  return event?.slug || event?.id || null;
+};
+
+const getEventPath = (event) => {
+  const key = getEventRouteKey(event);
+  return key ? `/events/${key}` : '/events';
+};
+
+const getEventTicketsPath = (event) => {
+  const key = getEventRouteKey(event);
+  return key ? `/events/${key}/tickets` : '/events';
+};
+
 const viewEvent = (event) => {
-  router.push(`/events/${event.slug}`);
+  router.push(getEventPath(event));
 };
 
 const isPaidEvent = (event) => {
   if (!event) return false;
   if (typeof event.is_ticketed === 'boolean') return event.is_ticketed;
+  if (typeof event.is_ticketed === 'number') return event.is_ticketed === 1;
+  if (typeof event.is_ticketed === 'string') {
+    const normalized = event.is_ticketed.trim().toLowerCase();
+    return normalized === '1' || normalized === 'true';
+  }
   if (event.event_mode) return event.event_mode === 'paid';
   if (event.event_type) return event.event_type === 'paid';
 
@@ -735,7 +909,7 @@ const toggleRsvp = async (event) => {
   }
 
   if (isPaidEvent(event)) {
-    router.push(`/events/${event.slug}/tickets`);
+    router.push(getEventTicketsPath(event));
     return;
   }
 
@@ -793,9 +967,35 @@ const nextPage = () => {
   }
 };
 
+const setMetaTag = (attribute, key, content) => {
+  if (!content) return;
+  let tag = document.head.querySelector(`meta[${attribute}="${key}"]`);
+  if (!tag) {
+    tag = document.createElement('meta');
+    tag.setAttribute(attribute, key);
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute('content', content);
+};
+
+const updatePageMeta = () => {
+  if (typeof window === 'undefined') return;
+  const title = 'Photography Events | Photographar SB';
+  const description = 'Explore upcoming, featured, and past photography events, workshops, and meetups.';
+  const canonical = `${window.location.origin}${route.path}`;
+
+  document.title = title;
+  setMetaTag('name', 'description', description);
+  setMetaTag('property', 'og:title', title);
+  setMetaTag('property', 'og:description', description);
+  setMetaTag('property', 'og:url', canonical);
+  setMetaTag('property', 'og:type', 'website');
+};
+
 // Lifecycle
 onMounted(() => {
   const initialize = async () => {
+    updatePageMeta();
     fetchStats();
     await fetchCities();
     fetchEvents();

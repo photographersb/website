@@ -141,11 +141,8 @@
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
 
-    <div id="app">
+    <div id="public-content">
         @yield('content')
     </div>
-    
-    <!-- Cookie Consent Banner Component -->
-    <cookie-consent-banner></cookie-consent-banner>
 </body>
 </html>

@@ -7,18 +7,18 @@
         <div class="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
       </div>
 
-      <div class="container mx-auto px-4 py-12 md:py-16 relative z-10 text-center">
-        <h1 class="text-3xl md:text-5xl font-bold mb-2 tracking-tight">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl py-12 md:py-16 relative z-10 text-center">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 tracking-tight">
           Reset Your Password
         </h1>
-        <p class="text-base md:text-lg text-gray-100">
+        <p class="text-base sm:text-lg md:text-xl text-gray-100 max-w-2xl mx-auto">
           We'll help you get back into your account
         </p>
       </div>
     </section>
 
     <!-- Reset Form -->
-    <div class="container mx-auto px-4 py-12 max-w-md">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 max-w-md">
       <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-100">
         <!-- Step 1: Enter Email -->
         <div v-if="step === 1">

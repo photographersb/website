@@ -1,5 +1,5 @@
 <template>
-  <!-- Meta tags are managed via document.title and meta elements -->
+  <span class="hidden" aria-hidden="true"></span>
 </template>
 
 <script>

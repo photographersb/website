@@ -1,641 +1,477 @@
 <template>
-  <div class="admin-shell">
+  <div class="min-h-screen bg-gray-50">
     <Toast
       v-if="toastVisible"
       :message="toastMessage"
       :type="toastType"
-      @close="closeToast"
+      @close="toastVisible = false"
     />
 
-    <AdminHeader 
-      title="📊 Admin Dashboard" 
-      subtitle="Platform Overview & Analytics"
+    <AdminHeader
+      title="📊 Admin Command Center"
+      subtitle="Real-time platform insights, monitoring, and operations"
     />
 
-    <div class="admin-shell__content px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       <AdminQuickNav />
 
-      <section class="dashboard-hero">
-        <div class="hero-copy">
-          <p class="hero-kicker">
-            COMMAND CENTER
-          </p>
-          <h1 class="hero-title">
-            Admin dashboard, tuned for clarity.
-          </h1>
-          <p class="hero-subtitle">
-            Track platform growth, revenue, and operational health from one cockpit.
-          </p>
-          <div class="hero-actions">
-            <router-link
-              to="/admin/analytics"
-              class="btn-admin-primary"
+      <section class="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+        <div class="grid grid-cols-1 xl:grid-cols-[1.4fr,1fr] gap-6">
+          <div>
+            <p class="text-xs font-bold tracking-[0.24em] text-gray-500 uppercase">Admin HQ</p>
+            <h1 class="mt-2 text-2xl sm:text-3xl font-bold text-gray-900">Platform command center</h1>
+            <p class="mt-2 text-sm sm:text-base text-gray-600 max-w-2xl">
+              Monitor growth, operations, health, and risk from one dashboard without leaving admin workflow.
+            </p>
+
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <button
+                type="button"
+                class="btn-admin-primary"
+                @click="go('/admin/events/create')"
+              >
+                Create Event
+              </button>
+              <button
+                type="button"
+                class="btn-admin-primary"
+                @click="go('/admin/competitions/create')"
+              >
+                Create Competition
+              </button>
+              <button
+                type="button"
+                class="btn-admin-secondary"
+                @click="go('/admin/verifications')"
+              >
+                Approve Photographers
+              </button>
+              <button
+                type="button"
+                class="btn-admin-secondary"
+                @click="go('/admin/notices')"
+              >
+                Send Platform Notice
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 sm:p-5">
+            <label class="text-sm font-semibold text-gray-800">Global Admin Search</label>
+            <div class="mt-2 flex gap-2">
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search users, photographers, events, competitions"
+                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-burgundy"
+              >
+              <button
+                type="button"
+                class="btn-admin-outline"
+                @click="fetchGlobalSearch"
+              >
+                Search
+              </button>
+            </div>
+
+            <div
+              v-if="searching"
+              class="mt-3 text-sm text-gray-500"
             >
-              Open Analytics
-            </router-link>
-            <router-link
-              to="/admin/approvals"
-              class="btn-admin-secondary"
+              Searching...
+            </div>
+
+            <div
+              v-else-if="searchQuery.trim().length >= 2 && globalSearchResults.length === 0"
+              class="mt-3 text-sm text-gray-500"
             >
-              Review Approvals
-            </router-link>
-          </div>
-        </div>
-        <div class="hero-status">
-          <div class="status-card">
-            <span class="status-label">System Health</span>
-            <span class="status-value">
-              {{ stats.system_status || 'Healthy' }}
-            </span>
-          </div>
-          <div class="status-card">
-            <span class="status-label">Active Competitions</span>
-            <span class="status-value">
-              {{ stats.active_competitions || 0 }}
-            </span>
-          </div>
-          <div class="status-card">
-            <span class="status-label">Pending Verifications</span>
-            <span class="status-value">
-              {{ stats.pending_verifications || 0 }}
-            </span>
+              No results found.
+            </div>
+
+            <div
+              v-else-if="globalSearchResults.length"
+              class="mt-3 space-y-2 max-h-56 overflow-auto"
+            >
+              <button
+                v-for="result in globalSearchResults"
+                :key="result.id"
+                type="button"
+                class="w-full text-left px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50"
+                @click="go(result.route)"
+              >
+                <p class="text-sm font-semibold text-gray-900">{{ result.title }}</p>
+                <p class="text-xs text-gray-500">{{ result.type }} • {{ result.subtitle }}</p>
+              </button>
+            </div>
+
+            <p class="mt-4 text-xs text-gray-500">Current role: <span class="font-semibold uppercase">{{ currentRole }}</span></p>
           </div>
         </div>
       </section>
 
-      <div class="dashboard-topbar">
-        <div class="topbar-left">
-          <div class="status-chip">
-            Updated just now
-          </div>
-        </div>
-        <div class="topbar-actions">
-          <router-link
-            to="/admin/system-health"
-            class="btn-admin-outline"
-          >
-            System Health
-          </router-link>
-          <router-link
-            to="/admin/activity-logs"
-            class="btn-admin-outline"
-          >
-            Activity Logs
-          </router-link>
-          <router-link
-            to="/judge/dashboard"
-            class="btn-admin-outline"
-          >
-            Judge Portal
-          </router-link>
-        </div>
-      </div>
-
-      <!-- Loading -->
       <div
         v-if="loading"
         class="text-center py-12"
       >
         <div class="admin-loader animate-spin rounded-full h-12 w-12 mx-auto" />
-        <p class="mt-4 text-gray-600">
-          Loading dashboard...
-        </p>
+        <p class="mt-4 text-gray-600">Loading command center...</p>
       </div>
 
-      <!-- Content -->
-      <div
-        v-else
-        class="space-y-6"
-      >
-            <!-- Main Stats Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <!-- Users -->
-              <div class="admin-kpi">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="admin-kpi__label">
-                      Total Users
-                    </p>
-                    <p class="admin-kpi__value">
-                      {{ stats.total_users || 0 }}
-                    </p>
-                    <p class="admin-kpi__meta admin-kpi__meta--success">
-                      {{ stats.active_users || 0 }} active
-                    </p>
-                  </div>
-                  <div class="admin-kpi__icon admin-kpi__icon--brand">
-                    <svg
-                      class="w-8 h-8"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div>
+      <template v-else>
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-8 gap-3">
+          <button
+            v-for="card in metricCards"
+            :key="card.key"
+            type="button"
+            class="text-left bg-white border border-gray-200 rounded-xl p-4 hover:border-burgundy/40 hover:shadow-sm transition"
+            @click="go(card.route)"
+          >
+            <p class="text-xs text-gray-500 uppercase tracking-wide">{{ card.label }}</p>
+            <p class="mt-1 text-2xl font-bold text-gray-900">{{ card.value }}</p>
+            <p class="mt-1 text-xs text-gray-500">{{ card.meta }}</p>
+          </button>
+        </section>
 
-              <!-- Photographers -->
-              <div class="admin-kpi">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="admin-kpi__label">
-                      Photographers
-                    </p>
-                    <p class="admin-kpi__value">
-                      {{ stats.total_photographers || 0 }}
-                    </p>
-                    <p class="admin-kpi__meta admin-kpi__meta--success">
-                      {{ stats.verified_photographers || 0 }} verified
-                    </p>
-                  </div>
-                  <div class="admin-kpi__icon admin-kpi__icon--info">
-                    <svg
-                      class="w-8 h-8"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                      />
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Bookings -->
-              <div class="admin-kpi">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="admin-kpi__label">
-                      Total Bookings
-                    </p>
-                    <p class="admin-kpi__value">
-                      {{ stats.total_bookings || 0 }}
-                    </p>
-                    <p class="admin-kpi__meta admin-kpi__meta--warning">
-                      {{ stats.pending_bookings || 0 }} pending
-                    </p>
-                  </div>
-                  <div class="admin-kpi__icon admin-kpi__icon--warning">
-                    <svg
-                      class="w-8 h-8"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Revenue -->
-              <div class="admin-kpi">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="admin-kpi__label">
-                      Total Revenue
-                    </p>
-                    <p class="admin-kpi__value">
-                      ৳{{ formatNumber(stats.total_revenue || 0) }}
-                    </p>
-                    <p class="admin-kpi__meta admin-kpi__meta--success">
-                      ৳{{ formatNumber(stats.monthly_revenue || 0) }} this month
-                    </p>
-                  </div>
-                  <div class="admin-kpi__icon admin-kpi__icon--success">
-                    <svg
-                      class="w-8 h-8"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Tips & Featured Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <!-- Tips Stats -->
-              <div class="admin-highlight admin-highlight--gold">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="text-sm font-medium text-white/80">
-                      Photographer Tips
-                    </p>
-                    <p class="mt-2 text-3xl font-bold">
-                      ৳{{ formatNumber(stats.total_tips || 0) }}
-                    </p>
-                    <p class="mt-1 text-sm text-white/80">
-                      {{ stats.total_tip_count || 0 }} tips received
-                    </p>
-                  </div>
-                  <div class="p-3 bg-white/20 rounded-full">
-                    <svg
-                      class="w-8 h-8"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H10.9v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.04c.1 1.7 1.36 2.66 2.86 2.97V19h2.34v-1.67c1.52-.29 2.72-1.16 2.73-2.77-.01-2.2-1.9-2.96-3.66-3.42z" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Featured Photographers Revenue -->
-              <div class="admin-highlight admin-highlight--rose">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="text-sm font-medium text-white/80">
-                      Featured Revenue
-                    </p>
-                    <p class="mt-2 text-3xl font-bold">
-                      ৳{{ formatNumber(stats.featured_revenue || 0) }}
-                    </p>
-                    <p class="mt-1 text-sm text-white/80">
-                      {{ stats.active_featured_photographers || 0 }} active
-                    </p>
-                    <router-link
-                      to="/admin/featured-photographers"
-                      class="inline-flex items-center gap-1 text-sm font-semibold text-white/90 hover:text-white mt-2"
-                    >
-                      Manage featured
-                      <svg
-                        class="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </router-link>
-                  </div>
-                  <div class="p-3 bg-white/20 rounded-full">
-                    <svg
-                      class="w-8 h-8"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Package Upgrades Revenue -->
-              <div class="admin-highlight admin-highlight--teal">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="text-sm font-medium text-white/80">
-                      Package Upgrades
-                    </p>
-                    <p class="mt-2 text-3xl font-bold">
-                      ৳{{ formatNumber(stats.upgrade_revenue || 0) }}
-                    </p>
-                    <p class="mt-1 text-sm text-white/80">
-                      {{ stats.total_upgrades || 0 }} upgrades
-                    </p>
-                  </div>
-                  <div class="p-3 bg-white/20 rounded-full">
-                    <svg
-                      class="w-8 h-8"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Recent Tips Table -->
-            <div class="admin-card">
-              <div class="admin-card__header px-6 py-4 flex justify-between items-center">
-                <h2 class="text-lg font-semibold text-gray-900">
-                  💰 Recent Tips
-                </h2>
-                <button class="btn-admin-outline text-sm">
-                  View All
+        <section class="grid grid-cols-1 2xl:grid-cols-3 gap-6">
+          <div class="2xl:col-span-2 space-y-6">
+            <div class="bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-900">Live Activity Feed</h2>
+                <button
+                  type="button"
+                  class="btn-admin-outline"
+                  @click="loadDashboard"
+                >
+                  Refresh
                 </button>
               </div>
+
               <div
-                v-if="recentTips.length === 0"
-                class="p-6 text-center text-gray-500"
+                v-if="paginatedActivity.length === 0"
+                class="py-10 text-center text-gray-500"
               >
-                No tips received yet
+                No recent activity found.
               </div>
+
               <div
                 v-else
-                class="overflow-x-auto"
+                class="mt-4 space-y-2"
               >
-                <table class="admin-table min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Photographer
-                      </th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Tipper
-                      </th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Amount
-                      </th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Payment Method
-                      </th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Message
-                      </th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Date
-                      </th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
-                    <tr
-                      v-for="tip in recentTips"
-                      :key="tip.id"
-                    >
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                          <div class="h-10 w-10 flex-shrink-0">
-                            <img
-                              v-if="tip.photographer?.profile_picture"
-                              :src="tip.photographer.profile_picture"
-                              class="h-10 w-10 rounded-full object-cover"
-                              :alt="tip.photographer.user?.name"
-                            >
-                            <div
-                              v-else
-                              class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold"
-                            >
-                              {{ tip.photographer?.user?.name?.charAt(0) || '?' }}
-                            </div>
-                          </div>
-                          <div class="ml-3">
-                            <div class="text-sm font-medium text-gray-900">
-                              {{ tip.photographer?.user?.name || 'Unknown' }}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {{ tip.tipper_name || 'Anonymous' }}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
-                        ৳{{ formatNumber(tip.amount) }}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <span class="badge badge-info">
-                          {{ tip.payment_method }}
-                        </span>
-                      </td>
-                      <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                        {{ tip.message || '-' }}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {{ formatDate(tip.created_at) }}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <span
-                          :class="getStatusClass(tip.status)"
-                        >
-                          {{ tip.status }}
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Top Photographers & Quick Stats -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <!-- Top Photographers by Tips -->
-              <div class="admin-card">
-                <div class="admin-card__header px-6 py-4">
-                  <h2 class="text-lg font-semibold text-gray-900">
-                    🏆 Top Photographers by Tips
-                  </h2>
-                </div>
-                <div class="p-6">
-                  <div
-                    v-if="topPhotographersByTips.length === 0"
-                    class="text-center text-gray-500 py-4"
-                  >
-                    No tips data available
-                  </div>
-                  <div
-                    v-else
-                    class="space-y-4"
-                  >
-                    <div
-                      v-for="(photographer, index) in topPhotographersByTips"
-                      :key="photographer.id"
-                      class="flex items-center"
-                    >
-                      <div class="flex-shrink-0 w-8 text-center">
-                        <span
-                          class="text-lg font-bold"
-                          :class="index === 0 ? 'text-yellow-500' : index === 1 ? 'text-gray-400' : index === 2 ? 'text-orange-600' : 'text-gray-600'"
-                        >
-                          {{ index + 1 }}
-                        </span>
-                      </div>
-                      <div class="ml-4 flex-shrink-0">
-                        <img
-                          v-if="photographer.profile_picture"
-                          :src="photographer.profile_picture"
-                          class="h-10 w-10 rounded-full object-cover"
-                          :alt="photographer.user?.name"
-                        >
-                        <div
-                          v-else
-                          class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold"
-                        >
-                          {{ photographer.user?.name?.charAt(0) || '?' }}
-                        </div>
-                      </div>
-                      <div class="ml-3 flex-1">
-                        <p class="text-sm font-medium text-gray-900">
-                          {{ photographer.user?.name || 'Unknown' }}
-                        </p>
-                        <p class="text-xs text-gray-500">
-                          {{ photographer.tip_count }} tips
-                        </p>
-                      </div>
-                      <div class="text-sm font-semibold text-green-600">
-                        ৳{{ formatNumber(photographer.total_tips) }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- System Health -->
-              <div class="admin-card">
-                <div class="admin-card__header px-6 py-4">
-                  <h2 class="text-lg font-semibold text-gray-900">
-                    ⚡ System Health
-                  </h2>
-                </div>
-                <div class="p-6 space-y-4">
-                  <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-600">Active Competitions</span>
-                    <span class="text-lg font-bold text-amber-700">{{ stats.active_competitions || 0 }}</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-600">Active Events</span>
-                    <span class="text-lg font-bold text-red-700">{{ stats.total_events || 0 }}</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-600">Total Reviews</span>
-                    <span class="text-lg font-bold text-amber-700">{{ stats.total_reviews || 0 }}</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-600">Average Rating</span>
-                    <span class="text-lg font-bold text-orange-600">{{ formatFixed(stats.avg_rating, 1, '0.0') }} ⭐</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-600">Pending Verifications</span>
-                    <span class="text-lg font-bold text-red-600">{{ stats.pending_verifications || 0 }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Profile Share Leaders -->
-            <div class="admin-card">
-              <div class="admin-card__header px-6 py-4">
-                <h2 class="text-lg font-semibold text-gray-900">
-                  🔗 Profile Share Leaders
-                </h2>
-              </div>
-              <div class="p-6">
                 <div
-                  v-if="profileShareLeaders.length === 0"
-                  class="text-center text-gray-500 py-4"
+                  v-for="item in paginatedActivity"
+                  :key="item.id"
+                  class="flex items-start justify-between gap-3 p-3 rounded-lg border border-gray-100"
                 >
-                  No profile share activity yet
+                  <div>
+                    <p class="text-sm font-semibold text-gray-900">{{ item.action }}</p>
+                    <p class="text-xs text-gray-600">Actor: {{ item.actor || 'System' }}</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-xs text-gray-500">{{ item.time_ago }}</p>
+                    <button
+                      type="button"
+                      class="text-xs text-burgundy hover:underline"
+                      @click="go(item.route || '/admin/activity-logs')"
+                    >
+                      Open
+                    </button>
+                  </div>
                 </div>
+
+                <div class="pt-2 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    class="btn-admin-outline"
+                    :disabled="activityPage <= 1"
+                    @click="activityPage--"
+                  >
+                    Prev
+                  </button>
+                  <span class="text-xs text-gray-500">Page {{ activityPage }} / {{ activityTotalPages }}</span>
+                  <button
+                    type="button"
+                    class="btn-admin-outline"
+                    :disabled="activityPage >= activityTotalPages"
+                    @click="activityPage++"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-900">Growth Visualization</h2>
+                <button
+                  type="button"
+                  class="btn-admin-outline"
+                  @click="chartsVisible = !chartsVisible"
+                >
+                  {{ chartsVisible ? 'Hide Charts' : 'Show Charts' }}
+                </button>
+              </div>
+
+              <div
+                ref="chartContainer"
+                class="mt-4"
+              >
+                <div v-if="!chartsVisible" class="text-sm text-gray-500">Charts are lazy-loaded for faster dashboard performance.</div>
                 <div
                   v-else
-                  class="space-y-4"
+                  class="grid grid-cols-1 lg:grid-cols-2 gap-4"
                 >
-                  <div
-                    v-for="(leader, index) in profileShareLeaders"
-                    :key="leader.id"
-                    class="flex items-center justify-between"
-                  >
-                    <div class="flex items-center gap-3">
-                      <div class="w-6 text-center text-sm font-semibold text-gray-500">
-                        {{ index + 1 }}
-                      </div>
-                      <div class="h-10 w-10 flex-shrink-0">
-                        <img
-                          v-if="leader.profile_picture"
-                          :src="leader.profile_picture"
-                          class="h-10 w-10 rounded-full object-cover"
-                          :alt="leader.user?.name"
-                        >
-                        <div
-                          v-else
-                          class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold"
-                        >
-                          {{ leader.user?.name?.charAt(0) || '?' }}
+                  <div class="rounded-lg border border-gray-200 p-4">
+                    <h3 class="font-semibold text-gray-800 mb-3">User registrations</h3>
+                    <div class="space-y-2">
+                      <div
+                        v-for="row in userGrowthChart"
+                        :key="row.label"
+                        class="grid grid-cols-[80px,1fr,44px] items-center gap-2"
+                      >
+                        <span class="text-xs text-gray-500">{{ row.label }}</span>
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div class="h-2 bg-burgundy rounded-full" :style="{ width: row.width }" />
                         </div>
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-900">
-                          {{ leader.user?.name || 'Unknown' }}
-                        </p>
-                        <p class="text-xs text-gray-500">
-                          {{ leader.user?.username ? `/@${leader.user.username}` : `/photographer/${leader.slug || 'profile'}` }}
-                        </p>
+                        <span class="text-xs text-gray-700 text-right">{{ row.value }}</span>
                       </div>
                     </div>
-                    <div class="text-right">
-                      <p class="text-sm font-semibold text-gray-900">
-                        {{ leader.share_visits }} visits
-                      </p>
-                      <p class="text-xs text-gray-500">
-                        {{ leader.share_clicks }} clicks
-                      </p>
+                  </div>
+
+                  <div class="rounded-lg border border-gray-200 p-4">
+                    <h3 class="font-semibold text-gray-800 mb-3">Bookings by status</h3>
+                    <div class="space-y-2">
+                      <div
+                        v-for="row in bookingStatusChart"
+                        :key="row.label"
+                        class="grid grid-cols-[90px,1fr,44px] items-center gap-2"
+                      >
+                        <span class="text-xs text-gray-500 capitalize">{{ row.label }}</span>
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div class="h-2 bg-amber-500 rounded-full" :style="{ width: row.width }" />
+                        </div>
+                        <span class="text-xs text-gray-700 text-right">{{ row.value }}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          <!-- End grid lg:grid-cols-2 -->
-      </div>
-      <!-- End v-else space-y-6 -->
+
+            <div class="bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
+              <h2 class="text-lg sm:text-xl font-bold text-gray-900">Navigation Hubs</h2>
+              <div class="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                <div
+                  v-for="group in navGroups"
+                  :key="group.title"
+                  class="rounded-lg border border-gray-100 p-3"
+                >
+                  <h3 class="text-sm font-semibold text-gray-900">{{ group.title }}</h3>
+                  <div class="mt-2 flex flex-wrap gap-2">
+                    <button
+                      v-for="link in group.links"
+                      :key="link.route"
+                      type="button"
+                      class="px-2.5 py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs hover:bg-gray-200"
+                      @click="go(link.route)"
+                    >
+                      {{ link.label }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <div class="bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-gray-900">System Health</h2>
+                <button
+                  type="button"
+                  class="btn-admin-outline"
+                  @click="go('/admin/system-health')"
+                >
+                  Details
+                </button>
+              </div>
+              <div class="mt-3 space-y-2">
+                <div
+                  v-for="check in healthChecks"
+                  :key="check.key"
+                  class="flex items-center justify-between border border-gray-100 rounded-lg px-3 py-2"
+                >
+                  <div class="flex items-center gap-2">
+                    <span :class="['health-dot', `health-dot--${check.status || 'yellow'}`]" />
+                    <span class="text-sm font-medium text-gray-900">{{ check.label }}</span>
+                  </div>
+                  <span class="text-xs text-gray-600">{{ check.message }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-gray-900">Error Center</h2>
+                <button
+                  type="button"
+                  class="btn-admin-outline"
+                  @click="go('/admin/error-center')"
+                >
+                  Open
+                </button>
+              </div>
+              <p class="mt-1 text-xs text-gray-500">
+                Open: {{ errorStats.open }} • Critical: {{ errorStats.critical }} • Resolved: {{ errorStats.resolved }}
+              </p>
+
+              <div class="mt-3 space-y-2 max-h-72 overflow-auto">
+                <div
+                  v-for="err in paginatedErrors"
+                  :key="err.id"
+                  class="border border-gray-100 rounded-lg p-3"
+                >
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-xs font-semibold" :class="severityClass(err.severity)">{{ err.severity || 'P3' }}</span>
+                    <span class="text-xs text-gray-500">{{ err.timestamp ? formatDate(err.timestamp) : '-' }}</span>
+                  </div>
+                  <p class="mt-1 text-sm font-medium text-gray-900 line-clamp-2">{{ err.message }}</p>
+                  <p class="text-xs text-gray-500 truncate">{{ err.route || '-' }}</p>
+
+                  <div class="mt-2 flex gap-2">
+                    <button
+                      v-if="!err.is_resolved"
+                      type="button"
+                      class="btn-admin-secondary"
+                      @click="resolveError(err)"
+                    >
+                      Mark Resolved
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-admin-outline"
+                      @click="go('/admin/error-center')"
+                    >
+                      Inspect
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-2 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  class="btn-admin-outline"
+                  :disabled="errorPage <= 1"
+                  @click="errorPage--"
+                >
+                  Prev
+                </button>
+                <span class="text-xs text-gray-500">Page {{ errorPage }} / {{ errorTotalPages }}</span>
+                <button
+                  type="button"
+                  class="btn-admin-outline"
+                  :disabled="errorPage >= errorTotalPages"
+                  @click="errorPage++"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-gray-900">Admin Notices</h2>
+                <button
+                  type="button"
+                  class="btn-admin-outline"
+                  @click="go('/admin/notices')"
+                >
+                  Manage
+                </button>
+              </div>
+
+              <div class="mt-3 grid grid-cols-3 gap-2 text-center">
+                <div class="rounded-lg bg-gray-50 p-2">
+                  <p class="text-xs text-gray-500">Published</p>
+                  <p class="font-semibold">{{ noticesSummary.published }}</p>
+                </div>
+                <div class="rounded-lg bg-gray-50 p-2">
+                  <p class="text-xs text-gray-500">Draft</p>
+                  <p class="font-semibold">{{ noticesSummary.draft }}</p>
+                </div>
+                <div class="rounded-lg bg-gray-50 p-2">
+                  <p class="text-xs text-gray-500">Scheduled</p>
+                  <p class="font-semibold">{{ noticesSummary.scheduled }}</p>
+                </div>
+              </div>
+
+              <div class="mt-3 space-y-2">
+                <div
+                  v-for="notice in noticesSummary.recent || []"
+                  :key="notice.id"
+                  class="rounded-lg border border-gray-100 p-2"
+                >
+                  <p class="text-sm font-medium text-gray-900 line-clamp-1">{{ notice.title }}</p>
+                  <p class="text-xs text-gray-500">{{ notice.priority }} • {{ notice.status }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
+              <h2 class="text-lg font-bold text-gray-900">Role Access</h2>
+              <div class="mt-3 space-y-2">
+                <div
+                  v-for="item in roleAccessMatrix"
+                  :key="item.role"
+                  class="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2"
+                >
+                  <span class="text-sm font-medium text-gray-800">{{ item.role }}</span>
+                  <span class="text-xs" :class="item.enabled ? 'text-green-600' : 'text-gray-400'">
+                    {{ item.enabled ? item.scope : 'No dashboard scope' }}
+                  </span>
+                </div>
+              </div>
+              <p class="mt-3 text-xs text-gray-500">Unauthorized admin APIs are already protected by middleware and controller checks.</p>
+            </div>
+          </div>
+        </section>
+      </template>
     </div>
-    <!-- End max-w-full Container -->
   </div>
-  <!-- End min-h-screen -->
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import api from '../../api';
 import AdminHeader from '../../components/AdminHeader.vue';
 import AdminQuickNav from '../../components/AdminQuickNav.vue';
 import Toast from '../../components/ui/Toast.vue';
 import {
   formatDate as formatDateValue,
-  formatFixed,
-  formatNumber as formatNumberValue
+  formatNumber as formatNumberValue,
 } from '../../utils/formatters';
 
+const router = useRouter();
 const loading = ref(true);
 const dashboardData = ref({});
+const errorStats = ref({ total: 0, open: 0, critical: 0, resolved: 0 });
 
-// Toast state
+const searchQuery = ref('');
+const searching = ref(false);
+const globalSearchResults = ref([]);
+let searchTimeout = null;
+
+const activityPage = ref(1);
+const activityPerPage = 8;
+
+const errorPage = ref(1);
+const errorPerPage = 4;
+
+const chartsVisible = ref(false);
+const chartContainer = ref(null);
+
 const toastVisible = ref(false);
 const toastMessage = ref('');
 const toastType = ref('success');
@@ -646,165 +482,246 @@ const showToast = (message, type = 'success') => {
   toastVisible.value = true;
 };
 
-const closeToast = () => {
-  toastVisible.value = false;
+const go = (path) => {
+  if (!path) return;
+  router.push(path);
 };
 
 const stats = computed(() => dashboardData.value.stats || {});
-const recentTips = computed(() => dashboardData.value.recent_tips || []);
-const topPhotographersByTips = computed(() => dashboardData.value.top_photographers_by_tips || []);
-const profileShareLeaders = computed(() => dashboardData.value.profile_share_leaderboard || []);
+const healthChecks = computed(() => dashboardData.value.system_health_panel || []);
+const noticesSummary = computed(() => dashboardData.value.notice_summary || { published: 0, draft: 0, scheduled: 0, recent: [] });
+const currentRole = computed(() => dashboardData.value.current_user?.role || 'admin');
 
-const formatNumber = (num) => {
-  return formatNumberValue(num);
-};
+const metricCards = computed(() => [
+  { key: 'total_photographers', label: 'Total photographers', value: formatNumberValue(stats.value.total_photographers || 0), meta: `${formatNumberValue(stats.value.verified_photographers || 0)} verified`, route: '/admin/photographers' },
+  { key: 'verified_photographers', label: 'Verified photographers', value: formatNumberValue(stats.value.verified_photographers || 0), meta: `${formatNumberValue(stats.value.pending_verifications || 0)} pending`, route: '/admin/verifications' },
+  { key: 'active_events', label: 'Active events', value: formatNumberValue(stats.value.active_events || stats.value.total_events || 0), meta: `${formatNumberValue(stats.value.upcoming_events || 0)} upcoming`, route: '/admin/events' },
+  { key: 'running_competitions', label: 'Running competitions', value: formatNumberValue(stats.value.running_competitions || stats.value.active_competitions || 0), meta: `${formatNumberValue(stats.value.total_submissions || 0)} submissions`, route: '/admin/competitions' },
+  { key: 'total_bookings', label: 'Total bookings', value: formatNumberValue(stats.value.total_bookings || 0), meta: `${formatNumberValue(stats.value.pending_bookings || 0)} pending`, route: '/admin/bookings' },
+  { key: 'total_inquiries', label: 'Total inquiries', value: formatNumberValue(stats.value.total_inquiries || 0), meta: 'Contact messages', route: '/admin/contact-messages' },
+  { key: 'total_users', label: 'Total users', value: formatNumberValue(stats.value.total_users || 0), meta: `${formatNumberValue(stats.value.active_users || 0)} active`, route: '/admin/users' },
+  { key: 'total_revenue', label: 'Total revenue', value: `৳${formatNumberValue(stats.value.total_revenue || 0)}`, meta: `৳${formatNumberValue(stats.value.monthly_revenue || 0)} this month`, route: '/admin/transactions' },
+]);
 
-const formatDate = (dateString) => {
-  if (!dateString) return '-';
-  return formatDateValue(dateString);
-};
+const activityFeed = computed(() => dashboardData.value.activity_feed || []);
+const activityTotalPages = computed(() => Math.max(1, Math.ceil(activityFeed.value.length / activityPerPage)));
+const paginatedActivity = computed(() => {
+  const start = (activityPage.value - 1) * activityPerPage;
+  return activityFeed.value.slice(start, start + activityPerPage);
+});
 
-const getStatusClass = (status) => {
-  const classes = {
-    completed: 'status-pill status-pill--success',
-    pending: 'status-pill status-pill--warning',
-    failed: 'status-pill status-pill--danger',
-    cancelled: 'status-pill status-pill--neutral'
+const errorsPreview = computed(() => dashboardData.value.error_center_preview || []);
+const errorTotalPages = computed(() => Math.max(1, Math.ceil(errorsPreview.value.length / errorPerPage)));
+const paginatedErrors = computed(() => {
+  const start = (errorPage.value - 1) * errorPerPage;
+  return errorsPreview.value.slice(start, start + errorPerPage);
+});
+
+const userGrowthChart = computed(() => toChartRows(dashboardData.value.user_growth || [], 'month', 'count'));
+const bookingStatusChart = computed(() => toChartRows(dashboardData.value.booking_stats || [], 'status', 'count'));
+
+const navGroups = computed(() => [
+  {
+    title: 'Platform Management',
+    links: [
+      { label: 'Users', route: '/admin/users' },
+      { label: 'Approvals', route: '/admin/approvals' },
+      { label: 'Roles', route: '/admin/roles' },
+      { label: 'Settings', route: '/admin/settings' },
+    ],
+  },
+  {
+    title: 'Photographers & Content',
+    links: [
+      { label: 'Photographers', route: '/admin/photographers' },
+      { label: 'Verifications', route: '/admin/verifications' },
+      { label: 'Featured', route: '/admin/featured-photographers' },
+      { label: 'Reviews', route: '/admin/reviews' },
+    ],
+  },
+  {
+    title: 'Events & Competitions',
+    links: [
+      { label: 'Events', route: '/admin/events' },
+      { label: 'Competitions', route: '/admin/competitions' },
+      { label: 'Submissions', route: '/admin/submissions' },
+      { label: 'Certificates', route: '/admin/certificates' },
+      { label: 'Certificate Automation', route: '/admin/certificates/automation-rules' },
+    ],
+  },
+  {
+    title: 'Payments & Analytics',
+    links: [
+      { label: 'Bookings', route: '/admin/bookings' },
+      { label: 'Transactions', route: '/admin/transactions' },
+      { label: 'Analytics', route: '/admin/analytics' },
+      { label: 'System', route: '/admin/system-health' },
+    ],
+  },
+  {
+    title: 'Moderation & System',
+    links: [
+      { label: 'Error Center', route: '/admin/error-center' },
+      { label: 'Activity Logs', route: '/admin/activity-logs' },
+      { label: 'Notices', route: '/admin/notices' },
+      { label: 'Audit Logs', route: '/admin/audit-logs' },
+    ],
+  },
+]);
+
+const roleAccessMatrix = computed(() => {
+  const role = currentRole.value;
+  return [
+    { role: 'Admins', enabled: ['admin', 'super_admin'].includes(role), scope: 'Full platform control' },
+    { role: 'Moderators', enabled: role === 'moderator', scope: 'Moderation tools' },
+    { role: 'Judges', enabled: true, scope: 'Judging panel via /judge/dashboard' },
+    { role: 'Mentors', enabled: true, scope: 'Mentoring features via /admin/mentors' },
+  ];
+});
+
+const severityClass = (severity) => {
+  const map = {
+    P0: 'text-red-700',
+    P1: 'text-orange-700',
+    P2: 'text-amber-700',
+    P3: 'text-blue-700',
+    P4: 'text-gray-700',
   };
-  return classes[status] || 'status-pill status-pill--neutral';
+  return map[severity] || 'text-gray-700';
+};
+
+const formatDate = (value) => {
+  if (!value) return '-';
+  return formatDateValue(value);
+};
+
+const toChartRows = (rows, labelKey, valueKey) => {
+  const normalized = (rows || []).map((row) => ({
+    label: row?.[labelKey] || '-',
+    value: Number(row?.[valueKey] || 0),
+  }));
+
+  const max = Math.max(1, ...normalized.map((row) => row.value));
+  return normalized.slice(-8).map((row) => ({
+    ...row,
+    width: `${Math.max(6, Math.round((row.value / max) * 100))}%`,
+  }));
 };
 
 const loadDashboard = async () => {
   try {
     loading.value = true;
-    const response = await api.get('/admin/dashboard');
-    
-    if (response.data.status === 'success') {
-      dashboardData.value = response.data.data;
+    const [dashboardRes, errorStatsRes] = await Promise.all([
+      api.get('/admin/dashboard'),
+      api.get('/admin/error-logs/statistics').catch(() => ({ data: { data: {} } })),
+    ]);
+
+    if (dashboardRes.data?.status === 'success') {
+      dashboardData.value = dashboardRes.data.data || {};
     } else {
       showToast('Failed to load dashboard data', 'error');
     }
+
+    errorStats.value = errorStatsRes.data?.data || { total: 0, open: 0, critical: 0, resolved: 0 };
   } catch (error) {
-    console.error('Dashboard load error:', error);
-    showToast(error.response?.data?.message || 'Failed to load dashboard', 'error');
+    showToast(error?.response?.data?.message || 'Failed to load admin dashboard', 'error');
   } finally {
     loading.value = false;
   }
 };
 
-onMounted(() => {
-  loadDashboard();
+const fetchGlobalSearch = async () => {
+  const q = searchQuery.value.trim();
+  if (q.length < 2) {
+    globalSearchResults.value = [];
+    return;
+  }
+
+  try {
+    searching.value = true;
+    const { data } = await api.get('/admin/global-search', { params: { q, limit: 5 } });
+    globalSearchResults.value = data?.data?.results || [];
+  } catch (error) {
+    showToast('Global search failed', 'error');
+  } finally {
+    searching.value = false;
+  }
+};
+
+const resolveError = async (errorItem) => {
+  if (!errorItem?.id) return;
+  try {
+    await api.post(`/admin/error-logs/${errorItem.id}/resolve`);
+    showToast('Issue marked as resolved', 'success');
+    await loadDashboard();
+  } catch (error) {
+    showToast('Failed to resolve issue', 'error');
+  }
+};
+
+watch(searchQuery, () => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(fetchGlobalSearch, 350);
+});
+
+watch(activityTotalPages, () => {
+  if (activityPage.value > activityTotalPages.value) {
+    activityPage.value = activityTotalPages.value;
+  }
+});
+
+watch(errorTotalPages, () => {
+  if (errorPage.value > errorTotalPages.value) {
+    errorPage.value = errorTotalPages.value;
+  }
+});
+
+onMounted(async () => {
+  await loadDashboard();
+
+  if ('IntersectionObserver' in window && chartContainer.value) {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        chartsVisible.value = true;
+        observer.disconnect();
+      }
+    }, { threshold: 0.2 });
+
+    observer.observe(chartContainer.value);
+  } else {
+    chartsVisible.value = true;
+  }
 });
 </script>
 
 <style scoped>
-.dashboard-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  gap: 1.5rem;
-  padding: 1.75rem 2rem;
-  border-radius: 1.5rem;
-  border: 1px solid rgba(142, 14, 63, 0.2);
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(247, 239, 233, 0.82)),
-    linear-gradient(90deg, rgba(142, 14, 63, 0.06), transparent 45%, rgba(109, 72, 56, 0.08));
-  box-shadow: 0 25px 55px rgba(24, 12, 8, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(6px);
-}
-
-.hero-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
-
-.hero-kicker {
-  font-size: 0.7rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--admin-text-secondary);
-  font-weight: 700;
-}
-
-.hero-title {
-  font-size: 2.1rem;
-  line-height: 1.1;
-  color: var(--admin-text-primary);
-  text-shadow: 0 2px 14px rgba(142, 14, 63, 0.18);
-}
-
-.hero-subtitle {
-  color: var(--admin-text-secondary);
-  max-width: 480px;
-}
-
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.hero-status {
-  display: grid;
-  gap: 0.8rem;
-}
-
-.status-card {
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(142, 14, 63, 0.2);
-  border-radius: 1rem;
-  padding: 1rem 1.25rem;
-  box-shadow: 0 16px 35px rgba(22, 12, 8, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.status-label {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--admin-text-secondary);
-}
-
-.status-value {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--admin-text-primary);
-}
-
-.dashboard-topbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.25rem;
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(140, 108, 95, 0.2);
-  border-radius: 1.1rem;
-  box-shadow: 0 18px 35px rgba(18, 9, 6, 0.08);
-  backdrop-filter: blur(8px);
-}
-
-.topbar-actions {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.status-chip {
-  background: rgba(142, 14, 63, 0.12);
-  color: var(--admin-text-primary);
-  padding: 0.4rem 0.8rem;
+.health-dot {
+  width: 0.6rem;
+  height: 0.6rem;
   border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  display: inline-flex;
+  flex-shrink: 0;
 }
 
-@media (max-width: 1024px) {
-  .dashboard-hero {
-    grid-template-columns: 1fr;
+.health-dot--green {
+  background-color: #16a34a;
+}
+
+.health-dot--yellow {
+  background-color: #ca8a04;
+}
+
+.health-dot--red {
+  background-color: #dc2626;
+}
+
+@media (max-width: 640px) {
+  .btn-admin-primary,
+  .btn-admin-secondary,
+  .btn-admin-outline {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    padding: 0.45rem 0.65rem;
   }
 }
 </style>

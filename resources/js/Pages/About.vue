@@ -7,7 +7,7 @@
         <div class="absolute bottom-0 right-0 w-96 h-96 bg-white bg-opacity-5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
       </div>
 
-      <div class="container mx-auto px-4 pt-10 pb-16 md:pt-10 md:pb-24 relative z-10 text-center">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl pt-10 pb-16 md:pt-10 md:pb-24 relative z-10 text-center">
         <div class="inline-flex mt-5 mb-2 sm:mb-3 px-3 sm:px-4 py-1 sm:py-1.5 bg-white bg-opacity-10 backdrop-blur-sm rounded-full border border-white border-opacity-20">
           <p class="text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2 justify-center">
             <svg
@@ -25,18 +25,18 @@
             >Somogro Bangladesh</a>
           </p>
         </div>
-        <h1 class="text-4xl md:text-6xl font-bold mb-4 tracking-tight">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 tracking-tight">
           About Photographer SB
         </h1>
-        <p class="text-lg md:text-xl text-gray-100 max-w-3xl mx-auto">
+        <p class="text-base sm:text-lg md:text-xl text-gray-100 max-w-3xl mx-auto">
           Bangladesh's premier photography marketplace
         </p>
       </div>
     </section>
 
-    <div class="container mx-auto px-4 py-12 max-w-4xl">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-12 max-w-4xl">
       <!-- Story Section -->
-      <div class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-100">
+      <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-8 border border-gray-100">
         <h2 class="text-2xl font-bold mb-4 text-burgundy">
           Our Story
         </h2>
@@ -50,7 +50,7 @@
 
       <!-- Mission & Vision -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="bg-white rounded-2xl shadow-xl p-6">
           <div class="flex items-center gap-3 mb-4">
             <div class="w-12 h-12 bg-burgundy rounded-lg flex items-center justify-center">
               <svg
@@ -76,7 +76,7 @@
           </p>
         </div>
 
-        <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="bg-white rounded-2xl shadow-xl p-6">
           <div class="flex items-center gap-3 mb-4">
             <div class="w-12 h-12 bg-burgundy rounded-lg flex items-center justify-center">
               <svg
@@ -110,7 +110,7 @@
       </div>
 
       <!-- Why Choose Us -->
-      <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+      <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-8">
         <h2 class="text-2xl font-bold mb-6 text-burgundy">
           Why Choose Photographer SB?
         </h2>
@@ -183,7 +183,7 @@
 
       <!-- Stats -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-burgundy text-white rounded-lg shadow-lg p-6 text-center">
+        <div class="bg-burgundy text-white rounded-2xl shadow-xl p-6 text-center">
           <div class="text-3xl font-bold mb-2">
             {{ stats.photographers }}+
           </div>
@@ -191,7 +191,7 @@
             Photographers
           </div>
         </div>
-        <div class="bg-burgundy text-white rounded-lg shadow-lg p-6 text-center">
+        <div class="bg-burgundy text-white rounded-2xl shadow-xl p-6 text-center">
           <div class="text-3xl font-bold mb-2">
             {{ formatNumber(stats.visitors) }}+
           </div>
@@ -199,7 +199,7 @@
             Happy Clients
           </div>
         </div>
-        <div class="bg-burgundy text-white rounded-lg shadow-lg p-6 text-center">
+        <div class="bg-burgundy text-white rounded-2xl shadow-xl p-6 text-center">
           <div class="text-3xl font-bold mb-2">
             {{ stats.cities }}+
           </div>
@@ -207,7 +207,7 @@
             Cities Covered
           </div>
         </div>
-        <div class="bg-burgundy text-white rounded-lg shadow-lg p-6 text-center">
+        <div class="bg-burgundy text-white rounded-2xl shadow-xl p-6 text-center">
           <div class="text-3xl font-bold mb-2">
             {{ stats.rating }}★
           </div>
@@ -218,7 +218,7 @@
       </div>
 
       <!-- Team Values -->
-      <div class="bg-white rounded-lg shadow-lg p-8">
+      <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
         <h2 class="text-2xl font-bold mb-6 text-burgundy">
           Our Values
         </h2>

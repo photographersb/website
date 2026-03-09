@@ -7,6 +7,7 @@ import api from './api'
 // Components
 import App from './App.vue'
 const PhotographerSearch = () => import('./components/PhotographerSearch.vue')
+const Discover = () => import('./Pages/Discover.vue')
 const PhotographerProfile = () => import('./components/PhotographerProfile.vue')
 const BookingForm = () => import('./components/BookingForm.vue')
 const Auth = () => import('./components/Auth.vue')
@@ -40,12 +41,6 @@ const AdminFeaturedPhotographersIndex = () => import('./Pages/Admin/FeaturedPhot
 const AdminDataHubPage = () => import('./Pages/Admin/DataHub.vue')
 const AdminFeaturedHashtagsPage = () => import('./Pages/Admin/FeaturedHashtags.vue')
 const AdminLocationsPage = () => import('./Pages/Admin/Cities/Index.vue')
-const AdminDataHub = () => import('./components/AdminDataHub.vue')
-const AdminSponsorManagement = () => import('./components/AdminSponsorManagement.vue')
-const AdminPhotoCategoryManagement = () => import('./components/AdminPhotoCategoryManagement.vue')
-const AdminHashtagManagement = () => import('./components/AdminHashtagManagement.vue')
-const EventsList = () => import('./components/EventsList.vue')
-const CompetitionsList = () => import('./components/CompetitionsList.vue')
 const Competitions = () => import('./Pages/Competitions.vue')
 const CompetitionDetail = () => import('./Pages/CompetitionDetail.vue')
 const CompetitionSubmit = () => import('./Pages/CompetitionSubmit.vue')
@@ -73,7 +68,6 @@ const AdminEventsEdit = () => import('./Pages/Admin/Events/Edit.vue')
 const AdminEventCheckIn = () => import('./Pages/Admin/Events/CheckIn.vue')
 const SubmissionModeration = () => import('./Pages/Admin/SubmissionModeration.vue')
 const JudgeScoring = () => import('./Pages/JudgeScoring.vue')
-const JudgeDashboard = () => import('./Pages/JudgeDashboard.vue')
 const WinnerAnnouncement = () => import('./Pages/WinnerAnnouncement.vue')
 const AdminUsersIndex = () => import('./Pages/Admin/Users/Index.vue')
 const AdminPhotographersIndex = () => import('./Pages/Admin/Photographers/Index.vue')
@@ -89,8 +83,10 @@ const AdminNoticesIndex = () => import('./Pages/Admin/Notices/Index.vue')
 const AdminCertificatesIndex = () => import('./Pages/Admin/Certificates/Index.vue')
 const AdminCertificatesManualIssuance = () => import('./Pages/Admin/Certificates/ManualIssuance.vue')
 const AdminCertificatesTemplates = () => import('./Pages/Admin/Certificates/Templates.vue')
+const AdminCertificatesAutomationRules = () => import('./Pages/Admin/Certificates/AutomationRules.vue')
 const AdminShareFrameGenerator = () => import('./Pages/Admin/ShareFrameGenerator.vue')
 const AdminSettingsChangeTracking = () => import('./Pages/Admin/Settings/ChangeTracking.vue')
+const AdminSettingsSiteLinks = () => import('./Pages/Admin/Settings/SiteLinks.vue')
 const AdminMentorsIndex = () => import('./Pages/Admin/Mentors/Index.vue')
 const AdminMentorsCreate = () => import('./Pages/Admin/Mentors/Create.vue')
 const AdminMentorsEdit = () => import('./Pages/Admin/Mentors/Edit.vue')
@@ -101,8 +97,10 @@ const AdminJudgesEdit = () => import('./Pages/Admin/Judges/Edit.vue')
 const AdminJudgesShow = () => import('./Pages/Admin/Judges/Show.vue')
 const AdminActivityLogsIndex = () => import('./Pages/Admin/ActivityLogs/Index.vue')
 const AdminErrorCenter = () => import('./Pages/Admin/ErrorCenter.vue')
+const AdminGrowthDashboard = () => import('./Pages/Admin/GrowthDashboard.vue')
+const AdminCommunityModeration = () => import('./Pages/Admin/CommunityModeration.vue')
+const AdminLearningManagement = () => import('./Pages/Admin/LearningManagement.vue')
 const AdminCategoriesIndex = () => import('./Pages/Admin/Categories/Index.vue')
-const AdminSponsors = () => import('./components/AdminSponsors.vue')
 const About = () => import('./Pages/About.vue')
 const HowItWorks = () => import('./Pages/HowItWorks.vue')
 const Pricing = () => import('./Pages/Pricing.vue')
@@ -130,24 +128,19 @@ const ForgotPassword = () => import('./Pages/ForgotPassword.vue')
 const BookingMessages = () => import('./Pages/BookingMessages.vue')
 const VerificationCenter = () => import('./Pages/VerificationCenter.vue')
 const PublicVerification = () => import('./Pages/PublicVerification.vue')
+const PhotographerCertificates = () => import('./Pages/PhotographerCertificates.vue')
 const LocationPhotographers = () => import('./Pages/LocationPhotographers.vue')
 const CategoryPhotographers = () => import('./Pages/CategoryPhotographers.vue')
 const CategoriesLanding = () => import('./Pages/CategoriesLanding.vue')
 const LocationsLanding = () => import('./Pages/LocationsLanding.vue')
+const TopReferrers = () => import('./Pages/TopReferrers.vue')
+const CommunityHub = () => import('./Pages/CommunityHub.vue')
+const LearnHub = () => import('./Pages/LearnHub.vue')
+const LearningDashboard = () => import('./Pages/LearningDashboard.vue')
 const PhotographerTips = () => import('./Pages/PhotographerTips.vue')
 const JudgeDashboardComponent = () => import('./components/Judge/JudgeDashboard.vue')
 const JudgeCompetitionsComponent = () => import('./components/Judge/JudgeCompetitions.vue')
 const JudgeScoringFormComponent = () => import('./components/Judge/JudgeScoringForm.vue')
-const JudgesManagement = () => import('./components/admin/pages/JudgesManagement.vue')
-const SponsorsManagement = () => import('./components/admin/pages/SponsorsManagement.vue')
-const ReviewsManagement = () => import('./components/admin/pages/ReviewsManagement.vue')
-const BookingsManagement = () => import('./components/admin/pages/BookingsManagement.vue')
-const TransactionsManagement = () => import('./components/admin/pages/TransactionsManagement.vue')
-const HashtagsManagement = () => import('./components/admin/pages/HashtagsManagement.vue')
-const NotificationsManagement = () => import('./components/admin/pages/NotificationsManagement.vue')
-const ErrorCenterManagement = () => import('./components/admin/pages/ErrorCenterManagement.vue')
-const ShareFramesManagement = () => import('./components/admin/pages/ShareFramesManagement.vue')
-const ActivityLogsManagement = () => import('./components/admin/pages/ActivityLogsManagement.vue')
 
 // Routes
 const routes = [
@@ -155,6 +148,11 @@ const routes = [
         path: '/',
         component: PhotographerSearch,
         name: 'home',
+    },
+    {
+        path: '/discover',
+        component: Discover,
+        name: 'discover',
     },
     {
         path: '/photographers/by-location',
@@ -177,6 +175,27 @@ const routes = [
         name: 'categories-landing',
     },
     {
+        path: '/community',
+        component: CommunityHub,
+        name: 'community',
+    },
+    {
+        path: '/learn',
+        component: LearnHub,
+        name: 'learn',
+    },
+    {
+        path: '/community/top-referrers',
+        component: TopReferrers,
+        name: 'community-top-referrers',
+    },
+    {
+        path: '/dashboard/learning',
+        component: LearningDashboard,
+        name: 'learning-dashboard',
+        meta: { requiresAuth: true },
+    },
+    {
         path: '/photographers',
         component: PhotographerSearch,
         name: 'photographers',
@@ -193,7 +212,12 @@ const routes = [
     },
     {
         path: '/photographers/:slug',
-        redirect: to => `/photographer/${to.params.slug}`,
+        redirect: to => `/@${to.params.slug}`,
+    },
+    {
+        path: '/@:username',
+        component: PhotographerProfile,
+        name: 'photographer-profile-username',
     },
     {
         path: '/booking/:id',
@@ -293,6 +317,11 @@ const routes = [
         path: '/login',
         component: Auth,
         name: 'login',
+    },
+    {
+        path: '/register',
+        component: Auth,
+        name: 'register',
     },
     {
         path: '/admin/login',
@@ -429,6 +458,18 @@ const routes = [
         meta: { requiresAuth: true },
     },
     {
+        path: '/dashboard/certificates',
+        component: PhotographerCertificates,
+        name: 'photographer-certificates',
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/photographer/certificates',
+        component: PhotographerCertificates,
+        name: 'photographer-certificates-alias',
+        meta: { requiresAuth: true },
+    },
+    {
         path: '/photographer/onboarding',
         component: PhotographerSettings,
         name: 'photographer-onboarding',
@@ -468,6 +509,24 @@ const routes = [
         path: '/admin/system-health',
         component: AdminSystemHealth,
         name: 'admin-system-health',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/growth',
+        component: AdminGrowthDashboard,
+        name: 'admin-growth-dashboard',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/community',
+        component: AdminCommunityModeration,
+        name: 'admin-community-moderation',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/learning',
+        component: AdminLearningManagement,
+        name: 'admin-learning-management',
         meta: { requiresAuth: true, requiresAdmin: true },
     },
     {
@@ -716,9 +775,21 @@ const routes = [
         meta: { requiresAuth: true, requiresAdmin: true },
     },
     {
+        path: '/admin/certificates/automation-rules',
+        component: AdminCertificatesAutomationRules,
+        name: 'admin-certificates-automation-rules',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
         path: '/admin/settings/changes',
         component: AdminSettingsChangeTracking,
         name: 'admin-settings-changes',
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: '/admin/settings/site-links',
+        component: AdminSettingsSiteLinks,
+        name: 'admin-settings-site-links',
         meta: { requiresAuth: true, requiresAdmin: true },
     },
     {
@@ -944,12 +1015,12 @@ const routes = [
         redirect: to => {
             const username = to.params.username;
             // Skip if it looks like a system route
-            const systemRoutes = ['admin', 'api', 'auth', 'payment', 'sitemap', 'storage', 'dashboard', 'photographer', 'competitions', 'events', 'bookings', 'reviews', 'help', 'privacy', 'terms', 'become-sponsor', 'be-featured', 'settings'];
+            const systemRoutes = ['admin', 'api', 'auth', 'payment', 'sitemap', 'storage', 'dashboard', 'photographer', 'competitions', 'events', 'discover', 'community', 'bookings', 'reviews', 'help', 'privacy', 'terms', 'become-sponsor', 'be-featured', 'settings'];
             if (systemRoutes.includes(username)) {
                 return to.path;
             }
             // Redirect to photographer profile
-            return `/photographer/${username}`;
+            return `/@${username}`;
         }
     },
 ]
@@ -1051,7 +1122,7 @@ const sendClickBatch = async (events, useBeacon = false) => {
             const blob = new Blob([body], { type: 'application/json' })
             navigator.sendBeacon(CLICK_ENDPOINT, blob)
             return
-        } catch (error) {
+        } catch {
             // Fallback to fetch
         }
     }
@@ -1064,7 +1135,7 @@ const sendClickBatch = async (events, useBeacon = false) => {
             credentials: 'include',
             keepalive: true,
         })
-    } catch (error) {
+    } catch {
         // Ignore tracking errors
     }
 }
@@ -1116,117 +1187,117 @@ const setupClickTracking = (routerInstance) => {
     })
 }
 
-setupClickTracking(router)
+const spaMountPoint = document.querySelector('#app[data-vue-app="true"]')
 
-// Navigation guard
-const normalizeRole = (role) => String(role || '').toLowerCase().replace(/[\s-]+/g, '_')
+if (spaMountPoint) {
+    setupClickTracking(router)
 
-const hydrateUserFromApi = async () => {
-    try {
-        const { data } = await api.get('/auth/me')
-        const user = data?.data || data?.user || data
-        if (user?.role) {
-            localStorage.setItem('user', JSON.stringify(user))
-            localStorage.setItem('user_role', normalizeRole(user.role))
-            return normalizeRole(user.role)
+    // Navigation guard
+    const normalizeRole = (role) => String(role || '').toLowerCase().replace(/[\s-]+/g, '_')
+
+    const hydrateUserFromApi = async () => {
+        try {
+            const { data } = await api.get('/auth/me')
+            const user = data?.data || data?.user || data
+            if (user?.role) {
+                localStorage.setItem('user', JSON.stringify(user))
+                localStorage.setItem('user_role', normalizeRole(user.role))
+                return normalizeRole(user.role)
+            }
+        } catch {
+            // If lookup fails, treat as unauthenticated and continue.
         }
-    } catch (error) {
-        // If lookup fails, treat as unauthenticated and continue.
+
+        return ''
     }
 
-    return ''
-}
+    router.beforeEach(async (to, from, next) => {
+        const user = JSON.parse(localStorage.getItem('user') || '{}')
+        let userRole = normalizeRole(localStorage.getItem('user_role') || user.role)
+        const isAdminRoute = to.path.startsWith('/admin')
+        const shouldHydrate = Boolean(
+            userRole ||
+            to.meta?.requiresAuth ||
+            to.meta?.requiresAdmin ||
+            isAdminRoute ||
+            to.path.startsWith('/dashboard') ||
+            to.path.startsWith('/judge') ||
+            to.path.startsWith('/client')
+        )
 
-router.beforeEach(async (to, from, next) => {
-    const user = JSON.parse(localStorage.getItem('user') || '{}')
-    let userRole = normalizeRole(localStorage.getItem('user_role') || user.role)
-    const isAdminRoute = to.path.startsWith('/admin')
-    const shouldHydrate = Boolean(
-        userRole ||
-        to.meta?.requiresAuth ||
-        to.meta?.requiresAdmin ||
-        isAdminRoute ||
-        to.path.startsWith('/dashboard') ||
-        to.path.startsWith('/judge') ||
-        to.path.startsWith('/client')
-    )
-
-    if (!userRole && shouldHydrate) {
-        userRole = await hydrateUserFromApi()
-    }
-
-    const isAuthenticated = Boolean(userRole)
-
-    if (to.path === '/bookings' && ['photographer', 'judge', 'admin', 'super_admin', 'moderator'].includes(userRole)) {
-        if (userRole === 'judge') {
-            return next('/judge/dashboard')
+        if (!userRole && shouldHydrate) {
+            userRole = await hydrateUserFromApi()
         }
-        if (userRole === 'photographer') {
-            return next('/dashboard')
-        }
-        return next('/admin/dashboard')
-    }
 
-    if (to.path === '/settings' && userRole === 'photographer') {
-        return next('/photographer/settings')
-    }
+        const isAuthenticated = Boolean(userRole)
 
-    // Redirect authenticated users from auth/login pages to their dashboard
-    if (['/auth', '/login', '/admin/login'].includes(to.path) && userRole) {
-        if (userRole && ['admin', 'super_admin', 'moderator'].includes(userRole)) {
+        if (to.path === '/bookings' && ['photographer', 'judge', 'admin', 'super_admin', 'moderator'].includes(userRole)) {
+            if (userRole === 'judge') {
+                return next('/judge/dashboard')
+            }
+            if (userRole === 'photographer') {
+                return next('/dashboard')
+            }
             return next('/admin/dashboard')
-        } else if (userRole === 'photographer') {
-            return next('/dashboard')
-        } else if (userRole === 'client') {
-            return next('/client/dashboard')
-        } else if (userRole) {
-            return next('/')
-        } else if (isAdminRoute) {
+        }
+
+        if (to.path === '/settings' && userRole === 'photographer') {
+            return next('/photographer/settings')
+        }
+
+        // Redirect authenticated users from auth/login pages to their dashboard
+        if (['/auth', '/login', '/admin/login'].includes(to.path) && userRole) {
+            if (userRole && ['admin', 'super_admin', 'moderator'].includes(userRole)) {
+                return next('/admin/dashboard')
+            } else if (userRole === 'photographer') {
+                return next('/dashboard')
+            } else if (userRole === 'client') {
+                return next('/client/dashboard')
+            } else if (userRole) {
+                return next('/')
+            } else if (isAdminRoute) {
+                window.location.href = '/403'
+                return
+            }
+        }
+
+        if (to.meta.requiresAuth && !isAuthenticated) {
+            return next(isAdminRoute ? '/admin/login' : '/auth')
+        }
+
+        const hasAdminRole = ['admin', 'super_admin', 'moderator'].includes(userRole)
+        if (to.meta.requiresAdmin && !hasAdminRole) {
+            if (!userRole) {
+                return next('/admin/login')
+            }
             window.location.href = '/403'
             return
         }
-    }
 
-    if (to.meta.requiresAuth && !isAuthenticated) {
-        return next(isAdminRoute ? '/admin/login' : '/auth')
-    }
-
-    const hasAdminRole = ['admin', 'super_admin', 'moderator'].includes(userRole)
-    if (to.meta.requiresAdmin && !hasAdminRole) {
-        if (!userRole) {
-            return next('/admin/login')
+        if (to.meta.requiresClient && userRole !== 'client') {
+            if (!userRole) {
+                return next('/auth')
+            }
+            if (userRole === 'photographer') {
+                return next('/dashboard')
+            }
+            if (userRole === 'judge') {
+                return next('/judge/dashboard')
+            }
+            if (hasAdminRole) {
+                return next('/admin/dashboard')
+            }
+            return next('/')
         }
-        window.location.href = '/403'
-        return
-    }
 
-    if (to.meta.requiresClient && userRole !== 'client') {
-        if (!userRole) {
-            return next('/auth')
-        }
-        if (userRole === 'photographer') {
-            return next('/dashboard')
-        }
-        if (userRole === 'judge') {
-            return next('/judge/dashboard')
-        }
-        if (hasAdminRole) {
-            return next('/admin/dashboard')
-        }
-        return next('/')
-    }
+        return next()
+    })
 
-    return next()
-})
+    const app = createApp(App)
 
-const app = createApp(App)
+    app.directive('lazy', lazyload)
+    app.component('CookieConsentBanner', CookieConsentBanner)
 
-// Register lazy loading directive
-app.directive('lazy', lazyload)
-
-// Register global components
-app.component('CookieConsentBanner', CookieConsentBanner)
-
-app.use(router)
-
-app.mount('#app')
+    app.use(router)
+    app.mount(spaMountPoint)
+}

@@ -17,7 +17,7 @@
     <div v-else class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <form @submit.prevent="submitForm" class="space-y-6" novalidate>
         <!-- Basic Information -->
-        <div class="bg-white rounded-lg shadow-card p-6">
+        <div class="sb-ui-card p-6">
           <h2 class="text-xl font-bold text-gray-900 mb-4">Basic Information</h2>
 
           <div class="space-y-4">
@@ -27,7 +27,7 @@
                 v-model="form.title"
                 type="text"
                 :required="form.status !== 'draft'"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-input"
               />
               <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</p>
             </div>
@@ -37,7 +37,7 @@
               <select
                 v-model="form.event_type"
                 :required="form.status !== 'draft'"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-select"
               >
                 <option value="">Select event type</option>
                 <option value="workshop">Workshop</option>
@@ -58,7 +58,7 @@
               <textarea
                 v-model="form.description"
                 rows="4"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-textarea"
                 placeholder="Detailed description of the event..."
               ></textarea>
               <p v-if="errors.description" class="mt-1 text-sm text-red-600">{{ errors.description }}</p>
@@ -69,7 +69,7 @@
               <input
                 v-model="form.hero_image_url"
                 type="url"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-input"
                 placeholder="https://example.com/hero-image.jpg"
               />
               <input
@@ -117,7 +117,7 @@
               <input
                 v-model="form.banner_image"
                 type="url"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-input"
                 placeholder="https://example.com/banner.jpg"
               />
               <p class="mt-1 text-sm text-gray-500">Optional banner image URL</p>
@@ -163,7 +163,7 @@
         </div>
 
         <!-- Date, Time & Location -->
-        <div class="bg-white rounded-lg shadow-card p-6">
+        <div class="sb-ui-card p-6">
           <h2 class="text-xl font-bold text-gray-900 mb-4">Date, Time & Location</h2>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -176,7 +176,7 @@
                 placeholder="dd-mm-yyyy"
                 pattern="\d{2}-\d{2}-\d{4}"
                 :required="form.status !== 'draft'"
-                class="js-date w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="js-date sb-ui-input"
               />
               <p v-if="errors.event_date" class="mt-1 text-sm text-red-600">{{ errors.event_date }}</p>
             </div>
@@ -189,7 +189,7 @@
                 inputmode="numeric"
                 placeholder="dd-mm-yyyy"
                 pattern="\d{2}-\d{2}-\d{4}"
-                class="js-date w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="js-date sb-ui-input"
               />
               <p class="mt-1 text-sm text-gray-500">Leave blank for single-day event</p>
               <p v-if="errors.event_end_date" class="mt-1 text-sm text-red-600">{{ errors.event_end_date }}</p>
@@ -200,7 +200,7 @@
               <input
                 v-model="form.start_time"
                 type="time"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-input"
               />
               <p v-if="errors.start_time" class="mt-1 text-sm text-red-600">{{ errors.start_time }}</p>
             </div>
@@ -210,7 +210,7 @@
               <input
                 v-model="form.end_time"
                 type="time"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-input"
               />
               <p v-if="errors.end_time" class="mt-1 text-sm text-red-600">{{ errors.end_time }}</p>
             </div>
@@ -233,7 +233,7 @@
                 type="number"
                 min="0.5"
                 step="0.5"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-input"
                 placeholder="2.5"
               />
               <p class="mt-1 text-sm text-gray-500">Duration in hours (e.g., 2.5 for 2.5 hours)</p>
@@ -245,7 +245,7 @@
               <select
                 v-model="form.city_id"
                 :required="form.status !== 'draft'"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-select"
               >
                 <option value="">Select location</option>
                 <option v-for="city in cities" :key="city.id" :value="city.id">
@@ -262,7 +262,7 @@
                 v-model="form.venue_name"
                 type="text"
                 :required="form.status !== 'draft'"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-input"
                 placeholder="e.g., ICCB, Hotel InterContinental, Dhaka Club"
               />
               <p v-if="errors.venue_name" class="mt-1 text-sm text-red-600">{{ errors.venue_name }}</p>
@@ -274,7 +274,7 @@
                 v-model="form.venue_address"
                 rows="2"
                 :required="form.status !== 'draft'"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-textarea"
                 placeholder="e.g., 123 Main Street, Building Name, Floor 2, Near Landmark"
               ></textarea>
               <p v-if="errors.venue_address" class="mt-1 text-sm text-red-600">{{ errors.venue_address }}</p>
@@ -286,7 +286,7 @@
                 v-model="form.location"
                 type="text"
                 :required="form.status !== 'draft'"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-input"
                 placeholder="Optional: Short location label for listings"
               />
               <p class="mt-1 text-sm text-gray-500">Short name for event listings (e.g., "Gulshan 2"). Required when publishing.</p>
@@ -298,7 +298,7 @@
               <input
                 v-model="form.address"
                 type="text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-input"
                 placeholder="Optional: Additional directions or notes"
               />
               <p class="mt-1 text-sm text-gray-500">Optional additional address information</p>
@@ -310,7 +310,7 @@
               <input
                 v-model="form.google_map_link"
                 type="url"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-input"
                 placeholder="https://maps.google.com/maps?q=..."
               />
               <p class="mt-1 text-sm text-gray-500">Paste a Google Maps link for the venue.</p>
@@ -320,7 +320,7 @@
         </div>
 
         <!-- Attendance & Pricing -->
-        <div class="bg-white rounded-lg shadow-card p-6">
+        <div class="sb-ui-card p-6">
           <h2 class="text-xl font-bold text-gray-900 mb-4">Attendance & Pricing</h2>
 
           <div class="space-y-4">
@@ -328,7 +328,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">Event Mode</label>
               <select
                 v-model="form.event_mode"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-select"
               >
                 <option value="free">Free</option>
                 <option value="paid">Paid</option>
@@ -342,7 +342,7 @@
                   v-model.number="form.max_attendees"
                   type="number"
                   min="1"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                   placeholder="50"
                 />
                 <p class="mt-1 text-sm text-gray-500">Leave blank for unlimited</p>
@@ -357,7 +357,7 @@
                   min="0"
                   step="100"
                   :disabled="form.event_mode !== 'paid'"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent disabled:bg-gray-100"
+                  class="sb-ui-input disabled:bg-gray-100"
                   placeholder="500"
                 />
                 <p class="mt-1 text-sm text-gray-500">Set to 0 for free ticketed events</p>
@@ -370,7 +370,7 @@
                   v-model.number="form.max_tickets_per_user"
                   type="number"
                   min="1"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-input"
                   placeholder="1"
                 />
                 <p v-if="errors.max_tickets_per_user" class="mt-1 text-sm text-red-600">{{ errors.max_tickets_per_user }}</p>
@@ -384,7 +384,7 @@
                   inputmode="numeric"
                   placeholder="dd-mm-yyyy hh:mm"
                   pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
-                  class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="js-datetime sb-ui-input"
                 />
                 <p v-if="errors.registration_deadline" class="mt-1 text-sm text-red-600">{{ errors.registration_deadline }}</p>
               </div>
@@ -417,7 +417,7 @@
         </div>
 
         <!-- Requirements -->
-        <div class="bg-white rounded-lg shadow-card p-6">
+        <div class="sb-ui-card p-6">
           <h2 class="text-xl font-bold text-gray-900 mb-4">Requirements & Details</h2>
 
           <div class="space-y-4">
@@ -426,7 +426,7 @@
               <textarea
                 v-model="form.requirements"
                 rows="3"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-textarea"
                 placeholder="What attendees need to bring or know (e.g., 'Bring your own camera')"
               ></textarea>
               <p v-if="errors.requirements" class="mt-1 text-sm text-red-600">{{ errors.requirements }}</p>
@@ -437,7 +437,7 @@
               <select
                 v-model="form.organizer_id"
                 :required="form.status !== 'draft'"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-select"
               >
                 <option value="">Select photographer</option>
                 <option v-for="photographer in photographers" :key="photographer.id" :value="photographer.id">
@@ -492,7 +492,7 @@
                 <select
                   v-model="form.certificate_template_id"
                   :disabled="!form.certificates_enabled"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  class="sb-ui-select"
                 >
                   <option value="">Select template</option>
                   <option v-for="template in certificateTemplates" :key="template.id" :value="template.id">
@@ -505,14 +505,14 @@
         </div>
 
         <!-- Sponsors -->
-        <div class="bg-white rounded-lg shadow-card p-6">
+        <div class="sb-ui-card p-6">
           <h2 class="text-xl font-bold text-gray-900 mb-4">Sponsors</h2>
           <div class="space-y-3">
             <input
               v-model="sponsorSearch"
               type="text"
               placeholder="Search sponsors..."
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+              class="sb-ui-input"
             />
 
             <div class="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-3 space-y-2">
@@ -580,7 +580,7 @@
         </div>
 
         <!-- SEO -->
-        <div class="bg-white rounded-lg shadow-card p-6">
+        <div class="sb-ui-card p-6">
           <h2 class="text-xl font-bold text-gray-900 mb-4">SEO</h2>
           <div class="space-y-4">
             <div>
@@ -588,7 +588,7 @@
               <input
                 v-model="form.meta_title"
                 type="text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                class="sb-ui-input"
               />
             </div>
             <div>
@@ -596,7 +596,7 @@
               <textarea
                 v-model="form.meta_description"
                 rows="3"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                class="sb-ui-textarea"
               />
             </div>
             <div>
@@ -604,7 +604,7 @@
               <input
                 v-model="form.og_image"
                 type="url"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                class="sb-ui-input"
               />
               <input
                 type="file"
@@ -619,7 +619,7 @@
         </div>
 
         <!-- Status & Settings -->
-        <div class="bg-white rounded-lg shadow-card p-6">
+        <div class="sb-ui-card p-6">
           <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
             <h2 class="text-xl font-bold text-gray-900">Status & Settings</h2>
             <span
@@ -637,7 +637,7 @@
               <select
                 v-model="form.status"
                 required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="sb-ui-select"
               >
                 <option value="draft">Draft (Not visible to public)</option>
                 <option value="published">Published (Visible to public)</option>
@@ -665,7 +665,7 @@
                 inputmode="numeric"
                 placeholder="dd-mm-yyyy hh:mm"
                 pattern="\d{2}-\d{2}-\d{4} \d{2}:\d{2}"
-                class="js-datetime w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                class="js-datetime sb-ui-input"
               />
               <p class="mt-1 text-sm text-gray-500">Leave blank to feature indefinitely</p>
               <p v-if="errors.featured_until" class="mt-1 text-sm text-red-600">{{ errors.featured_until }}</p>
@@ -688,7 +688,7 @@
         <div class="flex items-center justify-end gap-4">
           <router-link
             to="/admin/events"
-            class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all"
+            class="sb-ui-btn sb-ui-btn--secondary"
           >
             Cancel
           </router-link>
@@ -696,14 +696,14 @@
             type="button"
             @click="saveDraft"
             :disabled="processing"
-            class="px-6 py-3 bg-gray-100 text-gray-800 rounded-lg font-medium hover:bg-gray-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            class="sb-ui-btn sb-ui-btn--secondary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Save Draft
           </button>
           <button
             type="submit"
             :disabled="processing"
-            class="px-6 py-3 bg-burgundy text-white rounded-lg font-medium hover:bg-burgundy-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            class="sb-ui-btn sb-ui-btn--primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {{ processing ? 'Updating...' : 'Update Event' }}
           </button>
@@ -724,7 +724,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch, computed, nextTick } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, onBeforeRouteLeave } from 'vue-router';
 import api from '../../../api';
 import { validateUploadFile } from '../../../utils/imageValidation'
 import AdminHeader from '../../../components/AdminHeader.vue'
@@ -750,11 +750,42 @@ const eventTiming = ref({
   event_date: null,
   duration_hours: null,
 });
+const initialFormSnapshot = ref('');
 const uploadingImages = ref({
   hero_image_url: false,
   banner_image: false,
   og_image: false,
 });
+
+const stableStringify = (value) => {
+  const sortValue = (input) => {
+    if (Array.isArray(input)) {
+      return input.map(sortValue);
+    }
+    if (input && typeof input === 'object') {
+      return Object.keys(input).sort().reduce((acc, key) => {
+        acc[key] = sortValue(input[key]);
+        return acc;
+      }, {});
+    }
+    return input;
+  };
+  return JSON.stringify(sortValue(value));
+};
+
+const normalizeFormSnapshot = (value) => {
+  const clone = JSON.parse(JSON.stringify(value || {}));
+  return stableStringify(clone);
+};
+
+const isDirty = computed(() => {
+  if (!initialFormSnapshot.value) return false;
+  return normalizeFormSnapshot(form.value) !== initialFormSnapshot.value;
+});
+
+const setInitialSnapshot = () => {
+  initialFormSnapshot.value = normalizeFormSnapshot(form.value);
+};
 
 const pexelsPickerOpen = ref(false);
 const pexelsTarget = ref({
@@ -946,6 +977,35 @@ const formatDateTimeForInput = (dateString) => {
   return `${day}-${month}-${year} ${hours}:${minutes}`;
 };
 
+const formatTimeForInput = (value) => {
+  if (!value) return '';
+  if (value instanceof Date) {
+    const hours = String(value.getHours()).padStart(2, '0');
+    const minutes = String(value.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+  const trimmed = String(value).trim();
+  if (!trimmed) return '';
+
+  const hhmmMatch = trimmed.match(/^([01]?\d|2[0-3]):([0-5]\d)/);
+  if (hhmmMatch) return `${hhmmMatch[1].padStart(2, '0')}:${hhmmMatch[2]}`;
+
+  const ampmMatch = trimmed.match(/^([1-9]|1[0-2]):([0-5]\d)\s*([AaPp][Mm])$/);
+  if (!ampmMatch) return '';
+  let hours = Number(ampmMatch[1]);
+  const minutes = ampmMatch[2];
+  const meridiem = ampmMatch[3].toLowerCase();
+  if (meridiem === 'pm' && hours !== 12) hours += 12;
+  if (meridiem === 'am' && hours === 12) hours = 0;
+  return `${String(hours).padStart(2, '0')}:${minutes}`;
+};
+
+const normalizeTimeInput = (value) => {
+  if (!value) return null;
+  const formatted = formatTimeForInput(value);
+  return formatted || null;
+};
+
 const getEventIdFromPath = () => {
   const segments = window.location.pathname.split('/').filter(Boolean);
   const editIndex = segments.indexOf('edit');
@@ -987,8 +1047,8 @@ const fetchEvent = async () => {
       gallery_images: event.gallery_images || [],
       event_date: formatDateForInput(event.event_date),
       event_end_date: formatDateForInput(event.event_end_date),
-      start_time: event.start_time || '',
-      end_time: event.end_time || '',
+      start_time: formatTimeForInput(event.start_time),
+      end_time: formatTimeForInput(event.end_time),
       all_day_event: Boolean(event.all_day_event),
       duration_hours: event.duration_hours || null,
       city_id: event.city_id || '',
@@ -1025,6 +1085,7 @@ const fetchEvent = async () => {
       og_image: event.og_image || '',
       is_verified: Boolean(event.is_verified),
     };
+    setInitialSnapshot();
     eventTiming.value = {
       start_datetime: event.start_datetime || null,
       end_datetime: event.end_datetime || null,
@@ -1188,6 +1249,8 @@ const submitForm = async () => {
     const eventEndDate = parseDateInput(form.value.event_end_date);
     const registrationDeadline = parseDateTimeInput(form.value.registration_deadline);
     const featuredUntil = parseDateTimeInput(form.value.featured_until);
+    const startTime = form.value.all_day_event ? null : normalizeTimeInput(form.value.start_time);
+    const endTime = form.value.all_day_event ? null : normalizeTimeInput(form.value.end_time);
 
     if (form.value.status !== 'draft' && !eventDate) {
       errors.value.event_date = 'Use DD-MM-YYYY format.';
@@ -1201,6 +1264,12 @@ const submitForm = async () => {
     if (form.value.featured_until && !featuredUntil) {
       errors.value.featured_until = 'Use DD-MM-YYYY HH:mm format.';
     }
+    if (form.value.start_time && !startTime) {
+      errors.value.start_time = 'Use HH:MM format.';
+    }
+    if (form.value.end_time && !endTime) {
+      errors.value.end_time = 'Use HH:MM format.';
+    }
 
     if (Object.keys(errors.value).length > 0) {
       alert('Please fix the date fields.');
@@ -1213,6 +1282,8 @@ const submitForm = async () => {
       event_end_date: eventEndDate || null,
       registration_deadline: registrationDeadline ? `${registrationDeadline}:00` : null,
       featured_until: featuredUntil ? `${featuredUntil}:00` : null,
+      start_time: startTime,
+      end_time: endTime,
       type: form.value.event_type,
       organizer_id: form.value.organizer_id ? parseInt(form.value.organizer_id, 10) : null,
       city_id: form.value.city_id ? parseInt(form.value.city_id, 10) : null,
@@ -1226,6 +1297,7 @@ const submitForm = async () => {
     const response = await api.put(`/admin/events/${eventId}`, formData);
     
     if (response.data.status === 'success') {
+      setInitialSnapshot();
       alert('Event updated successfully!');
       router.push('/admin/events');
     }
@@ -1240,6 +1312,12 @@ const submitForm = async () => {
   } finally {
     processing.value = false;
   }
+};
+
+const handleBeforeUnload = (event) => {
+  if (processing.value || !isDirty.value) return;
+  event.preventDefault();
+  event.returnValue = '';
 };
 
 const initializePickers = () => {
@@ -1407,9 +1485,16 @@ onMounted(() => {
   fetchSponsors();
   fetchCertificateTemplates();
   fetchEvent();
+  window.addEventListener('beforeunload', handleBeforeUnload);
 });
 
 onBeforeUnmount(() => {
   destroyPickers();
+  window.removeEventListener('beforeunload', handleBeforeUnload);
+});
+
+onBeforeRouteLeave(() => {
+  if (processing.value || !isDirty.value) return true;
+  return window.confirm('You have unsaved changes. Leave without saving?');
 });
 </script>

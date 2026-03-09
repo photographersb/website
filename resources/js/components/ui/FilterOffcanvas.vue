@@ -9,7 +9,7 @@
         @click="close"
       />
       <transition name="slide-up">
-        <div class="relative w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden">
+        <div v-if="modelValue" class="relative w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden">
           <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
             <h3 class="text-lg font-bold text-gray-900">
               {{ title }}

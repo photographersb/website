@@ -281,16 +281,20 @@ const selectPhoto = async (photo) => {
   panX.value = 0.5;
   panY.value = 0.5;
   error.value = '';
-  await loadImage(photo.image_url);
+    await loadImage(photo.original_url || photo.url || photo.image_url);
 };
 
 const loadImage = async (url) => {
+  if (!url) {
+    error.value = 'Unable to load the selected photo.';
+    return;
+  }
   try {
-    const response = await fetch(url, { mode: 'cors' });
-    if (!response.ok) {
-      throw new Error('Failed to load image');
-    }
-    const blob = await response.blob();
+      const response = await api.get('/pexels/import', {
+        params: { url },
+        responseType: 'blob'
+      });
+    const blob = response.data;
     const objectUrl = URL.createObjectURL(blob);
     const img = new Image();
     img.onload = () => {

@@ -8,7 +8,7 @@
     <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       <AdminQuickNav />
 
-      <div class="bg-white rounded-lg shadow p-6">
+      <div class="sb-ui-card p-6">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h2 class="text-xl font-semibold text-gray-900">
@@ -20,23 +20,23 @@
           </div>
           <div class="flex flex-wrap gap-2">
             <button
-              class="inline-flex items-center px-4 py-2 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              class="sb-ui-btn sb-ui-btn--secondary"
               @click="downloadReport"
             >
               Export Report
             </button>
-            <Link
+            <InertiaLink
               href="/admin/events"
-              class="inline-flex items-center px-4 py-2 rounded-md bg-burgundy text-white text-sm font-medium hover:bg-burgundy-dark"
+              class="sb-ui-btn sb-ui-btn--primary"
             >
               Back to Events
-            </Link>
+            </InertiaLink>
           </div>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-white rounded-lg shadow p-4">
+        <div class="sb-ui-card p-4">
           <p class="text-sm text-gray-500">
             Confirmed
           </p>
@@ -44,7 +44,7 @@
             {{ stats.total_confirmed || 0 }}
           </p>
         </div>
-        <div class="bg-white rounded-lg shadow p-4">
+        <div class="sb-ui-card p-4">
           <p class="text-sm text-gray-500">
             Attended
           </p>
@@ -52,7 +52,7 @@
             {{ stats.total_attended || 0 }}
           </p>
         </div>
-        <div class="bg-white rounded-lg shadow p-4">
+        <div class="sb-ui-card p-4">
           <p class="text-sm text-gray-500">
             Pending
           </p>
@@ -62,7 +62,7 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-lg shadow p-6 space-y-4">
+      <div class="sb-ui-card p-6 space-y-4">
         <div>
           <h3 class="text-lg font-semibold text-gray-900">
             Scan QR Code
@@ -76,10 +76,10 @@
             v-model="scanToken"
             type="text"
             placeholder="QR token"
-            class="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-burgundy focus:border-burgundy"
+            class="sb-ui-input flex-1"
           >
           <button
-            class="inline-flex items-center px-4 py-2 rounded-md bg-burgundy text-white text-sm font-medium hover:bg-burgundy-dark"
+            class="sb-ui-btn sb-ui-btn--primary"
             @click="scanQr"
           >
             Check In
@@ -94,7 +94,7 @@
         </p>
       </div>
 
-      <div class="bg-white rounded-lg shadow p-6 space-y-4">
+      <div class="sb-ui-card p-6 space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h3 class="text-lg font-semibold text-gray-900">
@@ -109,7 +109,7 @@
               v-model="filters.search"
               type="text"
               placeholder="Search name or email"
-              class="border-gray-300 rounded-md shadow-sm focus:ring-burgundy focus:border-burgundy"
+              class="sb-ui-input"
               @input="debounceSearch"
             >
           </div>
@@ -188,14 +188,14 @@
                 <td class="px-4 py-4 text-right text-sm">
                   <button
                     v-if="reg.status !== 'attended'"
-                    class="inline-flex items-center px-3 py-1.5 rounded-md bg-success-600 text-white text-xs font-medium hover:bg-success-700"
+                    class="sb-ui-btn sb-ui-btn--primary sb-ui-btn--sm"
                     @click="manualCheckIn(reg.id)"
                   >
                     Check In
                   </button>
                   <button
                     v-else
-                    class="inline-flex items-center px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200"
+                    class="sb-ui-btn sb-ui-btn--secondary sb-ui-btn--sm"
                     @click="undoCheckIn(reg.id)"
                   >
                     Undo
@@ -214,7 +214,7 @@
           <div class="flex items-center gap-2">
             <button
               :disabled="meta.current_page <= 1"
-              class="px-3 py-1 border rounded-md disabled:opacity-50"
+              class="sb-ui-btn sb-ui-btn--secondary sb-ui-btn--sm disabled:opacity-50"
               @click="changePage(meta.current_page - 1)"
             >
               Previous
@@ -222,7 +222,7 @@
             <span>Page {{ meta.current_page }} of {{ meta.last_page }}</span>
             <button
               :disabled="meta.current_page >= meta.last_page"
-              class="px-3 py-1 border rounded-md disabled:opacity-50"
+              class="sb-ui-btn sb-ui-btn--secondary sb-ui-btn--sm disabled:opacity-50"
               @click="changePage(meta.current_page + 1)"
             >
               Next
@@ -236,14 +236,14 @@
 
 <script>
 import api from '@/api'
-import { Link } from '@inertiajs/vue3'
+import { Link as InertiaLink } from '@inertiajs/vue3'
 import AdminHeader from '@/components/AdminHeader.vue'
 import AdminQuickNav from '@/components/AdminQuickNav.vue'
 import { formatDate as formatDateValue, formatDateTime as formatDateTimeValue } from '@/utils/formatters'
 
 export default {
   name: 'AdminEventCheckIn',
-  components: { AdminHeader, AdminQuickNav, Link },
+  components: { AdminHeader, AdminQuickNav, InertiaLink },
   data() {
     return {
       event: null,

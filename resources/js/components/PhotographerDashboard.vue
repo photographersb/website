@@ -1,92 +1,100 @@
 <template>
   <div class="min-h-screen bg-gray-50 pt-2 sm:pt-3 md:pt-4">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-white via-white to-rose-50 border-b">
-      <div class="container mx-auto px-3 sm:px-4 py-6 sm:py-7">
-        <div class="flex items-center gap-3 sm:gap-4">
-          <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-burgundy flex items-center justify-center text-white font-bold text-lg sm:text-2xl flex-shrink-0 shadow-md">
-            <img
-              v-if="profileAvatarUrl"
-              :src="profileAvatarUrl"
-              :alt="user?.name"
-              class="w-full h-full object-cover"
-              @error="handleAvatarError"
-            >
-            <span v-else>{{ user?.name?.charAt(0).toUpperCase() }}</span>
-          </div>
-          <div class="min-w-0 flex-1">
-            <div class="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-burgundy bg-opacity-70">
-              Photographer HQ
+    <div class="container mx-auto px-3 sm:px-4 py-3 sm:py-5 md:py-6 space-y-3 sm:space-y-4 md:space-y-6">
+      <div class="sb-ui-card sb-ui-card--feature bg-gradient-to-r from-white via-white to-rose-50 border-gray-200/70 p-4 sm:p-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
+          <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+            <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-burgundy flex items-center justify-center text-white font-bold text-lg sm:text-2xl flex-shrink-0 shadow-md">
+              <img
+                v-if="profileAvatarUrl"
+                :src="profileAvatarUrl"
+                :alt="user?.name"
+                class="w-full h-full object-cover"
+                @error="handleAvatarError"
+              >
+              <span v-else>{{ user?.name?.charAt(0).toUpperCase() }}</span>
             </div>
-            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold truncate">Welcome, {{ user?.name }}</h1>
-            <p class="text-sm sm:text-base text-gray-600 truncate mt-1">Build momentum, respond fast, and grow bookings.</p>
+            <div class="min-w-0">
+              <p class="text-[11px] uppercase tracking-[0.2em] text-burgundy">Photographer HQ</p>
+              <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 truncate mt-1">Welcome, {{ user?.name }}</h1>
+              <p class="text-sm sm:text-base text-gray-600 mt-1">
+                Focus today: respond quickly, keep your profile fresh, and convert views into bookings.
+              </p>
+            </div>
           </div>
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              class="sb-ui-btn sb-ui-btn--secondary text-xs sm:text-sm"
+              @click="switchToTab('bookings')"
+            >
+              Incoming {{ incomingSummary.pending > 0 ? `(${incomingSummary.pending})` : '' }}
+            </button>
+            <button
+              type="button"
+              class="sb-ui-btn sb-ui-btn--primary text-xs sm:text-sm"
+              @click="switchToTab('portfolio')"
+            >
+              Update portfolio
+            </button>
             <NotificationBell />
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="container mx-auto px-3 sm:px-4 py-3 sm:py-5 md:py-6">
-      <!-- Stats Overview -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mt-3 sm:mt-4 md:mt-5 mb-3 sm:mb-4 md:mb-6">
-        <div class="bg-white rounded-xl border border-gray-200/70 shadow-sm p-3 sm:p-4 md:p-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+        <div class="sb-ui-card p-3 sm:p-4 md:p-5">
           <p class="text-[11px] sm:text-xs uppercase tracking-wide text-gray-500 mb-1">Total Bookings</p>
           <p class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{{ stats.total_bookings || 0 }}</p>
-          <p class="text-xs text-gray-500 mt-1">All time</p>
+          <p class="text-xs text-gray-500 mt-1">{{ incomingSummary.confirmed || 0 }} confirmed</p>
         </div>
-        <div class="bg-white rounded-xl border border-amber-200/70 shadow-sm p-3 sm:p-4 md:p-6">
+        <div class="sb-ui-card border-amber-200/70 p-3 sm:p-4 md:p-5">
           <p class="text-[11px] sm:text-xs uppercase tracking-wide text-amber-700 mb-1">Pending Requests</p>
           <p class="text-xl sm:text-2xl md:text-3xl font-bold text-amber-800">{{ stats.pending_bookings || 0 }}</p>
-          <p class="text-xs text-amber-700 mt-1">Needs response</p>
+          <p class="text-xs text-amber-700 mt-1">Respond within 2 hrs target</p>
         </div>
-        <div class="bg-white rounded-xl border border-emerald-200/70 shadow-sm p-3 sm:p-4 md:p-6">
+        <div class="sb-ui-card border-emerald-200/70 p-3 sm:p-4 md:p-5">
           <p class="text-[11px] sm:text-xs uppercase tracking-wide text-emerald-700 mb-1">Average Rating</p>
           <p class="text-xl sm:text-2xl md:text-3xl font-bold text-emerald-800">{{ stats.average_rating || 0 }}</p>
-          <p class="text-xs text-emerald-700 mt-1">Last 90 days</p>
+          <p class="text-xs text-emerald-700 mt-1">{{ trustStats.reviews || 0 }} reviews</p>
         </div>
-        <div class="bg-white rounded-xl border border-rose-200/70 shadow-sm p-3 sm:p-4 md:p-6">
+        <div class="sb-ui-card border-rose-200/70 p-3 sm:p-4 md:p-5">
           <p class="text-[11px] sm:text-xs uppercase tracking-wide text-rose-700 mb-1">Total Revenue</p>
           <p class="text-xl sm:text-2xl md:text-3xl font-bold text-rose-800">৳{{ stats.total_revenue || 0 }}</p>
-          <p class="text-xs text-rose-700 mt-1">Gross earnings</p>
+          <p class="text-xs text-rose-700 mt-1">All-time earnings</p>
         </div>
       </div>
 
-      <div class="grid gap-4 md:grid-cols-3 mb-3 sm:mb-4 md:mb-6">
-        <div class="md:col-span-2 bg-white rounded-2xl border border-gray-200/80 shadow-sm p-4 sm:p-6">
+      <div class="grid gap-4 lg:grid-cols-3">
+        <div class="lg:col-span-2 sb-ui-card sb-ui-card--feature border-gray-200/80 p-4 sm:p-6">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-base sm:text-lg font-bold">Quick Actions</h3>
-            <span class="text-xs sm:text-sm text-gray-500">Keep momentum high</span>
+            <h3 class="text-base sm:text-lg font-bold text-gray-900">Action Board</h3>
+            <span class="text-xs sm:text-sm text-gray-500">Highest impact tasks first</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div
               v-for="item in priorityActions"
               :key="item.key"
-              class="rounded-xl border p-4 sm:p-5 flex flex-col justify-between gap-3"
+              class="sb-ui-card sb-ui-card--interactive p-4 sm:p-5 flex flex-col justify-between gap-3"
               :class="item.cardClass"
             >
               <div>
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between gap-2">
                   <p class="text-xs uppercase tracking-wide text-gray-500">{{ item.title }}</p>
                   <span
                     v-if="item.badge"
-                    class="px-2 py-1 rounded-full text-[10px] font-semibold"
+                    class="sb-ui-badge text-[10px] font-semibold"
                     :class="item.badgeClass"
                   >
                     {{ item.badge }}
                   </span>
                 </div>
-                <p class="text-2xl font-bold text-gray-900 mt-2">
-                  {{ item.value }}
-                </p>
-                <p class="text-xs sm:text-sm text-gray-600 mt-1">
-                  {{ item.description }}
-                </p>
+                <p class="text-2xl font-bold text-gray-900 mt-2">{{ item.value }}</p>
+                <p class="text-xs sm:text-sm text-gray-600 mt-1">{{ item.description }}</p>
               </div>
               <button
                 type="button"
-                class="inline-flex items-center justify-center px-3 py-2 text-sm font-semibold rounded-lg"
+                class="sb-ui-btn text-sm font-semibold"
                 :class="item.buttonClass"
                 @click="item.onClick"
               >
@@ -96,10 +104,10 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-4 sm:p-6">
+        <div class="sb-ui-card sb-ui-card--feature border-gray-200/80 p-4 sm:p-6">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-base sm:text-lg font-bold">Profile Checklist</h3>
-            <span class="text-xs text-burgundy font-semibold">{{ profileCompletionPercent }}% complete</span>
+            <h3 class="text-base sm:text-lg font-bold text-gray-900">Profile Readiness</h3>
+            <span class="text-xs text-burgundy font-semibold">{{ profileCompletionPercent }}%</span>
           </div>
           <div class="h-2 bg-gray-200 rounded-full overflow-hidden mb-4">
             <div
@@ -107,7 +115,7 @@
               :style="{ width: profileCompletionPercent + '%' }"
             />
           </div>
-          <div class="space-y-2">
+          <div class="space-y-2.5">
             <div
               v-for="item in profileChecklist"
               :key="item.key"
@@ -122,48 +130,49 @@
               <span :class="item.done ? 'text-gray-700' : 'text-gray-500'">{{ item.label }}</span>
             </div>
           </div>
+          <button
+            type="button"
+            class="mt-4 w-full sb-ui-btn sb-ui-btn--primary text-sm font-semibold"
+            @click="openQuickAction('profile')"
+          >
+            Complete profile
+          </button>
         </div>
       </div>
 
-      <div class="rounded-2xl border border-rose-100 bg-gradient-to-r from-rose-50 via-white to-amber-50 p-4 sm:p-5 mb-3 sm:mb-4 md:mb-6 shadow-sm">
+      <div class="sb-ui-card sb-ui-card--feature border-rose-100 bg-gradient-to-r from-rose-50 via-white to-amber-50 p-4 sm:p-5">
         <div class="grid gap-4 md:grid-cols-2">
-          <div class="rounded-xl border border-rose-100 bg-white/70 p-4">
-            <p class="text-[11px] uppercase tracking-[0.2em] text-rose-600 mb-2">Share The Spotlight</p>
-            <h3 class="text-base sm:text-lg font-semibold text-gray-900">
-              Post your latest shots on Instagram and tag our handle to get featured.
-            </h3>
+          <div class="sb-ui-card border-rose-100 bg-white/70 p-4">
+            <p class="text-[11px] uppercase tracking-[0.2em] text-rose-600 mb-2">Visibility Boost</p>
+            <h3 class="text-base sm:text-lg font-semibold text-gray-900">Share your latest shots and get discovered faster.</h3>
             <p class="text-sm text-gray-600 mt-1">
-              Tag <span class="font-semibold text-rose-700">@thephotographersbd</span> so we can celebrate your work with the community.
+              Tag <span class="font-semibold text-rose-700">@thephotographersbd</span> and stay active in the community feed.
             </p>
             <div class="mt-3 flex flex-wrap items-center gap-2">
               <a
                 href="https://www.instagram.com/thephotographersbd"
                 target="_blank"
                 rel="noopener"
-                class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-100"
+                class="sb-ui-btn sb-ui-btn--secondary text-sm font-semibold border-rose-200 text-rose-700 hover:bg-rose-100"
               >
                 Open Instagram
               </a>
             </div>
           </div>
-          <div class="rounded-xl border border-amber-100 bg-white/70 p-4">
-            <p class="text-[11px] uppercase tracking-[0.2em] text-amber-700 mb-2">Share Your Profile</p>
-            <h3 class="text-base sm:text-lg font-semibold text-gray-900">
-              Put your work in front of the right people, fast.
-            </h3>
-            <p class="text-sm text-gray-600 mt-1">
-              Share your profile like a digital business card so every click becomes a future booking.
-            </p>
+          <div class="sb-ui-card border-amber-100 bg-white/70 p-4">
+            <p class="text-[11px] uppercase tracking-[0.2em] text-amber-700 mb-2">Public Profile Link</p>
+            <h3 class="text-base sm:text-lg font-semibold text-gray-900">Turn every share into a potential booking.</h3>
+            <p class="text-sm text-gray-600 mt-1">Copy your profile URL and send it where clients are already active.</p>
             <div class="mt-3 flex flex-col sm:flex-row sm:items-center gap-2">
               <input
                 :value="profileUrl"
                 readonly
-                class="w-full sm:flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700"
+                class="sb-ui-input w-full sm:flex-1 bg-white text-sm text-gray-700"
                 aria-label="Profile share link"
               >
               <button
                 type="button"
-                class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg border border-amber-200 text-amber-700 hover:bg-amber-100"
+                class="sb-ui-btn sb-ui-btn--secondary text-sm font-semibold border-amber-200 text-amber-700 hover:bg-amber-100"
                 @click="copyProfileLink"
               >
                 {{ copied ? 'Copied' : 'Copy link' }}
@@ -172,7 +181,7 @@
                 :href="profileUrl"
                 target="_blank"
                 rel="noopener"
-                class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg bg-amber-600 text-white hover:bg-amber-700"
+                class="sb-ui-btn text-sm font-semibold bg-amber-600 text-white hover:bg-amber-700"
                 @click="openProfile"
               >
                 Open profile
@@ -181,28 +190,28 @@
             <div class="mt-3 flex flex-wrap items-center gap-2">
               <button
                 type="button"
-                class="inline-flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border border-emerald-200 text-emerald-700 hover:bg-emerald-100"
+                class="sb-ui-btn sb-ui-btn--sm text-xs font-semibold border-emerald-200 text-emerald-700 hover:bg-emerald-100"
                 @click="shareProfile('whatsapp')"
               >
                 WhatsApp
               </button>
               <button
                 type="button"
-                class="inline-flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border border-blue-200 text-blue-700 hover:bg-blue-100"
+                class="sb-ui-btn sb-ui-btn--sm text-xs font-semibold border-blue-200 text-blue-700 hover:bg-blue-100"
                 @click="shareProfile('facebook')"
               >
                 Facebook
               </button>
               <button
                 type="button"
-                class="inline-flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border border-indigo-200 text-indigo-700 hover:bg-indigo-100"
+                class="sb-ui-btn sb-ui-btn--sm text-xs font-semibold border-indigo-200 text-indigo-700 hover:bg-indigo-100"
                 @click="shareProfile('messenger')"
               >
                 Messenger
               </button>
               <button
                 type="button"
-                class="inline-flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg border border-sky-200 text-sky-700 hover:bg-sky-100"
+                class="sb-ui-btn sb-ui-btn--sm text-xs font-semibold border-sky-200 text-sky-700 hover:bg-sky-100"
                 @click="shareProfile('telegram')"
               >
                 Telegram
@@ -290,7 +299,7 @@
       </div>
 
       <!-- Upcoming Summary -->
-      <div class="bg-white rounded-lg shadow p-4 sm:p-6 mb-3 sm:mb-4 md:mb-6">
+      <div class="sb-ui-card p-4 sm:p-6 mb-3 sm:mb-4 md:mb-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-base sm:text-lg font-bold">
             Upcoming
@@ -298,13 +307,13 @@
           <span class="text-xs sm:text-sm text-gray-500">Next 7 days</span>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          <div class="rounded-xl border border-gray-200/70 bg-gradient-to-b from-white to-gray-50 p-3 sm:p-4">
+          <div class="sb-ui-card p-3 sm:p-4">
             <div class="flex items-center justify-between mb-2">
               <p class="text-sm font-semibold text-gray-900">Bookings</p>
               <button
                 type="button"
-                class="text-xs font-semibold text-burgundy hover:text-burgundy-dark"
-                @click="activeTab = 'bookings'"
+                class="sb-ui-btn sb-ui-btn--secondary sb-ui-btn--sm"
+                @click="switchToTab('bookings')"
               >
                 View all
               </button>
@@ -317,13 +326,13 @@
               {{ upcomingBookings[0]?.event_date ? formatDate(upcomingBookings[0].event_date) : 'Add availability to get booked' }}
             </p>
           </div>
-          <div class="rounded-xl border border-gray-200/70 bg-gradient-to-b from-white to-gray-50 p-3 sm:p-4">
+          <div class="sb-ui-card p-3 sm:p-4">
             <div class="flex items-center justify-between mb-2">
               <p class="text-sm font-semibold text-gray-900">Events</p>
               <button
                 type="button"
-                class="text-xs font-semibold text-burgundy hover:text-burgundy-dark"
-                @click="activeTab = 'events'"
+                class="sb-ui-btn sb-ui-btn--secondary sb-ui-btn--sm"
+                @click="switchToTab('events')"
               >
                 View all
               </button>
@@ -340,7 +349,7 @@
       </div>
 
       <!-- Response SLA -->
-      <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-4 sm:p-6 mb-3 sm:mb-4 md:mb-6">
+      <div class="sb-ui-card p-4 sm:p-6 mb-3 sm:mb-4 md:mb-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-base sm:text-lg font-bold">
             Response Time
@@ -348,7 +357,7 @@
           <span class="text-xs sm:text-sm text-gray-500">Faster replies win more bookings</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="rounded-xl border border-gray-200/70 bg-gradient-to-b from-white to-gray-50 p-4">
+          <div class="sb-ui-card p-4">
             <p class="text-[11px] uppercase tracking-wide text-gray-500 mb-1">
               Average response
             </p>
@@ -359,7 +368,7 @@
               Goal: under {{ responseStats.target }} hrs
             </p>
           </div>
-          <div class="rounded-xl border border-gray-200/70 bg-gradient-to-b from-white to-gray-50 p-4">
+          <div class="sb-ui-card p-4">
             <p class="text-[11px] uppercase tracking-wide text-gray-500 mb-1">
               Performance
             </p>
@@ -377,7 +386,7 @@
               />
             </div>
           </div>
-          <div class="rounded-xl border border-rose-200/70 bg-gradient-to-b from-white to-rose-50/60 p-4 flex flex-col justify-between">
+          <div class="sb-ui-card p-4 flex flex-col justify-between">
             <div>
               <p class="text-[11px] uppercase tracking-wide text-rose-700 mb-1">
                 Tip
@@ -388,7 +397,7 @@
             </div>
             <router-link
               to="/photographer/settings"
-              class="mt-3 inline-flex items-center justify-center px-3 py-2 rounded-lg text-sm font-semibold bg-burgundy text-white hover:bg-burgundy-dark transition-colors"
+              class="sb-ui-btn sb-ui-btn--primary sb-ui-btn--sm mt-3"
             >
               Update account settings
             </router-link>
@@ -397,7 +406,10 @@
       </div>
 
       <!-- Tabs -->
-      <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm">
+      <div
+        ref="tabsSectionRef"
+        class="sb-ui-card"
+      >
         <div class="border-b border-gray-200 bg-gray-50 bg-opacity-70 border-opacity-70">
           <div class="overflow-x-auto scrollbar-hide">
             <div class="flex gap-3 sm:gap-6 px-3 sm:px-6 py-3 sm:py-4 min-w-max">
@@ -470,19 +482,19 @@
               </router-link>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 mb-4">
-              <div class="rounded-xl border border-gray-200/70 bg-gradient-to-b from-white to-gray-50 p-3">
+              <div class="sb-ui-card p-3">
                 <p class="text-[11px] uppercase tracking-wide text-gray-500">Total</p>
                 <p class="text-lg sm:text-xl font-bold text-gray-900">{{ incomingSummary.total }}</p>
               </div>
-              <div class="rounded-xl border border-amber-200/70 bg-gradient-to-b from-white to-amber-50/60 p-3">
+              <div class="sb-ui-card p-3">
                 <p class="text-[11px] uppercase tracking-wide text-amber-700">Pending</p>
                 <p class="text-lg sm:text-xl font-bold text-amber-800">{{ incomingSummary.pending }}</p>
               </div>
-              <div class="rounded-xl border border-orange-200/70 bg-gradient-to-b from-white to-orange-50/60 p-3">
+              <div class="sb-ui-card p-3">
                 <p class="text-[11px] uppercase tracking-wide text-orange-700">Awaiting Payment</p>
                 <p class="text-lg sm:text-xl font-bold text-orange-800">{{ incomingSummary.pendingPayment }}</p>
               </div>
-              <div class="rounded-xl border border-green-200/70 bg-gradient-to-b from-white to-green-50/60 p-3">
+              <div class="sb-ui-card p-3">
                 <p class="text-[11px] uppercase tracking-wide text-green-700">Confirmed</p>
                 <p class="text-lg sm:text-xl font-bold text-green-800">{{ incomingSummary.confirmed }}</p>
               </div>
@@ -500,7 +512,7 @@
               <div
                 v-for="booking in bookings"
                 :key="booking.id"
-                class="rounded-xl border border-gray-200/70 bg-white p-3 sm:p-4 hover:bg-gray-50 active:bg-gray-100"
+                class="sb-ui-card p-3 sm:p-4 hover:bg-gray-50 active:bg-gray-100"
               >
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2 sm:mb-3">
                   <div class="min-w-0 flex-1">
@@ -560,14 +572,14 @@
                       <a
                         v-if="booking.id"
                         :href="`/bookings/${booking.id}`"
-                        class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-100 min-h-[40px] sm:min-h-0"
+                        class="sb-ui-btn sb-ui-btn--secondary sb-ui-btn--sm min-h-[40px] sm:min-h-0"
                       >
                         View Details
                       </a>
                       <router-link
                         v-if="booking.id"
                         :to="`/bookings/${booking.id}/messages`"
-                        class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg border border-burgundy text-burgundy hover:bg-burgundy hover:text-white min-h-[40px] sm:min-h-0"
+                        class="sb-ui-btn sb-ui-btn--primary sb-ui-btn--sm min-h-[40px] sm:min-h-0"
                       >
                         Open Messages
                       </router-link>
@@ -580,13 +592,13 @@
                     <router-link
                       v-if="booking.id"
                       :to="`/bookings/${booking.id}/messages`"
-                      class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg border border-burgundy text-burgundy hover:bg-burgundy hover:text-white min-h-[40px] sm:min-h-0"
+                      class="sb-ui-btn sb-ui-btn--primary sb-ui-btn--sm min-h-[40px] sm:min-h-0"
                     >
                       Open Messages
                     </router-link>
                     <router-link
                       to="/bookings"
-                      class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 min-h-[40px] sm:min-h-0"
+                      class="sb-ui-btn sb-ui-btn--secondary sb-ui-btn--sm min-h-[40px] sm:min-h-0"
                     >
                       View Details
                     </router-link>
@@ -637,7 +649,7 @@
                 Portfolio Albums
               </h2>
               <button
-                class="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-burgundy text-white rounded hover:bg-[#6F112D] font-medium min-h-[44px] sm:min-h-0"
+                class="sb-ui-btn sb-ui-btn--primary w-full sm:w-auto min-h-[44px] sm:min-h-0"
                 @click="showAlbumModal = true"
               >
                 + Add Album
@@ -658,7 +670,7 @@
               <div
                 v-for="album in albums"
                 :key="album.id"
-                class="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+                class="sb-ui-card overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <div class="h-48 bg-gray-200 relative">
                   <img
@@ -669,13 +681,13 @@
                   >
                   <div class="absolute inset-0 bg-black/40 flex items-center justify-center gap-2 opacity-0 hover:opacity-100 transition-opacity">
                     <button
-                      class="px-3 py-2 bg-white text-burgundy rounded-lg font-medium text-sm hover:bg-gray-100"
+                      class="sb-ui-btn sb-ui-btn--secondary sb-ui-btn--sm"
                       @click="viewAlbum(album)"
                     >
                       View Photos
                     </button>
                     <button
-                      class="px-3 py-2 bg-blue-500 text-white rounded-lg font-medium text-sm hover:bg-blue-600"
+                      class="sb-ui-btn sb-ui-btn--primary sb-ui-btn--sm"
                       @click="editAlbum(album)"
                     >
                       Edit
@@ -692,13 +704,13 @@
                   <div class="flex items-center justify-between text-sm mb-3">
                     <span class="text-gray-500">{{ album.photos_count || 0 }} photos</span>
                     <span
-                      :class="`px-2 py-1 rounded text-xs ${album.is_public ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`"
+                      :class="`sb-ui-badge ${album.is_public ? 'sb-ui-badge--success' : 'sb-ui-badge--neutral'}`"
                     >
                       {{ album.is_public ? 'Public' : 'Private' }}
                     </span>
                   </div>
                   <button
-                    class="w-full px-3 py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 font-medium text-sm"
+                    class="sb-ui-btn sb-ui-btn--secondary sb-ui-btn--sm w-full"
                     @click="deleteAlbum(album)"
                   >
                     Delete
@@ -714,7 +726,7 @@
             class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
             @click.self="showAlbumModal = false"
           >
-            <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="sb-ui-card max-w-md w-full p-6">
               <h3 class="text-xl font-bold mb-4">
                 {{ editingAlbumId ? 'Edit Album' : 'Create New Album' }}
               </h3>
@@ -724,7 +736,7 @@
                   <input
                     v-model="albumForm.name"
                     type="text"
-                    class="w-full border rounded px-4 py-2 focus:ring-2 focus:ring-burgundy"
+                    class="sb-ui-input"
                     placeholder="Wedding Photography"
                   >
                 </div>
@@ -733,7 +745,7 @@
                   <textarea
                     v-model="albumForm.description"
                     rows="3"
-                    class="w-full border rounded px-4 py-2 focus:ring-2 focus:ring-burgundy"
+                    class="sb-ui-textarea"
                     placeholder="Beautiful wedding moments captured..."
                   />
                 </div>
@@ -753,13 +765,13 @@
               <div class="flex gap-3 mt-6">
                 <button
                   :disabled="!albumForm.name || creatingAlbum"
-                  class="flex-1 px-4 py-2 bg-burgundy text-white rounded hover:bg-[#6F112D] disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="sb-ui-btn sb-ui-btn--primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
                   @click="editingAlbumId ? updateAlbum() : createAlbum()"
                 >
                   {{ creatingAlbum ? 'Saving...' : (editingAlbumId ? 'Update Album' : 'Create Album') }}
                 </button>
                 <button
-                  class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+                  class="sb-ui-btn sb-ui-btn--secondary"
                   @click="closeAlbumModal"
                 >
                   Cancel
@@ -783,7 +795,7 @@
                 Service Packages
               </h2>
               <button
-                class="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-burgundy text-white rounded hover:bg-[#6F112D] font-medium min-h-[44px] sm:min-h-0"
+                class="sb-ui-btn sb-ui-btn--primary w-full sm:w-auto min-h-[44px] sm:min-h-0"
                 @click="showPackageModal = true"
               >
                 + Add Package
@@ -804,7 +816,7 @@
               <div
                 v-for="pkg in packages"
                 :key="pkg.id"
-                class="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+                class="sb-ui-card overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <!-- Package Cover Image -->
                 <div
@@ -847,7 +859,7 @@
                       </p>
                     </div>
                     <span
-                      :class="`px-3 py-1 rounded-full text-xs font-medium ${pkg.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`"
+                      :class="`sb-ui-badge ${pkg.is_active ? 'sb-ui-badge--success' : 'sb-ui-badge--neutral'}`"
                     >
                       {{ pkg.is_active ? 'Active' : 'Inactive' }}
                     </span>
@@ -929,13 +941,13 @@
 
                   <div class="flex gap-2">
                     <button
-                      class="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                      class="sb-ui-btn sb-ui-btn--secondary sb-ui-btn--sm flex-1"
                       @click="editPackage(pkg)"
                     >
                       Edit
                     </button>
                     <button
-                      class="px-3 py-2 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+                      class="sb-ui-btn sb-ui-btn--secondary sb-ui-btn--sm"
                       @click="deletePackage(pkg)"
                     >
                       Delete
@@ -2498,7 +2510,7 @@
           </router-link>
 
           <router-link
-            to="/photographer/achievements"
+            to="/dashboard/certificates"
             class="flex flex-col items-center p-2.5 sm:p-3 border border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 active:bg-red-100 transition-all group min-h-[72px] sm:min-h-0 hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-burgundy/30"
           >
             <span class="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-burgundy/10 text-burgundy group-hover:bg-burgundy/15 mb-1.5">
@@ -2537,7 +2549,7 @@
             <img
               src="/images/pexels.webp"
               alt="Pexels"
-              class="w-8 h-8 mb-2"
+              class="w-8 h-8 mb-2 object-contain"
               loading="lazy"
             >
             <span class="text-sm font-semibold">Pexels</span>
@@ -2549,6 +2561,12 @@
             target="_blank"
             rel="noopener"
           >
+            <img
+              src="/images/Unspalsh.png"
+              alt="Unsplash"
+              class="w-8 h-8 mb-2 object-contain"
+              loading="lazy"
+            >
             <span class="text-sm font-semibold">Unsplash</span>
             <span class="text-xs text-gray-500 text-center">Editorial visuals</span>
           </a>
@@ -2558,6 +2576,12 @@
             target="_blank"
             rel="noopener"
           >
+            <img
+              src="/images/Pixabay.png"
+              alt="Pixabay"
+              class="w-8 h-8 mb-2 object-contain"
+              loading="lazy"
+            >
             <span class="text-sm font-semibold">Pixabay</span>
             <span class="text-xs text-gray-500 text-center">Free photos and videos</span>
           </a>
@@ -2567,6 +2591,12 @@
             target="_blank"
             rel="noopener"
           >
+            <img
+              src="/images/behance.avif"
+              alt="Behance"
+              class="w-8 h-8 mb-2 object-contain"
+              loading="lazy"
+            >
             <span class="text-sm font-semibold">Behance</span>
             <span class="text-xs text-gray-500 text-center">Portfolios and inspiration</span>
           </a>
@@ -2575,11 +2605,11 @@
     </div>
 
     <!-- Toast Notifications -->
-    <div class="fixed top-4 right-4 z-50 space-y-2">
+    <div class="fixed top-4 right-4 left-4 sm:left-auto z-50 space-y-2">
       <div
         v-for="toast in toasts"
         :key="toast.id"
-        class="flex items-center gap-3 min-w-[300px] max-w-md px-4 py-3 rounded-lg shadow-lg transform transition-all duration-300"
+        class="flex items-center gap-3 w-full sm:min-w-[300px] sm:max-w-md px-4 py-3 rounded-lg shadow-lg transform transition-all duration-300"
         :class="{
           'bg-green-500 text-white': toast.type === 'success',
           'bg-red-500 text-white': toast.type === 'error',
@@ -2660,7 +2690,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import api from '../api';
 import { validateUploadFile } from '../utils/imageValidation';
 import ImageUpload from './ImageUpload.vue';
@@ -2711,6 +2741,7 @@ const loadingEventRsvps = ref(false);
 // Toast notifications
 const toasts = ref([]);
 let toastId = 0;
+const tabsSectionRef = ref(null);
 
 const disallowedBookingRoles = ['judge', 'admin', 'super_admin', 'moderator'];
 const normalizeRole = (role) => String(role || '').toLowerCase().replace(/[\s-]+/g, '_');
@@ -2743,6 +2774,19 @@ const showToast = (message, type = 'info') => {
 const removeToast = (id) => {
   const index = toasts.value.findIndex(t => t.id === id);
   if (index > -1) toasts.value.splice(index, 1);
+};
+
+const switchToTab = async (tabName) => {
+  if (tabName === 'bookings' && !canViewBookings.value) {
+    activeTab.value = 'portfolio';
+  } else {
+    activeTab.value = tabName;
+  }
+
+  await nextTick();
+  if (tabsSectionRef.value?.scrollIntoView) {
+    tabsSectionRef.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 };
 
 const albumForm = ref({

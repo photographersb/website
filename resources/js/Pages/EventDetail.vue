@@ -8,6 +8,8 @@
   <div
     v-if="loading"
     class="min-h-screen flex items-center justify-center"
+    role="status"
+    aria-live="polite"
   >
     <div class="text-center">
       <div class="inline-block animate-spin rounded-full h-16 w-16 border-b-2 border-burgundy" />
@@ -19,11 +21,11 @@
 
   <div
     v-else-if="event"
-    class="min-h-screen bg-gray-50"
+    class="min-h-screen bg-[#f7f2ee] text-[#1d1014]"
   >
     <!-- Hero Banner -->
-    <div class="relative h-64 sm:h-80 md:h-96 overflow-hidden bg-gradient-to-br from-gray-300 to-gray-400">
-      <picture v-if="heroImage">
+    <div class="relative h-80 sm:h-96 md:h-[34rem] overflow-hidden bg-[#1b0b12]">
+      <picture v-if="heroImage && !heroImageError">
         <source
           v-if="getWebpSource(heroImage)"
           :srcset="getWebpSource(heroImage)"
@@ -38,6 +40,7 @@
           fetchpriority="high"
           width="1600"
           height="900"
+          @error="heroImageError = true"
         >
       </picture>
       <div
@@ -60,9 +63,10 @@
       </div>
       <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
       
-      <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8">
-        <div class="container mx-auto">
-          <div class="flex flex-wrap items-center gap-2 mb-2 sm:mb-3">
+      <div class="absolute inset-0">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl h-full flex flex-col justify-end py-8 sm:py-12 md:py-16">
+          <div class="max-w-4xl">
+            <div class="flex flex-wrap items-center gap-2 mb-2 sm:mb-3">
             <span
               class="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold uppercase"
               :class="eventTypeBadge.tone"
@@ -95,68 +99,103 @@
             >
               Free
             </span>
-          </div>
-          <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
-            {{ event.title }}
-          </h1>
-          <p class="text-sm sm:text-base md:text-lg text-white/90">
-            {{ formatDate(event.start_datetime || event.event_date) }} • {{ event.venue_name || event.venue || event.location_text || event.location || 'TBA' }}
-          </p>
-          <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-            <div class="bg-black/45 rounded-lg px-3 py-2">
-              <p class="text-[10px] uppercase tracking-wide text-white/70">
-                Date
-              </p>
-              <p class="text-xs sm:text-sm font-semibold text-white">
-                {{ formatHeroDate(event.start_datetime || event.event_date) }}
-              </p>
             </div>
-            <div class="bg-black/45 rounded-lg px-3 py-2">
-              <p class="text-[10px] uppercase tracking-wide text-white/70">
-                Time
-              </p>
-              <p class="text-xs sm:text-sm font-semibold text-white">
-                {{ formatHeroTime(event.start_datetime || event.event_date) }}
-              </p>
+            <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
+              {{ event.title }}
+            </h1>
+            <p class="text-sm sm:text-base md:text-lg text-white/90">
+              {{ formatDate(event.start_datetime || event.event_date) }} • {{ event.venue_name || event.venue || event.location_text || event.location || 'TBA' }}
+            </p>
+            <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+              <div class="bg-black/45 rounded-lg px-3 py-2">
+                <p class="text-[10px] uppercase tracking-wide text-white/70">
+                  Date
+                </p>
+                <p class="text-xs sm:text-sm font-semibold text-white">
+                  {{ formatHeroDate(event.start_datetime || event.event_date) }}
+                </p>
+              </div>
+              <div class="bg-black/45 rounded-lg px-3 py-2">
+                <p class="text-[10px] uppercase tracking-wide text-white/70">
+                  Time
+                </p>
+                <div class="text-xs sm:text-sm font-semibold text-white space-y-0.5">
+                  <div>
+                    <span class="text-white/70">Start:</span>
+                    <span class="ml-1">{{ formatTimeLabel(event.start_time, event.start_datetime || event.event_date) }}</span>
+                  </div>
+                  <div>
+                    <span class="text-white/70">End:</span>
+                    <span class="ml-1">{{ formatTimeLabel(event.end_time, event.end_datetime || event.event_end_date) }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-black/45 rounded-lg px-3 py-2">
+                <p class="text-[10px] uppercase tracking-wide text-white/70">
+                  Location
+                </p>
+                <p class="text-xs sm:text-sm font-semibold text-white truncate">
+                  {{ event.venue_name || event.venue || event.location_text || event.location || 'TBA' }}
+                </p>
+              </div>
+              <div class="bg-black/45 rounded-lg px-3 py-2">
+                <p class="text-[10px] uppercase tracking-wide text-white/70">
+                  Entry
+                </p>
+                <p class="text-xs sm:text-sm font-semibold text-white">
+                  {{ isPaid ? formatPrice(priceValue, priceCurrency) : 'Free' }}
+                </p>
+              </div>
             </div>
-            <div class="bg-black/45 rounded-lg px-3 py-2">
-              <p class="text-[10px] uppercase tracking-wide text-white/70">
-                Location
-              </p>
-              <p class="text-xs sm:text-sm font-semibold text-white truncate">
-                {{ event.venue_name || event.venue || event.location_text || event.location || 'TBA' }}
-              </p>
-            </div>
-            <div class="bg-black/45 rounded-lg px-3 py-2">
-              <p class="text-[10px] uppercase tracking-wide text-white/70">
-                Entry
-              </p>
-              <p class="text-xs sm:text-sm font-semibold text-white">
-                {{ isPaid ? formatPrice(priceValue, priceCurrency) : 'Free' }}
-              </p>
-            </div>
-          </div>
-          <p
-            v-if="heroCredit"
-            class="mt-2 text-xs text-white/80"
-          >
-            Photo by
-            <a
-              :href="heroCredit.url"
-              target="_blank"
-              rel="noopener"
-              class="font-semibold text-white underline"
+            <p
+              v-if="heroCredit"
+              class="mt-2 text-xs text-white/80"
             >
-              {{ heroCredit.name }}
-            </a>
-            on Pexels.
-          </p>
+              Photo by
+              <a
+                :href="heroCredit.url"
+                target="_blank"
+                rel="noopener"
+                class="font-semibold text-white underline"
+              >
+                {{ heroCredit.name }}
+              </a>
+              on Pexels.
+            </p>
+
+            <div class="mt-5 flex flex-wrap items-center gap-2 sm:gap-3">
+              <button
+                :disabled="isEventFull"
+                :class="[
+                  'px-4 sm:px-5 py-2.5 rounded-full text-sm sm:text-base font-semibold transition-colors min-h-[42px]',
+                  isEventFull
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-burgundy text-white hover:bg-rose-800'
+                ]"
+                @click="handleRsvp"
+              >
+                {{ isPaid ? 'Buy Tickets' : (isRsvped ? '✓ Registered' : 'Register') }}
+              </button>
+              <button
+                class="px-4 sm:px-5 py-2.5 rounded-full text-sm sm:text-base font-semibold bg-white/10 border border-white/30 text-white hover:bg-white/20 transition-colors min-h-[42px]"
+                @click="addToCalendar"
+              >
+                Add to calendar
+              </button>
+              <button
+                class="px-4 sm:px-5 py-2.5 rounded-full text-sm sm:text-base font-semibold bg-white text-[#1b0b12] hover:bg-white/90 transition-colors min-h-[42px]"
+                @click="copyLink"
+              >
+                Share event
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Main Content -->
-    <div class="container mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl py-8 sm:py-10 md:py-12">
       <div class="lg:grid lg:grid-cols-3 lg:gap-8">
         <!-- Left Column: Event Details -->
         <div class="lg:col-span-2 space-y-6 sm:space-y-8">
@@ -233,9 +272,20 @@
                   <p class="text-xs sm:text-sm text-gray-600">
                     Date & Time
                   </p>
-                  <p class="font-semibold text-sm sm:text-base">
-                    {{ formatDateTimeRange(event.start_datetime || event.event_date, event.end_datetime || event.event_end_date) }}
-                  </p>
+                  <div class="font-semibold text-sm sm:text-base space-y-0.5">
+                    <div>
+                      <span class="text-gray-500">Date:</span>
+                      <span class="ml-1">{{ formatDate(event.start_datetime || event.event_date) }}</span>
+                    </div>
+                    <div>
+                      <span class="text-gray-500">Start:</span>
+                      <span class="ml-1">{{ formatTimeLabel(event.start_time, event.start_datetime || event.event_date) }}</span>
+                    </div>
+                    <div>
+                      <span class="text-gray-500">End:</span>
+                      <span class="ml-1">{{ formatTimeLabel(event.end_time, event.end_datetime || event.event_end_date) }}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -494,12 +544,135 @@
               {{ scheduleText }}
             </p>
           </div>
+
+          <div
+            v-if="event.mentors && event.mentors.length > 0"
+            class="bg-white rounded-lg shadow-md p-4 sm:p-5 md:p-6"
+          >
+            <h2 class="text-xl sm:text-2xl font-bold mb-4">Mentors / Speakers</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div
+                v-for="mentor in event.mentors"
+                :key="mentor.id"
+                class="border border-[#eadfd7] rounded-lg p-4 bg-[#fdf9f6]"
+              >
+                <div class="flex items-center gap-3">
+                  <img
+                    v-if="mentor.profile_photo_url"
+                    :src="mentor.profile_photo_url"
+                    :alt="mentor.name"
+                    class="w-12 h-12 rounded-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  >
+                  <div
+                    v-else
+                    class="w-12 h-12 rounded-full bg-[#efe5dc] flex items-center justify-center text-[#7a1f2b] font-bold"
+                  >
+                    {{ mentor.name?.charAt(0) || 'M' }}
+                  </div>
+                  <div>
+                    <p class="font-semibold text-gray-900">{{ mentor.name || 'Mentor' }}</p>
+                    <p class="text-xs text-gray-600">{{ mentor.title || mentor.expertise || 'Speaker' }}</p>
+                  </div>
+                </div>
+                <p
+                  v-if="mentor.bio"
+                  class="text-sm text-gray-700 mt-3"
+                >
+                  {{ mentor.bio }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            v-if="galleryImages.length > 0"
+            class="bg-white rounded-lg shadow-md p-4 sm:p-5 md:p-6"
+          >
+            <h2 class="text-xl sm:text-2xl font-bold mb-4">Gallery</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <img
+                v-for="(image, index) in galleryImages"
+                :key="`${event.id}-gallery-${index}`"
+                :src="image"
+                :alt="`${event.title} gallery ${index + 1}`"
+                class="w-full aspect-[4/3] object-cover rounded-lg"
+                loading="lazy"
+                decoding="async"
+              >
+            </div>
+          </div>
+
+          <div
+            v-if="event.sponsors && event.sponsors.length > 0"
+            class="bg-white rounded-lg shadow-md p-4 sm:p-5 md:p-6"
+          >
+            <h2 class="text-xl sm:text-2xl font-bold mb-4">Sponsors</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+              <component
+                :is="sponsor.website_url || sponsor.website ? 'a' : 'div'"
+                v-for="sponsor in event.sponsors"
+                :key="sponsor.id"
+                :href="sponsor.website_url || sponsor.website || undefined"
+                target="_blank"
+                rel="noopener"
+                class="border border-[#eadfd7] rounded-lg p-3 bg-[#fdf9f6] flex flex-col items-center text-center"
+              >
+                <img
+                  v-if="sponsor.logo_url || sponsor.logo"
+                  :src="sponsor.logo_url || sponsor.logo"
+                  :alt="sponsor.name"
+                  class="w-full h-12 object-contain mb-2"
+                  loading="lazy"
+                  decoding="async"
+                >
+                <p class="text-sm font-semibold text-gray-900">{{ sponsor.name || 'Sponsor' }}</p>
+              </component>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 md:p-6">
+            <h2 class="text-xl sm:text-2xl font-bold mb-4">Participants</h2>
+            <div class="flex items-center justify-between mb-3">
+              <p class="text-sm text-gray-600">Registered participants</p>
+              <p class="text-lg font-semibold text-burgundy">{{ participantCount }}</p>
+            </div>
+            <div
+              v-if="participantNames.length"
+              class="flex flex-wrap gap-2"
+            >
+              <span
+                v-for="(name, index) in participantNames"
+                :key="`${name}-${index}`"
+                class="px-3 py-1 rounded-full text-xs font-medium bg-[#efe5dc] text-[#7a1f2b]"
+              >
+                {{ name }}
+              </span>
+            </div>
+            <p
+              v-else
+              class="text-sm text-gray-500"
+            >
+              Participants will appear as registrations are confirmed.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 md:p-6">
+            <h2 class="text-xl sm:text-2xl font-bold mb-3">Certificate Availability</h2>
+            <p
+              :class="event.certificates_enabled ? 'text-emerald-700' : 'text-gray-600'"
+              class="text-sm sm:text-base font-medium"
+            >
+              {{ event.certificates_enabled ? 'Digital participation certificates are available for attendees.' : 'Certificates are not enabled for this event.' }}
+            </p>
+          </div>
         </div>
 
         <!-- Right Column: Sidebar -->
         <div class="mt-6 lg:mt-0 space-y-4 sm:space-y-6">
           <!-- RSVP Card -->
-          <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 md:p-6 sticky top-4">
+          <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 md:p-6 sticky top-24">
             <div class="text-center mb-4 sm:mb-6">
               <div class="text-3xl sm:text-4xl font-bold text-burgundy mb-2">
                 {{ isPaid ? formatPrice(priceValue, priceCurrency) : 'Free' }}
@@ -621,6 +794,7 @@
               <button
                 class="flex-1 p-2 sm:p-3 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-colors"
                 title="Share on Facebook"
+                aria-label="Share this event on Facebook"
                 @click="shareOnFacebook"
               >
                 <svg
@@ -633,20 +807,36 @@
               </button>
               <button
                 class="flex-1 p-2 sm:p-3 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-400 transition-colors"
-                title="Share on Twitter"
-                @click="shareOnTwitter"
+                title="Share on WhatsApp"
+                aria-label="Share this event on WhatsApp"
+                @click="shareOnWhatsApp"
               >
                 <svg
                   class="w-5 h-5 sm:w-6 sm:h-6 mx-auto text-blue-400"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.174.199-.347.223-.645.075-.297-.15-1.255-.463-2.39-1.475-.883-.787-1.48-1.76-1.653-2.058-.174-.298-.018-.458.13-.606.134-.133.298-.348.446-.52.149-.174.198-.298.298-.497.099-.198.05-.372-.025-.521-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.372-.01-.57-.01-.198 0-.52.075-.792.372-.272.298-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.077 4.487.71.306 1.263.489 1.694.626.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a8.41 8.41 0 01-4.281-1.175l-.307-.182-3.183.833.85-3.102-.2-.318a8.377 8.377 0 01-1.281-4.446c.002-4.627 3.773-8.396 8.403-8.396 2.242 0 4.347.873 5.933 2.46a8.345 8.345 0 012.458 5.93c-.003 4.628-3.774 8.397-8.404 8.397m7.188-15.615A10.166 10.166 0 0012.05 3c-5.62 0-10.194 4.572-10.196 10.19a10.13 10.13 0 001.357 5.077L1 23l4.876-1.28a10.2 10.2 0 004.874 1.24h.004c5.62 0 10.194-4.572 10.197-10.19a10.132 10.132 0 00-2.958-7.2" />
+                </svg>
+              </button>
+              <button
+                class="flex-1 p-2 sm:p-3 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-colors"
+                title="Share on LinkedIn"
+                aria-label="Share this event on LinkedIn"
+                @click="shareOnLinkedIn"
+              >
+                <svg
+                  class="w-5 h-5 sm:w-6 sm:h-6 mx-auto text-blue-700"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M20.447 20.452H16.89V14.87c0-1.33-.028-3.042-1.854-3.042-1.854 0-2.137 1.447-2.137 2.944v5.68H9.343V9h3.414v1.561h.049c.476-.9 1.637-1.85 3.37-1.85 3.605 0 4.271 2.372 4.271 5.456v6.285zM5.337 7.433a2.062 2.062 0 11.001-4.124 2.062 2.062 0 01-.001 4.124zM7.119 20.452H3.555V9h3.564v11.452z" />
                 </svg>
               </button>
               <button
                 class="flex-1 p-2 sm:p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 title="Copy link"
+                aria-label="Copy event link"
                 @click="copyLink"
               >
                 <svg
@@ -719,6 +909,7 @@ const {
 const event = ref(null);
 const loading = ref(true);
 const isRsvped = ref(false);
+const heroImageError = ref(false);
 
 // Computed
 const isEventFull = computed(() => {
@@ -734,6 +925,11 @@ const isPaid = computed(() => {
   if (event.value.event_mode) return event.value.event_mode === 'paid';
   if (event.value.event_type) return event.value.event_type === 'paid';
   if (typeof event.value.is_ticketed === 'boolean') return event.value.is_ticketed;
+  if (typeof event.value.is_ticketed === 'number') return event.value.is_ticketed === 1;
+  if (typeof event.value.is_ticketed === 'string') {
+    const normalized = event.value.is_ticketed.trim().toLowerCase();
+    return normalized === '1' || normalized === 'true';
+  }
 
   const numeric = Number(
     event.value.ticket_price ?? event.value.price ?? event.value.base_price ?? 0
@@ -807,9 +1003,59 @@ const spotsLeftText = computed(() => {
   return 'Unlimited spots';
 });
 
+const getGalleryImage = (eventValue) => {
+  if (!eventValue) return null;
+  const gallery = eventValue.gallery_images;
+  if (Array.isArray(gallery)) return gallery[0] || null;
+  if (typeof gallery === 'string') {
+    try {
+      const parsed = JSON.parse(gallery);
+      return Array.isArray(parsed) ? (parsed[0] || null) : null;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+};
+
 const heroImage = computed(() => {
   if (!event.value) return null;
-  return event.value.hero_image_url || event.value.banner_image || null;
+  return event.value.hero_image_url
+    || event.value.banner_image
+    || event.value.og_image
+    || getGalleryImage(event.value)
+    || null;
+});
+
+const galleryImages = computed(() => {
+  if (!event.value?.gallery_images) return [];
+  if (Array.isArray(event.value.gallery_images)) {
+    return event.value.gallery_images.filter(Boolean).slice(0, 12);
+  }
+  if (typeof event.value.gallery_images === 'string') {
+    try {
+      const parsed = JSON.parse(event.value.gallery_images);
+      return Array.isArray(parsed) ? parsed.filter(Boolean).slice(0, 12) : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+});
+
+const participantCount = computed(() => {
+  if (!event.value) return 0;
+  const total = Number(event.value.registered_count);
+  if (Number.isFinite(total)) return total;
+  return Array.isArray(event.value.registrations) ? event.value.registrations.length : 0;
+});
+
+const participantNames = computed(() => {
+  if (!Array.isArray(event.value?.registrations)) return [];
+  return event.value.registrations
+    .map((registration) => registration?.user?.name || registration?.name || registration?.participant_name)
+    .filter(Boolean)
+    .slice(0, 10);
 });
 
 const eventLocationSlug = computed(() => {
@@ -941,6 +1187,7 @@ const fetchEvent = async () => {
 
     if (data.event || data.data) {
       event.value = data.event || data.data;
+      heroImageError.value = false;
       const registration = event.value?.user_registration;
       isRsvped.value = registration && registration.rsvp_status === 'going';
       updateSeoMeta(event.value);
@@ -997,17 +1244,61 @@ const viewEventsByLocation = () => {
 const shareOnFacebook = () => {
   const url = encodeURIComponent(window.location.href);
   window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+  trackShareLog('facebook');
 };
 
-const shareOnTwitter = () => {
+const shareOnWhatsApp = () => {
   const url = encodeURIComponent(window.location.href);
   const text = encodeURIComponent(event.value?.title || 'Check out this event');
-  window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+  window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+  trackShareLog('whatsapp');
+};
+
+const shareOnLinkedIn = () => {
+  const url = encodeURIComponent(window.location.href);
+  window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+  trackShareLog('linkedin');
 };
 
 const copyLink = () => {
   navigator.clipboard.writeText(window.location.href);
   showToast('Link copied to clipboard!', 'success');
+  trackShareLog('copy');
+};
+
+const trackShareLog = async (platform) => {
+  try {
+    await api.post('/growth/share-log', {
+      entity_type: 'event',
+      entity_id: event.value?.id || null,
+      platform,
+    });
+  } catch (error) {
+    console.warn('Share log failed:', error);
+  }
+};
+
+const addToCalendar = () => {
+  if (!event.value) return;
+
+  const dateFrom = event.value.start_datetime || event.value.event_date;
+  const dateTo = event.value.end_datetime || event.value.event_end_date || dateFrom;
+  if (!dateFrom) return;
+
+  const formatForGoogle = (value) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+  };
+
+  const start = formatForGoogle(dateFrom);
+  const end = formatForGoogle(dateTo);
+  const details = encodeURIComponent(event.value.description || 'Photography event');
+  const title = encodeURIComponent(event.value.title || 'Event');
+  const location = encodeURIComponent(event.value.venue_name || event.value.venue || event.value.location_text || event.value.location || '');
+
+  const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${start}/${end}`;
+  window.open(calendarUrl, '_blank');
 };
 
 const formatDate = (date) => {
@@ -1022,12 +1313,14 @@ const formatHeroDate = (date) => {
   return value.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
-const formatHeroTime = (date) => {
-  if (!date) return 'TBA';
-  const raw = String(date);
+const formatTimeLabel = (timeValue, dateValue) => {
+  const timeOnly = formatTimeOnly(timeValue);
+  if (timeOnly) return timeOnly;
+  if (!dateValue) return 'TBA';
+  const raw = String(dateValue);
   if (!raw.includes(':') && raw.length <= 10) return 'TBA';
-  const value = new Date(date);
-  if (Number.isNaN(value.getTime())) return 'TBA';
+  const value = new Date(dateValue);
+  if (Number.isNaN(value.getTime()) || isMidnight(value)) return 'TBA';
   return value.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 };
 
@@ -1036,12 +1329,48 @@ const formatDateTime = (date) => {
   return formatDateTimeValue(date);
 };
 
-const formatDateTimeRange = (start, end) => {
-  if (!start && !end) return 'TBA';
+const formatDateTimeRange = (start, end, startTime, endTime) => {
+  if (!start && !end && !startTime && !endTime) return 'TBA';
+
+  const dateValue = start || end;
+  const datePart = formatDateValue(dateValue) || 'TBA';
+  const startPart = formatTimeOnly(startTime);
+  const endPart = formatTimeOnly(endTime);
+
+  if (startPart && endPart) {
+    return `${datePart} ${startPart} - ${endPart}`;
+  }
+  if (startPart) {
+    return `${datePart} ${startPart}`;
+  }
   if (start && end) {
+    if (isMidnight(new Date(start)) && isMidnight(new Date(end))) {
+      return datePart;
+    }
     return `${formatDateTime(start)} - ${formatDateTime(end)}`;
   }
+  if (dateValue && isMidnight(new Date(dateValue))) {
+    return datePart;
+  }
   return formatDateTime(start || end);
+};
+
+const formatTimeOnly = (value) => {
+  if (!value) return '';
+  if (typeof value === 'string') {
+    const match = value.match(/^(\d{2}):(\d{2})/);
+    if (match) return `${match[1]}:${match[2]}`;
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+};
+
+const isMidnight = (value) => {
+  if (!value || Number.isNaN(value.getTime())) return false;
+  return value.getHours() === 0 && value.getMinutes() === 0 && value.getSeconds() === 0;
 };
 
 const formatPrice = (price, currency = 'BDT') => {

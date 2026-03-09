@@ -262,7 +262,7 @@ const primaryCategory = computed(() => {
   return null;
 });
 
-const fallbackAvatar = '/images/default-avatar.png';
+const fallbackAvatar = '/images/placeholder.svg';
 
 const profileImage = computed(() => {
   const raw = props.photographer.profile_picture_url
@@ -271,7 +271,11 @@ const profileImage = computed(() => {
     || '';
   if (!raw) return fallbackAvatar;
   if (raw.startsWith('http') || raw.startsWith('/') || raw.startsWith('data:')) return raw;
-  return `/storage/${raw.replace(/^\/+/, '')}`;
+  const normalized = String(raw).replace(/^\/+/, '');
+  if (normalized.startsWith('storage/')) {
+    return `/${normalized}`;
+  }
+  return `/storage/${normalized}`;
 });
 
 const handleAvatarError = (event) => {

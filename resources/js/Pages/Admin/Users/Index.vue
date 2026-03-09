@@ -577,19 +577,17 @@
                 >
                   <span class="detail-label">Specializations:</span>
                   <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
-                    <span
-                      v-for="spec in selectedUser.photographer.specializations"
-                      v-if="selectedUser.photographer.specializations && selectedUser.photographer.specializations.length > 0"
-                      :key="spec"
-                      class="badge"
-                      style="background-color: #dcfce7; color: #166534;"
-                    >
-                      {{ spec }}
-                    </span>
-                    <span
-                      v-else
-                      class="text-muted"
-                    >None</span>
+                    <template v-if="selectedUser.photographer.specializations && selectedUser.photographer.specializations.length > 0">
+                      <span
+                        v-for="spec in selectedUser.photographer.specializations"
+                        :key="spec"
+                        class="badge"
+                        style="background-color: #dcfce7; color: #166534;"
+                      >
+                        {{ spec }}
+                      </span>
+                    </template>
+                    <span v-else class="text-muted">None</span>
                   </div>
                 </div>
                 <div
@@ -598,19 +596,17 @@
                 >
                   <span class="detail-label">Categories:</span>
                   <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
-                    <span
-                      v-for="cat in selectedUser.photographer.categories"
-                      v-if="selectedUser.photographer.categories && selectedUser.photographer.categories.length > 0"
-                      :key="cat.id"
-                      class="badge"
-                      style="background-color: #f3e8ff; color: #6b21a8;"
-                    >
-                      {{ cat.name }}
-                    </span>
-                    <span
-                      v-else
-                      class="text-muted"
-                    >None</span>
+                    <template v-if="selectedUser.photographer.categories && selectedUser.photographer.categories.length > 0">
+                      <span
+                        v-for="cat in selectedUser.photographer.categories"
+                        :key="cat.id"
+                        class="badge"
+                        style="background-color: #f3e8ff; color: #6b21a8;"
+                      >
+                        {{ cat.name }}
+                      </span>
+                    </template>
+                    <span v-else class="text-muted">None</span>
                   </div>
                 </div>
               </div>
@@ -1645,7 +1641,6 @@ const viewUser = async (user) => {
   loadingUserDetails.value = true
   try {
     const { data } = await api.get(`/admin/users/${user.id}`)
-    console.log('User details response:', data)
     
     if (data.status === 'success' && data.user) {
       selectedUser.value = data.user
@@ -1695,21 +1690,16 @@ const saveUser = async () => {
       ? `/admin/users/${selectedUser.value.id}` 
       : '/admin/users'
 
-    console.log('Saving user:', showEditModal.value ? 'Update' : 'Create', userForm.value)
-
     const request = showEditModal.value
       ? api.put(url, userForm.value)
       : api.post(url, userForm.value)
 
     const { data } = await request
     
-    console.log('API Response:', data)
-    
     if (data.status === 'success') {
       showToastMessage(data.message || 'User saved successfully!')
       closeEditModal()
       await fetchUsers()
-      console.log('✅ User saved and list refreshed')
     } else {
       showToastMessage(data.message || 'Error saving user', 'error')
       console.error('Save failed:', data)

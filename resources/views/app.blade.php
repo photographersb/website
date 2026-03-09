@@ -230,14 +230,11 @@
     src="https://www.facebook.com/tr?id={{ $fbPixelId }}&ev=PageView&noscript=1"/></noscript>
     @endif
 
-    <div id="app"></div>
+    <div id="app" data-vue-app="true"></div>
 
-    <!-- Cookie Consent Banner Component -->
-    <cookie-consent-banner></cookie-consent-banner>
-
+    @if(config('app.env') === 'production')
     <!-- Service Worker Registration -->
     <script>
-        // Register service worker for offline functionality and PWA features
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
@@ -250,5 +247,20 @@
             });
         }
     </script>
+    @else
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then((registrations) => {
+                registrations.forEach((registration) => registration.unregister());
+            });
+        }
+
+        if ('caches' in window) {
+            caches.keys().then((cacheKeys) => {
+                cacheKeys.forEach((cacheKey) => caches.delete(cacheKey));
+            });
+        }
+    </script>
+    @endif
 </body>
 </html>

@@ -4,6 +4,8 @@
     <div
       v-if="loading"
       class="container mx-auto px-4 py-16 text-center"
+      role="status"
+      aria-live="polite"
     >
       <div class="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-[#7a1f2b]" />
       <p class="text-gray-600 mt-6 text-lg">
@@ -30,7 +32,7 @@
         >
         <div class="absolute inset-0 bg-gradient-to-t from-black from-opacity-80 via-black via-opacity-40 to-transparent" />
         
-        <div class="absolute inset-0 container mx-auto px-4 flex flex-col justify-end py-8 sm:py-12 md:py-16">
+        <div class="absolute inset-0 container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl flex flex-col justify-end py-8 sm:py-12 md:py-16">
           <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
             <span
               :class="[
@@ -96,6 +98,26 @@
           >
             📷 {{ competition.theme }}
           </p>
+          <div class="mb-4 flex flex-wrap items-center gap-2 sm:gap-3">
+            <button
+              class="px-4 sm:px-5 py-2.5 rounded-full bg-[#7a1f2b] text-white text-sm sm:text-base font-semibold hover:bg-[#5f1421] transition"
+              @click="isAuthenticated ? submitPhoto() : $router.push('/login')"
+            >
+              {{ isAuthenticated ? 'Submit photo' : 'Login to submit' }}
+            </button>
+            <button
+              class="px-4 sm:px-5 py-2.5 rounded-full border border-white/40 bg-white/10 text-white text-sm sm:text-base font-semibold hover:bg-white/20 transition"
+              @click="viewGallery"
+            >
+              View submissions
+            </button>
+            <button
+              class="px-4 sm:px-5 py-2.5 rounded-full bg-white text-[#1b0b12] text-sm sm:text-base font-semibold hover:bg-white/90 transition"
+              @click="copyLink"
+            >
+              Share competition
+            </button>
+          </div>
           <p
             v-if="heroCredit"
             class="text-xs text-white text-opacity-80"
@@ -114,7 +136,7 @@
         </div>
       </div>
 
-      <div class="container mx-auto px-4 -mt-16 sm:-mt-20 relative z-10">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl -mt-16 sm:-mt-20 relative z-10">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           <!-- Main Content -->
           <div class="lg:col-span-2 space-y-8">
@@ -722,7 +744,7 @@
           <!-- Sidebar -->
           <div class="lg:col-span-1 space-y-8">
             <!-- Action Card -->
-            <div class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 lg:sticky lg:top-6">
+            <div class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-lg border border-[#eadfd7] p-6 lg:sticky lg:top-24">
               <div class="space-y-5">
                 <!-- Status Info -->
                 <div class="p-5 bg-[#f7f2ee] rounded-xl border-l-4 border-[#7a1f2b]">
@@ -893,15 +915,24 @@
               <div class="flex flex-wrap gap-2">
                 <button
                   class="flex-1 min-w-[100px] bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+                  aria-label="Share this competition on Facebook"
                   @click="shareOnFacebook"
                 >
                   Facebook
                 </button>
                 <button
-                  class="flex-1 min-w-[100px] bg-sky-500 text-white py-2 rounded-lg hover:bg-sky-600 transition-colors text-sm sm:text-base"
-                  @click="shareOnTwitter"
+                  class="flex-1 min-w-[100px] bg-emerald-500 text-white py-2 rounded-lg hover:bg-emerald-600 transition-colors text-sm sm:text-base"
+                  aria-label="Share this competition on WhatsApp"
+                  @click="shareOnWhatsApp"
                 >
-                  Twitter
+                  WhatsApp
+                </button>
+                <button
+                  class="flex-1 min-w-[100px] bg-blue-700 text-white py-2 rounded-lg hover:bg-blue-800 transition-colors text-sm sm:text-base"
+                  aria-label="Share this competition on LinkedIn"
+                  @click="shareOnLinkedIn"
+                >
+                  LinkedIn
                 </button>
                 <button
                   class="px-3 sm:px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -1246,6 +1277,7 @@ const fetchCompetition = async () => {
       competition.value = data.data;
       refreshVoteResumeId();
       fetchTopSubmissions(slug);
+      updateSeoMeta(data.data);
     }
   } catch (error) {
     console.error('Error fetching competition:', error);
@@ -1373,12 +1405,20 @@ const getTimeRemaining = (deadline) => {
 const shareOnFacebook = () => {
   const url = encodeURIComponent(window.location.href);
   window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+  trackShareLog('facebook');
 };
 
-const shareOnTwitter = () => {
+const shareOnWhatsApp = () => {
   const url = encodeURIComponent(window.location.href);
-  const text = encodeURIComponent(`Check out this photography competition: ${competition.value.title}`);
-  window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+  const text = encodeURIComponent(`Check out this photography competition: ${competition.value?.title || 'Competition'}`);
+  window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+  trackShareLog('whatsapp');
+};
+
+const shareOnLinkedIn = () => {
+  const url = encodeURIComponent(window.location.href);
+  window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+  trackShareLog('linkedin');
 };
 
 const handleVoteCta = () => {
@@ -1413,9 +1453,112 @@ const copyLink = async () => {
   try {
     await navigator.clipboard.writeText(window.location.href);
     alert('Link copied to clipboard!');
+    trackShareLog('copy');
   } catch (error) {
     console.error('Error copying link:', error);
   }
+};
+
+const trackShareLog = async (platform) => {
+  try {
+    await api.post('/growth/share-log', {
+      entity_type: 'competition',
+      entity_id: competition.value?.id || null,
+      platform,
+    });
+  } catch (error) {
+    console.warn('Share log failed:', error);
+  }
+};
+
+const setMetaTag = (attribute, key, content) => {
+  if (!content) return;
+  let tag = document.head.querySelector(`meta[${attribute}="${key}"]`);
+  if (!tag) {
+    tag = document.createElement('meta');
+    tag.setAttribute(attribute, key);
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute('content', content);
+};
+
+const setLinkTag = (rel, href) => {
+  if (!href) return;
+  let tag = document.head.querySelector(`link[rel="${rel}"]`);
+  if (!tag) {
+    tag = document.createElement('link');
+    tag.setAttribute('rel', rel);
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute('href', href);
+};
+
+const setJsonLd = (data) => {
+  if (!data) return;
+  let script = document.head.querySelector('script[data-competition-schema="true"]');
+  if (!script) {
+    script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.setAttribute('data-competition-schema', 'true');
+    document.head.appendChild(script);
+  }
+  script.textContent = JSON.stringify(data);
+};
+
+const resolveUrl = (value) => {
+  if (!value) return '';
+  if (/^https?:\/\//i.test(value)) return value;
+  return `${window.location.origin}${value.startsWith('/') ? '' : '/'}${value}`;
+};
+
+const truncateText = (value, maxLength = 155) => {
+  if (!value) return '';
+  const clean = String(value).replace(/\s+/g, ' ').trim();
+  if (clean.length <= maxLength) return clean;
+  const trimmed = clean.slice(0, maxLength);
+  const safe = trimmed.slice(0, trimmed.lastIndexOf(' ') > 60 ? trimmed.lastIndexOf(' ') : trimmed.length);
+  return `${safe}...`;
+};
+
+const updateSeoMeta = (competitionValue) => {
+  if (!competitionValue || typeof window === 'undefined') return;
+  const title = competitionValue.title || 'Photography Competition';
+  const description = truncateText(competitionValue.description || competitionValue.theme || 'Join this photography competition.');
+  const canonicalUrl = `${window.location.origin}${route.fullPath}`;
+  const imageUrl = resolveUrl(competitionValue.hero_image || competitionValue.banner_image || '/images/placeholder.svg');
+
+  document.title = `${title} | Photography Competitions`;
+  setMetaTag('name', 'description', description);
+  setMetaTag('property', 'og:title', title);
+  setMetaTag('property', 'og:description', description);
+  setMetaTag('property', 'og:image', imageUrl);
+  setMetaTag('property', 'og:url', canonicalUrl);
+  setMetaTag('property', 'og:type', 'website');
+  setMetaTag('name', 'twitter:card', 'summary_large_image');
+  setMetaTag('name', 'twitter:title', title);
+  setMetaTag('name', 'twitter:description', description);
+  setMetaTag('name', 'twitter:image', imageUrl);
+  setLinkTag('canonical', canonicalUrl);
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: title,
+    description,
+    image: imageUrl,
+    url: canonicalUrl,
+    genre: competitionValue.theme || 'Photography competition',
+    provider: {
+      '@type': 'Organization',
+      name: 'Photographar SB',
+    },
+    organizer: {
+      '@type': 'Organization',
+      name: competitionValue.organizer?.business_name || 'Photographar SB',
+    },
+  };
+
+  setJsonLd(schema);
 };
 
 onMounted(() => {

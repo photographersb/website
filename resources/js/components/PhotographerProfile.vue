@@ -1,13 +1,13 @@
 <template>
-  <div class="min-h-screen bg-[#f7f2ee] text-[#1d1014]">
+  <div class="min-h-screen bg-[#f7f2ee] text-[#1d1014] public-profile-page">
     <!-- Hero Section -->
     <div class="relative overflow-hidden bg-[#1b0b12]">
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(245,158,11,0.28)_0,_transparent_55%)]" />
       <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-[#f3b35a]/30 blur-3xl" />
       <div class="absolute -bottom-28 -left-24 h-80 w-80 rounded-full bg-[#c46b7a]/20 blur-3xl" />
-      <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 relative pt-8 sm:pt-12 lg:pt-16 pb-24 sm:pb-32 lg:pb-40">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 relative pt-10 sm:pt-14 lg:pt-20 pb-20 sm:pb-28 lg:pb-36">
         <button
-          class="inline-flex items-center gap-2 rounded-full border border-white border-opacity-20 bg-white bg-opacity-10 px-4 py-2 text-sm font-medium text-white text-opacity-90 transition hover:bg-opacity-20 mt-4 sm:mt-6"
+          class="inline-flex items-center gap-2 rounded-full border border-white border-opacity-20 bg-white bg-opacity-10 px-4 py-2 text-sm font-medium text-white text-opacity-90 transition hover:bg-opacity-20"
           @click="$router.back()"
         >
           <svg
@@ -66,7 +66,7 @@
       </div>
     </div>
 
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl mt-8 sm:mt-10 lg:mt-12 relative z-10 pb-64 sm:pb-72 lg:pb-[28rem] xl:pb-[32rem] mb-6">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl mt-8 sm:mt-10 lg:mt-12 relative z-10 pb-12 sm:pb-16 lg:pb-20 mb-6">
       <div
         v-if="loading"
         class="text-center py-20 bg-white rounded-lg shadow-lg"
@@ -107,12 +107,12 @@
 
       <div
         v-else
-        class="grid grid-cols-1 lg:grid-cols-3 gap-6"
+        class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 xl:gap-10"
       >
         <!-- Left Sidebar -->
         <div class="lg:col-span-1">
           <!-- Profile Card -->
-          <div class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-xl border border-[#eadfd7] overflow-hidden sticky top-6 transition-transform duration-300 hover:-translate-y-1">
+          <div class="bg-white bg-opacity-90 backdrop-blur rounded-2xl shadow-xl border border-[#eadfd7] overflow-hidden sticky top-24 transition-transform duration-300 hover:-translate-y-1">
             <div class="p-6 text-center">
               <p class="text-[11px] uppercase tracking-[0.4em] text-[#7a1f2b] mb-4">
                 Profile Snapshot
@@ -191,6 +191,19 @@
                   </svg>
                   Level {{ photographer.achievements.level }} • {{ photographer.achievements.total_points }} pts
                 </div>
+              </div>
+
+              <div
+                v-if="photographer.growth_badges && photographer.growth_badges.length"
+                class="mb-3 flex flex-wrap items-center justify-center gap-2"
+              >
+                <span
+                  v-for="badge in photographer.growth_badges"
+                  :key="`growth-badge-${badge.milestone}`"
+                  class="inline-flex items-center gap-1 rounded-full bg-amber-100 text-amber-800 px-2.5 py-1 text-xs font-semibold"
+                >
+                  🏅 {{ badge.badge_name }}
+                </span>
               </div>
               
               <div class="flex items-center justify-center gap-2 mb-3">
@@ -295,6 +308,32 @@
                     loading="lazy"
                   >
                 </a>
+              </div>
+
+              <div class="mb-4">
+                <p class="text-xs font-semibold text-gray-600 mb-2">Share Profile</p>
+                <div class="flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    class="min-h-[36px] px-3 py-1.5 rounded-full bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700"
+                    @click="shareProfile('facebook')"
+                  >Facebook</button>
+                  <button
+                    type="button"
+                    class="min-h-[36px] px-3 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600"
+                    @click="shareProfile('whatsapp')"
+                  >WhatsApp</button>
+                  <button
+                    type="button"
+                    class="min-h-[36px] px-3 py-1.5 rounded-full bg-blue-700 text-white text-xs font-semibold hover:bg-blue-800"
+                    @click="shareProfile('linkedin')"
+                  >LinkedIn</button>
+                  <button
+                    type="button"
+                    class="min-h-[36px] px-3 py-1.5 rounded-full border border-gray-300 text-gray-700 text-xs font-semibold hover:bg-gray-100"
+                    @click="shareProfile('copy')"
+                  >Copy Link</button>
+                </div>
               </div>
 
               <!-- Starting Price -->
@@ -1119,10 +1158,76 @@
                     </div>
                   </div>
                 </div>
+
+                <div
+                  v-if="certifications && certifications.length > 0"
+                  class="mb-8"
+                >
+                  <h3 class="text-xl font-bold text-gray-900 mb-4">
+                    Verified Certifications
+                  </h3>
+                  <div class="space-y-4">
+                    <div
+                      v-for="certificate in certifications"
+                      :key="certificate.id"
+                      class="border-2 border-emerald-100 rounded-lg p-5 bg-emerald-50/40"
+                    >
+                      <div class="flex items-start gap-4">
+                        <img
+                          v-if="certificate.preview_url"
+                          :src="certificate.preview_url"
+                          :alt="certificate.title"
+                          class="w-16 h-16 rounded object-cover border border-emerald-200"
+                        >
+                        <div
+                          v-else
+                          class="w-16 h-16 rounded bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-700 font-bold"
+                        >
+                          ✓
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                          <div class="flex flex-wrap items-start justify-between gap-2 mb-2">
+                            <div>
+                              <h4 class="font-bold text-lg text-gray-900">
+                                {{ certificate.title }}
+                              </h4>
+                              <p
+                                v-if="certificate.issuing_event"
+                                class="text-sm text-gray-600"
+                              >
+                                {{ certificate.issuing_event }}
+                              </p>
+                            </div>
+                            <span
+                              v-if="certificate.year"
+                              class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-semibold"
+                            >
+                              {{ certificate.year }}
+                            </span>
+                          </div>
+
+                          <div class="flex items-center gap-3">
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800">
+                              {{ certificate.verification_badge ? 'Verified' : 'Issued' }}
+                            </span>
+                            <a
+                              :href="certificate.verification_url"
+                              target="_blank"
+                              class="text-emerald-700 hover:underline text-xs font-medium"
+                            >
+                              Verify Certificate
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 
                 <!-- Empty State for Awards -->
                 <div
-                  v-if="(!awards || awards.length === 0) && (!competitionWins || competitionWins.length === 0)"
+                  v-if="(!awards || awards.length === 0) && (!competitionWins || competitionWins.length === 0) && (!certifications || certifications.length === 0)"
                   class="text-center py-12"
                 >
                   <svg
@@ -1212,7 +1317,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../api';
 import BuyMeCoffeeButton from './BuyMeCoffeeButton.vue';
@@ -1229,6 +1334,7 @@ const albums = ref([]);
 const packages = ref([]);
 const reviews = ref([]);
 const awards = ref([]);
+const certifications = ref([]);
 const competitionWins = ref([]);
 const activeTab = ref('portfolio');
 const loading = ref(true);
@@ -1277,6 +1383,57 @@ const memberSinceYear = computed(() => {
   return date.getFullYear()
 })
 
+const getProfileShareUrl = () => {
+  const base = window.location.href.split('?')[0]
+  const refCode = currentUser.value?.referral_code
+    || currentUser.value?.username
+    || null
+
+  if (!refCode) return base
+  return `${base}?ref=${encodeURIComponent(refCode)}`
+}
+
+const trackShareLog = async (platform) => {
+  try {
+    await api.post('/growth/share-log', {
+      entity_type: 'profile',
+      entity_id: photographer.value?.id || null,
+      platform,
+    })
+  } catch (error) {
+    console.warn('Share log failed:', error)
+  }
+}
+
+const shareProfile = async (platform) => {
+  const shareUrl = getProfileShareUrl()
+  const profileName = photographer.value?.user?.name || 'Photographer'
+
+  if (platform === 'facebook') {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank')
+    await trackShareLog('facebook')
+    return
+  }
+
+  if (platform === 'whatsapp') {
+    const text = encodeURIComponent(`Check out ${profileName} on Photographer SB: ${shareUrl}`)
+    window.open(`https://wa.me/?text=${text}`, '_blank')
+    await trackShareLog('whatsapp')
+    return
+  }
+
+  if (platform === 'linkedin') {
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank')
+    await trackShareLog('linkedin')
+    return
+  }
+
+  if (platform === 'copy') {
+    await navigator.clipboard.writeText(shareUrl)
+    await trackShareLog('copy')
+  }
+}
+
 
 const profileImage = computed(() => {
   const raw = photographer.value?.profile_picture
@@ -1301,7 +1458,11 @@ const isSelfBooking = computed(() => {
 
 const fetchPhotographer = async () => {
   try {
-    const { data } = await api.get(`/photographers/${route.params.slug}`);
+    const handle = route.params.username || route.params.slug || '';
+    const endpoint = route.params.username
+      ? `/photographers/@${handle}`
+      : `/photographers/${handle}`;
+    const { data } = await api.get(endpoint);
     
     if (data.status === 'success') {
       photographer.value = data.data;
@@ -1310,6 +1471,7 @@ const fetchPhotographer = async () => {
       packages.value = data.data.packages || [];
       reviews.value = data.data.reviews || [];
       awards.value = data.data.awards || [];
+      certifications.value = data.data.certifications || [];
       competitionWins.value = data.data.competition_wins || [];
 
       loadFavoriteStatus();
@@ -1415,6 +1577,11 @@ onMounted(() => {
     }
   }
   trackShareVisit();
+  fetchPhotographer();
+});
+
+watch(() => route.params.username || route.params.slug, () => {
+  loading.value = true;
   fetchPhotographer();
 });
 </script>
