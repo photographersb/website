@@ -46,6 +46,7 @@
             <button class="rounded-lg bg-gray-900 text-white text-sm px-4 py-2 font-medium hover:bg-black" @click="createDiscussion">
               Start Discussion
             </button>
+            <p v-if="feedbackMessage" class="text-xs text-gray-600">{{ feedbackMessage }}</p>
           </div>
 
           <div class="space-y-3">
@@ -67,6 +68,9 @@
                 <button @click="shareDiscussion(item.id)" class="hover:text-rose-700">🔗 Share</button>
               </div>
             </div>
+            <p v-if="!hubLoading && discussions.length === 0" class="text-sm text-gray-500">
+              No discussions yet. Be the first to start one.
+            </p>
           </div>
         </article>
 
@@ -81,6 +85,9 @@
                 <span class="text-gray-700">#{{ member.rank }} {{ member.name }}</span>
                 <span class="text-gray-500">{{ member.score }} pts</span>
               </div>
+              <p v-if="!hubLoading && leaderboard.length === 0" class="text-xs text-gray-500">
+                Leaderboard will appear when community activity starts.
+              </p>
             </div>
           </div>
 
@@ -92,6 +99,9 @@
                 <p class="text-xs text-gray-500">{{ mentor.years_experience }} years • {{ mentor.availability_status }}</p>
                 <button class="mt-2 text-xs text-rose-700 hover:underline" @click="requestMentorship(mentor.user_id)">Request Mentorship</button>
               </div>
+              <p v-if="!hubLoading && mentors.length === 0" class="text-xs text-gray-500">
+                No mentors are active right now. Please check again later.
+              </p>
             </div>
           </div>
         </aside>
@@ -126,6 +136,9 @@
               </div>
               <button class="text-xs px-3 py-1 rounded bg-rose-600 text-white hover:bg-rose-700" @click="joinGroup(group.id)">Join</button>
             </div>
+            <p v-if="!hubLoading && groups.length === 0" class="text-sm text-gray-500">
+              No groups available yet.
+            </p>
           </div>
         </article>
 
@@ -171,6 +184,8 @@ const mentors = ref([])
 const leaderboard = ref([])
 const searchQuery = ref('')
 const searchResults = ref(null)
+const hubLoading = ref(false)
+const feedbackMessage = ref('')
 
 const discussionForm = ref({
   title: '',
@@ -187,12 +202,51 @@ const groupForm = ref({
 })
 
 const loadHub = async () => {
-  const { data } = await api.get('/community/hub')
-  const payload = data?.data || {}
-  discussions.value = payload.featured_posts || []
-  groups.value = payload.local_groups || []
-  mentors.value = payload.mentorship_programs || []
-  leaderboard.value = payload.top_contributors || []
+  hubLoading.value = true
+  try {
+    const { data } = await api.get('/community/hub')
+    const payload = data?.data || {}
+    discussions.value = payload.featured_posts || []
+    groups.value = payload.local_groups || []
+    mentors.value = payload.mentorship_programs || []
+    leaderboard.value = payload.top_contributors || []
+
+    // Fallback fetches keep the page useful even when hub sections are sparse.
+    const fallbackRequests = []
+
+    if (discussions.value.length === 0) {
+      fallbackRequests.push(
+        api.get('/community/discussions', { params: { per_page: 6 } })
+          .then(({ data: fallbackData }) => {
+            discussions.value = fallbackData?.data || []
+          })
+      )
+    }
+
+    if (mentors.value.length === 0) {
+      fallbackRequests.push(
+        api.get('/community/mentors', { params: { per_page: 6 } })
+          .then(({ data: fallbackData }) => {
+            mentors.value = fallbackData?.data || []
+          })
+      )
+    }
+
+    if (leaderboard.value.length === 0) {
+      fallbackRequests.push(
+        api.get('/community/leaderboard')
+          .then(({ data: fallbackData }) => {
+            leaderboard.value = fallbackData?.data || []
+          })
+      )
+    }
+
+    if (fallbackRequests.length > 0) {
+      await Promise.allSettled(fallbackRequests)
+    }
+  } finally {
+    hubLoading.value = false
+  }
 }
 
 const runSearch = async () => {
@@ -201,34 +255,68 @@ const runSearch = async () => {
     return
   }
 
-  const { data } = await api.get('/community/search', { params: { q: searchQuery.value.trim() } })
-  searchResults.value = data?.data || null
+  try {
+    const { data } = await api.get('/community/search', { params: { q: searchQuery.value.trim() } })
+    searchResults.value = data?.data || null
+  } catch (error) {
+    feedbackMessage.value = error?.response?.data?.message || 'Search failed. Please try again.'
+  }
+}
+
+const handleActionError = (error, fallbackMessage) => {
+  const status = error?.response?.status
+  if (status === 401 || status === 403) {
+    feedbackMessage.value = 'Please sign in to use community actions.'
+    router.push('/auth')
+    return
+  }
+
+  feedbackMessage.value = error?.response?.data?.message || fallbackMessage
 }
 
 const createDiscussion = async () => {
+  if (!discussionForm.value.title?.trim() || !discussionForm.value.content?.trim()) {
+    feedbackMessage.value = 'Title and content are required to start a discussion.'
+    return
+  }
+
   const tags = discussionForm.value.tags
     .split(',')
     .map(tag => tag.trim())
     .filter(Boolean)
 
-  await api.post('/community/discussions', {
-    title: discussionForm.value.title,
-    content: discussionForm.value.content,
-    category: discussionForm.value.category,
-    tags,
-  })
+  try {
+    await api.post('/community/discussions', {
+      title: discussionForm.value.title,
+      content: discussionForm.value.content,
+      category: discussionForm.value.category,
+      tags,
+    })
 
-  discussionForm.value = { title: '', content: '', category: 'photography-techniques', tags: '' }
-  await loadHub()
+    discussionForm.value = { title: '', content: '', category: 'photography-techniques', tags: '' }
+    feedbackMessage.value = 'Discussion posted successfully.'
+    await loadHub()
+  } catch (error) {
+    handleActionError(error, 'Unable to post discussion right now.')
+  }
 }
 
 const likeDiscussion = async (discussionId) => {
-  await api.post(`/community/discussions/${discussionId}/like`)
-  await loadHub()
+  try {
+    await api.post(`/community/discussions/${discussionId}/like`)
+    await loadHub()
+  } catch (error) {
+    handleActionError(error, 'Unable to like discussion right now.')
+  }
 }
 
 const shareDiscussion = async (discussionId) => {
-  await api.post(`/community/discussions/${discussionId}/share`)
+  try {
+    await api.post(`/community/discussions/${discussionId}/share`)
+    feedbackMessage.value = 'Discussion share tracked.'
+  } catch (error) {
+    handleActionError(error, 'Unable to share discussion right now.')
+  }
 }
 
 const openDiscussion = (discussionId) => {
@@ -236,21 +324,41 @@ const openDiscussion = (discussionId) => {
 }
 
 const createGroup = async () => {
-  await api.post('/community/groups', groupForm.value)
-  groupForm.value = { name: '', description: '', type: 'interest', cover_image_url: '' }
-  await loadHub()
+  if (!groupForm.value.name?.trim() || !groupForm.value.description?.trim()) {
+    feedbackMessage.value = 'Group name and description are required.'
+    return
+  }
+
+  try {
+    await api.post('/community/groups', groupForm.value)
+    groupForm.value = { name: '', description: '', type: 'interest', cover_image_url: '' }
+    feedbackMessage.value = 'Group created successfully.'
+    await loadHub()
+  } catch (error) {
+    handleActionError(error, 'Unable to create group right now.')
+  }
 }
 
 const joinGroup = async (groupId) => {
-  await api.post(`/community/groups/${groupId}/join`)
-  await loadHub()
+  try {
+    await api.post(`/community/groups/${groupId}/join`)
+    feedbackMessage.value = 'Joined group successfully.'
+    await loadHub()
+  } catch (error) {
+    handleActionError(error, 'Unable to join group right now.')
+  }
 }
 
 const requestMentorship = async (mentorUserId) => {
-  await api.post(`/community/mentors/${mentorUserId}/request`, {
-    message: 'Hello, I would like mentorship guidance to improve my photography career.',
-    preferred_session_type: 'portfolio_review',
-  })
+  try {
+    await api.post(`/community/mentors/${mentorUserId}/request`, {
+      message: 'Hello, I would like mentorship guidance to improve my photography career.',
+      preferred_session_type: 'portfolio_review',
+    })
+    feedbackMessage.value = 'Mentorship request sent successfully.'
+  } catch (error) {
+    handleActionError(error, 'Unable to send mentorship request right now.')
+  }
 }
 
 onMounted(async () => {
